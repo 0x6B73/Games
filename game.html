@@ -105,7 +105,7 @@
           <div class="icon">📘</div>
           <div>
             <div class="title">Metal Tiers</div>
-            <div class="sub">Bronze(1) → Iron(10) → Steel(15) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
+            <div class="sub">Bronze(1) → Iron(5) → Steel(10) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@
   function chord(freqs=[440,660], dur=0.12, type='triangle', gain=0.03){ freqs.forEach((f,i)=> tone(f, dur*(0.9-i*0.1), type, gain)); }
   const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
 
-  const XP_RATE = 0.2; // slower XP
+  const XP_RATE = 0.7; // slower XP
 
   const TREES = [
     {name:'Normal', level:1,  tapMult:1,    autoMult:1   },
@@ -189,8 +189,8 @@
 
   const TAP_TIERS = [
     {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.3},
-    {name:'Iron',    req:10, inc:2,   base:2_500,     scale:1.5},
-    {name:'Steel',   req:15, inc:5,   base:15_000,    scale:1.7},
+    {name:'Iron',    req:5, inc:2,   base:2_500,     scale:1.5},
+    {name:'Steel',   req:10, inc:5,   base:15_000,    scale:1.7},
     {name:'Mithril', req:20, inc:12,  base:75_000,    scale:2.0},
     {name:'Adamant', req:30, inc:25,  base:350_000,   scale:2.05},
     {name:'Rune',    req:40, inc:60,  base:1_800_000, scale:2.1},
