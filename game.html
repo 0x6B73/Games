@@ -64,6 +64,8 @@
         <div class="pill">🏆 <b id="prestige">0</b><span class="sub" id="prestigeMult"></span></div>
         <div class="controls" style="margin-left:auto">
           <button id="saveBtn" class="small">💾 Save</button>
+          <button id="debugBtn" class="small" title="Add 10k logs & XP">🐞 +10k</button>
+
           <!--<button id="settingsBtn" class="small">⚙️</button>-->
         </div>
       </div>
@@ -323,6 +325,17 @@
   $('#soundBtn').addEventListener('click', ()=>{ state.sound = !state.sound; $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off'; if(state.sound) ensureAudio(); save(false); });
   $('#musicBtn').addEventListener('click', async ()=>{ state.music = !state.music; updateMusicUI(); save(false); if(state.music){ await tryStartMusic(); } else { els.bgm.pause(); } });
 
+  const dbgBtn = document.getElementById('debugBtn');
+if (dbgBtn) {
+  dbgBtn.addEventListener('click', () => {
+    state.wood += 10_000;
+    state.xp   += 10_000;        // grant exactly +10k XP (not scaled)
+    toast('+10k logs & +10k XP');
+    handleLevelUps();
+    updateUI();
+  });
+}
+  
   setInterval(()=> save(false), 30_000);
 
   function init(){ buildHelpers(); buildTreeGrid(); setTree(0); updateMusicUI(); load(); updateUI(); els.bgm.volume = clamp(state.musicVol,0,1); state.lastTick = Date.now(); requestAnimationFrame(tick); tryStartMusic(); }
