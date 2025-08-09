@@ -188,22 +188,22 @@
   function xpForLevel(n){ return Math.floor(50 * Math.pow(n, 1.6)); }
 
   const TAP_TIERS = [
-    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.3},
-    {name:'Iron',    req:5, inc:1.2,   base:300,     scale:1.5},
-    {name:'Steel',   req:10, inc:1.5,   base:5_000,    scale:1.7},
-    {name:'Mithril', req:20, inc:2,  base:20_000,    scale:2.0},
-    {name:'Adamant', req:30, inc:5,  base:100_000,   scale:2.05},
-    {name:'Rune',    req:40, inc:10,  base:1_000_000, scale:2.1},
-    {name:'Dragon',  req:60, inc:50, base:5_000_000, scale:2.15},
+    {name:'Bronze',  req:1,  inc:1,   base:10,        scale:1.3},
+    {name:'Iron',    req:5, inc:1.1,   base:100,     scale:1.5},
+    {name:'Steel',   req:10, inc:1.5,   base:1_000,    scale:1.7},
+    {name:'Mithril', req:20, inc:2,  base:10_000,    scale:2.0},
+    {name:'Adamant', req:30, inc:5,  base:50_000,   scale:2.05},
+    {name:'Rune',    req:40, inc:10,  base:100_000, scale:2.1},
+    {name:'Dragon',  req:60, inc:50, base:1_000_000, scale:2.15},
   ];
 
   const HELPERS = [
     {key:'child',   icon:'👶', name:'Small Child',  baseCps:0.2,  baseCost:50},
-    {key:'Elder',   icon:'👴', name:'Elder',        baseCps:2,   baseCost:1_000},
-    {key:'man',     icon:'👨', name:'Man',          baseCps:20,     baseCost:10_000},
-    {key:'town',    icon:'🏙️', name:'Town',         baseCps:100,    baseCost:300_000},
-    {key:'country', icon:'🗺️', name:'Country',      baseCps:500,    baseCost:6_000_000},
-    {key:'world',   icon:'🌍', name:'World',        baseCps:2500,   baseCost:50_000_000},
+    {key:'Elder',   icon:'👴', name:'Elder',        baseCps:2,   baseCost:500},
+    {key:'man',     icon:'👨', name:'Man',          baseCps:20,     baseCost:1_000},
+    {key:'town',    icon:'🏙️', name:'Town',         baseCps:100,    baseCost:30_000},
+    {key:'country', icon:'🗺️', name:'Country',      baseCps:500,    baseCost:500_000},
+    {key:'world',   icon:'🌍', name:'World',        baseCps:2500,   baseCost:1_000_000},
   ];
   const HELPER_SCALE = 1.1;
 
