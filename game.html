@@ -256,13 +256,25 @@
 }
   function tapCost(){ const t = TAP_TIERS[state.tapTier]; return Math.ceil(t.base * Math.pow(t.scale, state.tapWithin)); }
   function buyTap(){
-    // finished current metal; advance if next is allowed
-    const nextIdx = state.tapTier + 1;
-    if (state.tapTier < TAP_TIERS.length - 1 && state.level >= TAP_TIERS[nextIdx].req) {
-      state.tapTier = nextIdx;
-      state.tapWithin = 0;
-      try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+    const t = activeTier();
+    const cost = tapCost();
+    if (state.wood < cost) { sfx.nope(); return buzz(3); }
+    state.wood -= cost;
+  
+    const treeMult = TREES[state.currentTree].tapMult;
+    state.tapPower += t.inc * treeMult * prestigeMultiplier();
+    state.tapWithin++;
+  
+    // Only advance metal if you've finished 10/10 AND meet the next tier's level requirement
+    if (state.tapWithin >= 10) {
+      const nextIdx = state.tapTier + 1;
+      if (state.tapTier < TAP_TIERS.length - 1 && state.level >= TAP_TIERS[nextIdx].req) {
+        state.tapTier = nextIdx;
+        state.tapWithin = 0;
+        try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+      }
     }
+    sfx.buy(); buzz(10); updateUI();
 }
 
   function buildHelpers(){ els.helpersGrid.innerHTML=''; HELPERS.forEach(h=>{ const p=state.producers[h.key]; const card=document.createElement('div'); card.className='card'; const icon=document.createElement('div'); icon.className='icon'; icon.textContent=h.icon; card.appendChild(icon); const box=document.createElement('div'); const title=document.createElement('div'); title.className='title'; title.textContent=h.name; box.appendChild(title); const sub=document.createElement('div'); sub.className='sub'; sub.innerHTML=`Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">0</span>`; box.appendChild(sub); card.appendChild(box); const btn=document.createElement('button'); btn.className='btn'; btn.id=`buy-${h.key}`; btn.innerHTML=`Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`; btn.addEventListener('click', ()=> buyHelper(h.key)); card.appendChild(btn); els.helpersGrid.appendChild(card); }); }
