@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>Tree Chopper Idle — OSRS Trees v9</title>
+  <meta name="theme-color" content="#0e6b2f" />
+  <style>
+    :root{ --bg:#0f172a; --panel:#111827; --panel-2:#0b1223; --text:#e5e7eb; --muted:#9ca3af; --accent:#22c55e; --shadow:0 10px 20px rgba(0,0,0,.35); --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:radial-gradient(1200px 800px at 50% -10%,#052e16 0%,var(--bg) 45%);color:var(--text)}
+    .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100svh;padding-top:var(--safe-top);padding-bottom:calc(var(--safe-bottom) + 6px)}
+    header{position:sticky;top:0;z-index:5;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(17,24,39,.9),rgba(17,24,39,.65));border-bottom:1px solid #1f2937;padding:.6rem .9rem;padding-top:calc(.6rem + var(--safe-top))}
+    .stats{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
+    .pill{display:flex;align-items:center;gap:.35rem;padding:.45rem .7rem;border-radius:999px;background:#0b1223;box-shadow:var(--shadow)}.pill b{font-weight:700}
+    .main{display:grid;place-items:center;padding:1rem;position:relative}
+    .tree-btn{width:clamp(240px, 86svw, 520px);aspect-ratio:1/1;border-radius:28px;border:none;outline:none;-webkit-tap-highlight-color:transparent;background:#071a11;box-shadow:0 20px 40px rgba(0,0,0,.45),inset 0 6px 14px rgba(255,255,255,.04);color:#fff;font-size:clamp(42px, 10svw, 96px);line-height:1;display:grid;place-items:center;cursor:pointer;position:relative;touch-action:manipulation;overflow:hidden}
+    .tree-btn:active{transform:translateY(1px) scale(.997)}
+    .tree-img{width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 10px 12px rgba(0,0,0,.45))}
+    .fallback-emoji{font-size:clamp(72px,18svw,140px)}
+    .tap-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);font-size:clamp(.85rem, 2.6svw, 1rem);color:var(--muted);text-align:center}
+    .progress{height:10px;background:#0b1223;border-radius:999px;overflow:hidden;border:1px solid #1f2937}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16)}
+    #particles{position:fixed;inset:0;pointer-events:none;z-index:50}
+    .floating{position:absolute;pointer-events:none;font-weight:800;color:#4ade80;text-shadow:0 2px 6px rgba(0,0,0,.6);animation:floatUp .9s ease-out forwards}
+    @keyframes floatUp{from{opacity:1;transform:translate(-50%,0)} to{opacity:0;transform:translate(-50%,-60px)}}
+    .tabs{display:flex;gap:.35rem;padding:.4rem;background:#0b1223;border-top:1px solid #1f2937;position:sticky;bottom:0;z-index:7}
+    .tab{flex:1;text-align:center;padding:.55rem .6rem;border-radius:12px;border:1px solid #1f2937;background:#0c1326;color:var(--text);font-weight:700}
+    .tab.active{background:linear-gradient(180deg,#0f1a33,#081126);border-color:#22314a}
+    .panel{background:linear-gradient(180deg,rgba(11,18,35,1),rgba(5,10,22,1));border-top:1px solid #1f2937;padding:.6rem;display:none;gap:.5rem}
+    .panel.active{display:grid}
+    .row{display:flex;gap:.5rem}
+    .card{flex:1;background:#0c1326;border:1px solid #1e293b;border-radius:16px;padding:.75rem;display:flex;align-items:center;gap:.75rem;box-shadow:var(--shadow)}
+    .icon{font-size:1.4rem}
+    .title{font-weight:700}
+    .sub{font-size:.85rem;color:var(--muted)}
+    .btn{margin-left:auto;border:none;border-radius:12px;padding:.6rem .9rem;font-weight:700;background:#22c55e;color:#062814;cursor:pointer;box-shadow:var(--shadow)}
+    .btn:disabled{filter:grayscale(1) brightness(.7);cursor:not-allowed}
+    .controls{display:flex;gap:.5rem;flex-wrap:wrap}
+    .small{font-size:.9rem;padding:.45rem .6rem;background:#0b1223;color:#var(--text);border:1px solid #1f2937;border-radius:10px}
+    .section-title{font-weight:800;letter-spacing:.02em;color:#e2e8f0;margin:.2rem .4rem}
+    .section-hint{color:#9ca3af;font-size:.9rem;margin:0 .4rem .4rem}
+    .toast{position:fixed;left:50%;bottom:calc(88px + var(--safe-bottom));transform:translateX(-50%);background:#0b1223;color:#fff;border:1px solid #1f2937;border-radius:12px;padding:.6rem .8rem;box-shadow:var(--shadow);display:none}
+    .grid{display:grid;gap:.5rem}
+    .two{grid-template-columns:1fr 1fr}
+    .three{grid-template-columns:repeat(3,1fr)}
+    .tree-grid{grid-template-columns:repeat(3,1fr)}
+    .tree-card{background:#0c1326;border:1px solid #1e293b;border-radius:16px;padding:.5rem;display:flex;flex-direction:column;align-items:center;gap:.4rem;text-align:center}
+    .tree-card img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;background:#06101a}
+    .tree-card .lock{font-size:.8rem;color:#9ca3af}
+    .select-btn{width:100%;margin-top:.25rem}
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header>
+      <div class="stats">
+        <div class="pill">🌲 <b id="wood">0</b></div>
+        <div class="pill">⛏️ <b id="cps">0</b><span class="sub">/s</span></div>
+        <div class="pill">👆 <b id="tap">1</b></div>
+        <div class="pill">⭐ <b id="level">1</b></div>
+        <div class="pill">📈 <b id="xp">0</b>/<b id="xpNext">50</b></div>
+        <div class="pill">🏆 <b id="prestige">0</b><span class="sub" id="prestigeMult"></span></div>
+        <div class="controls" style="margin-left:auto">
+          <button id="saveBtn" class="small">💾 Save</button>
+          <button id="settingsBtn" class="small">⚙️</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main">
+      <button class="tree-btn" id="treeBtn" aria-label="Chop the tree">
+        <img id="treeImg" class="tree-img" alt="Tree" />
+        <div id="treeFallback" class="fallback-emoji" aria-hidden="true">🌳</div>
+        <div id="treeLabel" class="tap-hint"><span id="treeName">Normal</span> • Tap to chop</div>
+        <div id="progContainer" class="progress" aria-hidden="true" style="position:absolute;left:10%;right:10%;bottom:8px">
+          <div class="bar" id="progBar"></div>
+        </div>
+      </button>
+      <div id="particles"></div>
+
+      <audio id="bgm" src="https://oldschool.runescape.wiki/images/Harmony.ogg?3c785" preload="auto" loop playsinline></audio>
+      <audio id="wcLevelUp" src="https://oldschool.runescape.wiki/images/Woodcutting_Level_Up%21.ogg?bf94e" preload="auto"></audio>
+    </main>
+
+    <section class="panel active" id="shopPanel" aria-label="Shop">
+      <div class="section-title">Sharpening — Manual Taps</div>
+      <div class="section-hint">Each metal has <b>10 upgrades</b>. Next metal unlocks only after level requirement AND 10/10 of the previous one.</div>
+      <div class="grid two">
+        <div class="card" id="tapTierCard">
+          <div class="icon">🪓</div>
+          <div>
+            <div class="title">Sharpen Axe <span id="tapTierName">Bronze</span> <span class="sub">(<span id="tapTierProg">0</span>/10)</span></div>
+            <div class="sub">+<span id="tapInc">1</span> per tap • Next: <span id="nextTierInfo">Lv 10 & 10/10</span></div>
+          </div>
+          <button class="btn" id="buyTap">Buy — <span id="tapCost">10</span></button>
+        </div>
+        <div class="card">
+          <div class="icon">📘</div>
+          <div>
+            <div class="title">Metal Tiers</div>
+            <div class="sub">Bronze(1) → Iron(10) → Steel(15) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top:.8rem">Automated Choppers</div>
+      <div class="section-hint">Costs scale fast. Top tier is ~100,000,000 wood.</div>
+      <div class="grid three" id="helpersGrid"></div>
+
+      <div class="controls" style="justify-content:space-between;padding:.25rem .25rem .1rem;margin-top:.5rem">
+        <div class="sub">Autosaves every 30s • Offline progress enabled</div>
+        <div>
+          <button id="muteBtn" class="small">🔊 Haptics</button>
+          <button id="soundBtn" class="small">🔈 Sound</button>
+          <button id="musicBtn" class="small">🎵 Music On</button>
+          <button id="resetBtn" class="small" style="background:#1a0b0b;color:#fecaca;border-color:#7f1d1d">♻️ Reset</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="treesPanel" aria-label="Trees">
+      <div class="grid tree-grid" id="treeGrid"></div>
+    </section>
+
+    <section class="panel" id="prestigePanel" aria-label="Prestige">
+      <div class="prestige-box" style="text-align:center;padding:1rem;border:1px dashed #334155;border-radius:16px;background:#0a1224">
+        <h3 style="margin:.2rem 0">Prestige: Forestry Rank</h3>
+        <p class="sub" id="prestigeInfo">Prestige unlocks at <b>Level 99</b>. Reset for a permanent multiplier.</p>
+        <p><b>Current Multiplier:</b> <span id="prestigeMult2">x1.00</span></p>
+        <button class="btn" id="prestigeBtn" disabled>Prestige for <span id="prestigeGain">0</span> point(s)</button>
+        <div class="sub" style="margin-top:.4rem">Prestige resets wood, upgrades, and level, and grants +10% boost per point.</div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tab="shopPanel">🛒 Shop</button>
+      <button class="tab" data-tab="treesPanel">🌳 Trees</button>
+      <button class="tab" data-tab="prestigePanel">🏆 Prestige</button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast">Saved!</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const TREE_ASSETS = {
+    Normal:  'https://oldschool.runescape.wiki/images/Tree.png?dfbdb',
+    Oak:     'https://oldschool.runescape.wiki/images/Oak_tree.png?240a0',
+    Willow:  'https://oldschool.runescape.wiki/images/Willow_tree.png?42d4f',
+    Maple:   'https://oldschool.runescape.wiki/images/Maple_tree.png?1bf0b',
+    Yew:     'https://oldschool.runescape.wiki/images/Yew_tree.png?b2a07',
+    Magic:   'https://oldschool.runescape.wiki/images/Magic_tree.png?699f0',
+    Redwood: 'https://oldschool.runescape.wiki/images/Redwood_tree.png?9c38f'
+  };
+
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+  const clamp = (n,min,max)=> Math.max(min, Math.min(max,n));
+  const canVibrate = typeof navigator !== 'undefined' && !!navigator.vibrate;
+  function buzz(ms=8){ if(!state.haptics) return; if(canVibrate) navigator.vibrate(ms); }
+  function fmt(n){ if(n < 10_000) return Math.floor(n).toString(); if(n < 100_000) return (Math.round(n/100)/10).toFixed(1)+'k'; if(n < 1_000_000) return Math.round(n/1000)+'k'; const m = n/1_000_000; if(m < 10) return m.toFixed(2)+'M'; return m.toFixed(1)+'M'; }
+
+  let AC = null; function ensureAudio(){ if(!state.sound) return; if(AC) return; try{ AC = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ AC = null; } }
+  function at(){ return AC ? AC.currentTime : 0; }
+  function tone(freq=440, dur=0.08, type='square', gain=0.04){ if(!state.sound || !AC) return; const t0 = at(); const osc = AC.createOscillator(); osc.type = type; osc.frequency.value = freq; const g = AC.createGain(); g.gain.setValueAtTime(gain, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0+dur); osc.connect(g).connect(AC.destination); osc.start(t0); osc.stop(t0+dur); }
+  function chord(freqs=[440,660], dur=0.12, type='triangle', gain=0.03){ freqs.forEach((f,i)=> tone(f, dur*(0.9-i*0.1), type, gain)); }
+  const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
+
+  const XP_RATE = 0.2; // 5x slower XP
+
+  const TREES = [
+    {name:'Normal', level:1,  tapMult:1,    autoMult:1   },
+    {name:'Oak',    level:15, tapMult:1.5,  autoMult:1.3 },
+    {name:'Willow', level:30, tapMult:3,    autoMult:1.8 },
+    {name:'Maple',  level:45, tapMult:6,    autoMult:3   },
+    {name:'Yew',    level:60, tapMult:10,   autoMult:5   },
+    {name:'Magic',  level:75, tapMult:16,   autoMult:8   },
+    {name:'Redwood',level:90, tapMult:30,   autoMult:12  },
+  ];
+  function xpForLevel(n){ return Math.floor(50 * Math.pow(n, 1.6)); }
+
+  const TAP_TIERS = [
+    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.7},
+    {name:'Iron',    req:10, inc:2,   base:2_500,     scale:1.8},
+    {name:'Steel',   req:15, inc:5,   base:15_000,    scale:1.9},
+    {name:'Mithril', req:20, inc:12,  base:75_000,    scale:2.0},
+    {name:'Adamant', req:30, inc:25,  base:350_000,   scale:2.05},
+    {name:'Rune',    req:40, inc:60,  base:1_800_000, scale:2.1},
+    {name:'Dragon',  req:60, inc:150, base:9_000_000, scale:2.15},
+  ];
+
+  const HELPERS = [
+    {key:'child',   icon:'👶', name:'Small Child',  baseCps:0.02,  baseCost:100},
+    {key:'man',     icon:'👨', name:'Man',          baseCps:0.2,   baseCost:1_000},
+    {key:'village', icon:'🏘️', name:'Small Village',baseCps:2,     baseCost:25_000},
+    {key:'town',    icon:'🏙️', name:'Town',         baseCps:10,    baseCost:600_000},
+    {key:'country', icon:'🗺️', name:'Country',      baseCps:50,    baseCost:12_000_000},
+    {key:'world',   icon:'🌍', name:'World',        baseCps:250,   baseCost:100_000_000},
+  ];
+  const HELPER_SCALE = 1.25;
+
+  const state = {
+    wood: 0,
+    tapPower: 1, tapTier: 0, tapWithin: 0,
+    lastTick: Date.now(),
+    haptics: true, sound: true, music: true, musicVol: 0.35,
+    xp: 0, level: 1, xpNext: 50, currentTree: 0, prestigePoints: 0,
+    passivePool: 0,
+    producers: Object.fromEntries(HELPERS.map(h=>[h.key,{qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}]))
+  };
+
+  const els = {
+    wood: $('#wood'), cps: $('#cps'), tap: $('#tap'), level: $('#level'), xp: $('#xp'), xpNext: $('#xpNext'),
+    treeBtn: $('#treeBtn'), treeImg: $('#treeImg'), treeFallback: $('#treeFallback'), particles: $('#particles'), progBar: $('#progBar'),
+    tapTierName: $('#tapTierName'), tapInc: $('#tapInc'), tapCost: $('#tapCost'), buyTap: $('#buyTap'), nextTierInfo: $('#nextTierInfo'), tapTierProg: $('#tapTierProg'),
+    helpersGrid: $('#helpersGrid'),
+    saveBtn: $('#saveBtn'), resetBtn: $('#resetBtn'), settingsBtn: $('#settingsBtn'),
+    toast: $('#toast'), muteBtn: $('#muteBtn'), soundBtn: $('#soundBtn'), musicBtn: $('#musicBtn'),
+    tabs: $$('.tab'), panels: $$('.panel'), treeGrid: $('#treeGrid'), treeName: $('#treeName'),
+    prestige: $('#prestige'), prestigeMult: $('#prestigeMult'), prestigeInfo: $('#prestigeInfo'), prestigeBtn: $('#prestigeBtn'), prestigeGain: $('#prestigeGain'), prestigeMult2: $('#prestigeMult2'),
+    bgm: $('#bgm'), wcLevelUp: $('#wcLevelUp')
+  };
+
+  function prestigeMultiplier(){ return 1 + state.prestigePoints * 0.10; }
+  function totalCps(){ let base = 0; for(const k in state.producers){ const p = state.producers[k]; base += p.qty * p.baseCps; } const treeAuto = TREES[state.currentTree].autoMult; return base * treeAuto * prestigeMultiplier(); }
+  function addWood(n){ state.wood += n; state.xp += n * XP_RATE; }
+  function setTree(idx){ state.currentTree=idx; const t=TREES[idx]; const src=TREE_ASSETS[t.name]||''; if(src){ els.treeImg.src=src; els.treeImg.style.display='block'; els.treeFallback.style.display='none'; } else { els.treeImg.removeAttribute('src'); els.treeImg.style.display='none'; els.treeFallback.style.display='block'; } els.treeName.textContent=t.name; }
+
+  function canUseTier(ti){ if(ti===0) return true; const prevDone = state.tapWithin>=10 && state.tapTier>=ti-1; const levelOK = state.level >= TAP_TIERS[ti].req; return prevDone && levelOK; }
+  function activeTier(){ if(state.tapWithin>=10 && state.tapTier < TAP_TIERS.length-1){ const next = state.tapTier+1; if(canUseTier(next)){ state.tapTier = next; state.tapWithin = 0; } } return TAP_TIERS[state.tapTier]; }
+  function tapCost(){ const t = TAP_TIERS[state.tapTier]; return Math.ceil(t.base * Math.pow(t.scale, state.tapWithin)); }
+  function buyTap(){ const t = activeTier(); const cost = tapCost(); if(state.wood < cost){ sfx.nope(); return buzz(3); } state.wood -= cost; const treeMult = TREES[state.currentTree].tapMult; state.tapPower += t.inc * treeMult * prestigeMultiplier(); state.tapWithin++; if(state.tapWithin>=10){ sfx.level(); if(state.tapTier < TAP_TIERS.length-1 && state.level >= TAP_TIERS[state.tapTier+1].req){ state.tapTier++; state.tapWithin=0; } } sfx.buy(); buzz(10); updateUI(); }
+
+  function buildHelpers(){ els.helpersGrid.innerHTML=''; HELPERS.forEach(h=>{ const p=state.producers[h.key]; const card=document.createElement('div'); card.className='card'; const icon=document.createElement('div'); icon.className='icon'; icon.textContent=h.icon; card.appendChild(icon); const box=document.createElement('div'); const title=document.createElement('div'); title.className='title'; title.textContent=h.name; box.appendChild(title); const sub=document.createElement('div'); sub.className='sub'; sub.innerHTML=`Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">0</span>`; box.appendChild(sub); card.appendChild(box); const btn=document.createElement('button'); btn.className='btn'; btn.id=`buy-${h.key}`; btn.innerHTML=`Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`; btn.addEventListener('click', ()=> buyHelper(h.key)); card.appendChild(btn); els.helpersGrid.appendChild(card); }); }
+  function buyHelper(key){ const p = state.producers[key]; if(state.wood < p.cost){ sfx.nope(); return buzz(3); } state.wood -= p.cost; p.qty += 1; p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, p.qty)); sfx.buy(); buzz(10); updateUI(); }
+
+  function buildTreeGrid(){ els.treeGrid.innerHTML=''; TREES.forEach((t,i)=>{ const card=document.createElement('div'); card.className='tree-card'; const img=document.createElement('img'); const src=TREE_ASSETS[t.name]; if(src) img.src=src; else img.alt='🌳'; card.appendChild(img); const name=document.createElement('div'); name.className='title'; name.textContent=t.name; card.appendChild(name); const req=document.createElement('div'); req.className='sub'; req.textContent=`Req: Level ${t.level}`; card.appendChild(req); const boost=document.createElement('div'); boost.className='sub'; boost.textContent=`Tap x${t.tapMult} • Auto x${t.autoMult}`; card.appendChild(boost); const lock=document.createElement('div'); lock.className='lock'; lock.id=`lock-${i}`; card.appendChild(lock); const btn=document.createElement('button'); btn.className='btn select-btn'; btn.id=`select-${i}`; btn.textContent='Select'; btn.addEventListener('click', ()=>{ if(state.level < t.level){ toast('Level too low to select this tree.'); return; } setTree(i); updateUI(); toast(`${t.name} selected`); }); card.appendChild(btn); els.treeGrid.appendChild(card); }); updateTreeUnlocks(); }
+  function updateTreeUnlocks(){ TREES.forEach((t,i)=>{ const lockEl = document.getElementById(`lock-${i}`); const btn = document.getElementById(`select-${i}`); if(!lockEl||!btn) return; const unlocked = state.level >= t.level; lockEl.textContent = unlocked ? 'Unlocked' : 'Locked'; btn.disabled = !unlocked; }); }
+
+  function getBarTier(level){ if(level < 15) return {grad:['#ef4444','#b91c1c'], ease:1.30}; if(level < 30) return {grad:['#f59e0b','#b45309'], ease:1.55}; if(level < 45) return {grad:['#facc15','#ca8a04'], ease:1.80}; if(level < 60) return {grad:['#22c55e','#16a34a'], ease:2.10}; if(level < 75) return {grad:['#3b82f6','#1d4ed8'], ease:2.40}; if(level < 90) return {grad:['#a855f7','#7e22ce'], ease:2.70}; return {grad:['#fbbf24','#d97706'], ease:3.00}; }
+  function updateBar(frac){ const t = getBarTier(state.level); const display = Math.pow(clamp(frac,0,1), t.ease); els.progBar.style.width = (display*100).toFixed(1)+'%'; els.progBar.style.background = `linear-gradient(90deg, ${t.grad[0]}, ${t.grad[1]})`; }
+
+  function updateUI(){ els.wood.textContent = fmt(state.wood); els.cps.textContent = totalCps().toFixed(2); els.tap.textContent = Math.floor(state.tapPower); els.level.textContent = state.level; els.xp.textContent = fmt(state.xp); els.xpNext.textContent = fmt(state.xpNext); HELPERS.forEach(h=>{ const p=state.producers[h.key]; const qEl=$(`#qty-${h.key}`); const cEl=$(`#cost-${h.key}`); if(qEl) qEl.textContent = fmt(p.qty); if(cEl) cEl.textContent = fmt(p.cost); const btn=$(`#buy-${h.key}`); if(btn) btn.disabled = state.wood < p.cost; }); const t = activeTier(); els.tapTierName.textContent = t.name; els.tapInc.textContent = t.inc; els.tapTierProg.textContent = state.tapWithin; els.tapCost.textContent = fmt(tapCost()); const nextIndex = state.tapTier+1; const next = TAP_TIERS[nextIndex]; els.nextTierInfo.textContent = next ? `Lv ${next.req} & ${TAP_TIERS[state.tapTier].name} 10/10` : 'Max tier'; els.buyTap.disabled = (state.wood < tapCost()) || (state.tapWithin>=10 && !(next && state.level>=next.req)); updateTreeUnlocks(); const mult=prestigeMultiplier(); els.prestige.textContent = state.prestigePoints; els.prestigeMult.textContent = ` (x${mult.toFixed(2)})`; els.prestigeMult2.textContent = `x${mult.toFixed(2)}`; const gain = calcPrestigeGain(); els.prestigeGain.textContent = gain; els.prestigeBtn.disabled = gain <= 0; }
+
+  function tick(){ const nowMs = Date.now(); const dt = (nowMs - state.lastTick) / 1000; state.lastTick = nowMs; const cps = totalCps(); if(cps > 0){ state.passivePool += cps * dt; } if(state.passivePool >= 1){ const minted = Math.floor(state.passivePool); state.passivePool -= minted; addWood(minted); } updateBar(state.passivePool); handleLevelUps(); requestAnimationFrame(tick); updateUI(); }
+
+  function handleLevelUps(){ let unlockedBefore = highestUnlockedTreeByLevel(state.level); while(state.xp >= state.xpNext){ state.level++; sfx.level(); state.xpNext += xpForLevel(state.level); const unlockedAfter = highestUnlockedTreeByLevel(state.level); if(unlockedAfter > unlockedBefore){ // play OSRS woodcutting level-up
+        try{ els.wcLevelUp.currentTime = 0; els.wcLevelUp.play().catch(()=>{}); }catch{ }
+        unlockedBefore = unlockedAfter;
+      }
+    } }
+
+  function highestUnlockedTreeByLevel(lv){ let idx=0; for(let i=0;i<TREES.length;i++){ if(lv>=TREES[i].level) idx=i; } return idx; }
+
+  function calcPrestigeGain(){ return state.level >= 99 ? 1 : 0; }
+  function doPrestige(){ const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return; state.prestigePoints += gain; sfx.prestige(); Object.assign(state,{ wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0 }); for(const k in state.producers){ const p=state.producers[k]; p.qty=0; p.cost=p.baseCost; } toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`); save(false); updateUI(); }
+
+  const SAVE_KEY = 'tree-chopper-save-v10-xp-slow-manual-tree-levelsfx';
+  function save(showToast=true){ const data = {...state, lastTick: Date.now()}; localStorage.setItem(SAVE_KEY, JSON.stringify(data)); if(showToast) toast('Saved!'); }
+  function load(){ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return; try{ const data = JSON.parse(raw); Object.assign(state, data); HELPERS.forEach(h=>{ if(!state.producers[h.key]) state.producers[h.key]={qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}; Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost}); }); setTree(state.currentTree||0); const now = Date.now(); const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*8); const offline = Math.floor(totalCps() * away); if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); } }catch(e){ console.warn('Load failed', e); }
+  }
+
+  function updateMusicUI(){ els.musicBtn.textContent = state.music ? '🎵 Music On' : '🎵 Music Off'; els.bgm.volume = clamp(state.musicVol, 0, 1); if(!state.music && !els.bgm.paused) els.bgm.pause(); }
+  async function tryStartMusic(){ if(!state.music) return; try{ await els.bgm.play(); } catch(err){ const unlock = ()=>{ els.bgm.play().catch(()=>{}); window.removeEventListener('pointerdown', unlock, {once:true}); }; window.addEventListener('pointerdown', unlock, {once:true}); } }
+  function toast(msg){ els.toast.textContent = msg; els.toast.style.display = 'block'; clearTimeout(els.toast._t); els.toast._t = setTimeout(()=> els.toast.style.display='none', 1600); }
+  function particle(x,y,text){ const p=document.createElement('div'); p.className='floating'; p.textContent=text; p.style.left=x+'px'; p.style.top=y+'px'; els.particles.appendChild(p); setTimeout(()=>p.remove(),900); }
+
+  els.tabs.forEach(btn=> btn.addEventListener('click', ()=>{ els.tabs.forEach(b=> b.classList.remove('active')); btn.classList.add('active'); els.panels.forEach(p=> p.classList.remove('active')); $('#'+btn.dataset.tab).classList.add('active'); }));
+  function onTap(e){ ensureAudio(); if(state.music && els.bgm.paused){ els.bgm.play().catch(()=>{}); } const rect = els.treeBtn.getBoundingClientRect(); let x = rect.left + rect.width/2; let y = rect.top + rect.height/2; if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; } else if(e.clientX){ x = e.clientX; y = e.clientY; } const tree = TREES[state.currentTree]; const gain = state.tapPower * tree.tapMult * prestigeMultiplier(); state.wood += gain; state.xp += gain * XP_RATE; if(state.sound) sfx.chop(); particle(x, y, `+${fmt(gain)}`); buzz(8); handleLevelUps(); updateUI(); }
+  $('#treeBtn').addEventListener('click', onTap);
+  $('#treeBtn').addEventListener('touchstart', function(e){ e.preventDefault(); onTap(e); }, {passive:false});
+  $('#buyTap').addEventListener('click', buyTap);
+  $('#saveBtn').addEventListener('click', ()=> save(true));
+  $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Reset your progress?')){ localStorage.removeItem(SAVE_KEY); location.reload(); } });
+  $('#muteBtn').addEventListener('click', ()=>{ state.haptics = !state.haptics; $('#muteBtn').textContent = state.haptics ? '🔊 Haptics' : '🔕 Haptics Off'; save(false); });
+  $('#soundBtn').addEventListener('click', ()=>{ state.sound = !state.sound; $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off'; if(state.sound) ensureAudio(); save(false); });
+  $('#musicBtn').addEventListener('click', async ()=>{ state.music = !state.music; updateMusicUI(); save(false); if(state.music){ await tryStartMusic(); } else { els.bgm.pause(); } });
+
+  setInterval(()=> save(false), 30_000);
+
+  function init(){ buildHelpers(); buildTreeGrid(); setTree(0); updateMusicUI(); load(); updateUI(); els.bgm.volume = clamp(state.musicVol,0,1); state.lastTick = Date.now(); requestAnimationFrame(tick); tryStartMusic(); }
+  init();
+})();
+</script>
+</body>
+</html>
