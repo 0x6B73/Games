@@ -81,7 +81,10 @@
       <div id="particles"></div>
 
       <audio id="bgm" src="https://oldschool.runescape.wiki/images/Harmony.ogg?3c785" preload="auto" loop playsinline></audio>
-      <audio id="wcLevelUp" src="https://oldschool.runescape.wiki/images/Woodcutting_Level_Up%21.ogg?bf94e" preload="auto"></audio>
+      <audio id="wcLevelUp"   src="https://oldschool.runescape.wiki/images/Woodcutting_Level_Up%21.ogg?bf94e" preload="auto"></audio>
+      <audio id="wcUnlock"    src="https://oldschool.runescape.wiki/images/Woodcutting_Level_Up%21_%28Unlocks%29.ogg?14e49" preload="auto"></audio>
+      <audio id="axeTierUp"   src="https://oldschool.runescape.wiki/images/transcoded/Equip_sword.wav/Equip_sword.wav.mp3" preload="auto"></audio>
+
     </main>
 
     <section class="panel active" id="shopPanel" aria-label="Shop">
@@ -184,9 +187,9 @@
   function xpForLevel(n){ return Math.floor(50 * Math.pow(n, 1.6)); }
 
   const TAP_TIERS = [
-    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.7},
-    {name:'Iron',    req:5, inc:2,   base:2_500,     scale:1.8},
-    {name:'Steel',   req:10, inc:5,   base:15_000,    scale:1.9},
+    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.1},
+    {name:'Iron',    req:5, inc:2,   base:2_500,     scale:1.3},
+    {name:'Steel',   req:10, inc:5,   base:15_000,    scale:1.5},
     {name:'Mithril', req:20, inc:12,  base:75_000,    scale:2.0},
     {name:'Adamant', req:30, inc:25,  base:350_000,   scale:2.05},
     {name:'Rune',    req:40, inc:60,  base:1_800_000, scale:2.1},
@@ -201,7 +204,7 @@
     {key:'country', icon:'🗺️', name:'Country',      baseCps:50,    baseCost:12_000_000},
     {key:'world',   icon:'🌍', name:'World',        baseCps:250,   baseCost:100_000_000},
   ];
-  const HELPER_SCALE = 1.25;
+  const HELPER_SCALE = 1.1;
 
   const state = {
     wood: 0,
@@ -222,7 +225,10 @@
     toast: $('#toast'), muteBtn: $('#muteBtn'), soundBtn: $('#soundBtn'), musicBtn: $('#musicBtn'),
     tabs: $$('.tab'), panels: $$('.panel'), treeGrid: $('#treeGrid'), treeName: $('#treeName'),
     prestige: $('#prestige'), prestigeMult: $('#prestigeMult'), prestigeInfo: $('#prestigeInfo'), prestigeBtn: $('#prestigeBtn'), prestigeGain: $('#prestigeGain'), prestigeMult2: $('#prestigeMult2'),
-    bgm: $('#bgm'), wcLevelUp: $('#wcLevelUp')
+    bgm: $('#bgm'),
+    wcLevelUp: $('#wcLevelUp'),
+    wcUnlock: $('#wcUnlock'),
+    axeTierUp: $('#axeTierUp')
   };
 
   function prestigeMultiplier(){ return 1 + state.prestigePoints * 0.10; }
@@ -231,9 +237,27 @@
   function setTree(idx){ state.currentTree=idx; const t=TREES[idx]; const src=TREE_ASSETS[t.name]||''; if(src){ els.treeImg.src=src; els.treeImg.style.display='block'; els.treeFallback.style.display='none'; } else { els.treeImg.removeAttribute('src'); els.treeImg.style.display='none'; els.treeFallback.style.display='block'; } els.treeName.textContent=t.name; }
 
   function canUseTier(ti){ if(ti===0) return true; const prevDone = state.tapWithin>=10 && state.tapTier>=ti-1; const levelOK = state.level >= TAP_TIERS[ti].req; return prevDone && levelOK; }
-  function activeTier(){ if(state.tapWithin>=10 && state.tapTier < TAP_TIERS.length-1){ const next = state.tapTier+1; if(canUseTier(next)){ state.tapTier = next; state.tapWithin = 0; } } return TAP_TIERS[state.tapTier]; }
+  function activeTier(){
+  if (state.tapWithin >= 10 && state.tapTier < TAP_TIERS.length - 1) {
+      const next = state.tapTier + 1;
+      if (canUseTier(next)) {
+        state.tapTier = next;
+        state.tapWithin = 0;
+        try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+      }
+    }
+    return TAP_TIERS[state.tapTier];
+}
   function tapCost(){ const t = TAP_TIERS[state.tapTier]; return Math.ceil(t.base * Math.pow(t.scale, state.tapWithin)); }
-  function buyTap(){ const t = activeTier(); const cost = tapCost(); if(state.wood < cost){ sfx.nope(); return buzz(3); } state.wood -= cost; const treeMult = TREES[state.currentTree].tapMult; state.tapPower += t.inc * treeMult * prestigeMultiplier(); state.tapWithin++; if(state.tapWithin>=10){ sfx.level(); if(state.tapTier < TAP_TIERS.length-1 && state.level >= TAP_TIERS[state.tapTier+1].req){ state.tapTier++; state.tapWithin=0; } } sfx.buy(); buzz(10); updateUI(); }
+  function buyTap(){
+    // finished current metal; advance if next is allowed
+    const nextIdx = state.tapTier + 1;
+    if (state.tapTier < TAP_TIERS.length - 1 && state.level >= TAP_TIERS[nextIdx].req) {
+      state.tapTier = nextIdx;
+      state.tapWithin = 0;
+      try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+    }
+}
 
   function buildHelpers(){ els.helpersGrid.innerHTML=''; HELPERS.forEach(h=>{ const p=state.producers[h.key]; const card=document.createElement('div'); card.className='card'; const icon=document.createElement('div'); icon.className='icon'; icon.textContent=h.icon; card.appendChild(icon); const box=document.createElement('div'); const title=document.createElement('div'); title.className='title'; title.textContent=h.name; box.appendChild(title); const sub=document.createElement('div'); sub.className='sub'; sub.innerHTML=`Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">0</span>`; box.appendChild(sub); card.appendChild(box); const btn=document.createElement('button'); btn.className='btn'; btn.id=`buy-${h.key}`; btn.innerHTML=`Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`; btn.addEventListener('click', ()=> buyHelper(h.key)); card.appendChild(btn); els.helpersGrid.appendChild(card); }); }
   function buyHelper(key){ const p = state.producers[key]; if(state.wood < p.cost){ sfx.nope(); return buzz(3); } state.wood -= p.cost; p.qty += 1; p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, p.qty)); sfx.buy(); buzz(10); updateUI(); }
@@ -248,12 +272,31 @@
 
   function tick(){ const nowMs = Date.now(); const dt = (nowMs - state.lastTick) / 1000; state.lastTick = nowMs; const cps = totalCps(); if(cps > 0){ state.passivePool += cps * dt; } if(state.passivePool >= 1){ const minted = Math.floor(state.passivePool); state.passivePool -= minted; addWood(minted); } updateBar(state.passivePool); handleLevelUps(); requestAnimationFrame(tick); updateUI(); }
 
-  function handleLevelUps(){ let unlockedBefore = highestUnlockedTreeByLevel(state.level); while(state.xp >= state.xpNext){ state.level++; sfx.level(); state.xpNext += xpForLevel(state.level); const unlockedAfter = highestUnlockedTreeByLevel(state.level); if(unlockedAfter > unlockedBefore){ // play OSRS woodcutting level-up
-        try{ els.wcLevelUp.currentTime = 0; els.wcLevelUp.play().catch(()=>{}); }catch{ }
-        unlockedBefore = unlockedAfter;
-      }
-    } }
-
+  function handleLevelUps(){
+    let unlockedBefore = highestUnlockedTreeByLevel(state.level);
+  
+    while (state.xp >= state.xpNext) {
+      state.xp -= state.xpNext;              // optional: keep xp overflow tidy
+      state.level++;
+      state.xpNext += xpForLevel(state.level);
+  
+      const unlockedAfter = highestUnlockedTreeByLevel(state.level);
+      const unlockedNewTree = unlockedAfter > unlockedBefore;
+  
+      // Play correct SFX: unlock variant OR default
+      try {
+        if (unlockedNewTree) {
+          els.wcUnlock.currentTime = 0;
+          els.wcUnlock.play().catch(()=>{});
+        } else {
+          els.wcLevelUp.currentTime = 0;
+          els.wcLevelUp.play().catch(()=>{});
+        }
+      } catch {}
+  
+      unlockedBefore = unlockedAfter;
+    }
+}
   function highestUnlockedTreeByLevel(lv){ let idx=0; for(let i=0;i<TREES.length;i++){ if(lv>=TREES[i].level) idx=i; } return idx; }
 
   function calcPrestigeGain(){ return state.level >= 99 ? 1 : 0; }
