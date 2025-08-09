@@ -174,7 +174,7 @@
   function chord(freqs=[440,660], dur=0.12, type='triangle', gain=0.03){ freqs.forEach((f,i)=> tone(f, dur*(0.9-i*0.1), type, gain)); }
   const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
 
-  const XP_RATE = 5;
+  const XP_RATE = 3;
 
   const TREES = [
     {name:'Normal', level:1,  tapMult:1,    autoMult:1   },
