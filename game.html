@@ -174,6 +174,27 @@
   function chord(freqs=[440,660], dur=0.12, type='triangle', gain=0.03){ freqs.forEach((f,i)=> tone(f, dur*(0.9-i*0.1), type, gain)); }
   const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
 
+  // ---- SFX gating for HTMLAudio + WebAudio (mute fix) ----
+  function playSfx(el){
+    if (!state.sound) return;
+    try { el.currentTime = 0; el.play().catch(()=>{}); } catch {}
+  }
+  function stopAllSfx(){
+    [els.wcLevelUp, els.wcUnlock, els.axeTierUp].forEach(a=>{
+      try { a.pause(); a.currentTime = 0; } catch {}
+    });
+    try {
+      if (AC && AC.state !== 'suspended') AC.suspend();
+    } catch {}
+  }
+  function resumeSfx(){
+    ensureAudio();
+    try {
+      if (AC && AC.state === 'suspended') AC.resume();
+    } catch {}
+  }
+  // --------------------------------------------------------
+
   const XP_RATE = 2;
 
   const TREES = [
@@ -185,25 +206,31 @@
     {name:'Magic',  level:75, tapMult:16,   autoMult:8   },
     {name:'Redwood',level:90, tapMult:30,   autoMult:12  },
   ];
-  function xpForLevel(n){ return Math.floor(50 * Math.pow(n, 1.6)); }
+
+  // --- Slower XP curve: piecewise escalation ---
+  function xpForLevel(n){
+    if (n <= 10) return Math.floor(50 * Math.pow(n, 1.6));
+    if (n <= 50) return Math.floor(70 * Math.pow(n, 2.0) * Math.pow(1.02, n - 10));
+    return Math.floor(90 * Math.pow(n, 2.4) * Math.pow(1.035, n - 50));
+  }
 
   const TAP_TIERS = [
     {name:'Bronze',  req:1,  inc:1,   base:10,        scale:1.1},
-    {name:'Iron',    req:5, inc:2,   base:100,     scale:1.2},
-    {name:'Steel',   req:10, inc:4,   base:500,    scale:1.3},
-    {name:'Mithril', req:20, inc:8,  base:1_000,    scale:1.5},
-    {name:'Adamant', req:30, inc:16,  base:10_000,   scale:2.05},
-    {name:'Rune',    req:40, inc:32,  base:50_000, scale:2.1},
-    {name:'Dragon',  req:60, inc:64, base:100_000, scale:2.5},
+    {name:'Iron',    req:5,  inc:2,   base:100,       scale:1.2},
+    {name:'Steel',   req:10, inc:4,   base:500,       scale:1.3},
+    {name:'Mithril', req:20, inc:8,   base:1_000,     scale:1.5},
+    {name:'Adamant', req:30, inc:16,  base:10_000,    scale:2.05},
+    {name:'Rune',    req:40, inc:32,  base:50_000,    scale:2.1},
+    {name:'Dragon',  req:60, inc:64,  base:100_000,   scale:2.5},
   ];
 
   const HELPERS = [
     {key:'child',   icon:'👶', name:'Small Child',  baseCps:0.2,  baseCost:50},
-    {key:'Elder',   icon:'👴', name:'Elder',        baseCps:2,   baseCost:500},
-    {key:'man',     icon:'👨', name:'Man',          baseCps:20,     baseCost:1_000},
-    {key:'town',    icon:'🏙️', name:'Town',         baseCps:100,    baseCost:30_000},
-    {key:'country', icon:'🗺️', name:'Country',      baseCps:500,    baseCost:500_000},
-    {key:'world',   icon:'🌍', name:'World',        baseCps:2500,   baseCost:1_000_000},
+    {key:'Elder',   icon:'👴', name:'Elder',        baseCps:2,    baseCost:500},
+    {key:'man',     icon:'👨', name:'Man',          baseCps:20,   baseCost:1_000},
+    {key:'town',    icon:'🏙️', name:'Town',         baseCps:100,  baseCost:30_000},
+    {key:'country', icon:'🗺️', name:'Country',      baseCps:500,  baseCost:500_000},
+    {key:'world',   icon:'🌍', name:'World',        baseCps:2500, baseCost:1_000_000},
   ];
   const HELPER_SCALE = 1.1;
 
@@ -216,7 +243,7 @@
     passivePool: 0,
     // progress cycle
     cycleAccum: 0, cycleQuantum: 1, cycleLingerUntil: 0, resetBarPending: false,
-    producers: Object.fromEntries(HELPERS.map(h=>[h.key,{qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}]))
+    producers: Object.fromEntries(HELPERS.map(h=>[h.key,{qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}])),
   };
 
   const els = {
@@ -249,7 +276,7 @@
     if (!canUpgradeTier()) return false;
     state.tapTier += 1;
     state.tapWithin = 0;
-    try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+    playSfx(els.axeTierUp);
     return true;
   }
   function tapCost(){ const t = TAP_TIERS[state.tapTier]; return Math.ceil(t.base * Math.pow(t.scale, state.tapWithin)); }
@@ -323,11 +350,10 @@
     const now = Date.now();
     const lingering = now < state.cycleLingerUntil;
 
-    // Handle hard snap to 0% immediately after linger ends (prevents bounce)
     if (state.resetBarPending && !lingering) {
       els.progBar.style.transition = 'none';
       els.progBar.style.width = '0%';
-      void els.progBar.offsetWidth; // force reflow
+      void els.progBar.offsetWidth;
       els.progBar.style.transition = 'width .25s linear';
       state.resetBarPending = false;
     }
@@ -391,7 +417,6 @@
     const dt = (nowMs - state.lastTick) / 1000;
     state.lastTick = nowMs;
 
-    // Production & minting
     const cps = totalCps();
     if (cps > 0) state.passivePool += cps * dt;
     if (state.passivePool >= 1) {
@@ -400,22 +425,20 @@
       addWood(minted);
     }
 
-    // Tier/quantum management — reset when tier changes to avoid jumps
     const tier = getQuantumTier(cps);
     if (tier.quantum !== state.cycleQuantum) {
       state.cycleQuantum = tier.quantum;
       state.cycleAccum = 0;
       state.cycleLingerUntil = 0;
-      state.resetBarPending = true; // start new cycle from 0 cleanly
+      state.resetBarPending = true;
     }
 
-    // Accumulate toward quantum unless lingering at full
     if (nowMs >= state.cycleLingerUntil) {
       state.cycleAccum += cps * dt;
       if (state.cycleAccum >= state.cycleQuantum) {
-        state.cycleAccum = 0;                        // finish cycle
-        state.cycleLingerUntil = nowMs + 220;        // linger ~0.22s at 100%
-        state.resetBarPending = true;                // next frame after linger, snap to 0
+        state.cycleAccum = 0;
+        state.cycleLingerUntil = nowMs + 220;
+        state.resetBarPending = true;
       }
     }
 
@@ -430,12 +453,13 @@
     while (state.xp >= state.xpNext) {
       state.xp -= state.xpNext;
       state.level++;
+      // NOTE: keeping cumulative behavior (extra slow at high levels)
       state.xpNext += xpForLevel(state.level);
       const unlockedAfter = highestUnlockedTreeByLevel(state.level);
       const unlockedNewTree = unlockedAfter > unlockedBefore;
       try {
-        if (unlockedNewTree) { els.wcUnlock.currentTime = 0; els.wcUnlock.play().catch(()=>{}); }
-        else { els.wcLevelUp.currentTime = 0; els.wcLevelUp.play().catch(()=>{}); }
+        if (unlockedNewTree) { playSfx(els.wcUnlock); }
+        else { playSfx(els.wcLevelUp); }
       } catch {}
       unlockedBefore = unlockedAfter;
     }
@@ -463,7 +487,19 @@
   $('#saveBtn').addEventListener('click', ()=> save(true));
   $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Reset your progress?')){ localStorage.removeItem(SAVE_KEY); location.reload(); } });
   $('#muteBtn').addEventListener('click', ()=>{ state.haptics = !state.haptics; $('#muteBtn').textContent = state.haptics ? '🔊 Haptics' : '🔕 Haptics Off'; save(false); });
-  $('#soundBtn').addEventListener('click', ()=>{ state.sound = !state.sound; $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off'; if(state.sound) ensureAudio(); save(false); });
+
+  // SOUND toggle now fully mutes SFX (HTMLAudio + WebAudio)
+  $('#soundBtn').addEventListener('click', ()=>{
+    state.sound = !state.sound;
+    $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off';
+    if (state.sound) {
+      resumeSfx();
+    } else {
+      stopAllSfx();
+    }
+    save(false);
+  });
+
   $('#musicBtn').addEventListener('click', async ()=>{ state.music = !state.music; updateMusicUI(); save(false); if(state.music){ await tryStartMusic(); } else { els.bgm.pause(); } });
 
   const dbgBtn = document.getElementById('debugBtn');
