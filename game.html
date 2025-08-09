@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <<meta name="viewport" content="width=device-width, initial-scale=.75, maximum-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=.75, maximum-scale=1, viewport-fit=cover" />
   <title>Tree Chopper Idle</title>
   <meta name="theme-color" content="#0e6b2f" />
   <style>
@@ -21,7 +21,8 @@
     .fallback-emoji{font-size:clamp(72px,18svw,140px)}
     .tap-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);font-size:clamp(.85rem, 2.6svw, 1rem);color:var(--muted);text-align:center}
     .progress{height:10px;background:#0b1223;border-radius:999px;overflow:hidden;border:1px solid #1f2937}
-    .bar{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16)}
+    .bar{height:100%;width:0%;background:linear-gradient(90deg,#22c55e,#84cc16);transition:width .25s linear}
+    .cps-badge{position:absolute;right:12px;bottom:12px;font-size:.75rem;font-weight:800;color:#0b1223;background:#e5e7eb;border-radius:999px;padding:.15rem .45rem;opacity:.9;mix-blend:screen}
     #particles{position:fixed;inset:0;pointer-events:none;z-index:50}
     .floating{position:absolute;pointer-events:none;font-weight:800;color:#4ade80;text-shadow:0 2px 6px rgba(0,0,0,.6);animation:floatUp .9s ease-out forwards}
     @keyframes floatUp{from{opacity:1;transform:translate(-50%,0)} to{opacity:0;transform:translate(-50%,-60px)}}
@@ -65,8 +66,6 @@
         <div class="controls" style="margin-left:auto">
           <button id="saveBtn" class="small">💾 Save</button>
           <button id="debugBtn" class="small" title="Add 10k logs & XP">🐞 +10k</button>
-
-          <!--<button id="settingsBtn" class="small">⚙️</button>-->
         </div>
       </div>
     </header>
@@ -78,6 +77,7 @@
         <div id="treeLabel" class="tap-hint"><span id="treeName">Normal</span> • Tap to chop</div>
         <div id="progContainer" class="progress" aria-hidden="true" style="position:absolute;left:10%;right:10%;bottom:8px">
           <div class="bar" id="progBar"></div>
+          <div id="cpsBadge" class="cps-badge">x1</div>
         </div>
       </button>
       <div id="particles"></div>
@@ -105,13 +105,12 @@
           <div class="icon">📘</div>
           <div>
             <div class="title">Metal Tiers</div>
-            <div class="sub">Bronze(1) → Iron(5) → Steel(10) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
+            <div class="sub">Bronze(1) → Iron(10) → Steel(15) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
           </div>
         </div>
       </div>
 
       <div class="section-title" style="margin-top:.8rem">Automated Choppers (Cost 🪵)</div>
-      <!--<div class="section-hint">Costs scale fast. Top tier is ~100,000,000 wood.</div>-->
       <div class="grid three" id="helpersGrid"></div>
 
       <div class="controls" style="justify-content:space-between;padding:.25rem .25rem .1rem;margin-top:.5rem">
@@ -175,7 +174,7 @@
   function chord(freqs=[440,660], dur=0.12, type='triangle', gain=0.03){ freqs.forEach((f,i)=> tone(f, dur*(0.9-i*0.1), type, gain)); }
   const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
 
-  const XP_RATE = 0.2; // 5x slower XP
+  const XP_RATE = 0.2; // slower XP
 
   const TREES = [
     {name:'Normal', level:1,  tapMult:1,    autoMult:1   },
@@ -189,9 +188,9 @@
   function xpForLevel(n){ return Math.floor(50 * Math.pow(n, 1.6)); }
 
   const TAP_TIERS = [
-    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.1},
-    {name:'Iron',    req:5, inc:2,   base:2_500,     scale:1.3},
-    {name:'Steel',   req:10, inc:5,   base:15_000,    scale:1.5},
+    {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.3},
+    {name:'Iron',    req:10, inc:2,   base:2_500,     scale:1.5},
+    {name:'Steel',   req:15, inc:5,   base:15_000,    scale:1.7},
     {name:'Mithril', req:20, inc:12,  base:75_000,    scale:2.0},
     {name:'Adamant', req:30, inc:25,  base:350_000,   scale:2.05},
     {name:'Rune',    req:40, inc:60,  base:1_800_000, scale:2.1},
@@ -199,12 +198,12 @@
   ];
 
   const HELPERS = [
-    {key:'child',   icon:'👶', name:'Small Child',  baseCps:0.02,  baseCost:100},
-    {key:'Elder',     icon:'👴', name:'Elder',          baseCps:0.2,   baseCost:1_000},
-    {key:'man', icon:'👨', name:'Man',baseCps:2,     baseCost:25_000},
-    {key:'town',    icon:'🏙️', name:'Town',         baseCps:10,    baseCost:600_000},
-    {key:'country', icon:'🗺️', name:'Country',      baseCps:50,    baseCost:12_000_000},
-    {key:'world',   icon:'🌍', name:'World',        baseCps:250,   baseCost:100_000_000},
+    {key:'child',   icon:'👶', name:'Small Child',  baseCps:0.2,  baseCost:100},
+    {key:'Elder',   icon:'👴', name:'Elder',        baseCps:2,   baseCost:1_000},
+    {key:'man',     icon:'👨', name:'Man',          baseCps:20,     baseCost:10_000},
+    {key:'town',    icon:'🏙️', name:'Town',         baseCps:100,    baseCost:300_000},
+    {key:'country', icon:'🗺️', name:'Country',      baseCps:500,    baseCost:6_000_000},
+    {key:'world',   icon:'🌍', name:'World',        baseCps:2500,   baseCost:50_000_000},
   ];
   const HELPER_SCALE = 1.1;
 
@@ -215,22 +214,21 @@
     haptics: true, sound: true, music: true, musicVol: 0.35,
     xp: 0, level: 1, xpNext: 50, currentTree: 0, prestigePoints: 0,
     passivePool: 0,
+    // progress cycle
+    cycleAccum: 0, cycleQuantum: 1, cycleLingerUntil: 0, resetBarPending: false,
     producers: Object.fromEntries(HELPERS.map(h=>[h.key,{qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}]))
   };
 
   const els = {
     wood: $('#wood'), cps: $('#cps'), tap: $('#tap'), level: $('#level'), xp: $('#xp'), xpNext: $('#xpNext'),
     treeBtn: $('#treeBtn'), treeImg: $('#treeImg'), treeFallback: $('#treeFallback'), particles: $('#particles'), progBar: $('#progBar'),
-    tapTierName: $('#tapTierName'), tapInc: $('#tapInc'), tapCost: $('#tapCost'), buyTap: $('#buyTap'), nextTierInfo: $('#nextTierInfo'), tapTierProg: $('#tapTierProg'),
+    tapTierName: $('#tapTierName'), tapInc: $('#tapInc'), buyTap: $('#buyTap'), nextTierInfo: $('#nextTierInfo'), tapTierProg: $('#tapTierProg'),
     helpersGrid: $('#helpersGrid'),
     saveBtn: $('#saveBtn'), resetBtn: $('#resetBtn'), settingsBtn: $('#settingsBtn'),
     toast: $('#toast'), muteBtn: $('#muteBtn'), soundBtn: $('#soundBtn'), musicBtn: $('#musicBtn'),
     tabs: $$('.tab'), panels: $$('.panel'), treeGrid: $('#treeGrid'), treeName: $('#treeName'),
     prestige: $('#prestige'), prestigeMult: $('#prestigeMult'), prestigeInfo: $('#prestigeInfo'), prestigeBtn: $('#prestigeBtn'), prestigeGain: $('#prestigeGain'), prestigeMult2: $('#prestigeMult2'),
-    bgm: $('#bgm'),
-    wcLevelUp: $('#wcLevelUp'),
-    wcUnlock: $('#wcUnlock'),
-    axeTierUp: $('#axeTierUp')
+    bgm: $('#bgm'), wcLevelUp: $('#wcLevelUp'), wcUnlock: $('#wcUnlock'), axeTierUp: $('#axeTierUp')
   };
 
   function prestigeMultiplier(){ return 1 + state.prestigePoints * 0.10; }
@@ -238,44 +236,41 @@
   function addWood(n){ state.wood += n; state.xp += n * XP_RATE; }
   function setTree(idx){ state.currentTree=idx; const t=TREES[idx]; const src=TREE_ASSETS[t.name]||''; if(src){ els.treeImg.src=src; els.treeImg.style.display='block'; els.treeFallback.style.display='none'; } else { els.treeImg.removeAttribute('src'); els.treeImg.style.display='none'; els.treeFallback.style.display='block'; } els.treeName.textContent=t.name; }
 
-  function canUseTier(ti){ if(ti===0) return true; const prevDone = state.tapWithin>=10 && state.tapTier>=ti-1; const levelOK = state.level >= TAP_TIERS[ti].req; return prevDone && levelOK; }
-  function activeTier(){
-    // Only auto-advance if we've completed 10/10 AND meet level req
-    if (state.tapWithin >= 10 && state.tapTier < TAP_TIERS.length - 1) {
-      const next = state.tapTier + 1;
-      if (state.level >= TAP_TIERS[next].req) {
-        state.tapTier = next;
-        state.tapWithin = 0;
-        try {
-          els.axeTierUp.currentTime = 0;
-          els.axeTierUp.play().catch(()=>{});
-        } catch {}
-      }
-    }
-    return TAP_TIERS[state.tapTier];
-}
+  // --- Axe tier logic (manual upgrade) ---
+  function canUpgradeTier(){
+    const next = state.tapTier + 1;
+    return (
+      state.tapWithin >= 10 &&
+      state.tapTier < TAP_TIERS.length - 1 &&
+      state.level >= TAP_TIERS[next].req
+    );
+  }
+  function doUpgradeTier(){
+    if (!canUpgradeTier()) return false;
+    state.tapTier += 1;
+    state.tapWithin = 0;
+    try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+    return true;
+  }
   function tapCost(){ const t = TAP_TIERS[state.tapTier]; return Math.ceil(t.base * Math.pow(t.scale, state.tapWithin)); }
   function buyTap(){
-    const t = activeTier();
+    if (state.tapWithin >= 10) {
+      if (!doUpgradeTier()) {
+        const next = TAP_TIERS[state.tapTier + 1];
+        if (next) { toast(`Need Level ${next.req} to upgrade.`); sfx.nope(); }
+      }
+      updateUI();
+      return;
+    }
+    const t = TAP_TIERS[state.tapTier];
     const cost = tapCost();
     if (state.wood < cost) { sfx.nope(); return buzz(3); }
     state.wood -= cost;
-  
     const treeMult = TREES[state.currentTree].tapMult;
     state.tapPower += t.inc * treeMult * prestigeMultiplier();
     state.tapWithin++;
-  
-    // Only advance metal if you've finished 10/10 AND meet the next tier's level requirement
-    if (state.tapWithin >= 10) {
-      const nextIdx = state.tapTier + 1;
-      if (state.tapTier < TAP_TIERS.length - 1 && state.level >= TAP_TIERS[nextIdx].req) {
-        state.tapTier = nextIdx;
-        state.tapWithin = 0;
-        try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
-      }
-    }
     sfx.buy(); buzz(10); updateUI();
-}
+  }
 
   function buildHelpers(){ els.helpersGrid.innerHTML=''; HELPERS.forEach(h=>{ const p=state.producers[h.key]; const card=document.createElement('div'); card.className='card'; const icon=document.createElement('div'); icon.className='icon'; icon.textContent=h.icon; card.appendChild(icon); const box=document.createElement('div'); const title=document.createElement('div'); title.className='title'; title.textContent=h.name; box.appendChild(title); const sub=document.createElement('div'); sub.className='sub'; sub.innerHTML=`Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">0</span>`; box.appendChild(sub); card.appendChild(box); const btn=document.createElement('button'); btn.className='btn'; btn.id=`buy-${h.key}`; btn.innerHTML=`Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`; btn.addEventListener('click', ()=> buyHelper(h.key)); card.appendChild(btn); els.helpersGrid.appendChild(card); }); }
   function buyHelper(key){ const p = state.producers[key]; if(state.wood < p.cost){ sfx.nope(); return buzz(3); } state.wood -= p.cost; p.qty += 1; p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, p.qty)); sfx.buy(); buzz(10); updateUI(); }
@@ -283,44 +278,174 @@
   function buildTreeGrid(){ els.treeGrid.innerHTML=''; TREES.forEach((t,i)=>{ const card=document.createElement('div'); card.className='tree-card'; const img=document.createElement('img'); const src=TREE_ASSETS[t.name]; if(src) img.src=src; else img.alt='🌳'; card.appendChild(img); const name=document.createElement('div'); name.className='title'; name.textContent=t.name; card.appendChild(name); const req=document.createElement('div'); req.className='sub'; req.textContent=`Req: Level ${t.level}`; card.appendChild(req); const boost=document.createElement('div'); boost.className='sub'; boost.textContent=`Tap x${t.tapMult} • Auto x${t.autoMult}`; card.appendChild(boost); const lock=document.createElement('div'); lock.className='lock'; lock.id=`lock-${i}`; card.appendChild(lock); const btn=document.createElement('button'); btn.className='btn select-btn'; btn.id=`select-${i}`; btn.textContent='Select'; btn.addEventListener('click', ()=>{ if(state.level < t.level){ toast('Level too low to select this tree.'); return; } setTree(i); updateUI(); toast(`${t.name} selected`); }); card.appendChild(btn); els.treeGrid.appendChild(card); }); updateTreeUnlocks(); }
   function updateTreeUnlocks(){ TREES.forEach((t,i)=>{ const lockEl = document.getElementById(`lock-${i}`); const btn = document.getElementById(`select-${i}`); if(!lockEl||!btn) return; const unlocked = state.level >= t.level; lockEl.textContent = unlocked ? 'Unlocked' : 'Locked'; btn.disabled = !unlocked; }); }
 
-  function getBarTier(level){ if(level < 15) return {grad:['#ef4444','#b91c1c'], ease:1.30}; if(level < 30) return {grad:['#f59e0b','#b45309'], ease:1.55}; if(level < 45) return {grad:['#facc15','#ca8a04'], ease:1.80}; if(level < 60) return {grad:['#22c55e','#16a34a'], ease:2.10}; if(level < 75) return {grad:['#3b82f6','#1d4ed8'], ease:2.40}; if(level < 90) return {grad:['#a855f7','#7e22ce'], ease:2.70}; return {grad:['#fbbf24','#d97706'], ease:3.00}; }
-  function updateBar(frac){ const t = getBarTier(state.level); const display = Math.pow(clamp(frac,0,1), t.ease); els.progBar.style.width = (display*100).toFixed(1)+'%'; els.progBar.style.background = `linear-gradient(90deg, ${t.grad[0]}, ${t.grad[1]})`; }
+  function getQuantumTier(cps){
+    if (cps >= 10_000_000) return {quantum:10_000_000, label:'x10M',  color:'rainbow'};
+    if (cps >= 1_000_000)  return {quantum:1_000_000,  label:'x1M',   color:'red'};
+    if (cps >= 100_000)    return {quantum:100_000,    label:'x100k', color:'orange'};
+    if (cps >= 10_000)     return {quantum:10_000,     label:'x10k',  color:'yellow'};
+    if (cps >= 1_000)      return {quantum:1_000,      label:'x1000', color:'purple'};
+    if (cps >= 100)        return {quantum:100,        label:'x100',  color:'blue'};
+    if (cps >= 10)         return {quantum:10,         label:'x10',   color:'green'};
+    return {quantum:1,     label:'x1',    color:'white'};
+  }
 
-  function updateUI(){ els.wood.textContent = fmt(state.wood); els.cps.textContent = totalCps().toFixed(2); els.tap.textContent = Math.floor(state.tapPower); els.level.textContent = state.level; els.xp.textContent = fmt(state.xp); els.xpNext.textContent = fmt(state.xpNext); HELPERS.forEach(h=>{ const p=state.producers[h.key]; const qEl=$(`#qty-${h.key}`); const cEl=$(`#cost-${h.key}`); if(qEl) qEl.textContent = fmt(p.qty); if(cEl) cEl.textContent = fmt(p.cost); const btn=$(`#buy-${h.key}`); if(btn) btn.disabled = state.wood < p.cost; }); const t = activeTier(); els.tapTierName.textContent = t.name; els.tapInc.textContent = t.inc; els.tapTierProg.textContent = state.tapWithin; els.tapCost.textContent = fmt(tapCost()); const nextIndex = state.tapTier+1; const next = TAP_TIERS[nextIndex]; els.nextTierInfo.textContent = next ? `Lv ${next.req} & ${TAP_TIERS[state.tapTier].name} 10/10` : 'Max tier'; els.buyTap.disabled = (state.wood < tapCost()) || (state.tapWithin>=10 && !(next && state.level>=next.req)); updateTreeUnlocks(); const mult=prestigeMultiplier(); els.prestige.textContent = state.prestigePoints; els.prestigeMult.textContent = ` (x${mult.toFixed(2)})`; els.prestigeMult2.textContent = `x${mult.toFixed(2)}`; const gain = calcPrestigeGain(); els.prestigeGain.textContent = gain; els.prestigeBtn.disabled = gain <= 0; }
+  function setBarGradient(color){
+    switch (color) {
+      case 'rainbow':
+        els.progBar.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)';
+        break;
+      case 'red':
+        els.progBar.style.background = 'linear-gradient(90deg, #ef4444, #b91c1c)';
+        break;
+      case 'orange':
+        els.progBar.style.background = 'linear-gradient(90deg, #f59e0b, #d97706)';
+        break;
+      case 'yellow':
+        els.progBar.style.background = 'linear-gradient(90deg, #facc15, #eab308)';
+        break;
+      case 'purple':
+        els.progBar.style.background = 'linear-gradient(90deg, #a855f7, #7e22ce)';
+        break;
+      case 'blue':
+        els.progBar.style.background = 'linear-gradient(90deg, #3b82f6, #1d4ed8)';
+        break;
+      case 'green':
+        els.progBar.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
+        break;
+      default: // white
+        els.progBar.style.background = 'linear-gradient(90deg, #ffffff, #e5e7eb)';
+    }
+  }
 
-  function tick(){ const nowMs = Date.now(); const dt = (nowMs - state.lastTick) / 1000; state.lastTick = nowMs; const cps = totalCps(); if(cps > 0){ state.passivePool += cps * dt; } if(state.passivePool >= 1){ const minted = Math.floor(state.passivePool); state.passivePool -= minted; addWood(minted); } updateBar(state.passivePool); handleLevelUps(); requestAnimationFrame(tick); updateUI(); }
+  function updateBar(){
+    const cps = totalCps();
+    const tier = getQuantumTier(cps);
+    const now = Date.now();
+    const lingering = now < state.cycleLingerUntil;
+
+    // Handle hard snap to 0% immediately after linger ends (prevents bounce)
+    if (state.resetBarPending && !lingering) {
+      els.progBar.style.transition = 'none';
+      els.progBar.style.width = '0%';
+      void els.progBar.offsetWidth; // force reflow
+      els.progBar.style.transition = 'width .25s linear';
+      state.resetBarPending = false;
+    }
+
+    const frac = lingering ? 1 : clamp(state.cycleAccum / Math.max(1, state.cycleQuantum), 0, 1);
+
+    setBarGradient(tier.color);
+    els.progBar.style.width = (frac * 100).toFixed(1) + '%';
+
+    const badge = document.getElementById('cpsBadge');
+    if (badge) badge.textContent = tier.label;
+  }
+
+  function updateUI(){
+    els.wood.textContent = fmt(state.wood);
+    els.cps.textContent = totalCps().toFixed(2);
+    els.tap.textContent = Math.floor(state.tapPower);
+    els.level.textContent = state.level;
+    els.xp.textContent = fmt(state.xp);
+    els.xpNext.textContent = fmt(state.xpNext);
+
+    HELPERS.forEach(h=>{
+      const p=state.producers[h.key];
+      const qEl=$(`#qty-${h.key}`);
+      const cEl=$(`#cost-${h.key}`);
+      if(qEl) qEl.textContent = fmt(p.qty);
+      if(cEl) cEl.textContent = fmt(p.cost);
+      const btn=$(`#buy-${h.key}`);
+      if(btn) btn.disabled = state.wood < p.cost;
+    });
+
+    const t = TAP_TIERS[state.tapTier];
+    els.tapTierName.textContent = t.name;
+    els.tapInc.textContent = t.inc;
+    els.tapTierProg.textContent = state.tapWithin;
+
+    const next = TAP_TIERS[state.tapTier + 1];
+    els.nextTierInfo.textContent = next ? `Lv ${next.req} & ${t.name} 10/10` : 'Max tier';
+
+    if (state.tapWithin >= 10) {
+      els.buyTap.textContent = next ? `Upgrade to ${next.name}` : 'Maxed';
+      els.buyTap.disabled = !canUpgradeTier();
+    } else {
+      const cost = tapCost();
+      els.buyTap.innerHTML = `Buy — <span id="tapCost">${fmt(cost)}</span>`;
+      els.buyTap.disabled = state.wood < cost;
+    }
+
+    updateTreeUnlocks();
+    const mult=prestigeMultiplier();
+    els.prestige.textContent = state.prestigePoints;
+    els.prestigeMult.textContent = ` (x${mult.toFixed(2)})`;
+    els.prestigeMult2.textContent = `x${mult.toFixed(2)}`;
+    const gain = calcPrestigeGain();
+    els.prestigeGain.textContent = gain;
+    els.prestigeBtn.disabled = gain <= 0;
+  }
+
+  function tick(){
+    const nowMs = Date.now();
+    const dt = (nowMs - state.lastTick) / 1000;
+    state.lastTick = nowMs;
+
+    // Production & minting
+    const cps = totalCps();
+    if (cps > 0) state.passivePool += cps * dt;
+    if (state.passivePool >= 1) {
+      const minted = Math.floor(state.passivePool);
+      state.passivePool -= minted;
+      addWood(minted);
+    }
+
+    // Tier/quantum management — reset when tier changes to avoid jumps
+    const tier = getQuantumTier(cps);
+    if (tier.quantum !== state.cycleQuantum) {
+      state.cycleQuantum = tier.quantum;
+      state.cycleAccum = 0;
+      state.cycleLingerUntil = 0;
+      state.resetBarPending = true; // start new cycle from 0 cleanly
+    }
+
+    // Accumulate toward quantum unless lingering at full
+    if (nowMs >= state.cycleLingerUntil) {
+      state.cycleAccum += cps * dt;
+      if (state.cycleAccum >= state.cycleQuantum) {
+        state.cycleAccum = 0;                        // finish cycle
+        state.cycleLingerUntil = nowMs + 220;        // linger ~0.22s at 100%
+        state.resetBarPending = true;                // next frame after linger, snap to 0
+      }
+    }
+
+    updateBar();
+    handleLevelUps();
+    requestAnimationFrame(tick);
+    updateUI();
+  }
 
   function handleLevelUps(){
     let unlockedBefore = highestUnlockedTreeByLevel(state.level);
-  
     while (state.xp >= state.xpNext) {
-      state.xp -= state.xpNext;              // optional: keep xp overflow tidy
+      state.xp -= state.xpNext;
       state.level++;
       state.xpNext += xpForLevel(state.level);
-  
       const unlockedAfter = highestUnlockedTreeByLevel(state.level);
       const unlockedNewTree = unlockedAfter > unlockedBefore;
-  
-      // Play correct SFX: unlock variant OR default
       try {
-        if (unlockedNewTree) {
-          els.wcUnlock.currentTime = 0;
-          els.wcUnlock.play().catch(()=>{});
-        } else {
-          els.wcLevelUp.currentTime = 0;
-          els.wcLevelUp.play().catch(()=>{});
-        }
+        if (unlockedNewTree) { els.wcUnlock.currentTime = 0; els.wcUnlock.play().catch(()=>{}); }
+        else { els.wcLevelUp.currentTime = 0; els.wcLevelUp.play().catch(()=>{}); }
       } catch {}
-  
       unlockedBefore = unlockedAfter;
     }
-}
+  }
   function highestUnlockedTreeByLevel(lv){ let idx=0; for(let i=0;i<TREES.length;i++){ if(lv>=TREES[i].level) idx=i; } return idx; }
 
   function calcPrestigeGain(){ return state.level >= 99 ? 1 : 0; }
   function doPrestige(){ const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return; state.prestigePoints += gain; sfx.prestige(); Object.assign(state,{ wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0 }); for(const k in state.producers){ const p=state.producers[k]; p.qty=0; p.cost=p.baseCost; } toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`); save(false); updateUI(); }
 
-  const SAVE_KEY = 'tree-chopper-save-v10-xp-slow-manual-tree-levelsfx';
+  const SAVE_KEY = 'tree-chopper-save-v12-hard-reset-progress';
   function save(showToast=true){ const data = {...state, lastTick: Date.now()}; localStorage.setItem(SAVE_KEY, JSON.stringify(data)); if(showToast) toast('Saved!'); }
   function load(){ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return; try{ const data = JSON.parse(raw); Object.assign(state, data); HELPERS.forEach(h=>{ if(!state.producers[h.key]) state.producers[h.key]={qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}; Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost}); }); setTree(state.currentTree||0); const now = Date.now(); const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*8); const offline = Math.floor(totalCps() * away); if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); } }catch(e){ console.warn('Load failed', e); }
   }
@@ -342,15 +467,15 @@
   $('#musicBtn').addEventListener('click', async ()=>{ state.music = !state.music; updateMusicUI(); save(false); if(state.music){ await tryStartMusic(); } else { els.bgm.pause(); } });
 
   const dbgBtn = document.getElementById('debugBtn');
-if (dbgBtn) {
-  dbgBtn.addEventListener('click', () => {
-    state.wood += 10_000;
-    state.xp   += 10_000;        // grant exactly +10k XP (not scaled)
-    toast('+10k logs & +10k XP');
-    handleLevelUps();
-    updateUI();
-  });
-}
+  if (dbgBtn) {
+    dbgBtn.addEventListener('click', () => {
+      state.wood += 10_000;
+      state.xp   += 10_000;
+      toast('+10k logs & +10k XP');
+      handleLevelUps();
+      updateUI();
+    });
+  }
   
   setInterval(()=> save(false), 30_000);
 
