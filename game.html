@@ -240,12 +240,16 @@
 
   function canUseTier(ti){ if(ti===0) return true; const prevDone = state.tapWithin>=10 && state.tapTier>=ti-1; const levelOK = state.level >= TAP_TIERS[ti].req; return prevDone && levelOK; }
   function activeTier(){
-  if (state.tapWithin >= 10 && state.tapTier < TAP_TIERS.length - 1) {
+    // Only auto-advance if we've completed 10/10 AND meet level req
+    if (state.tapWithin >= 10 && state.tapTier < TAP_TIERS.length - 1) {
       const next = state.tapTier + 1;
-      if (canUseTier(next)) {
+      if (state.level >= TAP_TIERS[next].req) {
         state.tapTier = next;
         state.tapWithin = 0;
-        try { els.axeTierUp.currentTime = 0; els.axeTierUp.play().catch(()=>{}); } catch {}
+        try {
+          els.axeTierUp.currentTime = 0;
+          els.axeTierUp.play().catch(()=>{});
+        } catch {}
       }
     }
     return TAP_TIERS[state.tapTier];
