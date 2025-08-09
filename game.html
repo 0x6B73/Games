@@ -57,14 +57,14 @@
     <header>
       <div class="stats">
         <div class="pill">🌲 <b id="wood">0</b></div>
-        <div class="pill">⛏️ <b id="cps">0</b><span class="sub">/s</span></div>
+        <div class="pill">🪵 <b id="cps">0</b><span class="sub">/s</span></div>
         <div class="pill">👆 <b id="tap">1</b></div>
         <div class="pill">⭐ <b id="level">1</b></div>
         <div class="pill">📈 <b id="xp">0</b>/<b id="xpNext">50</b></div>
         <div class="pill">🏆 <b id="prestige">0</b><span class="sub" id="prestigeMult"></span></div>
         <div class="controls" style="margin-left:auto">
           <button id="saveBtn" class="small">💾 Save</button>
-          <button id="settingsBtn" class="small">⚙️</button>
+          <!--<button id="settingsBtn" class="small">⚙️</button>-->
         </div>
       </div>
     </header>
@@ -100,7 +100,7 @@
           <div class="icon">📘</div>
           <div>
             <div class="title">Metal Tiers</div>
-            <div class="sub">Bronze(1) → Iron(10) → Steel(15) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
+            <div class="sub">Bronze(1) → Iron(5) → Steel(10) → Mithril(20) → Adamant(30) → Rune(40) → Dragon(60)</div>
           </div>
         </div>
       </div>
@@ -185,8 +185,8 @@
 
   const TAP_TIERS = [
     {name:'Bronze',  req:1,  inc:1,   base:25,        scale:1.7},
-    {name:'Iron',    req:10, inc:2,   base:2_500,     scale:1.8},
-    {name:'Steel',   req:15, inc:5,   base:15_000,    scale:1.9},
+    {name:'Iron',    req:5, inc:2,   base:2_500,     scale:1.8},
+    {name:'Steel',   req:10, inc:5,   base:15_000,    scale:1.9},
     {name:'Mithril', req:20, inc:12,  base:75_000,    scale:2.0},
     {name:'Adamant', req:30, inc:25,  base:350_000,   scale:2.05},
     {name:'Rune',    req:40, inc:60,  base:1_800_000, scale:2.1},
