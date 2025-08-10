@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
-<title>Nozruc’s Neon Jackpots</title>
+<title>Nozruc’s Neon Jackpots — Player+EV Default</title>
 <meta name="theme-color" content="#00e5ff" />
 <style>
   :root{
@@ -82,7 +82,6 @@
 
   /* Wide screens: tidy two-row layout */
   @media (min-width: 721px){
-    .topbar{grid-template-columns:repeat(3,1fr)}
     .controls{
       grid-template-columns:repeat(6,1fr);
       grid-template-areas:
@@ -139,7 +138,7 @@
 <aside id="sheet" class="sheet" role="dialog" aria-label="Odds & Settings">
   <h3 style="margin:0 0 8px">Odds & Settings</h3>
   <p style="margin:6px 0 12px; color:#cfe">
-    Default favors the player: Base house edge <strong>-10%</strong> (RTP 110%). Adjust ±25 percentage points.
+    Default favors the player: Base house edge <strong>-15%</strong> (RTP 115%). Adjust ±25 percentage points.
   </p>
   <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
     <div>
@@ -147,16 +146,16 @@
       <input id="edgeSlider" type="range" min="-25" max="25" step="0.5" />
     </div>
     <div>
-      <span class="badge">Base Edge: <span id="baseEdgeLabel">-10%</span></span>
+      <span class="badge">Base Edge: <span id="baseEdgeLabel">-15%</span></span>
       <span class="badge">Adjustment: <span id="edgeAdjLabel">0%</span></span>
-      <span class="badge">Current Edge: <span id="edgeLabel">-10%</span></span>
-      <span class="badge">Est. RTP: <span id="rtpLabel">110%</span></span>
+      <span class="badge">Current Edge: <span id="edgeLabel">-15%</span></span>
+      <span class="badge">Est. RTP: <span id="rtpLabel">115%</span></span>
     </div>
     <div><button id="edgeReset" style="width:100%">Reset Adjustment</button></div>
     <div><button id="resetBtn" style="width:100%; border-color:#ff8080">Reset Progress</button></div>
     <div><button id="closeSheet" style="width:100%">Close</button></div>
   </div>
-  <p style="margin:12px 0 0; color:#cfe">Note: Small payouts <em>below</em> your bet are still losses (classic LDWs).</p>
+  <p style="margin:12px 0 0; color:#cfe">Note: Small payouts below your bet are still losses (LDWs). The default math is player-favorable overall.</p>
 </aside>
 
 <script>
@@ -164,15 +163,20 @@
   'use strict';
 
   /* ---------- Storage & state ---------- */
-  const SAVE_KEY = 'NOZRUC_V10_PE';
-  const META_KEY = 'NOZRUC_META_V1';
+  const SAVE_KEY = 'NOZRUC_V11_PLAYER_PLUS';
+  const META_KEY = 'NOZRUC_META_V2';
   const storage = (()=>{ try{ localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return localStorage; }catch{ return {getItem:()=>null,setItem:()=>{},removeItem:()=>{}}; }})();
   const now = ()=>Date.now();
 
-  const BASE_EDGE = -10;                 // % (player edge by default)
+  // Player-favorable default; slider adjusts in percentage points
+  const BASE_EDGE = -15;                 // %
   const SLIDER_RANGE = 25;               // ± points
+
+  // Warm-up plan: guaranteed net-positive over first 5 spins (sum = 6.0x bet)
+  const WARMUP_PLAN = [0.6, 0.8, 0.8, 0.8, 3.0];
+
   let meta = (()=>{ try{ return JSON.parse(storage.getItem(META_KEY))||{} }catch{ return {} }})();
-  if (typeof meta.warmupWinsLeft !== 'number') meta.warmupWinsLeft = 5; // first 5 spins win
+  if (typeof meta.warmupIndex !== 'number') meta.warmupIndex = 0;
   function saveMeta(){ try{ storage.setItem(META_KEY, JSON.stringify(meta)); }catch{} }
 
   const defaultState=()=>({credits:500, bet:10, spins:0, high:500, lastBonus:0, edgeAdj:0});
@@ -217,7 +221,7 @@
     const small=()=>[660,880].forEach((f,i)=>osc({type:'triangle',f0:f,f1:f*1.02,dur:.16,gain:.58,start:i*.09}));
     const win=()=>[523,659,783,1046].forEach((f,i)=>osc({type:'triangle',f0:f,f1:f*1.015,dur:.18,gain:.65,start:i*.1}));
     const mega=()=>{ for(let i=0;i<12;i++) osc({type:'sawtooth',f0:300+i*45,f1:420+i*60,dur:.09,gain:.6,start:i*.06}); };
-    const lose=()=>[220,196].forEach((f,i)=>osc({type:'sine',f0:f,f1:f*.98,dur:.2,gain:.42,start:i*.08}));
+    const lose=()=>[220,196].forEach((f,i)=>osc({type:'sine',f0:f,f1:f*.98,dur:.2,gain:.42,start*i*.08}));
     return {lever,whoosh,tick,clack,small,win,mega,lose}; })();
 
   /* ---------- Particles ---------- */
@@ -243,24 +247,35 @@
     requestAnimationFrame(loop); })(last);
 
   /* ---------- Symbols & RTP scaling ---------- */
-  const symbols=[ {ch:'🍒',w:22,p:4},{ch:'🍋',w:22,p:3},{ch:'🔔',w:16,p:6},{ch:'⭐',w:12,p:10},{ch:'💎',w:7,p:20},{ch:'7️⃣',w:4,p:50},{ch:'🌈',w:8,p:0,wild:true} ];
+  const symbols=[ {ch:'🍒',w:22,p:5},{ch:'🍋',w:22,p:4},{ch:'🔔',w:16,p:8},{ch:'⭐',w:12,p:12},{ch:'💎',w:7,p:25},{ch:'7️⃣',w:4,p:60},{ch:'🌈',w:8,p:0,wild:true} ];
+  // ↑ bumped 3-kind pays slightly to make wins feel better (RTP scaler will keep the chosen edge)
+
   const weighted=[]; symbols.forEach(s=>{ for(let i=0;i<s.w;i++) weighted.push(s); });
   const pick=()=>weighted[(Math.random()*weighted.length)|0];
 
   function evalCombo(a,b,c){
     const arr=[a,b,c], wilds=arr.filter(x=>x.wild).length, bases=arr.filter(x=>!x.wild);
     const counts={}; for(const s of bases) counts[s.ch]=(counts[s.ch]||0)+1;
-    for(const ch in counts){ if(counts[ch]+wilds>=3){ const sym=bases.find(x=>x.ch===ch); return {mult:sym.p, tag:'3kind'}; } }
-    for(const ch in counts){ if(counts[ch]+wilds>=2){ return {mult:0.6, tag:'2kind'}; } }
-    if(arr.some(s=>['⭐','💎','7️⃣'].includes(s.ch))) return {mult:0.2, tag:'single-high'};
-    return {mult:0, tag:'lose'};
+
+    // All-wilds pays as a real 3-kind (use 7️⃣ level by default)
+    if (wilds === 3) return { mult: 60, tag: '3kind-wild' };
+
+    // 3-kind (wilds can complete)
+    for(const ch in counts){ if(counts[ch]+wilds>=3){ const sym=bases.find(x=>x.ch===ch); return { mult: sym.p, tag:'3kind' }; } }
+    // 2-kind (wilds can complete)
+    for(const ch in counts){ if(counts[ch]+wilds>=2) return { mult: 0.6, tag:'2kind' }; }
+
+    // consolation if a “high” appears
+    if (arr.some(s=>['⭐','💎','7️⃣'].includes(s.ch))) return { mult: 0.25, tag:'single-high' }; // tiny, but a bit nicer
+    return { mult: 0, tag:'lose' };
   }
+
   function baseRTP(){ const n=weighted.length; let E=0; for(let i=0;i<n;i++)for(let j=0;j<n;j++)for(let k=0;k<n;k++)E+=evalCombo(weighted[i],weighted[j],weighted[k]).mult; return E/(n*n*n); }
   const BASE_RTP=baseRTP();
   const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
   const targetEdge=()=>clamp(BASE_EDGE+(+state.edgeAdj||0),-95,95);
-  const targetRTP=()=>1-targetEdge()/100;
-  const scaleMult=()=>clamp(targetRTP()/BASE_RTP,0.05,3);
+  const targetRTP=()=>1-targetEdge()/100;               // can exceed 1 when edge is negative
+  const scaleMult=()=>clamp(targetRTP()/BASE_RTP,0.05,3); // scaler maintains chosen edge
 
   /* ---------- UI helpers ---------- */
   const fmt=n=>n.toLocaleString();
@@ -277,9 +292,9 @@
 
   /* ---------- Controls ---------- */
   function setBet(v){ state.bet=clamp(Math.round(v)||1,1,100000); save(); sync(); }
-  betUp.addEventListener('click',()=>{ AudioKit.tick(); setBet(state.bet+5); });
-  betDown.addEventListener('click',()=>{ AudioKit.tick(); setBet(state.bet-5); });
-  maxBtn.addEventListener('click',()=>{ AudioKit.tick(); setBet(Math.min(state.credits,100000)); });
+  betUp.addEventListener('click',()=>setBet(state.bet+5));
+  betDown.addEventListener('click',()=>setBet(state.bet-5));
+  maxBtn.addEventListener('click',()=>setBet(Math.min(state.credits,100000)));
   betInput.addEventListener('change',()=>setBet(betInput.value));
   betInput.addEventListener('focus',e=>e.target.select());
 
@@ -308,27 +323,28 @@
     for(let i=0;i<3;i++){ const id=setInterval(()=>{ const s=pick(); reels[i].textContent=s.ch; AudioKit.tick(); }, Math.max(40,90-i*10)); ints.push(id); }
     stop.forEach((d,i)=>setTimeout(()=>{ clearInterval(ints[i]); const s=pick(); reels[i].textContent=s.ch; roll[i]=s; flash(reels[i]); AudioKit.clack();
       if(i===2){
-        // Warm-up rig (first N spins guaranteed "wins")
-        const isWarm = meta.warmupWinsLeft>0; if(isWarm){ meta.warmupWinsLeft--; saveMeta(); }
-
-        let {mult} = evalCombo(roll[0],roll[1],roll[2]);
-        let scale=scaleMult();
-        let raw = state.bet * mult * scale;
-
         let payout = 0;
-        if(isWarm){
-          const last = meta.warmupWinsLeft===0;
-          const multWarm = last ? (1.2 + Math.random()*1.3) : (0.25 + Math.random()*0.65);
-          raw = state.bet * multWarm;
+
+        // Warm-up: guaranteed net-positive over first 5 spins
+        if (meta.warmupIndex < WARMUP_PLAN.length){
+          const multWarm = WARMUP_PLAN[meta.warmupIndex++];
+          saveMeta();
+          const raw = state.bet * multWarm;
+          const base = Math.floor(raw), frac = raw - base;
+          payout = base + (Math.random() < frac ? 1 : 0);
+        } else {
+          // Normal path: evaluate + RTP scaling + unbiased rounding
+          const {mult} = evalCombo(roll[0],roll[1],roll[2]);
+          const raw = state.bet * mult * scaleMult();
+          const base = Math.floor(raw), frac = raw - base;
+          payout = base + (Math.random() < frac ? 1 : 0);
         }
-        // stochastic rounding (no floor bias)
-        const base=Math.floor(raw), frac=raw-base; payout = base + (Math.random()<frac ? 1 : 0);
 
         if(payout>0){
           state.credits+=payout;
           const strength=clamp((payout/state.bet - 0.2)/50,0,1);
           spawnFX(strength);
-          if(payout>=state.bet*10) AudioKit.mega(); else if(payout>=state.bet*2) AudioKit.win(); else AudioKit.small();
+          if(payout>=state.bet*12) AudioKit.mega(); else if(payout>=state.bet*2) AudioKit.win(); else AudioKit.small();
           setMsg(`You won ${payout.toLocaleString()} credits! 🎉`);
         }else{
           AudioKit.lose(); setMsg('So close!');
