@@ -481,4 +481,142 @@
   const scaleMultiplier = ()=> clamp(targetRTP()/BASE_RTP, 0.05, 2);
 
   /* ===============================
-     UI hel
+     UI helpers
+     =============================== */
+  const fmt = n => n.toLocaleString();
+  function setMessage(t){ msgEl.innerHTML = t || ''; }
+  function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
+
+  function sync(){
+    creditsEl.textContent = fmt(state.credits);
+    highEl.textContent = fmt(state.high);
+    spinsEl.textContent = fmt(state.spins);
+    betInput.value = state.bet;
+    edgeSlider.value = state.edgeAdj;
+    baseEdgeLabel.textContent = `${BASE_EDGE}%`;
+    edgeAdjLabel.textContent = `${(+state.edgeAdj).toFixed(1)}%`;
+    edgeLabel.textContent = `${(targetEdge()).toFixed(1)}%`;
+    rtpLabel.textContent = `${(targetRTP()*100).toFixed(1)}%`;
+  }
+  sync();
+
+  /* ===============================
+     Betting & controls
+     =============================== */
+  function setBet(v){
+    state.bet = clamp(Math.round(v)||1, 1, 100000);
+    save(); sync();
+  }
+  betUpBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(state.bet + 5); });
+  betDownBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(state.bet - 5); });
+  maxBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(Math.min(state.credits, 100000)); });
+  betInput.addEventListener('change', ()=> setBet(betInput.value));
+  betInput.addEventListener('focus', e=> e.target.select());
+
+  // Bonus every 2 minutes
+  function tryBonus(){
+    const COOLDOWN=120000, amt=50; const ready = now() - state.lastBonus >= COOLDOWN;
+    if(ready){ state.credits += amt; state.lastBonus = now(); setMessage(`Bonus +${amt} credits! ✨`); flash(stage); save(); sync(); return true; }
+    const left = Math.ceil((COOLDOWN - (now()-state.lastBonus))/1000);
+    setMessage(`Bonus ready in ${left}s…`); return false;
+  }
+  bonusBtn.addEventListener('click', ()=>{ AudioKit.tick(); tryBonus(); });
+
+  // Odds sheet
+  oddsBtn.addEventListener('click', ()=>{ sheet.classList.add('open'); });
+  closeSheet.addEventListener('click', ()=>{ sheet.classList.remove('open'); });
+  edgeSlider.addEventListener('input', ()=>{
+    state.edgeAdj = clamp(parseFloat(edgeSlider.value)||0, -SLIDER_RANGE, SLIDER_RANGE);
+    save(); sync();
+  });
+  edgeReset.addEventListener('click', ()=>{ state.edgeAdj = 0; save(); sync(); });
+
+  // Reset
+  $('resetBtn').addEventListener('click', ()=>{
+    if(confirm('Reset all progress? This cannot be undone.')){
+      storage.removeItem(SAVE_KEY);
+      state = defaultState(); save(); sync();
+      r0.textContent='🍒'; r1.textContent='🍋'; r2.textContent='🔔';
+      setMessage('Progress reset. Fresh bankroll!'); flash(stage);
+    }
+  });
+
+  /* ===============================
+     Spin logic
+     =============================== */
+  let spinning = false;
+  let spinTimers = [];
+  function clearTimers(){ spinTimers.forEach(id=>clearTimeout(id)); spinTimers.length=0; }
+
+  function doSpin(){
+    if(spinning) return;
+    if(state.bet > state.credits){ setMessage('Not enough credits. Lower your bet or claim a bonus.'); AudioKit.lose(); return; }
+
+    AudioKit.lever(); AudioKit.spinWhoosh();
+    setMessage('Spinning…');
+    spinning = true;
+    state.credits -= state.bet; save(); sync();
+
+    const reels = [r0,r1,r2];
+    const stopDelays = [760, 1080, 1420];
+    const roll = [null, null, null];
+
+    const intervalIds = [];
+    for(let i=0;i<3;i++){
+      let speed = 90 - i*10;
+      const id = setInterval(()=>{
+        const s = randSym(); reels[i].textContent = s.ch;
+        AudioKit.tick();
+      }, Math.max(40, speed));
+      intervalIds.push(id);
+    }
+
+    stopDelays.forEach((d,i)=>{
+      const tid = setTimeout(()=>{
+        clearInterval(intervalIds[i]);
+        const s = randSym(); reels[i].textContent = s.ch; roll[i]=s; flash(reels[i]); AudioKit.stopClack();
+
+        if(i===2){
+          const {mult, tag} = evaluate(roll[0], roll[1], roll[2]);
+          const scale = scaleMultiplier();
+          const payout = Math.floor(state.bet * mult * scale);
+          const net = payout - state.bet;
+
+          if(mult>0 && payout>0){
+            state.credits += payout;
+            const strength = clamp((payout/state.bet - 0.2)/50, 0, 1); // normalize 0..1
+            spawnWinFX(mult, strength);
+            if(mult>=50) AudioKit.mega(); else if(mult>=10) AudioKit.win(); else AudioKit.smallWin();
+            setMessage(`You won ${fmt(payout)} credits! 🎉`);
+          } else {
+            AudioKit.lose();
+            setMessage('So close!');
+          }
+
+          state.spins++;
+          if(state.credits>state.high) state.high = state.credits;
+
+          save(); sync(); spinning=false; clearTimers();
+        }
+      }, d);
+      spinTimers.push(tid);
+    });
+  }
+
+  spinBtn.addEventListener('click', doSpin);
+  document.addEventListener('keydown', e=>{ if(e.code==='Space'){ e.preventDefault(); doSpin(); } });
+
+  /* ===============================
+     Boot
+     =============================== */
+  (function boot(){
+    if(state.credits<=0){ state.credits=100; setMessage('Here are 100 credits to keep playing!'); }
+    sync();
+    // small intro flash
+    setTimeout(()=>flash(stage), 350);
+  })();
+
+})();
+</script>
+</body>
+</html>
