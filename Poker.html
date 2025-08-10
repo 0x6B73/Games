@@ -207,89 +207,99 @@ function cardToText(c){ return RANKS[c.r] + SUITS[c.s]; }
    Returns [rankCategory, ...kickers] where higher is better.
    Categories: 8=StraightFlush,7=Four,6=FullHouse,5=Flush,4=Straight,3=Trips,2=TwoPair,1=Pair,0=High
 */
+// ====== Hand Eval (fixed) ======
 function eval7(cards){
-  // Build helpers
-  const counts = Array(13).fill(0); const suitMap=[[],[],[],[]];
+  // Count ranks and bucket by suit
+  const counts = Array(13).fill(0);
+  const suitMap = [[], [], [], []]; // suitMap[suit] = [ranks...]
   for (const c of cards){ counts[c.r]++; suitMap[c.s].push(c.r); }
+
   const ranksDesc = [...Array(13).keys()].reverse();
-  const haveFlushSuit = suitMap.find(sarr=>sarr.length>=5);
-  const uniqRanks = ranksDesc.filter(r => counts[r]>0);
-  // Straight finder (with wheel A-5)
+  const uniqRanks = ranksDesc.filter(r => counts[r] > 0);
+
+  // Find flush suit index (0..3) or -1
+  const flushSuitIdx = suitMap.findIndex(arr => arr.length >= 5);
+
+  // Straight helper (returns the *low* key of best straight, or -1)
   function bestStraight(ranks){
-    let run=1, best=-1, last=ranks[0];
+    if (!ranks.length) return -1;
+    let run = 1, best = -1, last = ranks[0];
     for (let i=1;i<ranks.length;i++){
-      if (ranks[i] === last-1){ run++; if(run>=5) best = ranks[i-4]; }
-      else if (ranks[i] !== last){ run=1; }
+      if (ranks[i] === last-1){ run++; if (run>=5) best = ranks[i-4]; }
+      else if (ranks[i] !== last){ run = 1; }
       last = ranks[i];
     }
-    // Wheel (A-5): treat Ace (12) as below 0
-    if (ranks.includes(12) && ranks.includes(3) && ranks.includes(2) && ranks.includes(1) && ranks.includes(0))
-      best = Math.max(best, 3); // 5-high straight, key rank=3
-    return best; // returns low end key (rank of 5th card in run)
+    // Wheel A-5 (A=12)
+    if (ranks.includes(12) && ranks.includes(3) && ranks.includes(2) && ranks.includes(1) && ranks.includes(0)){
+      best = Math.max(best, 3);
+    }
+    return best;
   }
-  // Straight flush
-  if (haveFlushSuit){
-    const franks = [...new Set(suitMap[SUITS.indexOf(SUITS[haveFlushSuit])])]; // (not used)
+
+  // Straight Flush
+  if (flushSuitIdx !== -1){
+    const fr = [...new Set(suitMap[flushSuitIdx].sort((a,b)=>b-a))];
+    const sf = bestStraight(fr);
+    if (sf >= 0) return [8, sf+4, sf+3, sf+2, sf+1, sf];
   }
-  if (haveFlushSuit){
-    const rset = [...suitMap[SUITS.indexOf(SUITS[haveFlushSuit])]].sort((a,b)=>b-a);
-    const uniq = [...new Set(rset)];
-    let sf = bestStraight(uniq);
-    if (sf>=0) return [8, sf+4, sf+3, sf+2, sf+1, sf]; // straight top down
-  }
-  // Four, Full House, Trips, Pairs
+
+  // Group by counts
   const byCount = {4:[],3:[],2:[],1:[]};
   for (let r=12;r>=0;r--) byCount[counts[r]].push(r);
+
+  // Four of a kind
   if (byCount[4].length){
     const four = byCount[4][0];
-    const kick = [...byCount[1], ...byCount[2], ...byCount[3]].sort((a,b)=>b-a)[0];
+    const kick = [...byCount[1], ...byCount[2], ...byCount[3]].sort((a,b)=>b-a)[0] ?? 0;
     return [7, four, kick];
   }
+
+  // Full House
   if (byCount[3].length && (byCount[2].length || byCount[3].length>1)){
     const trips = byCount[3][0];
-    const pair = byCount[3].length>1 ? byCount[3][1] : byCount[2][0];
+    const pair  = byCount[3].length>1 ? byCount[3][1] : byCount[2][0];
     return [6, trips, pair];
   }
-  // Flush (pick top 5 ranks of flush suit)
-  if (haveFlushSuit){
-    const fr = suitMap[SUITS.indexOf(SUITS[haveFlushSuit])].sort((a,b)=>b-a);
-    return [5, fr[0],fr[1],fr[2],fr[3],fr[4]];
+
+  // Flush
+  if (flushSuitIdx !== -1){
+    const fr = suitMap[flushSuitIdx].sort((a,b)=>b-a);
+    return [5, fr[0], fr[1], fr[2], fr[3], fr[4]];
   }
+
   // Straight
-  const straightLowKey = bestStraight(uniqRanks);
-  if (straightLowKey>=0) return [4, straightLowKey+4, straightLowKey+3, straightLowKey+2, straightLowKey+1, straightLowKey];
+  {
+    const sKey = bestStraight(uniqRanks);
+    if (sKey >= 0) return [4, sKey+4, sKey+3, sKey+2, sKey+1, sKey];
+  }
+
   // Trips
   if (byCount[3].length){
     const t = byCount[3][0];
     const ks = [...byCount[1], ...byCount[2]].sort((a,b)=>b-a);
-    return [3, t, ks[0], ks[1]];
+    return [3, t, ks[0] ?? 0, ks[1] ?? 0];
   }
+
   // Two Pair
-  if (byCount[2].length>=2){
+  if (byCount[2].length >= 2){
     const p1 = byCount[2][0], p2 = byCount[2][1];
-    const kick = byCount[1].length? byCount[1][0] : (byCount[2][2] ?? 0);
+    const kick = byCount[1][0] ?? (byCount[2][2] ?? 0);
     return [2, p1, p2, kick];
   }
+
   // One Pair
   if (byCount[2].length){
     const p = byCount[2][0];
     const ks = byCount[1].slice(0,3);
-    while(ks.length<3) ks.push(0);
+    while (ks.length<3) ks.push(0);
     return [1, p, ...ks];
   }
+
   // High Card
   const top = uniqRanks.slice(0,5);
   while (top.length<5) top.push(0);
   return [0, ...top];
 }
-function cmpRank(a,b){
-  for (let i=0;i<Math.max(a.length,b.length);i++){
-    const av = a[i] ?? -1; const bv = b[i] ?? -1;
-    if (av!==bv) return av-bv;
-  }
-  return 0;
-}
-
 /* ====== Game State ====== */
 const NAMES = ["Maya","Zed","Kira","Owen","Rhea","Axel","Nora","Jules","Pax","Ivy","Cole"];
 const state = {
