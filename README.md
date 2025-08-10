@@ -1,2 +1,2 @@
 # IdleTreeCutter
-Stupid Idle Tree Cutter Game
+Idle Tree Cutter Game inspired by OSRS.
