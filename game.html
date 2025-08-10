@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=.75, maximum-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Tree Chopper Idle</title>
   <meta name="theme-color" content="#0e6b2f" />
   <style>
     :root{ --bg:#0f172a; --panel:#111827; --panel-2:#0b1223; --text:#e5e7eb; --muted:#9ca3af; --accent:#22c55e; --shadow:0 10px 20px rgba(0,0,0,.35); --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
     *{box-sizing:border-box}
-    html,body{height:100%}
+    html,body{touch-action: manipulation; /* allows panning & pinch; disables double-tap zoom */}
+    button, a, .btn, canvas {
+      touch-action: manipulation;
+    }
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:radial-gradient(1200px 800px at 50% -10%,#052e16 0%,var(--bg) 45%);color:var(--text)}
     .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100svh;padding-top:var(--safe-top);padding-bottom:calc(var(--safe-bottom) + 6px)}
     header{position:sticky;top:0;z-index:5;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(17,24,39,.9),rgba(17,24,39,.65));border-bottom:1px solid #1f2937;padding:.6rem .9rem;padding-top:calc(.6rem + var(--safe-top))}
