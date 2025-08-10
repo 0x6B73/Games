@@ -1,4 +1,4 @@
-# IdleTreeCutter
+# Tree
 Idle Tree Cutter Game inspired by OSRS.
 
 
@@ -10,3 +10,7 @@ Features:
 - Prestige Syetem
 - Cosmetic Unlocks
 - Offline progress
+
+
+# Nozruc's Neon JackPots
+Slots
