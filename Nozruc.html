@@ -190,7 +190,9 @@
     const smallWin = () => { [660,880].forEach((f,i)=>osc({type:'triangle',f0:f,f1:f*1.02,dur:.16,gain:.58,start:i*.09})); };
     const bigWin = () => { [523,659,783,1046].forEach((f,i)=>osc({type:'triangle',f0:f,f1:f*1.015,dur:.18,gain:.65,start*i*.1})); };
     const mega = () => { for(let i=0;i<12;i++) osc({type:'sawtooth', f0:300+i*45, f1:420+i*60, dur:.09, gain:.6, start:i*.06}); };
-    const lose = () => { [220,196].forEach((f,i)=>osc({type:'sine', f0:f, f1:f*.98, dur:.2, gain:.42, start:i*.08})); };
+    const lose = () => { 
+  [220,196].forEach((f,i)=>osc({type:'sine', f0:f, f1:f*.98, dur:.2, gain:.42, start: i*.08}));
+};
 
     return { lever, spinWhoosh, tick, stopClack, smallWin, bigWin, mega, lose };
   })();
