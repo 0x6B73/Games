@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta
-  name="viewport"
-  content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1"
-/>
-<title>Nozruc’s Neon Jackpots</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+<title>Nozruc’s Neon Jackpots — Player-Edge</title>
 <meta name="theme-color" content="#00e5ff" />
 <style>
   /* =========================
@@ -33,202 +29,68 @@
              env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
   .app{min-height:100dvh; display:grid; grid-template-rows:auto 1fr auto; gap:var(--gap)}
-  .container{max-width:1000px; margin:0 auto; width:100%}
+  .container{max-width:1000px; margin:0 auto; width:100%}/* Header */ .hdr{padding:var(--pad) var(--pad) 6px; text-align:center} .logo{ margin:0; font-weight:900; letter-spacing:.6px; line-height:1.1; font-size: clamp(26px, 7vw, 56px); background: linear-gradient(90deg,var(--neon1),var(--neon2),var(--neon4)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow: 0 0 22px rgba(0,229,255,.35); } .marquee{ height:7px; max-width:min(680px,92%); margin:10px auto 0; border-radius:999px; position:relative; overflow:hidden; background:linear-gradient(90deg,#012,#024 30%,#013 60%,#012); } .marquee::before{ content:""; position:absolute; inset:-50% auto auto -30%; width:60%; height:220%; background: conic-gradient(from 0deg, var(--neon2), var(--neon1), var(--neon3), var(--neon4), var(--neon2)); filter: blur(12px) saturate(160%); opacity:.9; animation:sweep 3.5s linear infinite; pointer-events:none; } @keyframes sweep{to{transform: translateX(250%)}}
 
-  /* Header */
-  .hdr{padding:var(--pad) var(--pad) 6px; text-align:center}
-  .logo{
-    margin:0;
-    font-weight:900; letter-spacing:.6px; line-height:1.1;
-    font-size: clamp(26px, 7vw, 56px);
-    background: linear-gradient(90deg,var(--neon1),var(--neon2),var(--neon4));
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    text-shadow: 0 0 22px rgba(0,229,255,.35);
-  }
-  .marquee{
-    height:7px; max-width:min(680px,92%); margin:10px auto 0;
-    border-radius:999px; position:relative; overflow:hidden;
-    background:linear-gradient(90deg,#012,#024 30%,#013 60%,#012);
-  }
-  .marquee::before{
-    content:""; position:absolute; inset:-50% auto auto -30%;
-    width:60%; height:220%;
-    background: conic-gradient(from 0deg, var(--neon2), var(--neon1), var(--neon3), var(--neon4), var(--neon2));
-    filter: blur(12px) saturate(160%); opacity:.9; animation:sweep 3.5s linear infinite;
-    pointer-events:none;
-  }
-  @keyframes sweep{to{transform: translateX(250%)}}
+/* Stage (game area) */ .stage{ position:relative; isolation:isolate; margin:0 auto; padding:var(--pad); max-width:900px; background: linear-gradient(180deg, rgba(0,229,255,.06), rgba(255,47,211,.05)); border:1px solid rgba(0,229,255,.25); border-radius: var(--radius); box-shadow: 0 10px 30px rgba(0,0,0,.55); } .topbar{ display:grid; grid-template-columns: repeat(3,1fr); gap:var(--gap); padding:8px; border-radius:12px; background:linear-gradient(180deg,rgba(0,229,255,.08),rgba(255,47,211,.06)); border:1px solid rgba(0,229,255,.2); } .chip{ display:flex; align-items:center; justify-content:center; gap:8px; min-height:44px; padding:10px; border-radius:999px; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800; box-shadow: inset 0 0 10px rgba(0,229,255,.2); } .chip .dot{ width:10px; height:10px; border-radius:999px; background:var(--neon1); box-shadow:0 0 10px var(--neon1), 0 0 20px var(--neon1); }
 
-  /* Stage (game area) */
-  .stage{
-    position:relative; isolation:isolate;
-    margin:0 auto; padding:var(--pad);
-    max-width:900px;
-    background: linear-gradient(180deg, rgba(0,229,255,.06), rgba(255,47,211,.05));
-    border:1px solid rgba(0,229,255,.25);
-    border-radius: var(--radius);
-    box-shadow: 0 10px 30px rgba(0,0,0,.55);
-  }
-  .topbar{
-    display:grid; grid-template-columns: repeat(3,1fr); gap:var(--gap);
-    padding:8px; border-radius:12px;
-    background:linear-gradient(180deg,rgba(0,229,255,.08),rgba(255,47,211,.06));
-    border:1px solid rgba(0,229,255,.2);
-  }
-  .chip{
-    display:flex; align-items:center; justify-content:center; gap:8px;
-    min-height:44px; padding:10px; border-radius:999px;
-    background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25);
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:800;
-    box-shadow: inset 0 0 10px rgba(0,229,255,.2);
-  }
-  .chip .dot{
-    width:10px; height:10px; border-radius:999px; background:var(--neon1);
-    box-shadow:0 0 10px var(--neon1), 0 0 20px var(--neon1);
-  }
+/* Reels */ .reels{ display:grid; grid-template-columns: repeat(3,1fr); gap:var(--gap); margin:var(--gap) auto; max-width:760px; } .reel{ position:relative; height: clamp(120px, 32vw, 210px); border-radius:14px; background: radial-gradient(260px 110px at 50% -20%, rgba(255,179,0,.2), rgba(255,47,211,.08)), linear-gradient(180deg,#0b1c28,#06141d 40%,#0b1c28); border:1px solid rgba(0,229,255,.25); box-shadow: inset 0 -30px 60px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.35); overflow:hidden; } .window{ position:absolute; inset:10px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.65)); border:1px solid rgba(255,255,255,.06); font-size: clamp(44px, 12vw, 80px); text-shadow:0 0 14px rgba(255,255,255,.3); } .flash{animation:flash .7s ease-out} @keyframes flash{30%{box-shadow:0 0 22px 6px rgba(255,255,255,.38)}}
 
-  /* Reels */
-  .reels{
-    display:grid; grid-template-columns: repeat(3,1fr); gap:var(--gap);
-    margin:var(--gap) auto; max-width:760px;
-  }
-  .reel{
-    position:relative; height: clamp(120px, 32vw, 210px); border-radius:14px;
-    background: radial-gradient(260px 110px at 50% -20%, rgba(255,179,0,.2), rgba(255,47,211,.08)),
-               linear-gradient(180deg,#0b1c28,#06141d 40%,#0b1c28);
-    border:1px solid rgba(0,229,255,.25);
-    box-shadow: inset 0 -30px 60px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.35);
-    overflow:hidden;
-  }
-  .window{
-    position:absolute; inset:10px; border-radius:10px;
-    display:flex; align-items:center; justify-content:center;
-    background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.65));
-    border:1px solid rgba(255,255,255,.06);
-    font-size: clamp(44px, 12vw, 80px);
-    text-shadow:0 0 14px rgba(255,255,255,.3);
-  }
-  .flash{animation:flash .7s ease-out}
-  @keyframes flash{30%{box-shadow:0 0 22px 6px rgba(255,255,255,.38)}}
+/* Particle canvas overlays stage */ #fx{ position:absolute; inset:0; pointer-events:none; border-radius:inherit; overflow:hidden; }
 
-  /* Particle canvas overlays stage */
-  #fx{
-    position:absolute; inset:0; pointer-events:none; border-radius:inherit; overflow:hidden;
-  }
+/* Message */ .message{min-height:28px; text-align:center; margin:6px 0 2px; font-weight:900; color:#bfefff}
 
-  /* Message */
-  .message{min-height:28px; text-align:center; margin:6px 0 2px; font-weight:900; color:#bfefff}
+/* Controls - sticky on mobile */ .controls-wrap{ position:sticky; bottom:0; z-index:15; padding: calc(8px + env(safe-area-inset-bottom)) var(--pad) var(--pad); background: linear-gradient(180deg, transparent, rgba(0,0,0,.55) 35%, rgba(0,0,0,.85)); backdrop-filter: blur(6px); } .controls{ display:grid; grid-template-columns: repeat(6,1fr); gap:var(--gap); max-width:900px; margin:0 auto; } button{ appearance:none; -webkit-appearance:none; padding:14px; min-height:48px; border-radius:12px; border:1px solid rgba(0,229,255,.35); background:linear-gradient(180deg,rgba(0,229,255,.1),rgba(255,47,211,.06)); color:var(--text); font-weight:900; letter-spacing:.35px; cursor:pointer; box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 0 16px rgba(0,229,255,.15); } button:active{transform:translateY(1px)} .primary{border-color:rgba(137,255,0,.45)} .input{ width:100%; padding:12px; min-height:48px; border-radius:10px; border:1px solid rgba(0,229,255,.35); background:#07121a; color:var(--text); font-weight:900; text-align:center; font-size:16px; } #betInput{grid-column: span 2} #spinBtn{grid-column: span 2} #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 2}
 
-  /* Controls - sticky on mobile */
-  .controls-wrap{
-    position:sticky; bottom:0; z-index:15;
-    padding: calc(8px + env(safe-area-inset-bottom)) var(--pad) var(--pad);
-    background: linear-gradient(180deg, transparent, rgba(0,0,0,.55) 35%, rgba(0,0,0,.85));
-    backdrop-filter: blur(6px);
-  }
-  .controls{
-    display:grid; grid-template-columns: repeat(6,1fr); gap:var(--gap); max-width:900px; margin:0 auto;
-  }
-  button{
-    appearance:none; -webkit-appearance:none;
-    padding:14px; min-height:48px;
-    border-radius:12px; border:1px solid rgba(0,229,255,.35);
-    background:linear-gradient(180deg,rgba(0,229,255,.1),rgba(255,47,211,.06));
-    color:var(--text); font-weight:900; letter-spacing:.35px; cursor:pointer;
-    box-shadow:0 8px 18px rgba(0,0,0,.35), inset 0 0 16px rgba(0,229,255,.15);
-  }
-  button:active{transform:translateY(1px)}
-  .primary{border-color:rgba(137,255,0,.45)}
-  .input{
-    width:100%; padding:12px; min-height:48px; border-radius:10px;
-    border:1px solid rgba(0,229,255,.35); background:#07121a; color:var(--text);
-    font-weight:900; text-align:center; font-size:16px;
-  }
-  #betInput{grid-column: span 2}
-  #spinBtn{grid-column: span 4}
-  #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 2}
+/* Odds sheet (bottom modal) */ .sheet{ position:fixed; inset:auto 0 0 0; z-index:9999; background:#0a1118; color:var(--text); border-top-left-radius:18px; border-top-right-radius:18px; border:1px solid rgba(0,229,255,.25); transform:translateY(110%); transition:transform .28s ease; max-height:82dvh; overflow:auto; padding:16px; } .sheet.open{transform:translateY(0)} .badge{ display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25); font-weight:800; margin-right:8px; margin-bottom:8px; } .warn{color:#ff6b6b; font-weight:900}
 
-  /* Odds sheet (bottom modal) */
-  .sheet{
-    position:fixed; inset:auto 0 0 0; z-index:9999;
-    background:#0a1118; color:var(--text);
-    border-top-left-radius:18px; border-top-right-radius:18px;
-    border:1px solid rgba(0,229,255,.25);
-    transform:translateY(110%); transition:transform .28s ease;
-    max-height:82dvh; overflow:auto; padding:16px;
-  }
-  .sheet.open{transform:translateY(0)}
-  .badge{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:6px 10px; border-radius:999px;
-    background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25);
-    font-weight:800; margin-right:8px; margin-bottom:8px;
-  }
-  .warn{color:#ff6b6b; font-weight:900}
+/* Narrow phones: stack top chips, compact grid / @media (max-width: 720px){ .topbar{grid-template-columns:1fr} .controls{grid-template-columns: repeat(4,1fr)} #betInput{grid-column: span 2} #spinBtn{grid-column: span 4} / wider spin on mobile */ #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 4} } @media (max-width: 360px){ .controls{grid-template-columns: repeat(3,1fr)} #betInput,#spinBtn{grid-column: span 3} } </style>
 
-  /* Narrow phones: stack top chips, compact grid */
-  @media (max-width: 720px){
-    .topbar{grid-template-columns:1fr}
-    .controls{grid-template-columns: repeat(4,1fr)}
-    #betInput{grid-column: span 2}
-    #spinBtn{grid-column: span 4}
-    #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 4}
-  }
-  @media (max-width: 360px){
-    .controls{grid-template-columns: repeat(3,1fr)}
-    #betInput,#spinBtn{grid-column: span 3}
-  }
-</style>
 </head>
 <body>
   <div class="app">
     <header class="hdr container">
       <h1 class="logo">Nozruc’s Neon Jackpots</h1>
       <div class="marquee" aria-hidden="true"></div>
-    </header>
+    </header><main class="container">
+  <section class="stage" id="stage" aria-label="Slot machine">
+    <!-- Particle FX -->
+    <canvas id="fx"></canvas>
 
-    <main class="container">
-      <section class="stage" id="stage" aria-label="Slot machine">
-        <!-- Particle FX -->
-        <canvas id="fx"></canvas>
+    <!-- Score chips -->
+    <div class="topbar">
+      <div class="chip"><span class="dot"></span> Credits: <strong id="credits">0</strong></div>
+      <div class="chip"><span class="dot" style="background:var(--neon2)"></span> High: <strong id="high">0</strong></div>
+      <div class="chip"><span class="dot" style="background:var(--neon4)"></span> Spins: <strong id="spins">0</strong></div>
+    </div>
 
-        <!-- Score chips -->
-        <div class="topbar">
-          <div class="chip"><span class="dot"></span> Credits: <strong id="credits">0</strong></div>
-          <div class="chip"><span class="dot" style="background:var(--neon2)"></span> High: <strong id="high">0</strong></div>
-          <div class="chip"><span class="dot" style="background:var(--neon4)"></span> Spins: <strong id="spins">0</strong></div>
-        </div>
+    <!-- Reels -->
+    <div class="reels">
+      <div class="reel"><div class="window" id="r0">🍒</div></div>
+      <div class="reel"><div class="window" id="r1">🍋</div></div>
+      <div class="reel"><div class="window" id="r2">🔔</div></div>
+    </div>
 
-        <!-- Reels -->
-        <div class="reels">
-          <div class="reel"><div class="window" id="r0">🍒</div></div>
-          <div class="reel"><div class="window" id="r1">🍋</div></div>
-          <div class="reel"><div class="window" id="r2">🔔</div></div>
-        </div>
+    <div class="message" id="message" role="status" aria-live="polite"></div>
+  </section>
+</main>
 
-        <div class="message" id="message" role="status" aria-live="polite"></div>
-      </section>
-    </main>
-
-    <!-- Sticky controls -->
-    <nav class="controls-wrap">
-      <div class="controls container">
-        <button id="betDown" aria-label="Decrease bet">−</button>
-        <input id="betInput" class="input" type="number" min="1" max="100000" step="1" inputmode="numeric" pattern="[0-9]*" value="10" />
-        <button id="betUp" aria-label="Increase bet">＋</button>
-        <button id="spinBtn" class="primary">SPIN ✨</button>
-        <button id="maxBtn" title="Bet maximum">Max</button>
-        <button id="bonusBtn" title="Periodic bonus">Bonus</button>
-        <button id="oddsBtn" title="Odds & Settings">Odds</button>
-      </div>
-    </nav>
+<!-- Sticky controls -->
+<nav class="controls-wrap">
+  <div class="controls container">
+    <button id="betDown" aria-label="Decrease bet">−</button>
+    <input id="betInput" class="input" type="number" min="1" max="100000" step="1" inputmode="numeric" pattern="[0-9]*" value="10" />
+    <button id="betUp" aria-label="Increase bet">＋</button>
+    <button id="spinBtn" class="primary">SPIN ✨</button>
+    <button id="maxBtn" title="Bet maximum">Max</button>
+    <button id="bonusBtn" title="Periodic bonus">Bonus</button>
+    <button id="oddsBtn" title="Odds & Settings">Odds</button>
   </div>
+</nav>
 
-  <!-- Odds & Settings Bottom Sheet -->
-  <aside id="sheet" class="sheet" role="dialog" aria-label="Odds & Settings">
+  </div>  <!-- Odds & Settings Bottom Sheet -->  <aside id="sheet" class="sheet" role="dialog" aria-label="Odds & Settings">
     <h3 style="margin:0 0 8px">Odds & Settings</h3>
     <p style="margin:6px 0 12px; color:#cfe">
-      Base house edge <strong>40%</strong>. Adjust within <strong>±25%</strong>.
+      Default favors the player. Base house edge <strong>-10%</strong> (RTP 110%). Adjust within <strong>±25%</strong>.
     </p>
     <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
       <div>
@@ -236,10 +98,10 @@
         <input id="edgeSlider" type="range" min="-25" max="25" step="0.5" />
       </div>
       <div>
-        <span class="badge">Base Edge: <span id="baseEdgeLabel">40%</span></span>
+        <span class="badge">Base Edge: <span id="baseEdgeLabel">-10%</span></span>
         <span class="badge">Adjustment: <span id="edgeAdjLabel">0%</span></span>
-        <span class="badge">Current Edge: <span id="edgeLabel">55%</span></span>
-        <span class="badge">Est. RTP: <span id="rtpLabel">45%</span></span>
+        <span class="badge">Current Edge: <span id="edgeLabel">-10%</span></span>
+        <span class="badge">Est. RTP: <span id="rtpLabel">110%</span></span>
       </div>
       <div>
         <button id="edgeReset" style="width:100%">Reset Adjustment</button>
@@ -251,30 +113,28 @@
         <button id="closeSheet" style="width:100%">Close</button>
       </div>
     </div>
-    <p style="margin:12px 0 0; color:#cfe">Small payouts below your bet are <span class="warn">losses disguised as wins</span>. The show is loud on purpose.</p>
-  </aside>
-
-<script>
+    <p style="margin:12px 0 0; color:#cfe">Small payouts below your bet are flashy but still losses. Adjust the edge to explore how quickly bankrolls rise or fall.</p>
+  </aside><script>
 (() => {
   'use strict';
 
   /* ===============================
      Storage (guarded) & State
      =============================== */
-  const SAVE_KEY = 'NOZRUC_V9_MOBILE';
+  const SAVE_KEY = 'NOZRUC_PLAYER_EDGE_V1';
   const storage = (() => {
     try { localStorage.setItem('_t','1'); localStorage.removeItem('_t'); return localStorage; }
     catch { return { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} }; }
   })();
   const now = () => Date.now();
-  const BASE_EDGE = 40;  // %
+  const BASE_EDGE = -10;  // % (player-favor default)
   const SLIDER_RANGE = 25;
 
   const defaultState = () => ({
-    credits: 1000,
+    credits: 500,
     bet: 10,
     spins: 0,
-    high: 1000,
+    high: 500,
     lastBonus: 0,
     edgeAdj: 0,   // ±25
   });
@@ -318,13 +178,8 @@
     const Ctx = window.AudioContext || window.webkitAudioContext;
     const ctx = new Ctx();
     let unlocked = false;
-    const unlock = () => {
-      if (!unlocked) { ctx.resume(); unlocked = true; }
-    };
-    // unlock on first user gesture
-    ['pointerdown','touchstart','click'].forEach(t =>
-      window.addEventListener(t, unlock, { once:true })
-    );
+    const unlock = () => { if (!unlocked) { ctx.resume(); unlocked = true; } };
+    ['pointerdown','touchstart','click'].forEach(t => window.addEventListener(t, unlock, { once:true }));
 
     const master = ctx.createGain(); master.gain.value = 0.22; master.connect(ctx.destination);
     const comp = ctx.createDynamicsCompressor();
@@ -332,7 +187,6 @@
     comp.connect(master);
     const delay = ctx.createDelay(0.6); delay.delayTime.value = 0.14;
     const dGain = ctx.createGain(); dGain.gain.value = 0.18; delay.connect(dGain); dGain.connect(comp);
-
     const chain = n => { n.connect(comp); n.connect(delay); };
 
     function osc({type='square', f0=440, f1=440, dur=0.15, gain=0.8, start=0}){
@@ -356,11 +210,9 @@
       const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=lp;
       const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=hp;
       src.connect(hpf); hpf.connect(lpf); lpf.connect(g); chain(g);
-      const t0 = ctx.currentTime + start;
-      src.start(t0); src.stop(t0+dur);
+      const t0 = ctx.currentTime + start; src.start(t0); src.stop(t0+dur);
     }
 
-    // SFX palette
     const lever = () => { noise({dur:.09, lp:8000, hp:1000, gain:.35}); osc({type:'triangle', f0:220, f1:160, dur:.10, gain:.7}); };
     const spinWhoosh = () => { for(let i=0;i<11;i++) osc({type:'sawtooth', f0:220+i*36, f1:260+i*44, dur:.06, gain:.35, start:i*0.045}); };
     const tick = () => { osc({type:'square', f0:1200, f1:1000, dur:.03, gain:.36}); };
@@ -387,10 +239,9 @@
   }
   const rand=(a,b)=>a+Math.random()*(b-a);
   function spawnWinFX(mult, strength){
-    // mult ~ payout / bet; strength ~ scaled 0..1
     const rect = stage.getBoundingClientRect();
     const cx = rect.width/2, cy = rect.height*0.36;
-    const count = Math.round(30 + strength*120);
+    const count = Math.round(30 + strength*140);
     for(let i=0;i<count;i++){
       const huePick = Math.random();
       const color = huePick<.33? 'rgba(0,229,255,' : (huePick<.66? 'rgba(255,47,211,' : 'rgba(137,255,0,');
@@ -398,7 +249,7 @@
         x: cx, y: cy,
         vx: rand(-2-strength*2, 2+strength*2),
         vy: rand(-3-strength*3, -1-strength*1),
-        life: rand(0.7, 1.5) + strength*0.6,
+        life: rand(0.7, 1.6) + strength*0.7,
         age: 0,
         size: rand(2, 4) + strength*2,
         colorBase: color
@@ -409,10 +260,7 @@
     fxc.clearRect(0,0,fxCanvas.width,fxCanvas.height);
     particles = particles.filter(p => p.age < p.life);
     for(const p of particles){
-      p.age += dt;
-      p.vy += 4 * dt; // gravity
-      p.x += p.vx;
-      p.y += p.vy;
+      p.age += dt; p.vy += 4 * dt; p.x += p.vx; p.y += p.vy;
       const t = Math.min(1, p.age / p.life);
       const alpha = (1 - t) * 0.9;
       fxc.fillStyle = p.colorBase + alpha + ')';
@@ -421,13 +269,8 @@
     requestAnimationFrame(loopFX);
   }
   let lastTS = performance.now();
-  function loopFX(ts){
-    const dt = Math.max(0.001, Math.min(0.033, (ts - lastTS)/1000));
-    lastTS = ts;
-    stepFX(dt);
-  }
-  const ro = new ResizeObserver(resizeFX); ro.observe(stage);
-  resizeFX(); requestAnimationFrame(loopFX);
+  function loopFX(ts){ const dt = Math.max(0.001, Math.min(0.033, (ts - lastTS)/1000)); lastTS = ts; stepFX(dt); }
+  const ro = new ResizeObserver(resizeFX); ro.observe(stage); resizeFX(); requestAnimationFrame(loopFX);
 
   /* ===============================
      Symbols, odds, LDW-bias
@@ -444,41 +287,30 @@
   const weighted = []; for(const s of symbols) for(let i=0;i<s.weight;i++) weighted.push(s);
   const randSym = ()=> weighted[(Math.random()*weighted.length)|0];
 
+  // Correct wild handling: pay true 3-kind when wilds complete a set
   function evaluate(a,b,c){
     const arr=[a,b,c]; const wilds=arr.filter(s=>s.wild).length; const bases=arr.filter(s=>!s.wild);
     const counts={}; for(const s of bases) counts[s.ch]=(counts[s.ch]||0)+1;
-    if(bases.length===3 && bases[0].ch===bases[1].ch && bases[1].ch===bases[2].ch) return {mult:bases[0].pay, tag:'3kind'};
-    if(wilds>=1 && bases.length>=2){
-      const same=Object.keys(counts).find(k=>counts[k]>=2);
-      if(same){ const sym=bases.find(x=>x.ch===same); return {mult:sym.pay, tag:'3kind-wild'}; }
-    }
-    if(Object.values(counts).some(n=>n===2) || (wilds>=1 && bases.length>=1)) return {mult:0.6, tag:'2kind'};
+    // 3-kind (including wild substitutions)
+    for(const ch in counts){ if(counts[ch] + wilds >= 3){ const sym=bases.find(x=>x.ch===ch); return {mult:sym.pay, tag:'3kind'}; } }
+    // 2-kind (including wilds)
+    for(const ch in counts){ if(counts[ch] + wilds >= 2){ return {mult:0.6, tag:'2kind'}; } }
+    // Tiny consolation if any high symbol appears
     if(arr.some(s=>['⭐','💎','7️⃣'].includes(s.ch))) return {mult:0.2, tag:'single-high'};
     return {mult:0, tag:'lose'};
   }
 
   // Compute base RTP (expected multiplier per spin before scaling)
   function computeBaseRTP(){
-    const tw = weighted.length;
-    let E=0;
-    for(let i=0;i<tw;i++){
-      const si = weighted[i];
-      for(let j=0;j<tw;j++){
-        const sj = weighted[j];
-        for(let k=0;k<tw;k++){
-          const sk = weighted[k];
-          const {mult} = evaluate(si,sj,sk);
-          E += mult;
-        }
-      }
-    }
+    const tw = weighted.length; let E=0;
+    for(let i=0;i<tw;i++) for(let j=0;j<tw;j++) for(let k=0;k<tw;k++) E += evaluate(weighted[i],weighted[j],weighted[k]).mult;
     return E / (tw*tw*tw);
   }
   const BASE_RTP = computeBaseRTP();
   const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
-  const targetEdge = ()=> clamp(BASE_EDGE + (Number(state.edgeAdj)||0), 0, 95);
-  const targetRTP  = ()=> 1 - targetEdge()/100;
-  const scaleMultiplier = ()=> clamp(targetRTP()/BASE_RTP, 0.05, 2);
+  const targetEdge = ()=> clamp(BASE_EDGE + (Number(state.edgeAdj)||0), -95, 95);
+  const targetRTP  = ()=> 1 - targetEdge()/100; // can exceed 1 when edge is negative
+  const scaleMultiplier = ()=> clamp(targetRTP()/BASE_RTP, 0.05, 3);
 
   /* ===============================
      UI helpers
@@ -486,7 +318,6 @@
   const fmt = n => n.toLocaleString();
   function setMessage(t){ msgEl.innerHTML = t || ''; }
   function flash(el){ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); }
-
   function sync(){
     creditsEl.textContent = fmt(state.credits);
     highEl.textContent = fmt(state.high);
@@ -503,10 +334,7 @@
   /* ===============================
      Betting & controls
      =============================== */
-  function setBet(v){
-    state.bet = clamp(Math.round(v)||1, 1, 100000);
-    save(); sync();
-  }
+  function setBet(v){ state.bet = clamp(Math.round(v)||1, 1, 100000); save(); sync(); }
   betUpBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(state.bet + 5); });
   betDownBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(state.bet - 5); });
   maxBtn.addEventListener('click', ()=>{ AudioKit.tick(); setBet(Math.min(state.credits, 100000)); });
@@ -525,10 +353,7 @@
   // Odds sheet
   oddsBtn.addEventListener('click', ()=>{ sheet.classList.add('open'); });
   closeSheet.addEventListener('click', ()=>{ sheet.classList.remove('open'); });
-  edgeSlider.addEventListener('input', ()=>{
-    state.edgeAdj = clamp(parseFloat(edgeSlider.value)||0, -SLIDER_RANGE, SLIDER_RANGE);
-    save(); sync();
-  });
+  edgeSlider.addEventListener('input', ()=>{ state.edgeAdj = clamp(parseFloat(edgeSlider.value)||0, -SLIDER_RANGE, SLIDER_RANGE); save(); sync(); });
   edgeReset.addEventListener('click', ()=>{ state.edgeAdj = 0; save(); sync(); });
 
   // Reset
@@ -545,9 +370,6 @@
      Spin logic
      =============================== */
   let spinning = false;
-  let spinTimers = [];
-  function clearTimers(){ spinTimers.forEach(id=>clearTimeout(id)); spinTimers.length=0; }
-
   function doSpin(){
     if(spinning) return;
     if(state.bet > state.credits){ setMessage('Not enough credits. Lower your bet or claim a bonus.'); AudioKit.lose(); return; }
@@ -560,27 +382,27 @@
     const reels = [r0,r1,r2];
     const stopDelays = [760, 1080, 1420];
     const roll = [null, null, null];
+    const intervals = [];
 
-    const intervalIds = [];
     for(let i=0;i<3;i++){
       let speed = 90 - i*10;
-      const id = setInterval(()=>{
-        const s = randSym(); reels[i].textContent = s.ch;
-        AudioKit.tick();
-      }, Math.max(40, speed));
-      intervalIds.push(id);
+      const id = setInterval(()=>{ const s = randSym(); reels[i].textContent = s.ch; AudioKit.tick(); }, Math.max(40, speed));
+      intervals.push(id);
     }
 
     stopDelays.forEach((d,i)=>{
-      const tid = setTimeout(()=>{
-        clearInterval(intervalIds[i]);
+      setTimeout(()=>{
+        clearInterval(intervals[i]);
         const s = randSym(); reels[i].textContent = s.ch; roll[i]=s; flash(reels[i]); AudioKit.stopClack();
-
         if(i===2){
           const {mult, tag} = evaluate(roll[0], roll[1], roll[2]);
           const scale = scaleMultiplier();
-          const payout = Math.floor(state.bet * mult * scale);
-          const net = payout - state.bet;
+
+          // Unbiased (stochastic) rounding to remove floor bias
+          const raw = state.bet * mult * scale;
+          const base = Math.floor(raw);
+          const frac = raw - base;
+          const payout = base + (Math.random() < frac ? 1 : 0);
 
           if(mult>0 && payout>0){
             state.credits += payout;
@@ -589,17 +411,13 @@
             if(mult>=50) AudioKit.mega(); else if(mult>=10) AudioKit.win(); else AudioKit.smallWin();
             setMessage(`You won ${fmt(payout)} credits! 🎉`);
           } else {
-            AudioKit.lose();
-            setMessage('So close!');
+            AudioKit.lose(); setMessage('So close!');
           }
 
-          state.spins++;
-          if(state.credits>state.high) state.high = state.credits;
-
-          save(); sync(); spinning=false; clearTimers();
+          state.spins++; if(state.credits>state.high) state.high = state.credits;
+          save(); sync(); spinning=false;
         }
       }, d);
-      spinTimers.push(tid);
     });
   }
 
@@ -611,12 +429,9 @@
      =============================== */
   (function boot(){
     if(state.credits<=0){ state.credits=100; setMessage('Here are 100 credits to keep playing!'); }
-    sync();
-    // small intro flash
-    setTimeout(()=>flash(stage), 350);
+    sync(); setTimeout(()=>flash(stage), 350);
   })();
 
 })();
-</script>
-</body>
+</script></body>
 </html>
