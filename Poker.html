@@ -203,34 +203,30 @@ function freshDeck(){
 }
 function cardToText(c){ return RANKS[c.r] + SUITS[c.s]; }
 
-/* ====== Hand Eval (7-card Texas Hold’em) ======
+/* ====== Hand Eval (fixed) ======
    Returns [rankCategory, ...kickers] where higher is better.
    Categories: 8=StraightFlush,7=Four,6=FullHouse,5=Flush,4=Straight,3=Trips,2=TwoPair,1=Pair,0=High
 */
-// ====== Hand Eval (fixed) ======
 function eval7(cards){
-  // Count ranks and bucket by suit
   const counts = Array(13).fill(0);
-  const suitMap = [[], [], [], []]; // suitMap[suit] = [ranks...]
+  const suitMap = [[], [], [], []];
   for (const c of cards){ counts[c.r]++; suitMap[c.s].push(c.r); }
 
   const ranksDesc = [...Array(13).keys()].reverse();
   const uniqRanks = ranksDesc.filter(r => counts[r] > 0);
 
-  // Find flush suit index (0..3) or -1
   const flushSuitIdx = suitMap.findIndex(arr => arr.length >= 5);
 
-  // Straight helper (returns the *low* key of best straight, or -1)
   function bestStraight(ranks){
     if (!ranks.length) return -1;
-    let run = 1, best = -1, last = ranks[0];
-    for (let i=1;i<ranks.length;i++){
-      if (ranks[i] === last-1){ run++; if (run>=5) best = ranks[i-4]; }
-      else if (ranks[i] !== last){ run = 1; }
-      last = ranks[i];
+    const sorted = [...new Set(ranks)].sort((a,b)=>b-a);
+    let run = 1, best = -1, last = sorted[0];
+    for (let i=1;i<sorted.length;i++){
+      if (sorted[i] === last-1){ run++; if (run>=5) best = sorted[i-4]; }
+      else { run = 1; }
+      last = sorted[i];
     }
-    // Wheel A-5 (A=12)
-    if (ranks.includes(12) && ranks.includes(3) && ranks.includes(2) && ranks.includes(1) && ranks.includes(0)){
+    if (sorted.includes(12) && sorted.includes(3) && sorted.includes(2) && sorted.includes(1) && sorted.includes(0)){
       best = Math.max(best, 3);
     }
     return best;
@@ -238,56 +234,48 @@ function eval7(cards){
 
   // Straight Flush
   if (flushSuitIdx !== -1){
-    const fr = [...new Set(suitMap[flushSuitIdx].sort((a,b)=>b-a))];
+    const fr = [...new Set(suitMap[flushSuitIdx])].sort((a,b)=>b-a);
     const sf = bestStraight(fr);
     if (sf >= 0) return [8, sf+4, sf+3, sf+2, sf+1, sf];
   }
 
-  // Group by counts
   const byCount = {4:[],3:[],2:[],1:[]};
   for (let r=12;r>=0;r--) byCount[counts[r]].push(r);
 
-  // Four of a kind
   if (byCount[4].length){
     const four = byCount[4][0];
     const kick = [...byCount[1], ...byCount[2], ...byCount[3]].sort((a,b)=>b-a)[0] ?? 0;
     return [7, four, kick];
   }
 
-  // Full House
   if (byCount[3].length && (byCount[2].length || byCount[3].length>1)){
     const trips = byCount[3][0];
     const pair  = byCount[3].length>1 ? byCount[3][1] : byCount[2][0];
     return [6, trips, pair];
   }
 
-  // Flush
   if (flushSuitIdx !== -1){
     const fr = suitMap[flushSuitIdx].sort((a,b)=>b-a);
     return [5, fr[0], fr[1], fr[2], fr[3], fr[4]];
   }
 
-  // Straight
   {
     const sKey = bestStraight(uniqRanks);
     if (sKey >= 0) return [4, sKey+4, sKey+3, sKey+2, sKey+1, sKey];
   }
 
-  // Trips
   if (byCount[3].length){
     const t = byCount[3][0];
     const ks = [...byCount[1], ...byCount[2]].sort((a,b)=>b-a);
     return [3, t, ks[0] ?? 0, ks[1] ?? 0];
   }
 
-  // Two Pair
   if (byCount[2].length >= 2){
     const p1 = byCount[2][0], p2 = byCount[2][1];
     const kick = byCount[1][0] ?? (byCount[2][2] ?? 0);
     return [2, p1, p2, kick];
   }
 
-  // One Pair
   if (byCount[2].length){
     const p = byCount[2][0];
     const ks = byCount[1].slice(0,3);
@@ -295,11 +283,18 @@ function eval7(cards){
     return [1, p, ...ks];
   }
 
-  // High Card
   const top = uniqRanks.slice(0,5);
   while (top.length<5) top.push(0);
   return [0, ...top];
 }
+function cmpRank(a,b){
+  for (let i=0;i<Math.max(a.length,b.length);i++){
+    const av = a[i] ?? -1; const bv = b[i] ?? -1;
+    if (av!==bv) return av-bv;
+  }
+  return 0;
+}
+
 /* ====== Game State ====== */
 const NAMES = ["Maya","Zed","Kira","Owen","Rhea","Axel","Nora","Jules","Pax","Ivy","Cole"];
 const state = {
@@ -308,13 +303,13 @@ const state = {
   minRaise: 20,
   playerBank: 1000,
   opponents: 3,
-  seats: [], // [{id,name,bank,isMe,in,folded,bet,allin,hole:[2], power}]
+  seats: [],
   deck: [],
   board: [],
   pot: 0,
   dealerIdx: 0,
   toAct: 0,
-  street: 'idle', // idle|preflop|flop|turn|river|showdown
+  street: 'idle',
   lastAggressor: null,
   handOver: true,
 };
@@ -335,15 +330,12 @@ const newGameBtn = $('#newGameBtn'), leaveBtn = $('#leaveBtn');
 oppSlider.addEventListener('input', e=>{
   oppCountLabel.textContent = e.target.value;
 });
-
 newGameBtn.addEventListener('click', ()=>{
   state.opponents = Number(oppSlider.value);
   startFreshGame(true);
 });
-
 leaveBtn.addEventListener('click', ()=>{
   showToast(`You leave the table with ${fmt(state.playerBank)}.`, 2200);
-  // Leaving just resets opponents; you keep bankroll.
   startFreshGame(false);
 });
 
@@ -362,25 +354,18 @@ callBtn.addEventListener('click', onPlayerCall);
 raiseBtn.addEventListener('click', onPlayerRaise);
 dealBtn.addEventListener('click', ()=> startHand());
 
-function updateBank(){
-  bankEl.textContent = fmt(state.playerBank);
-}
+function updateBank(){ bankEl.textContent = fmt(state.playerBank); }
 function meSeat(){ return state.seats.find(s=>s.isMe); }
 
 /* ====== Rendering ====== */
 function render(){
-  // Community
   commEl.innerHTML='';
-  for (const c of state.board){
-    const card = renderCard(c, true);
-    commEl.appendChild(card);
-  }
-  // Pot / phase
+  for (const c of state.board){ commEl.appendChild(renderCard(c, true)); }
+
   potEl.textContent = fmt(state.pot);
   phaseTag.textContent = state.street==='idle' ? '' :
     {preflop:'Preflop',flop:'Flop',turn:'Turn',river:'River',showdown:'Showdown'}[state.street];
 
-  // Seats
   playersEl.innerHTML='';
   state.seats.forEach((s, idx)=>{
     const seat = el('div','seat'+(s.isMe?' me':''));
@@ -407,25 +392,25 @@ function render(){
     playersEl.appendChild(seat);
   });
 
-  // Controls state
   const me = meSeat();
   const toActMe = state.seats[state.toAct] && state.seats[state.toAct].isMe && !state.handOver;
   const currentBet = Math.max(...state.seats.map(s=>s.bet));
   const meOwes = Math.max(0, currentBet - me.bet);
-  callBtn.textContent = meOwes>0 ? `Call ${fmt(meOwes)}` : 'Call';
-  checkBtn.textContent = meOwes>0 ? '—' : 'Check';
 
-  foldBtn.disabled = !toActMe;
+  // Enable/disable — simpler, predictable
+  foldBtn.disabled  = !toActMe;
   checkBtn.disabled = !toActMe || meOwes>0;
-  callBtn.disabled = !toActMe || meOwes===0 && anyoneToActAfterMe()===false; // trivial check/auto
+  callBtn.disabled  = !toActMe || meOwes===0;
   raiseBtn.disabled = !toActMe;
+  allInBtn.disabled = !toActMe;
+
+  callBtn.textContent = meOwes>0 ? `Call ${fmt(meOwes)}` : 'Call';
   betSlider.min = Math.max(state.minRaise, state.bigBlind);
   betSlider.max = Math.max(state.bigBlind*50, me.bank);
   if (Number(betSlider.value) < Number(betSlider.min)) betSlider.value = betSlider.min;
   betLabel.textContent = fmt(betSlider.value);
-  dealBtn.disabled = !state.handOver;
-  allInBtn.disabled = !toActMe;
 
+  dealBtn.disabled = !state.handOver;
   updateBank();
 }
 function tag(text){ const t=el('div','tag'); t.textContent=text; return t; }
@@ -440,12 +425,9 @@ function renderCard(c, face=true){
 
 /* ====== Game Flow ====== */
 function startFreshGame(resetBankroll){
-  // Opponents reset to $1000. Player keeps bankroll unless resetBankroll=true.
   if (resetBankroll) state.playerBank = 1000;
   const seats = [];
-  // Player
   seats.push({id:'me', name:'You', bank: state.playerBank, isMe:true, in:true, folded:false, bet:0, allin:false, hole:[], power:0});
-  // Opponents
   const opps = state.opponents;
   const pool = [...NAMES];
   for (let i=0;i<opps;i++){
@@ -453,7 +435,6 @@ function startFreshGame(resetBankroll){
     seats.push({id:'cpu'+i, name:nm, bank:1000, isMe:false, in:true, folded:false, bet:0, allin:false, hole:[], power:0});
   }
   state.seats = seats;
-  // Remove busted (none yet)
   state.dealerIdx = 0;
   resetHandState();
   state.handOver = true;
@@ -469,19 +450,13 @@ function resetHandState(){
   state.seats.forEach(s=>{ s.bet=0; s.folded=false; s.allin=false; s.in = s.bank>0; s.hole=[]; s.revealed=false; });
 }
 function removeBustedOpponents(){
-  const before = state.seats.length;
-  // keep player seat 0
-  state.seats = [meSeat(), ...state.seats.slice(1).filter(s=>s.bank>0)];
-  if (state.seats.length !== before) {
-    showToast('An opponent leaves the table (busted).');
-  }
+  const me = meSeat();
+  state.seats = [me, ...state.seats.slice(1).filter(s=>s.bank>0)];
 }
 function startHand(){
-  // If all opponents busted previously -> new set while keeping player money
   const oppsRemaining = state.seats.slice(1).filter(s=>s.bank>0).length;
   if (oppsRemaining===0){
     showToast(`You cleared the table and keep ${fmt(state.playerBank)}! New opponents join.`, 2400);
-    // Refill opponents to slider count, player keeps bankroll
     const keepBank = state.playerBank;
     state.opponents = Number(oppSlider.value);
     startFreshGame(false);
@@ -492,18 +467,13 @@ function startHand(){
   resetHandState();
   state.handOver = false;
 
-  // Deal hole cards
   for (let r=0;r<2;r++){
     for (let i=0;i<state.seats.length;i++){
       const s = state.seats[i];
-      if (s.bank>0){
-        s.hole.push(state.deck.pop());
-      }
+      if (s.bank>0){ s.hole.push(state.deck.pop()); }
     }
   }
 
-  // Blinds
-  // Rotate dealer
   state.dealerIdx = nextInIdx(state.dealerIdx);
   const sbIdx = nextInIdx(state.dealerIdx);
   const bbIdx = nextInIdx(sbIdx);
@@ -516,7 +486,6 @@ function startHand(){
 
   statusEl.textContent = 'Make your move.';
   render();
-
   autoPlayLoop();
 }
 
@@ -530,31 +499,21 @@ function postBlind(idx, amt){
 
 function nextInIdx(from){
   let i = from;
-  do { i = (i+1) % state.seats.length; } while (!state.seats[i].in && i!==from);
+  let safety = 0;
+  do {
+    i = (i+1) % state.seats.length;
+    safety++;
+    if (safety>state.seats.length+2) break;
+  } while (!state.seats[i].in);
   return i;
 }
-function activeCount(){
-  return state.seats.filter(s=>s.in && !s.folded).length;
-}
-function anyoneToActAfterMe(){
-  // Simplified: if any non-folded, non-allin opponent hasn't matched current bet
-  const currentBet = Math.max(...state.seats.map(s=>s.bet));
-  for (let i=0;i<state.seats.length;i++){
-    const s=state.seats[i];
-    if (!s.in || s.folded || s.allin) continue;
-    if (s.bet < currentBet) return true;
-  }
-  return false;
-}
+function activeCount(){ return state.seats.filter(s=>s.in && !s.folded).length; }
 
 /* ====== Betting Round Control ====== */
 function advanceStreet(){
-  // If only one left, award pot
   if (activeCount()<=1) { return showdown(true); }
 
-  // Move to next street
   if (state.street==='preflop'){
-    // Burn 1 (abstracted), deal 3
     state.board.push(state.deck.pop(), state.deck.pop(), state.deck.pop());
     state.street='flop';
   } else if (state.street==='flop'){
@@ -566,10 +525,8 @@ function advanceStreet(){
   } else if (state.street==='river'){
     return showdown(false);
   }
-  // Reset betting
   state.seats.forEach(s=> s.bet=0);
   state.minRaise = state.bigBlind;
-  // Set action to next from dealer
   state.toAct = nextInIdx(state.dealerIdx);
   render();
   autoPlayLoop();
@@ -595,7 +552,7 @@ function onPlayerCall(){
   const me = meSeat();
   const currentBet = Math.max(...state.seats.map(s=>s.bet));
   const owe = Math.max(0, currentBet - me.bet);
-  if (owe===0){ statusEl.textContent='You check.'; return stepToNext(); }
+  if (owe===0) return;
   betChips(me, owe);
   statusEl.textContent = `You call ${fmt(owe)}.`;
   stepToNext();
@@ -605,12 +562,12 @@ function onPlayerRaise(){
   const me = meSeat();
   const target = Math.max(...state.seats.map(s=>s.bet));
   let raiseTo = Math.max(target + state.minRaise, Number(betSlider.value));
-  raiseTo = Math.min(raiseTo, me.bet + me.bank); // cannot exceed all-in
+  raiseTo = Math.min(raiseTo, me.bet + me.bank);
   const add = raiseTo - me.bet;
   if (add<=0) return;
   betChips(me, add);
   state.lastAggressor = state.seats.indexOf(me);
-  state.minRaise = Math.max(state.minRaise, add); // track raise size cap
+  state.minRaise = Math.max(state.minRaise, add);
   statusEl.textContent = `You raise to ${fmt(raiseTo)}.`;
   stepToNext(true);
 }
@@ -622,7 +579,6 @@ function betChips(seat, amount){
 }
 
 function stepToNext(resetFromAggressor=false){
-  // Next to act
   if (resetFromAggressor){
     state.toAct = nextInIdx(state.seats.indexOf(meSeat()));
   } else {
@@ -634,12 +590,10 @@ function stepToNext(resetFromAggressor=false){
 }
 
 function resolveBettingIfRoundDone(){
-  // Betting round ends when all active players have equal bets or all but one folded/all-in
   const active = state.seats.filter(s=>s.in && !s.folded);
   const equalBets = new Set(active.map(s=>s.bet)).size===1;
   const anyToCall = active.some(s=>!s.allin && s.bet < Math.max(...active.map(x=>x.bet)));
   if (!anyToCall && equalBets){
-    // Move to next street
     state.toAct = nextInIdx(state.dealerIdx);
     advanceStreet();
   }
@@ -647,13 +601,9 @@ function resolveBettingIfRoundDone(){
 
 /* ====== Opponent AI ====== */
 function handStrengthEstimate(seat){
-  // Very rough strength based on hole cards + board:
-  // Evaluate full 7-card when possible; otherwise use simple preflop weighting.
   const available = [...state.board, ...seat.hole];
   if (available.length>=5){
-    // Add randomization
     const score = eval7(available);
-    // Normalize to approx 0..1 using category and high kickers
     const base = score[0]/8;
     const spice = (score.slice(1).reduce((a,b)=>a+b,0))/ (12*5);
     return Math.min(1, base*0.85 + spice*0.15);
@@ -674,13 +624,10 @@ function aiAct(){
   const currentBet = Math.max(...state.seats.map(x=>x.bet));
   const owe = Math.max(0, currentBet - s.bet);
   const hs = handStrengthEstimate(s);
-  const risk = 1 - hs;
   const potOdds = owe ? (owe / Math.max(1, (state.pot))) : 0;
   let action = 'check', amount = 0;
 
-  // Simple policy:
   if (owe===0){
-    // Consider betting/raising small, normal, or big
     if (hs>0.7 && Math.random()<0.6){
       amount = Math.min(s.bank, Math.max(state.minRaise, Math.round(state.bigBlind*(2+hs*6))));
       action = 'bet';
@@ -691,9 +638,7 @@ function aiAct(){
       action = 'check';
     }
   } else {
-    // Facing a bet
     if (hs>0.8 || potOdds < 0.25) {
-      // Sometimes raise
       if (Math.random()<0.35){
         const raiseSize = Math.max(state.minRaise, Math.round(owe + state.bigBlind*(1+hs*5)));
         amount = Math.min(s.bank, s.bet + owe + raiseSize) - s.bet;
@@ -708,59 +653,44 @@ function aiAct(){
     }
   }
 
-  if (action==='fold'){
-    s.folded = true;
-    statusEl.textContent = `${s.name} folds.`;
-  } else if (action==='check'){
-    statusEl.textContent = `${s.name} checks.`;
-  } else if (action==='call'){
-    betChips(s, amount);
-    statusEl.textContent = `${s.name} calls ${fmt(amount)}.`;
-  } else if (action==='bet'){
+  if (action==='fold'){ s.folded = true; statusEl.textContent = `${s.name} folds.`; }
+  else if (action==='check'){ statusEl.textContent = `${s.name} checks.`; }
+  else if (action==='call'){ betChips(s, amount); statusEl.textContent = `${s.name} calls ${fmt(amount)}.`; }
+  else if (action==='bet'){
     const target = s.bet + amount;
     betChips(s, target - s.bet);
     state.lastAggressor = i;
     state.minRaise = Math.max(state.minRaise, amount);
     statusEl.textContent = `${s.name} bets ${fmt(amount)}.`;
-  } else if (action==='raise'){
+  }
+  else if (action==='raise'){
     betChips(s, amount);
     state.lastAggressor = i;
     state.minRaise = Math.max(state.minRaise, amount - owe);
     statusEl.textContent = `${s.name} raises.`;
   }
 
-  // Move on
   state.toAct = nextInIdx(i);
   resolveBettingIfRoundDone();
   render();
 }
 
 function autoPlayLoop(){
-  // Keep running AI while it's their turn and hand not over
   if (state.handOver) return;
   const seat = state.seats[state.toAct];
   if (!seat) return;
+
   if (!seat.isMe){
     setTimeout(()=>{ aiAct(); autoPlayLoop(); }, 600 + Math.random()*500);
   } else {
-    // Player turn — if owes 0 and nobody to act, auto-advance (checks around)
-    const currentBet = Math.max(...state.seats.map(s=>s.bet));
-    const me = meSeat(); const owe = Math.max(0, currentBet - me.bet);
-    if (owe===0){
-      // If everyone matched and checked, advance
-      const active = state.seats.filter(s=>s.in && !s.folded);
-      const equalBets = new Set(active.map(s=>s.bet)).size===1;
-      if (equalBets){
-        setTimeout(()=>advanceStreet(), 500);
-      }
-    }
+    // IMPORTANT: do NOT auto-advance on the player's turn — they must act
+    // (Previously this sometimes skipped the player on post-flop and felt like a freeze.)
   }
 }
 
 /* ====== Showdown / Payout ====== */
 function showdown(byFold){
   state.street='showdown';
-  // Reveal hands of anyone not folded
   state.seats.forEach(s=>{ if (s.in && !s.folded) s.revealed=true; });
 
   if (byFold){
@@ -768,22 +698,16 @@ function showdown(byFold){
     winner.bank += state.pot; if (winner.isMe) state.playerBank = winner.bank;
     statusEl.textContent = `${winner.isMe?'You':winner.name} win the pot ${fmt(state.pot)}.`;
     state.pot=0; state.handOver=true;
-    concludeHandCleanups();
-    render(); return;
+    concludeHandCleanups(); render(); return;
   }
 
-  // Evaluate each active hand
-  const contenders = state.seats
-    .map((s,idx)=>({s, idx}))
-    .filter(x=>x.s.in && !x.s.folded);
-
+  const contenders = state.seats.map((s,idx)=>({s, idx})).filter(x=>x.s.in && !x.s.folded);
   const scores = contenders.map(x=>{
     const seven = [...state.board, ...x.s.hole];
     return { idx:x.idx, score: eval7(seven) };
   });
   scores.sort((a,b)=> cmpRank(a.score,b.score)).reverse();
 
-  // Tie handling: all top-equal split
   const top = scores[0].score;
   const winners = scores.filter(x=>cmpRank(x.score, top)===0).map(x=>x.idx);
   const share = Math.floor(state.pot / winners.length);
@@ -795,26 +719,19 @@ function showdown(byFold){
     : `Split pot ${fmt(state.pot)} among ${winners.length} players.`;
   state.pot=0; state.handOver=true;
 
-  // Small reveal time
   setTimeout(()=>{ concludeHandCleanups(); render(); }, 900);
 }
 
 function concludeHandCleanups(){
-  // Remove busted opponents
   removeBustedOpponents();
-
-  // Update player stored bank
   const me = meSeat(); state.playerBank = me.bank;
 
-  // If player busted: allow buy-back
   if (me.bank<=0){
     showToast('You are busted. Buying back in for $1,000 and starting a new game.');
     state.playerBank = 1000;
     startFreshGame(true);
     return;
   }
-
-  // If all opponents gone, auto new game with same slider, player keeps money
   const oppsLeft = state.seats.slice(1).filter(s=>s.bank>0).length;
   if (oppsLeft===0){
     showToast(`You cleared the table and keep ${fmt(state.playerBank)}! New opponents join.`, 2600);
@@ -826,13 +743,11 @@ function concludeHandCleanups(){
   }
 }
 
-/* ====== Player Buy-In Button (implicit via bust), Leave behavior handled above ====== */
-
 /* ====== Start ====== */
 startFreshGame(true);
 render();
 
-/* Quality of life: prevent double-tap zoom on buttons */
+/* Prevent accidental double-tap zoom */
 document.addEventListener('touchend', (e)=>{
   const now = Date.now();
   if (document.lastTouchEnd && (now - document.lastTouchEnd) < 300){
