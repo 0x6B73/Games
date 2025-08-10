@@ -15,6 +15,11 @@
     .stats{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
     .pill{display:flex;align-items:center;gap:.35rem;padding:.45rem .7rem;border-radius:999px;background:#0b1223;box-shadow:var(--shadow)}.pill b{font-weight:700}
     .main{display:grid;place-items:center;padding:1rem;position:relative}
+
+    /* Make the tree totally non-selectable / no caret / no mouse focus ring */
+    .tree-btn, .tree-btn *{ -webkit-user-select:none; user-select:none; -webkit-user-drag:none; caret-color:transparent; }
+    .tree-btn:focus, .tree-btn:focus-visible{ outline:none; }
+
     .tree-btn{width:clamp(240px, 86svw, 520px);aspect-ratio:1/1;border-radius:28px;border:none;outline:none;-webkit-tap-highlight-color:transparent;background:#071a11;box-shadow:0 20px 40px rgba(0,0,0,.45),inset 0 6px 14px rgba(255,255,255,.04);color:#fff;font-size:clamp(42px, 10svw, 96px);line-height:1;display:grid;place-items:center;cursor:pointer;position:relative;touch-action:manipulation;overflow:hidden}
     .tree-btn:active{transform:translateY(1px) scale(.997)}
     .tree-img{width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 10px 12px rgba(0,0,0,.45))}
@@ -35,7 +40,7 @@
     .card{flex:1;background:#0c1326;border:1px solid #1e293b;border-radius:16px;padding:.75rem;display:flex;align-items:center;gap:.75rem;box-shadow:var(--shadow)}
     .icon{font-size:1.4rem}
     .title{font-weight:700}
-    .sub{font-size:.85rem;color:var(--muted)}
+    .sub{font-size:.85rem;color:#9ca3af}
     .btn{margin-left:auto;border:none;border-radius:12px;padding:.6rem .9rem;font-weight:700;background:#22c55e;color:#062814;cursor:pointer;box-shadow:var(--shadow)}
     .btn:disabled{filter:grayscale(1) brightness(.7);cursor:not-allowed}
     .controls{display:flex;gap:.5rem;flex-wrap:wrap}
@@ -51,6 +56,14 @@
     .tree-card img{width:100%;aspect-ratio:1/1;object-fit:contain;border-radius:10px;background:#06101a}
     .tree-card .lock{font-size:.8rem;color:#9ca3af}
     .select-btn{width:100%;margin-top:.25rem}
+
+    /* Flashing hint for Trees tab */
+    @keyframes hintFlash{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.7);border-color:#22c55e}50%{box-shadow:0 0 12px 4px rgba(34,197,94,.35);border-color:#86efac}}
+    .tab.hint-green{animation:hintFlash 1.25s ease-in-out infinite;border-width:2px}
+
+    /* NEW: make anything inside .btn ignore pointer events & selection to avoid “click on number” bug */
+    .btn, .btn *{ -webkit-user-select:none; user-select:none; caret-color:transparent; }
+    .btn *{ pointer-events:none; }
   </style>
 </head>
 <body>
@@ -140,7 +153,7 @@
 
     <nav class="tabs">
       <button class="tab active" data-tab="shopPanel">🛒 Shop</button>
-      <button class="tab" data-tab="treesPanel">🌳 Trees</button>
+      <button class="tab" data-tab="treesPanel" id="treesTab">🌳 Trees</button>
       <button class="tab" data-tab="prestigePanel">🏆 Prestige</button>
     </nav>
   </div>
@@ -175,24 +188,9 @@
   const sfx = { chop(){ tone(130,0.045,'sawtooth',0.04); tone(260,0.04,'square',0.02); }, buy(){ chord([523,659,784],0.12,'triangle',0.03); }, nope(){ tone(160,0.12,'sawtooth',0.03); }, level(){ chord([440,554,659],0.18,'triangle',0.035); }, prestige(){ chord([392,523,784],0.22,'square',0.04); } };
 
   // ---- SFX gating for HTMLAudio + WebAudio (mute fix) ----
-  function playSfx(el){
-    if (!state.sound) return;
-    try { el.currentTime = 0; el.play().catch(()=>{}); } catch {}
-  }
-  function stopAllSfx(){
-    [els.wcLevelUp, els.wcUnlock, els.axeTierUp].forEach(a=>{
-      try { a.pause(); a.currentTime = 0; } catch {}
-    });
-    try {
-      if (AC && AC.state !== 'suspended') AC.suspend();
-    } catch {}
-  }
-  function resumeSfx(){
-    ensureAudio();
-    try {
-      if (AC && AC.state === 'suspended') AC.resume();
-    } catch {}
-  }
+  function playSfx(el){ if (!state.sound) return; try { el.currentTime = 0; el.play().catch(()=>{}); } catch {} }
+  function stopAllSfx(){ [els.wcLevelUp, els.wcUnlock, els.axeTierUp].forEach(a=>{ try { a.pause(); a.currentTime = 0; } catch {} }); try { if (AC && AC.state !== 'suspended') AC.suspend(); } catch {} }
+  function resumeSfx(){ ensureAudio(); try { if (AC && AC.state === 'suspended') AC.resume(); } catch {} }
   // --------------------------------------------------------
 
   const XP_RATE = 2;
@@ -244,6 +242,8 @@
     // progress cycle
     cycleAccum: 0, cycleQuantum: 1, cycleLingerUntil: 0, resetBarPending: false,
     producers: Object.fromEntries(HELPERS.map(h=>[h.key,{qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}])),
+    // hint state
+    seenTreesTab: false,
   };
 
   const els = {
@@ -255,7 +255,8 @@
     toast: $('#toast'), muteBtn: $('#muteBtn'), soundBtn: $('#soundBtn'), musicBtn: $('#musicBtn'),
     tabs: $$('.tab'), panels: $$('.panel'), treeGrid: $('#treeGrid'), treeName: $('#treeName'),
     prestige: $('#prestige'), prestigeMult: $('#prestigeMult'), prestigeInfo: $('#prestigeInfo'), prestigeBtn: $('#prestigeBtn'), prestigeGain: $('#prestigeGain'), prestigeMult2: $('#prestigeMult2'),
-    bgm: $('#bgm'), wcLevelUp: $('#wcLevelUp'), wcUnlock: $('#wcUnlock'), axeTierUp: $('#axeTierUp')
+    bgm: $('#bgm'), wcLevelUp: $('#wcLevelUp'), wcUnlock: $('#wcUnlock'), axeTierUp: $('#axeTierUp'),
+    treesTab: $('#treesTab'),
   };
 
   function prestigeMultiplier(){ return 1 + state.prestigePoints * 0.10; }
@@ -292,7 +293,7 @@
     const t = TAP_TIERS[state.tapTier];
     const cost = tapCost();
     if (state.wood < cost) { sfx.nope(); return buzz(3); }
-    state.wood -= cost;
+    state.wood -= cost; // single, correct subtraction
     const treeMult = TREES[state.currentTree].tapMult;
     state.tapPower += t.inc * treeMult * prestigeMultiplier();
     state.tapWithin++;
@@ -318,29 +319,14 @@
 
   function setBarGradient(color){
     switch (color) {
-      case 'rainbow':
-        els.progBar.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)';
-        break;
-      case 'red':
-        els.progBar.style.background = 'linear-gradient(90deg, #ef4444, #b91c1c)';
-        break;
-      case 'orange':
-        els.progBar.style.background = 'linear-gradient(90deg, #f59e0b, #d97706)';
-        break;
-      case 'yellow':
-        els.progBar.style.background = 'linear-gradient(90deg, #facc15, #eab308)';
-        break;
-      case 'purple':
-        els.progBar.style.background = 'linear-gradient(90deg, #a855f7, #7e22ce)';
-        break;
-      case 'blue':
-        els.progBar.style.background = 'linear-gradient(90deg, #3b82f6, #1d4ed8)';
-        break;
-      case 'green':
-        els.progBar.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)';
-        break;
-      default: // white
-        els.progBar.style.background = 'linear-gradient(90deg, #ffffff, #e5e7eb)';
+      case 'rainbow': els.progBar.style.background = 'linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet)'; break;
+      case 'red':    els.progBar.style.background = 'linear-gradient(90deg, #ef4444, #b91c1c)'; break;
+      case 'orange': els.progBar.style.background = 'linear-gradient(90deg, #f59e0b, #d97706)'; break;
+      case 'yellow': els.progBar.style.background = 'linear-gradient(90deg, #facc15, #eab308)'; break;
+      case 'purple': els.progBar.style.background = 'linear-gradient(90deg, #a855f7, #7e22ce)'; break;
+      case 'blue':   els.progBar.style.background = 'linear-gradient(90deg, #3b82f6, #1d4ed8)'; break;
+      case 'green':  els.progBar.style.background = 'linear-gradient(90deg, #22c55e, #16a34a)'; break;
+      default:       els.progBar.style.background = 'linear-gradient(90deg, #ffffff, #e5e7eb)';
     }
   }
 
@@ -359,7 +345,6 @@
     }
 
     const frac = lingering ? 1 : clamp(state.cycleAccum / Math.max(1, state.cycleQuantum), 0, 1);
-
     setBarGradient(tier.color);
     els.progBar.style.width = (frac * 100).toFixed(1) + '%';
 
@@ -410,6 +395,9 @@
     const gain = calcPrestigeGain();
     els.prestigeGain.textContent = gain;
     els.prestigeBtn.disabled = gain <= 0;
+
+    // If level >= 15 and user hasn't opened Trees yet, flash the Trees tab
+    maybeFlashTreesTab();
   }
 
   function tick(){
@@ -453,50 +441,80 @@
     while (state.xp >= state.xpNext) {
       state.xp -= state.xpNext;
       state.level++;
-      // NOTE: keeping cumulative behavior (extra slow at high levels)
+      // cumulative requirement (steeper at high levels)
       state.xpNext += xpForLevel(state.level);
       const unlockedAfter = highestUnlockedTreeByLevel(state.level);
       const unlockedNewTree = unlockedAfter > unlockedBefore;
-      try {
-        if (unlockedNewTree) { playSfx(els.wcUnlock); }
-        else { playSfx(els.wcLevelUp); }
-      } catch {}
+      try { if (unlockedNewTree) { playSfx(els.wcUnlock); } else { playSfx(els.wcLevelUp); } } catch {}
       unlockedBefore = unlockedAfter;
     }
   }
   function highestUnlockedTreeByLevel(lv){ let idx=0; for(let i=0;i<TREES.length;i++){ if(lv>=TREES[i].level) idx=i; } return idx; }
 
   function calcPrestigeGain(){ return state.level >= 99 ? 1 : 0; }
-  function doPrestige(){ const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return; state.prestigePoints += gain; sfx.prestige(); Object.assign(state,{ wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0 }); for(const k in state.producers){ const p=state.producers[k]; p.qty=0; p.cost=p.baseCost; } toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`); save(false); updateUI(); }
+  function doPrestige(){ const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return; state.prestigePoints += gain; sfx.prestige(); Object.assign(state,{ wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0, seenTreesTab:false }); for(const k in state.producers){ const p=state.producers[k]; p.qty=0; p.cost=p.baseCost; } toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`); save(false); updateUI(); }
 
   const SAVE_KEY = 'tree-chopper-save-v12-hard-reset-progress';
   function save(showToast=true){ const data = {...state, lastTick: Date.now()}; localStorage.setItem(SAVE_KEY, JSON.stringify(data)); if(showToast) toast('Saved!'); }
-  function load(){ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return; try{ const data = JSON.parse(raw); Object.assign(state, data); HELPERS.forEach(h=>{ if(!state.producers[h.key]) state.producers[h.key]={qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}; Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost}); }); setTree(state.currentTree||0); const now = Date.now(); const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*8); const offline = Math.floor(totalCps() * away); if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); } }catch(e){ console.warn('Load failed', e); }
-  }
+  function load(){ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return; try{ const data = JSON.parse(raw); Object.assign(state, data); HELPERS.forEach(h=>{ if(!state.producers[h.key]) state.producers[h.key]={qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}; Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost}); }); setTree(state.currentTree||0); const now = Date.now(); const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*8); const offline = Math.floor(totalCps() * away); if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); } }catch(e){ console.warn('Load failed', e); } }
 
   function updateMusicUI(){ els.musicBtn.textContent = state.music ? '🎵 Music On' : '🎵 Music Off'; els.bgm.volume = clamp(state.musicVol, 0, 1); if(!state.music && !els.bgm.paused) els.bgm.pause(); }
   async function tryStartMusic(){ if(!state.music) return; try{ await els.bgm.play(); } catch(err){ const unlock = ()=>{ els.bgm.play().catch(()=>{}); window.removeEventListener('pointerdown', unlock, {once:true}); }; window.addEventListener('pointerdown', unlock, {once:true}); } }
   function toast(msg){ els.toast.textContent = msg; els.toast.style.display = 'block'; clearTimeout(els.toast._t); els.toast._t = setTimeout(()=> els.toast.style.display='none', 1600); }
   function particle(x,y,text){ const p=document.createElement('div'); p.className='floating'; p.textContent=text; p.style.left=x+'px'; p.style.top=y+'px'; els.particles.appendChild(p); setTimeout(()=>p.remove(),900); }
 
-  els.tabs.forEach(btn=> btn.addEventListener('click', ()=>{ els.tabs.forEach(b=> b.classList.remove('active')); btn.classList.add('active'); els.panels.forEach(p=> p.classList.remove('active')); $('#'+btn.dataset.tab).classList.add('active'); }));
-  function onTap(e){ ensureAudio(); if(state.music && els.bgm.paused){ els.bgm.play().catch(()=>{}); } const rect = els.treeBtn.getBoundingClientRect(); let x = rect.left + rect.width/2; let y = rect.top + rect.height/2; if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; } else if(e.clientX){ x = e.clientX; y = e.clientY; } const tree = TREES[state.currentTree]; const gain = state.tapPower * tree.tapMult * prestigeMultiplier(); state.wood += gain; state.xp += gain * XP_RATE; if(state.sound) sfx.chop(); particle(x, y, `+${fmt(gain)}`); buzz(8); handleLevelUps(); updateUI(); }
+  // Tabs
+  els.tabs.forEach(btn=> btn.addEventListener('click', ()=>{
+    els.tabs.forEach(b=> b.classList.remove('active'));
+    btn.classList.add('active');
+    els.panels.forEach(p=> p.classList.remove('active'));
+    $('#'+btn.dataset.tab).classList.add('active');
+
+    // If user clicked Trees, acknowledge hint and stop flashing
+    if (btn === els.treesTab) {
+      state.seenTreesTab = true;
+      els.treesTab.classList.remove('hint-green');
+      save(false);
+    }
+  }));
+
+  // Desktop: prevent focus/caret/selection when clicking the big tree
+  $('#treeBtn').addEventListener('mousedown', e => e.preventDefault());
+
+  function onTap(e){
+    ensureAudio();
+    if(state.music && els.bgm.paused){ els.bgm.play().catch(()=>{}); }
+
+    const rect = els.treeBtn.getBoundingClientRect();
+    let x = rect.left + rect.width/2;
+    let y = rect.top + rect.height/2;
+    if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; }
+    else if(e.clientX){ x = e.clientX; y = e.clientY; }
+
+    const tree = TREES[state.currentTree];
+    const gain = state.tapPower * tree.tapMult * prestigeMultiplier();
+    state.wood += gain;
+    state.xp += gain * XP_RATE;
+    if(state.sound) sfx.chop();
+    particle(x, y, `+${fmt(gain)}`);
+    buzz(8);
+    handleLevelUps();
+    updateUI();
+  }
+
   $('#treeBtn').addEventListener('click', onTap);
   $('#treeBtn').addEventListener('touchstart', function(e){ e.preventDefault(); onTap(e); }, {passive:false});
+
   $('#buyTap').addEventListener('click', buyTap);
   $('#saveBtn').addEventListener('click', ()=> save(true));
   $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Reset your progress?')){ localStorage.removeItem(SAVE_KEY); location.reload(); } });
   $('#muteBtn').addEventListener('click', ()=>{ state.haptics = !state.haptics; $('#muteBtn').textContent = state.haptics ? '🔊 Haptics' : '🔕 Haptics Off'; save(false); });
 
-  // SOUND toggle now fully mutes SFX (HTMLAudio + WebAudio)
+  // SOUND toggle fully mutes SFX (HTMLAudio + WebAudio)
   $('#soundBtn').addEventListener('click', ()=>{
     state.sound = !state.sound;
     $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off';
-    if (state.sound) {
-      resumeSfx();
-    } else {
-      stopAllSfx();
-    }
+    if (state.sound) { resumeSfx(); } else { stopAllSfx(); }
     save(false);
   });
 
@@ -515,7 +533,22 @@
   
   setInterval(()=> save(false), 30_000);
 
-  function init(){ buildHelpers(); buildTreeGrid(); setTree(0); updateMusicUI(); load(); updateUI(); els.bgm.volume = clamp(state.musicVol,0,1); state.lastTick = Date.now(); requestAnimationFrame(tick); tryStartMusic(); }
+  function maybeFlashTreesTab(){ if (state.level >= 15 && !state.seenTreesTab) { els.treesTab.classList.add('hint-green'); } else { els.treesTab.classList.remove('hint-green'); } }
+
+  function init(){
+    buildHelpers();
+    buildTreeGrid();
+    setTree(0);
+    updateMusicUI();
+    load();
+    updateUI();
+    els.bgm.volume = clamp(state.musicVol,0,1);
+    state.lastTick = Date.now();
+    requestAnimationFrame(tick);
+    tryStartMusic();
+    // In case a save already has level >= 15 but user never opened Trees
+    maybeFlashTreesTab();
+  }
   init();
 })();
 </script>
