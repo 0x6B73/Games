@@ -2,48 +2,41 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-<title>Nozruc's Neon Jackpots</title>
+<title>Nozruc's Neon Jackpots — Mobile Optimized</title>
+<meta name="theme-color" content="#0ef" />
 <style>
-  /* Base layout */
-  :root{
-    --neon1:#00e5ff; --neon2:#ff2fd3; --neon3:#89ff00; --neon4:#ffb300;
-    --panel:#08131c; --panel2:#0b1a26; --text:#e7f8ff; --muted:#9ed1df;
-  }
+  :root{ --neon1:#00e5ff; --neon2:#ff2fd3; --neon3:#89ff00; --neon4:#ffb300; --text:#e7f8ff; --muted:#9ed1df; }
   *{box-sizing:border-box}
   html,body{height:100%}
-  body{
-    margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
-    background: radial-gradient(1200px 800px at 50% 20%, #001018 0%, #02040a 45%, #000 70%);
-    color: var(--text);
-    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  body{ margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial; color:var(--text);
+        background: radial-gradient(1200px 800px at 50% 12%, #001018 0%, #02040a 50%, #000 80%);
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   }
-  .container{max-width:960px;margin:0 auto;padding:16px}/* Logo */ .logo{font-size:clamp(26px,6vw,46px);font-weight:900;text-align:center;letter-spacing:.5px; background:linear-gradient(90deg,var(--neon1),var(--neon2),var(--neon4)); -webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 18px rgba(0,229,255,.35)} .marquee{height:6px;margin:8px auto 0;max-width:min(640px,92%);background:linear-gradient(90deg,#012,#024 30%,#013 60%,#012);border-radius:999px}
+  .container{max-width:960px; margin:0 auto; padding:16px}/* Header */ .logo{font-size:clamp(26px,6vw,46px); font-weight:900; letter-spacing:.5px; text-align:center; background:linear-gradient(90deg,var(--neon1),var(--neon2),var(--neon4)); -webkit-background-clip:text; background-clip:text; color:transparent; text-shadow:0 0 18px rgba(0,229,255,.35)} .marquee{height:6px; margin:8px auto 0; max-width:min(640px,92%); background:linear-gradient(90deg,#012,#024 30%,#013 60%,#012); border-radius:999px; position:relative; overflow:hidden} .marquee::before{content:""; position:absolute; left:-30%; top:-60%; width:60%; height:220%; background: conic-gradient(from 0deg, var(--neon2), var(--neon1), var(--neon3), var(--neon4), var(--neon2)); filter: blur(12px) saturate(140%); animation: sweep 3.5s linear infinite; opacity:.9 } @keyframes sweep{to{transform: translateX(250%)}}
 
-/* Stage card */ .stage{margin:16px auto;background:linear-gradient(180deg,rgba(0,60,90,.28),rgba(0,0,0,.6)); border:1px solid rgba(0,229,255,.2);border-radius:16px;padding:12px;box-shadow:0 10px 30px rgba(0,0,0,.55)}
+/* Stage */ .stage{margin:16px auto; background:linear-gradient(180deg,rgba(0,60,90,.28),rgba(0,0,0,.6)); border:1px solid rgba(0,229,255,.2); border-radius:16px; padding:12px; box-shadow:0 10px 30px rgba(0,0,0,.55); position:relative; isolation:isolate}
 
-/* Topbar chips (responsive grid prevents clipping) */ .topbar{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:8px;background:linear-gradient(180deg,rgba(0,229,255,.08),rgba(255,47,211,.06));border:1px solid rgba(0,229,255,.2);border-radius:12px} .chip{display:flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:10px;border-radius:999px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);box-shadow:inset 0 0 10px rgba(0,229,255,.2);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .chip .dot{width:10px;height:10px;border-radius:999px;background:var(--neon1);box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon1)}
+/* Topbar (stack on small screens) */ .topbar{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:8px; background:linear-gradient(180deg,rgba(0,229,255,.08),rgba(255,47,211,.06)); border:1px solid rgba(0,229,255,.2); border-radius:12px} .chip{display:flex; align-items:center; justify-content:center; gap:8px; min-height:42px; padding:10px; border-radius:999px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25); box-shadow:inset 0 0 10px rgba(0,229,255,.2); font-weight:800} .chip .dot{width:10px;height:10px;border-radius:999px;background:var(--neon1); box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon1)}
 
-/* Reels */ .reels{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:14px auto;max-width:760px} .reel{position:relative;height:clamp(120px,28vw,180px);border-radius:14px;background:radial-gradient(280px 120px at 50% -20%,rgba(255,179,0,.2),rgba(255,47,211,.08)),linear-gradient(180deg,#0b1c28,#06141d 35%,#0b1c28);border:1px solid rgba(0,229,255,.25);box-shadow:inset 0 -30px 60px rgba(0,0,0,.45),0 6px 18px rgba(0,0,0,.35);overflow:hidden} .window{position:absolute;inset:8px;border-radius:10px;background:linear-gradient(180deg,rgba(0,0,0,.4),rgba(0,0,0,.65));border:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;font-size:clamp(44px,8vw,64px);text-shadow:0 0 14px rgba(255,255,255,.3)}
+/* Reels */ .reels{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px auto; max-width:760px} .reel{position:relative; height:clamp(120px,28vw,180px); border-radius:14px; background: radial-gradient(280px 120px at 50% -20%, rgba(255,179,0,.2), rgba(255,47,211,.08)), linear-gradient(180deg, #0b1c28, #06141d 35%, #0b1c28); border:1px solid rgba(0,229,255,.25); box-shadow: inset 0 -30px 60px rgba(0,0,0,.45), 0 6px 18px rgba(0,0,0,.35); overflow:hidden } .window{position:absolute; inset:8px; border-radius:10px; background: linear-gradient(180deg, rgba(0,0,0,.4), rgba(0,0,0,.65)); border:1px solid rgba(255,255,255,.06); display:flex; align-items:center; justify-content:center; font-size:clamp(44px,8vw,64px); text-shadow:0 0 14px rgba(255,255,255,.3)} .flash{animation: flash 700ms ease-out} @keyframes flash{30%{box-shadow:0 0 22px 6px rgba(255,255,255,.38)}}
 
-/* Controls: grid on mobile, row on wide */ .controls{display:grid;gap:10px;grid-template-columns:repeat(6,1fr);align-items:center;margin:10px auto;max-width:760px} .controls .tiny, .controls .primary, .controls button{padding:12px 14px;border-radius:12px;border:1px solid rgba(0,229,255,.35);background:linear-gradient(180deg,rgba(0,229,255,.1),rgba(255,47,211,.06));color:var(--text);font-weight:800} .bet-input{grid-column:span 2;width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,229,255,.35);background:#07121a;color:#e7f8ff;text-align:center;font-weight:800} .controls .tiny{grid-column:span 1} #spinBtn{grid-column:span 2} #maxBtn,#bonusBtn,#oddsBtn{grid-column:span 2}
+/* Controls */ .controls{display:grid; gap:10px; grid-template-columns:repeat(6,1fr); align-items:center; margin:10px auto; max-width:760px} button{border:1px solid rgba(0,229,255,.35); background:linear-gradient(180deg,rgba(0,229,255,.1),rgba(255,47,211,.06)); color:var(--text); padding:12px 14px; border-radius:12px; box-shadow: 0 8px 18px rgba(0,0,0,.35), inset 0 0 16px rgba(0,229,255,.15); font-weight:800; letter-spacing:.4px; cursor:pointer} .tiny{padding:12px 10px} #spinBtn{grid-column: span 2} #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 2} .bet-input{grid-column: span 2; width:100%; padding:10px; border-radius:10px; border:1px solid rgba(0,229,255,.35); background:#07121a; color:#e7f8ff; text-align:center; font-weight:800}
 
-/* Message */ .message{text-align:center;min-height:28px;margin:8px 0 4px;font-weight:800;color:#bfefff}
+.message{text-align:center; min-height:28px; margin:8px 0 4px; font-weight:800; color:#bfefff}
 
-/* Details panels */ details{margin:12px auto;max-width:760px;background:linear-gradient(180deg,rgba(0,229,255,.06),rgba(137,255,0,.05));border:1px solid rgba(0,229,255,.25);border-radius:12px;padding:10px} summary{font-weight:800}
+/* Odds details */ details{margin:12px auto; max-width:760px; background:linear-gradient(180deg,rgba(0,229,255,.06),rgba(137,255,0,.05)); border:1px solid rgba(0,229,255,.25); border-radius:12px; padding:10px} summary{font-weight:800; cursor:pointer} table{width:100%; border-collapse:collapse; margin-top:8px} th,td{padding:8px 10px; border-bottom:1px solid rgba(255,255,255,.08)} .right{text-align:right} .badge{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(0,229,255,.08); border:1px solid rgba(0,229,255,.25); font-weight:800} .warn{color:#ff6b6b; font-weight:800} .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
 
-/* Mobile-first fixes / @media (max-width: 720px){ .container{padding:12px} .topbar{grid-template-columns:1fr; gap:8px} / stack chips to avoid clipping */ .controls{grid-template-columns:repeat(4,1fr)} .bet-input{grid-column:span 2} #spinBtn{grid-column:span 2} #maxBtn,#bonusBtn,#oddsBtn{grid-column:span 4} }
-
-/* Very small phones */ @media (max-width: 360px){ .controls{grid-template-columns:repeat(3,1fr)} .bet-input{grid-column:span 3} #spinBtn{grid-column:span 3} } </style>
+/* Stack chips on narrow screens to prevent clipping */ @media (max-width:720px){ .topbar{grid-template-columns:1fr} .controls{grid-template-columns:repeat(4,1fr)} #spinBtn{grid-column: span 2} #maxBtn,#bonusBtn,#oddsBtn{grid-column: span 4} .bet-input{grid-column: span 2} } @media (max-width:360px){ .controls{grid-template-columns:repeat(3,1fr)} #spinBtn,.bet-input{grid-column: span 3} } </style>
 
 </head>
 <body>
   <div class="container">
     <div class="logo">Nozruc's Neon Jackpots</div>
-    <div class="marquee" aria-hidden="true"></div><div class="stage">
+    <div class="marquee" aria-hidden="true"></div><div class="stage" id="stage">
   <div class="topbar">
-    <div class="chip"><span class="dot"></span> <span>Credits:&nbsp;<strong id="credits">458</strong></span></div>
-    <div class="chip"><span class="dot" style="background:var(--neon2)"></span> <span>High Score:&nbsp;<strong id="high">500</strong></span></div>
-    <div class="chip"><span class="dot" style="background:var(--neon4)"></span> <span>Spins:&nbsp;<strong id="spins">4</strong></span></div>
+    <div class="chip"><span class="dot"></span> Credits: <span id="credits">0</span></div>
+    <div class="chip"><span class="dot" style="background:var(--neon2)"></span> High Score: <span id="high">0</span></div>
+    <div class="chip"><span class="dot" style="background:var(--neon4)"></span> Spins: <span id="spins">0</span></div>
   </div>
 
   <div class="reels">
@@ -57,25 +50,213 @@
     <input id="betInput" class="bet-input" type="number" min="1" max="100000" step="1" value="10" />
     <button class="tiny" id="betUp" aria-label="Increase Bet">＋</button>
     <button class="primary" id="spinBtn">SPIN ✨</button>
-    <button id="maxBtn">Max Bet</button>
-    <button id="bonusBtn">Claim Bonus</button>
-    <button id="oddsBtn">Odds & Settings</button>
+    <button id="maxBtn" title="Bet maximum">Max Bet</button>
+    <button id="bonusBtn" title="Claim a periodic bonus">Claim Bonus</button>
+    <button id="oddsBtn" title="Show odds & settings">Odds & Settings</button>
   </div>
 
   <div class="message" id="message" role="status" aria-live="polite"></div>
 
-  <details>
+  <details id="paytable">
     <summary>Paytable & Rules</summary>
-    <p style="margin:8px 0;color:#cfe">Content unchanged; this block stays readable on phones.</p>
+    <table>
+      <thead><tr><th>Symbol/Pattern</th><th class="right">Pays</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>7️⃣7️⃣7️⃣</td><td class="right">×50 bet</td><td>Jackpot</td></tr>
+        <tr><td>💎💎💎</td><td class="right">×20 bet</td><td>Big Win</td></tr>
+        <tr><td>⭐⭐⭐</td><td class="right">×10 bet</td><td>Bright Win</td></tr>
+        <tr><td>🔔🔔🔔</td><td class="right">×6 bet</td><td>Classic Win</td></tr>
+        <tr><td>🍒🍒🍒</td><td class="right">×4 bet</td><td>Cherry Win</td></tr>
+        <tr><td>🍋🍋🍋</td><td class="right">×3 bet</td><td>Zesty Win</td></tr>
+        <tr><td>Any 2-of-a-kind</td><td class="right">×0.6 bet</td><td>Small win (often &lt; bet)</td></tr>
+        <tr><td>Any single 7️⃣/💎/⭐</td><td class="right">×0.2 bet</td><td>Tiny win (often &lt; bet)</td></tr>
+        <tr><td>Wild 🌈</td><td class="right">Substitute</td><td>Counts toward matches</td></tr>
+      </tbody>
+    </table>
   </details>
 
-  <details>
+  <details id="oddsPanel">
     <summary>Odds, House Edge & Settings</summary>
-    <p style="margin:8px 0;color:#cfe">Content unchanged; sliders and buttons will stack on small screens.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:8px">
+      <div>
+        <label for="edgeSlider" style="font-weight:800;display:block;margin-bottom:6px">House Edge Adjustment</label>
+        <input id="edgeSlider" type="range" min="-25" max="25" step="0.5" />
+      </div>
+      <div class="badge">Base Edge: <span id="baseEdgeLabel">55%</span></div>
+      <div class="badge">Adjustment: <span id="edgeAdjLabel">0%</span></div>
+      <div class="badge">Current Edge: <span id="edgeLabel">55%</span></div>
+      <div class="badge">Estimated RTP: <span id="rtpLabel">45%</span></div>
+      <div class="badge">Last Spin Net: <span id="netLabel" class="mono">0</span></div>
+      <div class="badge">LDWs so far: <span id="ldwLabel" class="mono">0</span></div>
+      <div>
+        <label style="font-weight:800"><input id="truthToggle" type="checkbox" /> Truth Mode (show LDW labels & net)</label>
+      </div>
+      <div>
+        <button id="edgeResetBtn" class="tiny">Reset Adjustment</button>
+        <button id="resetBtn" class="tiny" style="border-color:#ff6b6b">Reset Progress</button>
+      </div>
+    </div>
   </details>
+
+  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:8px">
+    <div>Autosaves locally as you play.</div>
+    <div>Made for awareness — luck isn’t a strategy. 🎰</div>
+  </div>
 </div>
 
-  </div>  <script>
-    // Existing V7 logic/audio can remain; this change focuses on layout.
-  </script></body>
-</html>
+  </div><script>
+(() => {
+  'use strict';
+  // ===== Storage =====
+  const SAVE_KEY = 'NOZRUC_SLOTS_SAVE_V8';
+  const now = () => Date.now();
+  const BASE_EDGE = 55; // %
+  const SLIDER_RANGE = 25; // ±
+  const defaultState = () => ({ credits:500, bet:10, spins:0, high:500, lastBonus:0, edgeAdj:0, truth:false, ldwCount:0 });
+  let state = load();
+  function load(){ try{ const raw = localStorage.getItem(SAVE_KEY); return raw? sanitize(JSON.parse(raw)) : defaultState(); }catch{ return defaultState(); } }
+  function sanitize(s){
+    if(!Number.isFinite(s.credits)||s.credits<0) s.credits=500;
+    if(!Number.isFinite(s.bet)||s.bet<1) s.bet=10;
+    if(!Number.isFinite(s.spins)||s.spins<0) s.spins=0;
+    if(!Number.isFinite(s.high)||s.high<0) s.high=500;
+    if(!Number.isFinite(s.lastBonus)||s.lastBonus<0) s.lastBonus=0;
+    if(!Number.isFinite(s.edgeAdj)) s.edgeAdj=0;
+    s.truth = !!s.truth;
+    if(!Number.isFinite(s.ldwCount)||s.ldwCount<0) s.ldwCount=0;
+    return s;
+  }
+  function save(){ localStorage.setItem(SAVE_KEY, JSON.stringify(state)); }
+
+  // ===== Elements =====
+  const $=id=>document.getElementById(id);
+  const creditsEl=$('credits'), highEl=$('high'), spinsEl=$('spins');
+  const msgEl=$('message'), stage=$('stage');
+  const reelEls=[ $('r0'), $('r1'), $('r2') ];
+  const spinBtn=$('spinBtn'), betUpBtn=$('betUp'), betDownBtn=$('betDown'), maxBtn=$('maxBtn'), bonusBtn=$('bonusBtn');
+  const betInput=$('betInput');
+  const oddsBtn=$('oddsBtn'), oddsPanel=$('oddsPanel');
+  const edgeSlider=$('edgeSlider'), baseEdgeLabel=$('baseEdgeLabel'), edgeAdjLabel=$('edgeAdjLabel'), rtpLabel=$('rtpLabel'), edgeLabel=$('edgeLabel');
+  const edgeResetBtn=$('edgeResetBtn'), resetBtn=$('resetBtn');
+  const truthToggle=$('truthToggle'), netLabel=$('netLabel'), ldwLabel=$('ldwLabel');
+
+  // ===== Symbols & payouts =====
+  const symbols=[
+    {ch:'🍒', weight:22, pay:4},
+    {ch:'🍋', weight:22, pay:3},
+    {ch:'🔔', weight:16, pay:6},
+    {ch:'⭐', weight:12, pay:10},
+    {ch:'💎', weight:7, pay:20},
+    {ch:'7️⃣', weight:4, pay:50},
+    {ch:'🌈', weight:8, pay:0, wild:true}
+  ];
+  const totalWeight = symbols.reduce((a,s)=>a+s.weight,0);
+  const weighted=[]; for(const s of symbols) for(let i=0;i<s.weight;i++) weighted.push(s);
+  const randSym = ()=> weighted[(Math.random()*weighted.length)|0];
+
+  // ===== Audio (WebAudio) =====
+  const AudioKit=(()=>{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    let unlocked=false; const unlock=()=>{ if(!unlocked){ ctx.resume(); unlocked=true; }}
+    const master=ctx.createGain(); master.gain.value=0.18; master.connect(ctx.destination);
+    const comp=ctx.createDynamicsCompressor(); comp.threshold.value=-24; comp.knee.value=22; comp.ratio.value=8; comp.attack.value=0.003; comp.release.value=0.25; comp.connect(master);
+    const delay=ctx.createDelay(0.6); delay.delayTime.value=0.14; const dGain=ctx.createGain(); dGain.gain.value=0.18; delay.connect(dGain); dGain.connect(comp);
+    const chain=n=>{ n.connect(comp); n.connect(delay); };
+    function osc({type='square', f0=440, f1=440, dur=0.15, gain=0.8, start=0}){ const o=ctx.createOscillator(); o.type=type; o.frequency.setValueAtTime(f0, ctx.currentTime+start); if(f1!==f0) o.frequency.exponentialRampToValueAtTime(Math.max(40,f1), ctx.currentTime+start+dur); const g=ctx.createGain(); g.gain.setValueAtTime(0, ctx.currentTime+start); g.gain.linearRampToValueAtTime(gain, ctx.currentTime+start+0.01); g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+start+dur); o.connect(g); chain(g); o.start(ctx.currentTime+start); o.stop(ctx.currentTime+start+dur+0.02); }
+    function noise({dur=0.2, lp=12000, hp=200, gain=0.5, start=0}){ const bufferSize=2*ctx.sampleRate*dur; const buffer=ctx.createBuffer(1,bufferSize,ctx.sampleRate); const data=buffer.getChannelData(0); for(let i=0;i<bufferSize;i++) data[i]=(Math.random()*2-1); const src=ctx.createBufferSource(); src.buffer=buffer; const g=ctx.createGain(); g.gain.value=gain; const lpf=ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=lp; const hpf=ctx.createBiquadFilter(); hpf.type='highpass'; hpf.frequency.value=hp; src.connect(hpf); hpf.connect(lpf); lpf.connect(g); chain(g); src.start(ctx.currentTime+start); src.stop(ctx.currentTime+start+dur); }
+    const click=()=>{ unlock(); osc({type:'square', f0:700, f1:600, dur:0.06, gain:0.5}); };
+    const lever=()=>{ unlock(); noise({dur:0.08, lp:8000, hp=1000, gain:0.35}); osc({type:'triangle', f0:220, f1:180, dur:0.08, gain:0.6}); };
+    const spinWhoosh=()=>{ for(let i=0;i<10;i++) osc({type:'sawtooth', f0:200+i*35, f1:260+i*45, dur:0.06, gain:0.35, start:i*0.045}); };
+    const tick=()=>{ osc({type:'square', f0:1200, f1:1000, dur:0.03, gain:0.35}); };
+    const stopClack=()=>{ noise({dur:0.05, lp=5000, hp=1200, gain=0.35}); osc({type:'square', f0:300, f1:260, dur:0.05, gain:0.3}); };
+    const smallWin=()=>{ [660,880].forEach((f,i)=>osc({type:'triangle', f0:f, f1:f*1.03, dur:0.14, gain:0.55, start:i*0.08})); };
+    const win=()=>{ [523,659,783,1046].forEach((f,i)=>osc({type:'triangle', f0:f, f1:f*1.02, dur:0.16, gain:0.65, start:i*0.09})); };
+    const jackpot=()=>{ for(let i=0;i<12;i++) osc({type:'sawtooth', f0:300+i*45, f1:400+i*60, dur:0.09, gain:0.55, start:i*0.06}); };
+    const lose=()=>{ [220,196].forEach((f,i)=>osc({type:'sine', f0:f, f1:f*0.98, dur:0.18, gain:0.4, start:i*0.08})); };
+    return {click,lever,spinWhoosh,tick,stopClack,smallWin,win,jackpot,lose};
+  })();
+
+  // ===== Outcome evaluation (LDWs) =====
+  function evaluate(a,b,c){
+    const arr=[a,b,c]; const wilds=arr.filter(s=>s.wild).length; const bases=arr.filter(s=>!s.wild); const counts={};
+    for(const s of bases) counts[s.ch]=(counts[s.ch]||0)+1;
+    if(bases.length===3 && bases[0].ch===bases[1].ch && bases[1].ch===bases[2].ch) return {mult:bases[0].pay, tag:'3kind'};
+    if(wilds>=1 && bases.length>=2){ const same=Object.keys(counts).find(k=>counts[k]>=2); if(same){ const sym=bases.find(x=>x.ch===same); return {mult:sym.pay, tag:'3kind-wild'}; } }
+    if(Object.values(counts).some(n=>n===2) || (wilds>=1 && bases.length>=1)) return {mult:0.6, tag:'2kind'}; // LDW-prone
+    if(arr.some(s=>['⭐','💎','7️⃣'].includes(s.ch))) return {mult:0.2, tag:'single-high'}; // tiny
+    return {mult:0, tag:'lose'};
+  }
+
+  // ===== RTP & edge scaling =====
+  function computeBaseRTP(){ let E=0; const L=symbols.length; for(let i=0;i<L;i++){ const si=symbols[i], pi=si.weight/totalWeight; for(let j=0;j<L;j++){ const sj=symbols[j], pj=sj.weight/totalWeight; for(let k=0;k<L;k++){ const sk=symbols[k], pk=sk.weight/totalWeight; const {mult}=evaluate(si,sj,sk); E+= mult*(pi*pj*pk); } } } return E; }
+  const BASE_RTP = computeBaseRTP();
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const targetEdge=()=> clamp(BASE_EDGE + state.edgeAdj, 0, 95);
+  const targetRTP =()=> 1 - (targetEdge()/100);
+  const scaleMultiplier=()=> clamp(targetRTP()/BASE_RTP, 0.05, 2);
+
+  function updateOddsUI(){
+    baseEdgeLabel.textContent = `${BASE_EDGE}%`;
+    edgeSlider.min=-SLIDER_RANGE; edgeSlider.max=SLIDER_RANGE; edgeSlider.step=0.5; edgeSlider.value=state.edgeAdj;
+    edgeAdjLabel.textContent = `${(+state.edgeAdj).toFixed(1)}%`;
+    rtpLabel.textContent = `${(targetRTP()*100).toFixed(2)}%`;
+    edgeLabel.textContent = `${(targetEdge()).toFixed(2)}%`;
+    truthToggle.checked = !!state.truth;
+    ldwLabel.textContent = `${state.ldwCount}`;
+  }
+
+  // ===== UI helpers =====
+  const fmt=n=>n.toLocaleString();
+  const setMessage=t=>{ msgEl.innerHTML = t || '' };
+  const flash=el=>{ el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash'); };
+  const ring=()=>{ stage.classList.remove('flash'); void stage.offsetWidth; stage.classList.add('flash'); };
+
+  function sync(){ creditsEl.textContent=fmt(state.credits); highEl.textContent=fmt(state.high); spinsEl.textContent=fmt(state.spins); betInput.value=state.bet; updateOddsUI(); }
+  sync();
+
+  // ===== Betting =====
+  function setBet(v){ state.bet = clamp(Math.round(v)||1,1,100000); sync(); save(); }
+  $('betUp').addEventListener('click', ()=>{ AudioKit.click(); setBet(state.bet+5); });
+  $('betDown').addEventListener('click', ()=>{ AudioKit.click(); setBet(state.bet-5); });
+  maxBtn.addEventListener('click', ()=>{ AudioKit.click(); setBet(Math.min(state.credits,100000)||1); });
+  betInput.addEventListener('change', ()=> setBet(betInput.value) );
+  betInput.addEventListener('focus', e=> e.target.select());
+
+  // ===== Bonus (every 2 minutes) =====
+  function tryBonus(){ const COOLDOWN=2*60*1000, amt=50; const ready= now()-state.lastBonus>=COOLDOWN; if(ready){ state.credits+=amt; state.lastBonus=now(); setMessage(`Bonus +${amt} credits! ✨`); flash(stage); sync(); save(); return true; } const left=Math.ceil((COOLDOWN-(now()-state.lastBonus))/1000); setMessage(`Bonus ready in ${left}s…`); return false; }
+  bonusBtn.addEventListener('click', ()=>{ AudioKit.click(); tryBonus(); });
+
+  // ===== Spin logic (with ticking) =====
+  let spinning=false; let spinIntervals=[]; let spinTimeouts=[];
+  const clearSpinTimers=()=>{ for(const id of spinIntervals) clearInterval(id); for(const id of spinTimeouts) clearTimeout(id); spinIntervals=[]; spinTimeouts=[]; };
+
+  function doSpin(){
+    if(spinning) return;
+    if(state.bet>state.credits){ setMessage('Not enough credits. Lower your bet or claim a bonus.'); AudioKit.lose(); return; }
+    AudioKit.lever(); AudioKit.spinWhoosh();
+    spinning=true; setMessage('Spinning…');
+    state.credits -= state.bet; sync(); save();
+
+    const stopDelays=[760,1080,1420];
+    for(let i=0;i<3;i++){
+      let speed=90-i*10; // stagger
+      const intId=setInterval(()=>{ const s=randSym(); reelEls[i].textContent=s.ch; AudioKit.tick(); }, Math.max(40,speed));
+      spinIntervals.push(intId);
+    }
+
+    stopDelays.forEach((d,i)=>{
+      const toId=setTimeout(()=>{
+        clearInterval(spinIntervals[i]);
+        const s=randSym(); reelEls[i].textContent=s.ch; flash(reelEls[i]); AudioKit.stopClack();
+        if(i===2){
+          const a=symbols.find(x=>x.ch===reelEls[0].textContent)||randSym();
+          const b=symbols.find(x=>x.ch===reelEls[1].textContent)||randSym();
+          const c=symbols.find(x=>x.ch===reelEls[2].textContent)||randSym();
+          const {mult,tag}=evaluate(a,b,c);
+          const scale=scaleMultiplier();
+          const payout=Math.floor(state.bet*mult*scale);
+          const net = payout - state.bet;
+
+          if(mult>0 && payout>0){
+            state.credits+=payout; ring();
+            if(mult>=50) AudioKit.jackpot(); else if(mult>=10) AudioKit.win(); else A
