@@ -2,16 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=.75, maximum-scale=1, viewport-fit=cover" />
   <title>Tree Chopper Idle</title>
   <meta name="theme-color" content="#0e6b2f" />
   <style>
     :root{ --bg:#0f172a; --panel:#111827; --panel-2:#0b1223; --text:#e5e7eb; --muted:#9ca3af; --accent:#22c55e; --shadow:0 10px 20px rgba(0,0,0,.35); --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); }
     *{box-sizing:border-box}
-    html,body{touch-action: manipulation; /* allows panning & pinch; disables double-tap zoom */}
-    button, a, .btn, canvas {
-      touch-action: manipulation;
-    }
+    html,body{height:100%}
     body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Apple Color Emoji","Segoe UI Emoji";background:radial-gradient(1200px 800px at 50% -10%,#052e16 0%,var(--bg) 45%);color:var(--text)}
     .app{display:grid;grid-template-rows:auto 1fr auto;min-height:100svh;padding-top:var(--safe-top);padding-bottom:calc(var(--safe-bottom) + 6px)}
     header{position:sticky;top:0;z-index:5;backdrop-filter:blur(6px);background:linear-gradient(180deg,rgba(17,24,39,.9),rgba(17,24,39,.65));border-bottom:1px solid #1f2937;padding:.6rem .9rem;padding-top:calc(.6rem + var(--safe-top))}
@@ -64,9 +61,17 @@
     @keyframes hintFlash{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.7);border-color:#22c55e}50%{box-shadow:0 0 12px 4px rgba(34,197,94,.35);border-color:#86efac}}
     .tab.hint-green{animation:hintFlash 1.25s ease-in-out infinite;border-width:2px}
 
-    /* NEW: make anything inside .btn ignore pointer events & selection to avoid “click on number” bug */
+    /* Avoid “click on number” bug and caret */
     .btn, .btn *{ -webkit-user-select:none; user-select:none; caret-color:transparent; }
     .btn *{ pointer-events:none; }
+
+    /* Settings dropdown */
+    .settings-menu{ position:absolute; right:0; top:100%; margin-top:.4rem; background:#0b1223; border:1px solid #1f2937; border-radius:12px; box-shadow:var(--shadow); padding:.35rem; width:220px; display:none; z-index:20 }
+    .settings-menu.open{ display:block; }
+    .settings-menu .menu-item{ width:100%; text-align:left; background:#0c1326; color:var(--text); border:1px solid #1f2937; border-radius:10px; padding:.5rem .6rem; margin:.25rem 0; font-weight:700; cursor:pointer }
+    .settings-menu .menu-item:hover{ background:#0f1a33; }
+    .settings-menu hr{ border:none; border-top:1px solid #1f2937; margin:.35rem 0; }
+    .settings-menu .danger{ background:#1a0b0b; color:#fecaca; border-color:#7f1d1d; }
   </style>
 </head>
 <body>
@@ -79,9 +84,16 @@
         <div class="pill">⭐ <b id="level">1</b></div>
         <div class="pill">📈 <b id="xp">0</b>/<b id="xpNext">50</b></div>
         <div class="pill">🏆 <b id="prestige">0</b><span class="sub" id="prestigeMult"></span></div>
-        <div class="controls" style="margin-left:auto">
+        <div class="controls" style="margin-left:auto; position:relative">
           <button id="saveBtn" class="small">💾 Save</button>
-          <!--<button id="debugBtn" class="small" title="Add 10k logs & XP">🐞 +10k</button>-->
+          <button id="settingsToggle" class="small" aria-haspopup="true" aria-expanded="false" title="Settings">⚙️</button>
+          <div id="settingsMenu" class="settings-menu" role="menu" aria-hidden="true">
+            <button id="muteBtn" class="menu-item">🔊 Haptics</button>
+            <button id="soundBtn" class="menu-item">🔈 Sound</button>
+            <button id="musicBtn" class="menu-item">🎵 Music On</button>
+            <hr />
+            <button id="resetBtn" class="menu-item danger">♻️ Reset</button>
+          </div>
         </div>
       </div>
     </header>
@@ -130,13 +142,8 @@
       <div class="grid three" id="helpersGrid"></div>
 
       <div class="controls" style="justify-content:space-between;padding:.25rem .25rem .1rem;margin-top:.5rem">
-        <div class="sub">Autosaves every 30s • Offline progress enabled</div>
-        <div>
-          <button id="muteBtn" class="small">🔊 Haptics</button>
-          <button id="soundBtn" class="small">🔈 Sound</button>
-          <button id="musicBtn" class="small">🎵 Music On</button>
-          <button id="resetBtn" class="small" style="background:#1a0b0b;color:#fecaca;border-color:#7f1d1d">♻️ Reset</button>
-        </div>
+        <div class="sub">Autosaves every 30s • Offline progress enabled (30 minutes)</div>
+      </div>
       </div>
     </section>
 
@@ -254,7 +261,7 @@
     treeBtn: $('#treeBtn'), treeImg: $('#treeImg'), treeFallback: $('#treeFallback'), particles: $('#particles'), progBar: $('#progBar'),
     tapTierName: $('#tapTierName'), tapInc: $('#tapInc'), buyTap: $('#buyTap'), nextTierInfo: $('#nextTierInfo'), tapTierProg: $('#tapTierProg'),
     helpersGrid: $('#helpersGrid'),
-    saveBtn: $('#saveBtn'), resetBtn: $('#resetBtn'), settingsBtn: $('#settingsBtn'),
+    saveBtn: $('#saveBtn'), settingsToggle: $('#settingsToggle'), settingsMenu: $('#settingsMenu'),
     toast: $('#toast'), muteBtn: $('#muteBtn'), soundBtn: $('#soundBtn'), musicBtn: $('#musicBtn'),
     tabs: $$('.tab'), panels: $$('.panel'), treeGrid: $('#treeGrid'), treeName: $('#treeName'),
     prestige: $('#prestige'), prestigeMult: $('#prestigeMult'), prestigeInfo: $('#prestigeInfo'), prestigeBtn: $('#prestigeBtn'), prestigeGain: $('#prestigeGain'), prestigeMult2: $('#prestigeMult2'),
@@ -263,7 +270,22 @@
   };
 
   function prestigeMultiplier(){ return 1 + state.prestigePoints * 0.10; }
-  function totalCps(){ let base = 0; for(const k in state.producers){ const p = state.producers[k]; base += p.qty * p.baseCps; } const treeAuto = TREES[state.currentTree].autoMult; return base * treeAuto * prestigeMultiplier(); }
+
+  function totalCps(){
+    let base = 0;
+    for(const k in state.producers){
+      const p = state.producers[k];
+      if (k === 'man' || k === 'Elder') {
+        const total = (p.qtyM || 0) + (p.qtyF || 0);
+        base += total * p.baseCps;
+      } else {
+        base += (p.qty || 0) * p.baseCps;
+      }
+    }
+    const treeAuto = TREES[state.currentTree].autoMult;
+    return base * treeAuto * prestigeMultiplier();
+  }
+
   function addWood(n){ state.wood += n; state.xp += n * XP_RATE; }
   function setTree(idx){ state.currentTree=idx; const t=TREES[idx]; const src=TREE_ASSETS[t.name]||''; if(src){ els.treeImg.src=src; els.treeImg.style.display='block'; els.treeFallback.style.display='none'; } else { els.treeImg.removeAttribute('src'); els.treeImg.style.display='none'; els.treeFallback.style.display='block'; } els.treeName.textContent=t.name; }
 
@@ -296,15 +318,120 @@
     const t = TAP_TIERS[state.tapTier];
     const cost = tapCost();
     if (state.wood < cost) { sfx.nope(); return buzz(3); }
-    state.wood -= cost; // single, correct subtraction
+    state.wood -= cost; // correct single subtraction
     const treeMult = TREES[state.currentTree].tapMult;
     state.tapPower += t.inc * treeMult * prestigeMultiplier();
     state.tapWithin++;
     sfx.buy(); buzz(10); updateUI();
   }
 
-  function buildHelpers(){ els.helpersGrid.innerHTML=''; HELPERS.forEach(h=>{ const p=state.producers[h.key]; const card=document.createElement('div'); card.className='card'; const icon=document.createElement('div'); icon.className='icon'; icon.textContent=h.icon; card.appendChild(icon); const box=document.createElement('div'); const title=document.createElement('div'); title.className='title'; title.textContent=h.name; box.appendChild(title); const sub=document.createElement('div'); sub.className='sub'; sub.innerHTML=`Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">0</span>`; box.appendChild(sub); card.appendChild(box); const btn=document.createElement('button'); btn.className='btn'; btn.id=`buy-${h.key}`; btn.innerHTML=`Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`; btn.addEventListener('click', ()=> buyHelper(h.key)); card.appendChild(btn); els.helpersGrid.appendChild(card); }); }
-  function buyHelper(key){ const p = state.producers[key]; if(state.wood < p.cost){ sfx.nope(); return buzz(3); } state.wood -= p.cost; p.qty += 1; p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, p.qty)); sfx.buy(); buzz(10); updateUI(); }
+  function buildHelpers(){
+    els.helpersGrid.innerHTML='';
+    HELPERS.forEach(h=>{
+      const p=state.producers[h.key];
+      const card=document.createElement('div');
+      card.className='card';
+
+      const icon=document.createElement('div');
+      icon.className='icon';
+      icon.id = `icon-${h.key}`;
+      // main icon reflects gender for Man/Elder
+      if (h.key === 'man') {
+        icon.textContent = (p.gender === 'f') ? '👩' : '👨';
+      } else if (h.key === 'Elder') {
+        icon.textContent = (p.gender === 'f') ? '👵' : '👴';
+      } else {
+        icon.textContent = h.icon;
+      }
+      card.appendChild(icon);
+
+      const box=document.createElement('div');
+      const title=document.createElement('div');
+      title.className='title';
+      title.id = `title-${h.key}`;
+      // main title reflects gender for Man/Elder
+      if (h.key === 'man') {
+        title.textContent = (p.gender === 'f') ? 'Woman' : 'Man';
+      } else if (h.key === 'Elder') {
+        title.textContent = (p.gender === 'f') ? 'Elder Woman' : 'Elder Man';
+      } else {
+        title.textContent = h.name;
+      }
+      box.appendChild(title);
+
+      const sub=document.createElement('div');
+      sub.className='sub';
+      if (h.key === 'man' || h.key === 'Elder') {
+        sub.innerHTML = `Each: ${h.baseCps} /s • Owned (m): <span id="qty-${h.key}-m">${fmt(p.qtyM || 0)}</span> • (f): <span id="qty-${h.key}-f">${fmt(p.qtyF || 0)}</span>`;
+      } else {
+        sub.innerHTML = `Each: ${h.baseCps} /s • Owned: <span id="qty-${h.key}">${fmt(p.qty || 0)}</span>`;
+      }
+      box.appendChild(sub);
+      card.appendChild(box);
+
+      // Gender toggle for Man/Elder
+      if (h.key === 'man' || h.key === 'Elder') {
+        const toggle = document.createElement('button');
+        toggle.className = 'small';
+        toggle.id = `toggle-${h.key}`;
+        toggle.title = 'Switch purchase target';
+        toggle.textContent = (p.gender === 'f') ? 'Switch Gender' : 'Switch Gender';
+        toggle.addEventListener('click', ()=>{
+          p.gender = (p.gender === 'm') ? 'f' : 'm';
+
+          // Update MAIN icon + title on the card
+          const ico = document.getElementById(`icon-${h.key}`);
+          if (ico) {
+            if (h.key === 'man') ico.textContent = (p.gender === 'f') ? '👩' : '👨';
+            else if (h.key === 'Elder') ico.textContent = (p.gender === 'f') ? '👵' : '👴';
+          }
+          const ttl = document.getElementById(`title-${h.key}`);
+          if (ttl) {
+            if (h.key === 'man') ttl.textContent = (p.gender === 'f') ? 'Woman' : 'Man';
+            else if (h.key === 'Elder') ttl.textContent = (p.gender === 'f') ? 'Elder Woman' : 'Elder Man';
+          }
+
+          // Update toggle label
+          const tgl = document.getElementById(`toggle-${h.key}`);
+          if (tgl) tgl.textContent = (p.gender === 'f') ? 'Switch Gender' : 'Switch Gender';
+
+          save(false);
+        });
+        card.appendChild(toggle);
+      }
+
+      const btn=document.createElement('button');
+      btn.className='btn';
+      btn.id=`buy-${h.key}`;
+      btn.innerHTML = `Buy — <span id="cost-${h.key}">${fmt(p.cost)}</span>`;
+      btn.addEventListener('click', ()=> buyHelper(h.key));
+      card.appendChild(btn);
+
+      els.helpersGrid.appendChild(card);
+    });
+  }
+
+  function buyHelper(key){
+    const p = state.producers[key];
+
+    if (key === 'man' || key === 'Elder') {
+      const totalOwned = (p.qtyM || 0) + (p.qtyF || 0);
+      if (state.wood < p.cost) { sfx.nope(); return buzz(3); }
+      state.wood -= p.cost;
+
+      if (p.gender === 'f') { p.qtyF = (p.qtyF || 0) + 1; }
+      else { p.qtyM = (p.qtyM || 0) + 1; }
+
+      const newTotal = (p.qtyM || 0) + (p.qtyF || 0);
+      p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, newTotal));
+
+      sfx.buy(); buzz(10); updateUI();
+      return;
+    }
+
+    if(state.wood < p.cost){ sfx.nope(); return buzz(3); }
+    state.wood -= p.cost; p.qty += 1; p.cost = Math.ceil(p.baseCost * Math.pow(HELPER_SCALE, p.qty)); sfx.buy(); buzz(10); updateUI();
+  }
 
   function buildTreeGrid(){ els.treeGrid.innerHTML=''; TREES.forEach((t,i)=>{ const card=document.createElement('div'); card.className='tree-card'; const img=document.createElement('img'); const src=TREE_ASSETS[t.name]; if(src) img.src=src; else img.alt='🌳'; card.appendChild(img); const name=document.createElement('div'); name.className='title'; name.textContent=t.name; card.appendChild(name); const req=document.createElement('div'); req.className='sub'; req.textContent=`Req: Level ${t.level}`; card.appendChild(req); const boost=document.createElement('div'); boost.className='sub'; boost.textContent=`Tap x${t.tapMult} • Auto x${t.autoMult}`; card.appendChild(boost); const lock=document.createElement('div'); lock.className='lock'; lock.id=`lock-${i}`; card.appendChild(lock); const btn=document.createElement('button'); btn.className='btn select-btn'; btn.id=`select-${i}`; btn.textContent='Select'; btn.addEventListener('click', ()=>{ if(state.level < t.level){ toast('Level too low to select this tree.'); return; } setTree(i); updateUI(); toast(`${t.name} selected`); }); card.appendChild(btn); els.treeGrid.appendChild(card); }); updateTreeUnlocks(); }
   function updateTreeUnlocks(){ TREES.forEach((t,i)=>{ const lockEl = document.getElementById(`lock-${i}`); const btn = document.getElementById(`select-${i}`); if(!lockEl||!btn) return; const unlocked = state.level >= t.level; lockEl.textContent = unlocked ? 'Unlocked' : 'Locked'; btn.disabled = !unlocked; }); }
@@ -365,12 +492,35 @@
 
     HELPERS.forEach(h=>{
       const p=state.producers[h.key];
-      const qEl=$(`#qty-${h.key}`);
-      const cEl=$(`#cost-${h.key}`);
-      if(qEl) qEl.textContent = fmt(p.qty);
-      if(cEl) cEl.textContent = fmt(p.cost);
-      const btn=$(`#buy-${h.key}`);
-      if(btn) btn.disabled = state.wood < p.cost;
+      if (h.key === 'man' || h.key === 'Elder') {
+        const qm = $(`#qty-${h.key}-m`);
+        const qf = $(`#qty-${h.key}-f`);
+        if (qm) qm.textContent = fmt(p.qtyM || 0);
+        if (qf) qf.textContent = fmt(p.qtyF || 0);
+        const cEl = $(`#cost-${h.key}`);
+        if (cEl) cEl.textContent = fmt(p.cost);
+        const btn = $(`#buy-${h.key}`);
+        if (btn) btn.disabled = state.wood < p.cost;
+        const ico = $(`#icon-${h.key}`);
+        if (ico) {
+          if (h.key === 'man') ico.textContent = (p.gender === 'f') ? '👩' : '👨';
+          else if (h.key === 'Elder') ico.textContent = (p.gender === 'f') ? '👵' : '👴';
+        }
+        const ttl = $(`#title-${h.key}`);
+        if (ttl) {
+          if (h.key === 'man') ttl.textContent = (p.gender === 'f') ? 'Woman' : 'Man';
+          else if (h.key === 'Elder') ttl.textContent = (p.gender === 'f') ? 'Elder Woman' : 'Elder Man';
+        }
+        const tgl = $(`#toggle-${h.key}`);
+        if (tgl) tgl.textContent = (p.gender === 'f') ? 'Switch Gender' : 'Switch Gender';
+      } else {
+        const qEl=$(`#qty-${h.key}`);
+        const cEl=$(`#cost-${h.key}`);
+        if(qEl) qEl.textContent = fmt(p.qty || 0);
+        if(cEl) cEl.textContent = fmt(p.cost);
+        const btn=$(`#buy-${h.key}`);
+        if(btn) btn.disabled = state.wood < p.cost;
+      }
     });
 
     const t = TAP_TIERS[state.tapTier];
@@ -399,7 +549,6 @@
     els.prestigeGain.textContent = gain;
     els.prestigeBtn.disabled = gain <= 0;
 
-    // If level >= 15 and user hasn't opened Trees yet, flash the Trees tab
     maybeFlashTreesTab();
   }
 
@@ -444,7 +593,6 @@
     while (state.xp >= state.xpNext) {
       state.xp -= state.xpNext;
       state.level++;
-      // cumulative requirement (steeper at high levels)
       state.xpNext += xpForLevel(state.level);
       const unlockedAfter = highestUnlockedTreeByLevel(state.level);
       const unlockedNewTree = unlockedAfter > unlockedBefore;
@@ -455,11 +603,60 @@
   function highestUnlockedTreeByLevel(lv){ let idx=0; for(let i=0;i<TREES.length;i++){ if(lv>=TREES[i].level) idx=i; } return idx; }
 
   function calcPrestigeGain(){ return state.level >= 99 ? 1 : 0; }
-  function doPrestige(){ const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return; state.prestigePoints += gain; sfx.prestige(); Object.assign(state,{ wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0, seenTreesTab:false }); for(const k in state.producers){ const p=state.producers[k]; p.qty=0; p.cost=p.baseCost; } toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`); save(false); updateUI(); }
+  function doPrestige(){
+    const gain = calcPrestigeGain(); if(gain<=0) return; if(!confirm(`Prestige now for ${gain} point? This resets wood, upgrades, and level.`)) return;
+    state.prestigePoints += gain;
+    Object.assign(state, { wood:0, tapPower:1, tapTier:0, tapWithin:0, xp:0, level:1, xpNext:xpForLevel(1), currentTree:0, passivePool:0, seenTreesTab:false, cycleAccum:0, cycleQuantum:1, cycleLingerUntil:0, resetBarPending:true });
+    for(const k in state.producers){ const p=state.producers[k]; if (k==='man' || k==='Elder'){ p.qtyM=0; p.qtyF=0; p.gender='m'; p.cost=p.baseCost; } else { p.qty=0; p.cost=p.baseCost; } }
+    setTree(0);
+    ensureAudio(); sfx.prestige();
+    toast(`Prestiged! Total points: ${state.prestigePoints} (x${prestigeMultiplier().toFixed(2)})`);
+    save(false); updateUI();
+  }
 
   const SAVE_KEY = 'tree-chopper-save-v12-hard-reset-progress';
   function save(showToast=true){ const data = {...state, lastTick: Date.now()}; localStorage.setItem(SAVE_KEY, JSON.stringify(data)); if(showToast) toast('Saved!'); }
-  function load(){ const raw = localStorage.getItem(SAVE_KEY); if(!raw) return; try{ const data = JSON.parse(raw); Object.assign(state, data); HELPERS.forEach(h=>{ if(!state.producers[h.key]) state.producers[h.key]={qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost}; Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost}); }); setTree(state.currentTree||0); const now = Date.now(); const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*0.5); const offline = Math.floor(totalCps() * away); if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); } }catch(e){ console.warn('Load failed', e); } }
+  function upgradeSaves(){
+    // Normalize split quantities and gender for legacy saves
+    const pm = state.producers.man;
+    if (pm) {
+      if (pm.qtyM === undefined) pm.qtyM = pm.qty || 0;
+      if (pm.qtyF === undefined) pm.qtyF = 0;
+      if (pm.gender !== 'f' && pm.gender !== 'm') pm.gender = 'm';
+      const totalM = (pm.qtyM || 0) + (pm.qtyF || 0);
+      pm.cost = Math.ceil(pm.baseCost * Math.pow(HELPER_SCALE, totalM));
+    }
+    const pe = state.producers.Elder;
+    if (pe) {
+      if (pe.qtyM === undefined) pe.qtyM = pe.qty || 0;
+      if (pe.qtyF === undefined) pe.qtyF = 0;
+      if (pe.gender !== 'f' && pe.gender !== 'm') pe.gender = 'm';
+      const totalE = (pe.qtyM || 0) + (pe.qtyF || 0);
+      pe.cost = Math.ceil(pe.baseCost * Math.pow(HELPER_SCALE, totalE));
+    }
+  }
+
+  function load(){
+    const raw = localStorage.getItem(SAVE_KEY); if(!raw) return;
+    try{
+      const data = JSON.parse(raw);
+      Object.assign(state, data);
+      // Reattach helper metadata and ensure keys exist
+      HELPERS.forEach(h=>{
+        if(!state.producers[h.key]) state.producers[h.key] = {qty:0, baseCps:h.baseCps, baseCost:h.baseCost, cost:h.baseCost};
+        Object.assign(state.producers[h.key], {baseCps:h.baseCps, baseCost:h.baseCost});
+      });
+
+      // Upgrade legacy saves (adds qtyM/qtyF/gender and fixes costs)
+      upgradeSaves();
+
+      setTree(state.currentTree||0);
+      const now = Date.now();
+      const away = clamp((now - (data.lastTick||now))/1000, 0, 60*60*8);
+      const offline = Math.floor(totalCps() * away);
+      if(offline>0){ addWood(offline); toast(`While you were away: +${fmt(offline)} wood`); }
+    }catch(e){ console.warn('Load failed', e); }
+  }
 
   function updateMusicUI(){ els.musicBtn.textContent = state.music ? '🎵 Music On' : '🎵 Music Off'; els.bgm.volume = clamp(state.musicVol, 0, 1); if(!state.music && !els.bgm.paused) els.bgm.pause(); }
   async function tryStartMusic(){ if(!state.music) return; try{ await els.bgm.play(); } catch(err){ const unlock = ()=>{ els.bgm.play().catch(()=>{}); window.removeEventListener('pointerdown', unlock, {once:true}); }; window.addEventListener('pointerdown', unlock, {once:true}); } }
@@ -467,89 +664,76 @@
   function particle(x,y,text){ const p=document.createElement('div'); p.className='floating'; p.textContent=text; p.style.left=x+'px'; p.style.top=y+'px'; els.particles.appendChild(p); setTimeout(()=>p.remove(),900); }
 
   // Tabs
-  els.tabs.forEach(btn=> btn.addEventListener('click', ()=>{
-    els.tabs.forEach(b=> b.classList.remove('active'));
-    btn.classList.add('active');
-    els.panels.forEach(p=> p.classList.remove('active'));
-    $('#'+btn.dataset.tab).classList.add('active');
-
-    // If user clicked Trees, acknowledge hint and stop flashing
-    if (btn === els.treesTab) {
-      state.seenTreesTab = true;
-      els.treesTab.classList.remove('hint-green');
-      save(false);
-    }
-  }));
+  els.tabs.forEach(btn=> btn.addEventListener('click', ()=>{ els.tabs.forEach(b=> b.classList.remove('active')); btn.classList.add('active'); els.panels.forEach(p=> p.classList.remove('active')); $('#'+btn.dataset.tab).classList.add('active'); if (btn === els.treesTab) { state.seenTreesTab = true; els.treesTab.classList.remove('hint-green'); save(false); } }));
 
   // Desktop: prevent focus/caret/selection when clicking the big tree
   $('#treeBtn').addEventListener('mousedown', e => e.preventDefault());
 
-  function onTap(e){
-    ensureAudio();
-    if(state.music && els.bgm.paused){ els.bgm.play().catch(()=>{}); }
+  function onTap(e){ ensureAudio(); if(state.music && els.bgm.paused){ els.bgm.play().catch(()=>{}); } const rect = els.treeBtn.getBoundingClientRect(); let x = rect.left + rect.width/2; let y = rect.top + rect.height/2; if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; } else if(e.clientX){ x = e.clientX; y = e.clientY; } const tree = TREES[state.currentTree]; const gain = state.tapPower * tree.tapMult * prestigeMultiplier(); state.wood += gain; state.xp += gain * XP_RATE; if(state.sound) sfx.chop(); particle(x, y, `+${fmt(gain)}`); buzz(8); handleLevelUps(); updateUI(); }
 
-    const rect = els.treeBtn.getBoundingClientRect();
-    let x = rect.left + rect.width/2;
-    let y = rect.top + rect.height/2;
-    if(e.touches && e.touches[0]){ x = e.touches[0].clientX; y = e.touches[0].clientY; }
-    else if(e.clientX){ x = e.clientX; y = e.clientY; }
-
-    const tree = TREES[state.currentTree];
-    const gain = state.tapPower * tree.tapMult * prestigeMultiplier();
-    state.wood += gain;
-    state.xp += gain * XP_RATE;
-    if(state.sound) sfx.chop();
-    particle(x, y, `+${fmt(gain)}`);
-    buzz(8);
-    handleLevelUps();
-    updateUI();
-  }
-
+  // Listeners
   $('#treeBtn').addEventListener('click', onTap);
   $('#treeBtn').addEventListener('touchstart', function(e){ e.preventDefault(); onTap(e); }, {passive:false});
-
   $('#buyTap').addEventListener('click', buyTap);
+  els.prestigeBtn.addEventListener('click', doPrestige);
   $('#saveBtn').addEventListener('click', ()=> save(true));
-  $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Reset your progress?')){ localStorage.removeItem(SAVE_KEY); location.reload(); } });
-  $('#muteBtn').addEventListener('click', ()=>{ state.haptics = !state.haptics; $('#muteBtn').textContent = state.haptics ? '🔊 Haptics' : '🔕 Haptics Off'; save(false); });
 
-  // SOUND toggle fully mutes SFX (HTMLAudio + WebAudio)
-  $('#soundBtn').addEventListener('click', ()=>{
-    state.sound = !state.sound;
-    $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off';
-    if (state.sound) { resumeSfx(); } else { stopAllSfx(); }
-    save(false);
+  // Settings dropdown
+  els.settingsToggle.addEventListener('click', (e)=>{
+    const open = !els.settingsMenu.classList.contains('open');
+    els.settingsMenu.classList.toggle('open', open);
+    els.settingsToggle.setAttribute('aria-expanded', open?'true':'false');
+    els.settingsMenu.setAttribute('aria-hidden', open?'false':'true');
+    e.stopPropagation();
+  });
+  // Close on outside click / escape / blur
+  document.addEventListener('click', (e)=>{
+    if (!els.settingsMenu.classList.contains('open')) return;
+    if (!els.settingsMenu.contains(e.target) && e.target !== els.settingsToggle) {
+      els.settingsMenu.classList.remove('open');
+      els.settingsToggle.setAttribute('aria-expanded','false');
+      els.settingsMenu.setAttribute('aria-hidden','true');
+    }
+  });
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && els.settingsMenu.classList.contains('open')) {
+      els.settingsMenu.classList.remove('open');
+      els.settingsToggle.setAttribute('aria-expanded','false');
+      els.settingsMenu.setAttribute('aria-hidden','true');
+    }
+  });
+  window.addEventListener('blur', ()=>{
+    if (els.settingsMenu.classList.contains('open')) {
+      els.settingsMenu.classList.remove('open');
+      els.settingsToggle.setAttribute('aria-expanded','false');
+      els.settingsMenu.setAttribute('aria-hidden','true');
+    }
   });
 
+  // Settings actions
+  $('#resetBtn').addEventListener('click', ()=>{ if(confirm('Reset your progress?')){ localStorage.removeItem(SAVE_KEY); location.reload(); } });
+  $('#muteBtn').addEventListener('click', ()=>{ state.haptics = !state.haptics; $('#muteBtn').textContent = state.haptics ? '🔊 Haptics' : '🔕 Haptics Off'; save(false); });
+  $('#soundBtn').addEventListener('click', ()=>{ state.sound = !state.sound; $('#soundBtn').textContent = state.sound ? '🔈 Sound' : '🔇 Sound Off'; if (state.sound) { resumeSfx(); } else { stopAllSfx(); } save(false); });
   $('#musicBtn').addEventListener('click', async ()=>{ state.music = !state.music; updateMusicUI(); save(false); if(state.music){ await tryStartMusic(); } else { els.bgm.pause(); } });
 
   const dbgBtn = document.getElementById('debugBtn');
-  if (dbgBtn) {
-    dbgBtn.addEventListener('click', () => {
-      state.wood += 10_000;
-      state.xp   += 10_000;
-      toast('+10k logs & +10k XP');
-      handleLevelUps();
-      updateUI();
-    });
-  }
+  if (dbgBtn) { dbgBtn.addEventListener('click', () => { state.wood += 10_000; state.xp += 10_000; toast('+10k logs & +10k XP'); handleLevelUps(); updateUI(); }); }
   
-  setInterval(()=> save(false), 30_000);
+  setInterval(()=> save(false), 30_000);(()=> save(false), 30_000);
 
   function maybeFlashTreesTab(){ if (state.level >= 15 && !state.seenTreesTab) { els.treesTab.classList.add('hint-green'); } else { els.treesTab.classList.remove('hint-green'); } }
 
   function init(){
+    load();              // load first so UI builds with correct gender/costs
     buildHelpers();
     buildTreeGrid();
     setTree(0);
     updateMusicUI();
-    load();
     updateUI();
     els.bgm.volume = clamp(state.musicVol,0,1);
     state.lastTick = Date.now();
     requestAnimationFrame(tick);
     tryStartMusic();
-    // In case a save already has level >= 15 but user never opened Trees
     maybeFlashTreesTab();
   }
   init();
