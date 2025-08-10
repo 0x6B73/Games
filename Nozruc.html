@@ -228,7 +228,7 @@
   <aside id="sheet" class="sheet" role="dialog" aria-label="Odds & Settings">
     <h3 style="margin:0 0 8px">Odds & Settings</h3>
     <p style="margin:6px 0 12px; color:#cfe">
-      Base house edge <strong>55%</strong>. Adjust within <strong>±25%</strong>.
+      Base house edge <strong>40%</strong>. Adjust within <strong>±25%</strong>.
     </p>
     <div style="display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(220px,1fr))">
       <div>
@@ -236,7 +236,7 @@
         <input id="edgeSlider" type="range" min="-25" max="25" step="0.5" />
       </div>
       <div>
-        <span class="badge">Base Edge: <span id="baseEdgeLabel">55%</span></span>
+        <span class="badge">Base Edge: <span id="baseEdgeLabel">40%</span></span>
         <span class="badge">Adjustment: <span id="edgeAdjLabel">0%</span></span>
         <span class="badge">Current Edge: <span id="edgeLabel">55%</span></span>
         <span class="badge">Est. RTP: <span id="rtpLabel">45%</span></span>
@@ -267,14 +267,14 @@
     catch { return { getItem:()=>null, setItem:()=>{}, removeItem:()=>{} }; }
   })();
   const now = () => Date.now();
-  const BASE_EDGE = 55;  // %
+  const BASE_EDGE = 40;  // %
   const SLIDER_RANGE = 25;
 
   const defaultState = () => ({
-    credits: 500,
+    credits: 1000,
     bet: 10,
     spins: 0,
-    high: 500,
+    high: 1000,
     lastBonus: 0,
     edgeAdj: 0,   // ±25
   });
