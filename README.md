@@ -1,3 +1,5 @@
+A collection of random games.
+
 # Tree
 Idle Tree Cutter Game inspired by OSRS.
 
