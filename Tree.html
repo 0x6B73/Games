@@ -263,7 +263,7 @@
       'Grinding Goblin','Loglord Nerdicus','Branch Toucher','Touch Grass','Eternal Addict'
 
     ];
-    const specials = {5:'Adept', 10:'Expert', 15:'Master', 20:'Grandmaster', 25:'Mythic', 30:'Legendary',50:'Tryhard',75:'No Life',90:'Addict',99:'Touch Grass',100:'BANNED'};
+    const specials = {5:'Adept', 10:'Expert', 15:'Master', 20:'Grandmaster', 25:'Mythic', 30:'Legendary',50:'Tryhard',75:'No Life',90:'Addict',99:'Touch Grass',100:'ADDICT'};
     return base.map((name, i)=>{ const lvl=i+1; const badge=specials[lvl]?` (${specials[lvl]})`:''; return {level:lvl,key:String(lvl),name:`${name}${badge}`}; });
   })();
 
@@ -704,4 +704,4 @@
 </script>
 </body>
 </html>
-<!-- Version 1.1.0 -->
+<!-- Version 1.1.1 -->
