@@ -1,6 +1,7 @@
 A collection of random games.
 
 # Tree
+https://0x6b73.github.io/Games/Tree
 Idle Tree Cutter Game inspired by OSRS.
 
 
@@ -15,4 +16,8 @@ Features:
 
 
 # Nozruc's Neon JackPots
+https://0x6b73.github.io/Games/Nozruc
 Slots
+
+# Not Candy Crush
+https://0x6b73.github.io/Games/NotCandyCrush
