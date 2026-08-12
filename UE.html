@@ -277,6 +277,74 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   background:#1a1a1a;
   display:block;
 }
+.avatar-builder{
+  margin:8px 0 10px;
+  padding:8px;
+  border:1px solid #4e4435;
+  background:linear-gradient(180deg,#151516,#0a0b0c);
+}
+.avatar-builder-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-bottom:6px;
+  font-size:10px;
+  font-weight:900;
+  color:#e3d4b8;
+}
+.avatar-builder-head span{
+  font-size:8px;
+  font-weight:400;
+  color:#8e8678;
+}
+.avatar-builder-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:6px;
+}
+.avatar-cycle-card{
+  padding:6px;
+  border:1px solid #3b3428;
+  background:#0b0c0d;
+}
+.avatar-cycle-label{
+  display:block;
+  font-size:8px;
+  font-weight:900;
+  letter-spacing:.05em;
+  color:#c9b27a;
+  margin-bottom:5px;
+}
+.avatar-cycle-controls{
+  display:grid;
+  grid-template-columns:28px minmax(0,1fr) 28px;
+  gap:4px;
+  align-items:center;
+}
+.avatar-cycle-value{
+  font-size:9px;
+  font-weight:900;
+  color:#ddd3c1;
+  text-align:center;
+  white-space:nowrap;
+}
+.avatar-cycle-controls .btn{
+  min-height:26px;
+  padding:4px 0;
+}
+.avatar-builder-actions{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:7px;
+}
+.avatar-builder-actions .btn{
+  flex:1 1 120px;
+}
+@media(max-width:600px){
+  .avatar-builder-grid{grid-template-columns:1fr}
+}
 
 
 /* CAMPAIGNS */
@@ -2055,8 +2123,53 @@ body:after{
   font-size:7px;color:#91ad7c
 }
 .fight-stamina-badge{
-  display:inline-block;margin-left:4px;padding:2px 4px;border:1px solid #55482f;
-  background:#151109;color:#d1b764;font-size:7px;font-weight:900
+  display:inline-flex;align-items:center;gap:2px;padding:2px 4px;border:1px solid #55482f;
+  background:#151109;color:#d1b764;font-size:7px;font-weight:900;white-space:nowrap
+}
+
+/* FIGHT PAGE STREAMLINE — BUILD 0.22.9 */
+.fight-refresh-bar{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:7px!important;align-items:center!important;
+  margin:5px 0 6px!important;padding:6px 7px!important;border:1px solid #3a3b3d!important;
+  border-left:3px solid #776039!important;background:linear-gradient(#121416,#090a0b)!important
+}
+.fight-refresh-copy{font-size:8px!important;color:#9b9489!important;line-height:1.35}
+.fight-refresh-copy b{display:block;font-size:9px;color:#d6c7aa;margin-bottom:1px}
+.fight-set-list{display:grid;gap:4px}
+.fight-card{
+  border:1px solid #36383b;border-left:3px solid #685332;background:linear-gradient(#111315,#08090a);padding:7px;min-width:0
+}
+.fight-card.hit{border-left-color:#7f3d35}.fight-card.user-bounty{border-left-color:#967535}
+.fight-card-head{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:7px;align-items:center}
+.fight-card-icon{
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #3d3d3a;background:#0a0b0c
+}
+.fight-card-icon .ue-sprite{width:27px;height:27px;box-shadow:none}
+.fight-card-copy{min-width:0}
+.fight-card-name{font-size:11px;font-weight:900;color:#ddd4c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fight-card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.fight-card-tags .threat-badge,.fight-card-tags .fight-stamina-badge{margin-left:0}
+.fight-card-odds{min-width:52px;text-align:right}
+.fight-card-odds .fight-chance{margin-left:0;font-size:8px}
+.fight-card-stats{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;margin-top:6px
+}
+.fight-card-stat{padding:4px 5px;border:1px solid #2f3133;background:#0a0b0c;min-width:0}
+.fight-card-stat span{display:block;font-size:6px;color:#77736c;font-weight:900;letter-spacing:.05em}
+.fight-card-stat b{display:block;margin-top:1px;font-size:9px;color:#cfc4b1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fight-card-record{margin-top:5px;font-size:7px;color:#7f7971;line-height:1.35}
+.fight-card-actions{display:grid;grid-template-columns:30px minmax(96px,.8fr) minmax(110px,1.2fr);gap:3px;margin-top:6px;padding-top:6px;border-top:1px solid #282a2b}
+.fight-card-actions.two{grid-template-columns:30px minmax(110px,1fr)}
+.fight-card-actions.one{grid-template-columns:1fr}
+.fight-card-actions .btn{width:100%!important;min-width:0!important}
+.fight-card-empty{padding:10px;border:1px dashed #3a3b3c;background:#090a0b;color:#8e887e;font-size:9px;line-height:1.4;text-align:center}
+@media(min-width:760px){#fightlist.fight-set-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){
+  .fight-refresh-bar{grid-template-columns:1fr!important}.fight-refresh-bar .btn{width:100%!important}
+  .fight-card-head{grid-template-columns:30px minmax(0,1fr) auto}.fight-card-icon{width:30px;height:30px}
+  .fight-card-icon .ue-sprite{width:24px;height:24px}
+  .fight-card-actions{grid-template-columns:28px 1fr 1fr}
+  .fight-card-actions.two{grid-template-columns:28px 1fr}
 }
 
 
@@ -2371,7 +2484,7 @@ body:after{
 <section id="view-fight" class="view">
  <div class="tab-banner" data-banner="FIGHT"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="fold-card tab-section-fold" open>
-   <summary>FIGHT LIST <span>1 stamina per attack</span></summary>
+   <summary>FIGHT LIST <span>set rivals · threat-based stamina</span></summary>
    <div class="fold-body">
      <div id="combatInfo"></div>
      <div id="fightRefreshBar" class="fight-refresh-bar"></div>
@@ -2383,7 +2496,7 @@ body:after{
    <div class="fold-body"><div id="revenge"></div></div>
  </details>
  <details class="fold-card tab-section-fold">
-   <summary>HITLIST <span>dynamic bounties</span></summary>
+   <summary>HITLIST <span>set bounties · refresh with fight list</span></summary>
    <div class="fold-body"><div id="hitlist"></div></div>
  </details>
 </section>
@@ -2648,11 +2761,46 @@ body:after{
   <input id="customFriendPhoto" type="file" accept="image/*" class="name-input" onchange="previewCustomFriendPhoto(event)">
   <div class="file-note">Images are resized and stored locally with the game save.</div>
 
+  <div class="avatar-builder">
+    <div class="avatar-builder-head">AVATAR BUILDER <span>Cycle face, hair, and background.</span></div>
+    <div class="avatar-builder-grid">
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">BACKGROUND</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('bg',-1)">◀</button>
+          <div id="customAvatarBgValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('bg',1)">▶</button>
+        </div>
+      </div>
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">FACE</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('face',-1)">◀</button>
+          <div id="customAvatarFaceValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('face',1)">▶</button>
+        </div>
+      </div>
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">HAIR</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('hair',-1)">◀</button>
+          <div id="customAvatarHairValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cycleCustomAvatarPart('hair',1)">▶</button>
+        </div>
+      </div>
+    </div>
+    <div class="avatar-builder-actions">
+      <button class="btn secondary" type="button" onclick="randomizeCustomAvatarBuilder()">RANDOMIZE AVATAR</button>
+      <button class="btn secondary" type="button" onclick="useCustomUploadedPhoto()">USE UPLOADED PHOTO</button>
+    </div>
+  </div>
+
   <div class="custom-friend-preview">
     <img id="customFriendPreview" src="" alt="">
     <div>
       <div class="sub">Preview</div>
       <b id="customFriendPreviewName">Select a crew member</b>
+      <div id="customFriendPreviewMode" class="file-note">Avatar builder preview.</div>
     </div>
   </div>
 
@@ -2673,11 +2821,46 @@ body:after{
   <input id="editPlayerPhoto" type="file" accept="image/*" class="name-input" onchange="previewPlayerPhoto(event)">
   <div class="file-note">Images are resized and stored locally with your save.</div>
 
+  <div class="avatar-builder">
+    <div class="avatar-builder-head">AVATAR BUILDER <span>Cycle face, hair, and background.</span></div>
+    <div class="avatar-builder-grid">
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">BACKGROUND</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('bg',-1)">◀</button>
+          <div id="playerAvatarBgValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('bg',1)">▶</button>
+        </div>
+      </div>
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">FACE</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('face',-1)">◀</button>
+          <div id="playerAvatarFaceValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('face',1)">▶</button>
+        </div>
+      </div>
+      <div class="avatar-cycle-card">
+        <span class="avatar-cycle-label">HAIR</span>
+        <div class="avatar-cycle-controls">
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('hair',-1)">◀</button>
+          <div id="playerAvatarHairValue" class="avatar-cycle-value">1 / 16</div>
+          <button class="btn secondary" type="button" onclick="cyclePlayerAvatarPart('hair',1)">▶</button>
+        </div>
+      </div>
+    </div>
+    <div class="avatar-builder-actions">
+      <button class="btn secondary" type="button" onclick="randomizePlayerAvatarBuilder()">RANDOMIZE AVATAR</button>
+      <button class="btn secondary" type="button" onclick="usePlayerUploadedPhoto()">USE UPLOADED PHOTO</button>
+    </div>
+  </div>
+
   <div class="custom-friend-preview">
     <img id="editPlayerPreview" class="player-photo-preview" src="" alt="">
     <div>
       <div class="sub">Current profile</div>
       <b id="editPlayerPreviewName"></b>
+      <div id="editPlayerPreviewMode" class="file-note">Avatar builder preview.</div>
     </div>
   </div>
 
@@ -2736,7 +2919,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.6";
+const BUILD_NUMBER="0.22.9";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2998,7 +3181,7 @@ const ENDGAME_TIER_DEFS={
    costs:[200,400,800,1600,3200],
    rates:[270,240,210,180,120],
    unit:"seconds / Heat",
-   desc:"Lawyers, fixers, shell companies, and paid contacts accelerate passive Heat reduction. Tier 5 cuts the base decay interval from 5 minutes to 2 minutes."
+   desc:"Lawyers, fixers, shell companies, and paid contacts accelerate passive Heat reduction. Tier 5 cuts the active-pressure interval from 5 minutes to 2 minutes, and quiet recovery can become even faster."
  }
 };
 
@@ -3042,22 +3225,22 @@ const joinReplies=["I am in.","You have my support.","Count me in.","I will stan
 const refuseReplies=["Not yet.","I am not ready to commit.","I will stay independent for now.","No."];
 
 
-function avatarUrl(id,name=""){
+function legacy_avatarUrl(id,name=""){
   const seed=encodeURIComponent(`${id}-${name}`.toLowerCase());
   return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=1f2937,374151,4b5563&radius=8`;
 }
-function generatedPlayerAvatarUrl(){
+function legacy_generatedPlayerAvatarUrl(){
   const seedValue=state.playerAvatarSeed||(state.playerName||"east-harbor-boss").toLowerCase();
   const seed=encodeURIComponent(seedValue);
   return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=111827,1f2937,374151&radius=8`;
 }
-function playerAvatarUrl(){
+function legacy_playerAvatarUrl(){
   return state.playerPhoto||generatedPlayerAvatarUrl();
 }
 
 let pendingPlayerPhoto="";
 
-function openEditProfile(){
+function legacy_openEditProfile(){
   const modal=document.getElementById("editProfileModal");
   const name=document.getElementById("editPlayerName");
   const photo=document.getElementById("editPlayerPhoto");
@@ -3074,7 +3257,7 @@ function openEditProfile(){
   setTimeout(()=>name?.focus(),100);
 }
 
-function previewPlayerPhoto(event){
+function legacy_previewPlayerPhoto(event){
   const file=event.target.files?.[0];
   pendingPlayerPhoto="";
   if(!file)return;
@@ -3112,7 +3295,7 @@ function previewPlayerPhoto(event){
   reader.readAsDataURL(file);
 }
 
-function saveEditedProfile(){
+function legacy_saveEditedProfile(){
   const input=document.getElementById("editPlayerName");
   const name=(input?.value||"").trim().replace(/\s+/g," ");
   if(name.length<2)return toast("Enter a name with at least 2 characters.");
@@ -3128,7 +3311,7 @@ function saveEditedProfile(){
   toast("Profile updated.");
 }
 
-function removePlayerPhoto(){
+function legacy_removePlayerPhoto(){
   state.playerPhoto="";
   pendingPlayerPhoto="";
 
@@ -3153,7 +3336,7 @@ function promptForPlayerName(){
   const input=document.getElementById("playerNameInput");
   if(modal){modal.classList.add("show");setTimeout(()=>input?.focus(),150)}
 }
-function savePlayerName(){
+function legacy_savePlayerName(){
   const input=document.getElementById("playerNameInput");
   const value=(input?.value||"").trim().replace(/\s+/g," ");
   if(value.length<2)return toast("Enter a name with at least 2 characters.");
@@ -3171,7 +3354,7 @@ function getBasePersonDef(id){
     || state.generatedContacts?.[id]
     || {id,name:"Unknown Contact",role:"Associate",tag:"Unknown contact",help:.45,join:.5,temper:.25};
 }
-function getPersonDef(id){
+function legacy_getPersonDef(id){
   const base=getBasePersonDef(id);
   const custom=state.customFriends?.[id];
   if(!custom)return base;
@@ -3184,7 +3367,7 @@ function getPersonDef(id){
   };
 }
 
-function openCustomFriendModal(){
+function legacy_openCustomFriendModal(){
   const modal=document.getElementById("customFriendModal");
   const select=document.getElementById("customFriendReplaceId");
   const photo=document.getElementById("customFriendPhoto");
@@ -3207,7 +3390,7 @@ function openCustomFriendModal(){
 }
 
 
-function selectCustomReplacement(){
+function legacy_selectCustomReplacement(){
   const id=document.getElementById("customFriendReplaceId")?.value;
   if(!id)return;
   const d=getPersonDef(id),base=getBasePersonDef(id),custom=state.customFriends?.[id];
@@ -3226,7 +3409,7 @@ function selectCustomReplacement(){
   if(note)note.textContent=`Preserved: ${base.role} role, Reputation, Trust, Respect, crew status, activity, cooldowns, and reward state.`;
   if(restore)restore.disabled=!custom;
 }
-function updateCustomReplacementPreview(){
+function legacy_updateCustomReplacementPreview(){
   const id=document.getElementById("customFriendReplaceId")?.value;
   if(!id)return;
   const name=(document.getElementById("customFriendName")?.value||"").trim();
@@ -3240,7 +3423,7 @@ function updateCustomReplacementPreview(){
 
 let pendingCustomPhoto="";
 
-function previewCustomFriendPhoto(event){
+function legacy_previewCustomFriendPhoto(event){
   const file=event.target.files?.[0];
   pendingCustomPhoto="";
   if(!file)return;
@@ -3276,7 +3459,7 @@ function previewCustomFriendPhoto(event){
   reader.readAsDataURL(file);
 }
 
-function saveCustomFriend(){
+function legacy_saveCustomFriend(){
   const id=document.getElementById("customFriendReplaceId")?.value;
   const f=state.friends[id];
   if(!id||!f||!f.crew)return showRequirementPopup("Select a currently recruited crew member.");
@@ -3305,7 +3488,7 @@ function saveCustomFriend(){
 }
 
 
-function restoreCustomFriendIdentity(){
+function legacy_restoreCustomFriendIdentity(){
   const id=document.getElementById("customFriendReplaceId")?.value;
   if(!id||!state.customFriends?.[id])return;
   const customName=state.customFriends[id].name;
@@ -3318,7 +3501,7 @@ function restoreCustomFriendIdentity(){
   toast(`${customName} restored to ${base.name}.`);
 }
 
-function personAvatarUrl(id,name){
+function legacy_personAvatarUrl(id,name){
   const d=getPersonDef(id);
   return d.customPhoto||avatarUrl(id,name);
 }
@@ -3666,7 +3849,7 @@ function renderCampaignTopBar(){
  fill.style.width=`${pct}%`;
 
  if(state.heat>=90){
-   objEl.innerHTML=`<span style="color:#ff8074">MANHUNT:</span> ${objEl.textContent} · Win fights to reduce Heat.`;
+   objEl.innerHTML=`<span style="color:#ff8074">MANHUNT:</span> ${objEl.textContent} · Win fights or open Heat controls to recover.`;
  }
 }
 
@@ -3972,13 +4155,13 @@ function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
+ return {playerName:"",playerPhoto:"",playerAvatarSeed:"",playerAvatarSpec:{},customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
- currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
@@ -4008,12 +4191,15 @@ function migrate(){
  if(typeof state.playerName!=="string")state.playerName="";
  if(typeof state.playerPhoto!=="string")state.playerPhoto="";
  if(typeof state.playerAvatarSeed!=="string")state.playerAvatarSeed="";
+ if(!state.playerAvatarSpec||typeof state.playerAvatarSpec!=="object")state.playerAvatarSpec={};
  if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
  if(!state.generatedContacts||typeof state.generatedContacts!=="object")state.generatedContacts={};
  if(!Number.isFinite(state.bankCash)||state.bankCash<0)state.bankCash=0;
  if(!Number.isInteger(state.prestige)||state.prestige<0)state.prestige=0;
  if(!state.collectionClaimed||typeof state.collectionClaimed!=="object")state.collectionClaimed={};
  if(!Array.isArray(state.fightList))state.fightList=[];
+ if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
+ if(typeof state.fightListsInitialized!=="boolean")state.fightListsInitialized=false;
  if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
  if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
@@ -4073,6 +4259,10 @@ function migrate(){
    }
    state.legacyCustomMigrationNotice={migrated:migratedLegacy,removed:removedLegacy};
  }
+ Object.values(state.customFriends||{}).forEach(custom=>{
+   if(!custom||typeof custom!=="object")return;
+   if(!custom.avatarSpec||typeof custom.avatarSpec!=="object")custom.avatarSpec={};
+ });
  if(!Number.isFinite(state.lastGeneratedContact))state.lastGeneratedContact=now();
  if(!Number.isFinite(state.lastPresenceUpdate))state.lastPresenceUpdate=now();
  if(!Number.isFinite(state.lastGiftEvent))state.lastGiftEvent=now();
@@ -4196,6 +4386,8 @@ function migrate(){
  if(!Number.isFinite(state.lastStaminaRegen))state.lastStaminaRegen=regenBase;
  if(!Number.isFinite(state.lastHealthRegen))state.lastHealthRegen=regenBase;
  if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=regenBase;
+ if(!Number.isFinite(state.lastHeatGain))state.lastHeatGain=regenBase;
+ if(!Number.isFinite(state.lastLayLow))state.lastLayLow=0;
  if(!Number.isFinite(state.lastIncome))state.lastIncome=now();
  if(!Number.isFinite(state.lastUpkeep))state.lastUpkeep=now();
  if(!Number.isFinite(state.lastSocial))state.lastSocial=now();
@@ -4278,11 +4470,37 @@ function endgameCanBuy(def){
 function endgameTier(kind){
  return Math.max(0,Math.min(5,Math.floor(Number(state.endgameInfra?.[`${kind}Tier`])||0)));
 }
-function heatDecayMs(){
+const HEAT_QUIET_AFTER_MS=5*60000;
+const HEAT_QUIET_MULTIPLIER=.40;
+const HEAT_QUIET_MIN_MS=60000;
+const LAY_LOW_COOLDOWN_MS=10*60000;
+
+function heatBaseDecayMs(){
  const tier=endgameTier("heat");
  if(tier<=0)return 300000;
  const seconds=ENDGAME_TIER_DEFS.heat.rates[tier-1]||300;
  return seconds*1000;
+}
+function heatQuietRecoveryActive(t=now()){
+ return t-(Number(state.lastHeatGain)||0)>=HEAT_QUIET_AFTER_MS;
+}
+function heatDecayMs(t=now()){
+ const base=heatBaseDecayMs();
+ return heatQuietRecoveryActive(t)?Math.max(HEAT_QUIET_MIN_MS,Math.round(base*HEAT_QUIET_MULTIPLIER)):base;
+}
+function addHeat(amount){
+ const gain=Math.max(0,Number(amount)||0);
+ if(gain<=0)return 0;
+ const before=state.heat;
+ state.lastHeatGain=now();
+ state.heat=Math.min(100,state.heat+gain);
+ return Math.max(0,state.heat-before);
+}
+function layLowRemaining(){
+ return Math.max(0,LAY_LOW_COOLDOWN_MS-(now()-(Number(state.lastLayLow)||0)));
+}
+function cashHeatBribeCost(){
+ return Math.min(5000,500+Math.max(0,(Number(state.level)||1)-1)*75);
 }
 function staminaCostMarkup(cost){return `${spriteIconHtml("stamina","xs")} ${cost}`;}
 function fightStaminaCost(o){
@@ -4432,7 +4650,7 @@ function renderEndgameFacilities(){
    const next=tier<5?def.costs[tier]:0;
    let rateText="";
    if(kind==="heat"){
-     rateText=tier?`Passive Heat decay: -1 every ${Math.round(def.rates[tier-1]/6)/10} min`:"Base Heat decay: -1 every 5 min";
+     rateText=tier?`Active-pressure decay: -1 every ${Math.round(def.rates[tier-1]/6)/10} min · faster after 5 quiet min`:"Active-pressure decay: -1 every 5 min · 2 min after 5 quiet min";
    }else{
      rateText=tier?`${def.rates[tier-1]} ${def.unit}`:"No automatic production";
    }
@@ -4558,7 +4776,7 @@ function addXp(n){
  while(state.xp>=xpNeed()){
    state.xp-=xpNeed();state.level++;state.skill+=5;
    state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;
-   state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;
+   state.hp=state.maxHp;state.en=state.maxEn;state.st=Math.min(state.st,state.maxSt);
    state.notoriety+=10;gained.push(state.level);
    log(`Level ${state.level}. Five skill points awarded.`);S.lvl();
  }
@@ -4660,7 +4878,7 @@ const PROFILE_HELP={
  crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
  activeCrew:{title:"Combat Crew",text:"The number of currently fielded crew members. Jobs can use your full recruited crew, but combat has a level/prestige-based field limit and diminishing returns. Each fielded member can use one weapon, one armor item, and one vehicle."},
  record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and reduces Heat. Harder opponents require stronger Attack, better equipment, and more active crew; Defense also supports the highest-threat offensive fights."},
- heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Winning offensive fights lowers Heat, or you can spend 10 Gold Bars to bribe law enforcement and reset Heat to 0 immediately."},
+ heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. You can always use Lay Low, pay a Cash bribe, win fights, or use the Heat-free fallback Job to recover."},
  income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
  gold:{title:"Gold Bars",text:"Rare currency used for permanent Gold Vault unlocks. They can appear through Ask for Help or be acquired through the Cash exchange."},
  territory:{title:"Territory",text:"The number of districts under your control. Territory provides income and represents long-term organizational power."}
@@ -4678,12 +4896,12 @@ function showProfileHelp(key,e){
 
 const STAT_HELP={
  health:{title:"Health",text:"Health is the damage your character can take. Fights and failed operations can reduce it. You need at least 10 Health to initiate a fight. Health regenerates by 1 every 1 minute 30 seconds."},
- energy:{title:"Energy",text:"Energy powers Jobs. Natural recovery is fastest when your reserve is almost empty: 0–2 Energy regenerates at 1 point per minute. As you bank more, each point takes progressively longer, reaching 12 minutes per point at 30+ Energy. Energy Drinks still restore 3–7 instantly."},
+ energy:{title:"Energy",text:"Energy powers Jobs. Natural recovery is a flat 1 Energy every 3 minutes regardless of how much Energy you have banked. Energy Drinks still restore 3–7 instantly."},
  stamina:{title:"Stamina",text:"Stamina powers fights, incoming-attack defenses, and territory actions. Most fights cost 1 Stamina and territory moves cost 2. Stamina regenerates by 1 every 3 minutes. Adrenaline Shots restore a random 1–3 Stamina and can be stored up to 999."},
  cash:{title:"Cash",text:"Cash buys equipment and properties, pays favors and operating costs, and covers losses. You can also exchange $100,000 Cash for 1 Gold Bar in the Gear tab."},
  gold:{title:"Gold Bars",text:"Gold Bars are rare currency for permanent special unlocks. They can appear as an exceptionally rare Ask for Help reward, or you can exchange $100,000 Cash for 1 Gold Bar."},
  crew:{title:"Crew",text:"Crew size unlocks Jobs and increases combat power. Each available recruited crew member contributes to your organization. Injured or arrested members temporarily stop contributing to active combat power."},
- heat:{title:"Heat",text:"Heat measures law-enforcement and rival attention. Jobs raise Heat. Higher Heat lowers Job success and can trigger cleanup costs or arrests. Heat naturally falls by 1 about every 5 minutes."}
+ heat:{title:"Heat",text:"Heat measures law-enforcement and rival attention. Jobs raise Heat. Higher Heat lowers Job success and can trigger cleanup costs or arrests. Heat falls naturally, and after 5 minutes without gaining Heat the recovery timer speeds up substantially."}
 };
 function showStatHelp(key,e){
  if(e?.stopPropagation)e.stopPropagation();
@@ -4692,7 +4910,8 @@ function showStatHelp(key,e){
  const actions=document.getElementById("statHelpActions");
  if(actions){
    if(key==="heat"){
-     actions.innerHTML=`<div class="bribe-box"><b>BRIBE LAW ENFORCEMENT</b><span>Pay 10 Gold Bars to wipe Heat to 0.</span><button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
+     const layWait=layLowRemaining(),cashCost=cashHeatBribeCost(),quiet=heatQuietRecoveryActive(),decay=heatDecayMs();
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#5f5134;background:#141108"><b style="color:#efd36a">HEAT CONTROL</b><span>${quiet?"Quiet recovery active":"Stay clean for 5 minutes to accelerate passive recovery"} · Current decay: -1 every ${formatRegenTime(decay)}.<br>The fallback Job <b style="display:inline;color:#ddd3c1">Deliver a Sealed Package</b> stays available at any Heat and generates no Heat.</span><button class="btn green" style="margin-top:6px" onclick="layLow()" ${state.heat<=0||layWait>0?"disabled":""}>${layWait>0?`LAY LOW · ${fmt(layWait)}`:"LAY LOW · FREE · -15 HEAT"}</button><button class="btn secondary" style="margin-top:5px" onclick="cashHeatBribe()" ${state.heat<=0||state.cash<cashCost?"disabled":""}>CASH BRIBE · ${money(cashCost)} · -25 HEAT</button><button class="btn red" style="margin-top:5px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>FULL WIPE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
      const gross=propertyIncome()+facilityIncome()+territoryIncome(),upkeep=propertyUpkeep()+facilityUpkeep()+gearUpkeep(),net=netIncome();
      actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Facilities + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
@@ -4741,7 +4960,7 @@ function renderEnergyReserve(){
    <div class="er"><span>ENERGY DRINKS</span><b>${spriteIconHtml("drink","sm")} ${qty}</b></div>
  </div>
  <div class="energy-rate"><b>Current natural recovery:</b> ${state.en>=state.maxEn?"FULL":energyRateLabel()}${state.en>=state.maxEn?"":` · Next Energy in ${regen.text.replace("+1 IN ","")}`}</div>
- <p class="sub">Natural recovery slows as Energy is banked. Energy Drinks restore 3–7 Energy.</p>
+ <p class="sub">Natural recovery is always 1 Energy every 3 minutes. Energy Drinks restore 3–7 Energy.</p>
  ${supplyExchangeHtml()}`;
  btn.textContent=`DRINK ENERGY DRINK${qty?` (x${qty})`:""}`;
  btn.disabled=qty<=0||state.en>=state.maxEn;
@@ -4929,7 +5148,7 @@ function doJob(id){
  const j=jobDefs.find(x=>x.id===id),miss=reqMissing(j);
  if(miss.length)return showRequirementPopup(`Missing requirement${miss.length===1?"":"s"}: ${miss.join(" · ")}`);
  if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
- setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);
+ setJobBusy(id,true);state.en-=j.energy;addHeat(j.heat);
  const chance=jobChance(j),success=rnd(1,100)<=chance,jobData=jobState(id);
  if(success){
    const eventMult=state.event.ends>now()?1.25:1;
@@ -4978,7 +5197,7 @@ function doJob(id){
    if(Math.random()<Math.max(.12,.35-mitigation*.35))injureRandomCrew();
    if(state.heat>65&&Math.random()<Math.max(.08,.25-mitigation*.20))arrestRandomCrew();
  }
- save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700);
+ save();render();if(!j.fallback)maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700);
 }
 function injureRandomCrew(){
  const ids=availableCrew();if(!ids.length)return null;
@@ -5100,10 +5319,22 @@ function makeFightRival(i){
    ...rivalRecordBase(base.level)
  };
 }
+function makeHitlistRival(i){
+ const base=genOpponent(i+2,true);
+ return {
+   ...base,
+   id:`hit_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,
+   name:generatedContactName(),
+   ...rivalRecordBase(base.level)
+ };
+}
 function ensureFightList(){
  if(!Array.isArray(state.fightList))state.fightList=[];
- if(state.fightList.length<5){
-   while(state.fightList.length<5)state.fightList.push(makeFightRival(state.fightList.length));
+ if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
+ if(!state.fightListsInitialized){
+   if(!state.fightList.length)state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
+   if(!state.dynamicHitlist.length)state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
+   state.fightListsInitialized=true;
    if(!state.lastFightRefresh)state.lastFightRefresh=now();
  }
  return state.fightList;
@@ -5115,8 +5346,10 @@ function refreshFightList(force=false){
  const wait=fightRefreshWait();
  if(!force&&wait>0)return showRequirementPopup(`New rivals available in ${fmt(wait)}.`);
  state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
+ state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
+ state.fightListsInitialized=true;
  state.lastFightRefresh=now();save();render();
- if(!force)showActionFlash("FIGHT LIST REFRESHED","New rival organizations located.","info");
+ if(!force)showActionFlash("FIGHT LIST REFRESHED","Five rivals and three street bounties located.","info");
 }
 function updateRivalHistory(o,playerWon){
  if(!o?.id)return {fled:false,streak:0};
@@ -5168,13 +5401,7 @@ function updateRivalHistory(o,playerWon){
 
 function removeFleeingRivalFromFightList(id){
  if(!id||!Array.isArray(state.fightList))return;
- const removed=state.fightList.find(x=>x.id===id);
- if(!removed)return;
- const replacementIndex=Math.max(0,Math.min(4,opponentThreat(removed)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- while(state.fightList.length<5){
-   state.fightList.push(makeFightRival(replacementIndex));
- }
 }
 
 function bountyPlacementCost(o){
@@ -5189,9 +5416,7 @@ function placeBountyOnRival(id){
  state.cash-=cost;state.lifetimeCashSpent+=cost;
  state.playerBounties.unshift({...o,bounty:Math.round(cost*.35),placedCost:cost,placedAt:now()});
  state.playerBounties=state.playerBounties.slice(0,10);
- const replacementIndex=Math.max(0,Math.min(4,opponentThreat(o)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- state.fightList.push(makeFightRival(replacementIndex));
  showActionFlash("BOUNTY POSTED",`${o.name} · Cost ${money(cost)} · Hitlist reward ${money(Math.round(cost*.35))}`,"cash");
  save();render();
 }
@@ -5272,7 +5497,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    :revengeId
      ?state.revenge.find(x=>x.id===revengeId)
      :hit
-       ?genOpponent(i,true)
+       ?(state.dynamicHitlist||[])[i]
        :ensureFightList()[i];
  if(!o)return;
 
@@ -5312,6 +5537,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    );
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
    if(bountyId)state.playerBounties=state.playerBounties.filter(x=>x.id!==bountyId);
+   if(hit&&!bountyId&&o?.id)state.dynamicHitlist=(state.dynamicHitlist||[]).filter(x=>x.id!==o.id);
  }else{
    const mitigation=defenseMitigation(),threat=opponentThreat(o),baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
    const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
@@ -5341,7 +5567,7 @@ function fightBoss(t){
    const payout=Math.floor(1800*(t+1)*(1+rematches*.15)*prestigeCashMult());
    const xpEarned=Math.floor((120+50*t+rematches*10)*prestigeXpMult());
    state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.notoriety+=first?25:8;
-   addXp(xpEarned);state.heat=Math.min(100,state.heat+12);
+   addXp(xpEarned);addHeat(12);
 
    const extras=[];
    const pool=bossLootDefs[t]||["Boss Trophy"];
@@ -5442,7 +5668,7 @@ function takeTerritory(id){
  state.st-=2;state.lifetimeTerritoryMoves++;
  const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
  if(p>=e){
-   ts.progress+=35;state.heat=Math.min(100,state.heat+8);
+   ts.progress+=35;addHeat(8);
    if(ts.progress>=100){
      ts.owned=true;ts.progress=100;state.notoriety+=18;
      log(`You took control of ${t.name}.`);
@@ -5454,7 +5680,7 @@ function takeTerritory(id){
    S.ok();
  }else{
    const hpBefore=state.hp;
-   state.hp=Math.max(1,state.hp-rnd(8,18));state.heat=Math.min(100,state.heat+5);
+   state.hp=Math.max(1,state.hp-rnd(8,18));addHeat(5);
    const hpLoss=Math.max(0,Math.floor(hpBefore-state.hp));
    log(`Your move on ${t.name} failed.`);
    showActionFlash("TERRITORY MOVE FAILED",`${t.name} · -2 Stamina · -${hpLoss} Health`,"bad");
@@ -6218,14 +6444,29 @@ function maybeHeatEvent(){
  }else arrestRandomCrew();
 }
 function layLow(){
- if(state.cash<300)return toast("You need $300 to disappear for a while.");
- const oldHeat=state.heat,oldEnergy=state.en;
- state.cash-=300;state.lifetimeCashSpent+=300;S.cash();
- state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);
- const heatDrop=Math.floor(oldHeat-state.heat),energyGain=Math.floor(state.en-oldEnergy);
+ if(state.heat<=0)return toast("Your Heat is already at 0.");
+ const remaining=layLowRemaining();
+ if(remaining>0)return showRequirementPopup(`Lay Low is available again in ${fmt(remaining)}.`);
+ const oldHeat=state.heat;
+ state.heat=Math.max(0,state.heat-15);
+ state.lastLayLow=now();
+ const heatDrop=Math.floor(oldHeat-state.heat);
  log(`You laid low and reduced Heat by ${heatDrop}.`);
- showActionFlash("LAID LOW",`${money(300)} paid · -${heatDrop} Heat${energyGain?` · +${energyGain} Energy`:""}`,"good");
+ showActionFlash("LAID LOW",`Free cooldown action · -${heatDrop} Heat · Ready again in 10m`,"good");
  save();render();
+}
+function cashHeatBribe(){
+ if(state.heat<=0)return toast("Your Heat is already at 0.");
+ const cost=cashHeatBribeCost();
+ if(state.cash<cost)return showRequirementPopup(`A cash bribe costs ${money(cost)}. You have ${money(state.cash)}.`);
+ const oldHeat=state.heat;
+ state.cash-=cost;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
+ state.heat=Math.max(0,state.heat-25);
+ const heatDrop=Math.floor(oldHeat-state.heat);
+ log(`Paid ${money(cost)} in cash bribes and reduced Heat by ${heatDrop}.`);
+ showActionFlash("CASH BRIBE PAID",`${money(cost)} · -${heatDrop} Heat`,"cash");
+ S.cash();save();render();
 }
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);
@@ -6277,7 +6518,7 @@ function renderEnergy(id){
    el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Ask contacts for Energy Drinks, use one from your stash, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · ${energyRateLabel()}</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button>${drinks>0?`<button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK (x${drinks})</button>`:""}</div></div>`;
  }else if(state.en<=Math.max(3,state.maxEn*.2)){
    const r=energyRegenCountdown();
-   el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Low reserves recover quickly. Banked Energy becomes progressively slower to regenerate.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · ${energyRateLabel()}</div><div class="actions"><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button>${drinks>0?`<button class="btn secondary small" onclick="drinkEnergyDrink()">DRINK (x${drinks})</button>`:""}</div></div>`;
+   el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Energy recovers at a flat rate of 1 every 3 minutes.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · ${energyRateLabel()}</div><div class="actions"><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button>${drinks>0?`<button class="btn secondary small" onclick="drinkEnergyDrink()">DRINK (x${drinks})</button>`:""}</div></div>`;
  }else el.innerHTML="";
 }
 
@@ -6483,11 +6724,11 @@ function prestigeGame(){
  if(!canPrestige())return showRequirementPopup("Prestige requires Level 100 and every rank boss defeated.");
  if(!confirm("Become a higher-tier Kingpin? This resets level, cash, jobs, bosses, properties, territory, equipment, and run statistics. Crew, custom identities, Gold Bars, Gold Vault unlocks, rare loot, achievements, and completed collections are preserved."))return;
  state.prestige=(state.prestige||0)+1;
- state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.notoriety=10*state.prestige;
+ state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.lastHeatGain=now();state.lastLayLow=0;state.notoriety=10*state.prestige;
  state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
  state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
  state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
- state.fightList=[];state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
+ state.fightList=[];state.dynamicHitlist=[];state.fightListsInitialized=false;state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
  resetGoldUnlockStats();
  log(`Kingpin Prestige ${state.prestige} began. Permanent bonuses increased.`);
  showActionFlash("KINGPIN PRESTIGE",`Prestige ${state.prestige} · +${state.prestige*5}% Job Cash/XP · +${state.prestige*2} Attack/Defense`,"cash");
@@ -6600,7 +6841,7 @@ function openGoldVaultFromStat(){
 }
 function showFightBreakdown(i,hit=false,revengeId=null,e){
  if(e?.stopPropagation)e.stopPropagation();
- const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):(hit?(state.dynamicHitlist||[])[i]:ensureFightList()[i]);
  if(!o)return;
  const p=offensiveFightProfile(o),chance=fightWinChance(o);
  document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
@@ -6842,41 +7083,75 @@ function renderFight(){
  const fightEl=document.getElementById("fightlist"),revengeEl=document.getElementById("revenge"),hitEl=document.getElementById("hitlist");
  if(!fightEl||!revengeEl||!hitEl)return;
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
+ const list=ensureFightList();
+ const streetBounties=state.dynamicHitlist||[];
+ fightEl.className="fight-set-list";
+ revengeEl.className="fight-set-list";
+ hitEl.className="fight-set-list";
+
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Stamina scales more gradually: Street through Dangerous cost 1, Hard/Brutal cost 2, Elite/Kingpin cost 3, and Nightmare costs 4.</div><div class="fight-access-note">Fight List replacements now stay in the same Threat band. Beating or placing a bounty on an easy rival no longer replaces them with a high-Threat rival.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat means a stronger enemy organization. Beat the same Fight List rival ${RIVAL_FLEE_STREAK} times in a row and they flee for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Defense reduces losses by ${mit}%. Stamina costs scale by Threat.</div><div class="fight-access-note">Fight List and street-bounty targets are finite. Fleeing rivals and posted bounties leave an empty slot. New targets only appear when you manually refresh the list.</div></details>`;
  }
  const wait=fightRefreshWait();
- if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
+ if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy"><b>${list.length}/5 RIVALS REMAIN · ${streetBounties.length}/3 STREET BOUNTIES</b>Targets do not auto-repopulate after they leave the list.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH LISTS"}</button>`;
 
- const list=ensureFightList();
- fightEl.innerHTML=list.map((o,i)=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o);
-   return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
-    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span><span class="fight-stamina-badge">${staminaCostMarkup(fightStaminaCost(o))}</span></div>
-    <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
-    <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} intimidation`:``}`:""}</div>
-   </div><div class="fight-row-actions">
-    <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
-    <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
-    <button class="btn red small" onclick="fight(${i},false)" ${state.st<fightStaminaCost(o)?"disabled":""}>ATTACK · ${staminaCostMarkup(fightStaminaCost(o))}</button>
-   </div></div></div>`;
- }).join("");
+ fightEl.innerHTML=list.length?list.map((o,i)=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card">
+     <div class="fight-card-head">
+       <div class="fight-card-icon">${spriteIconHtml("target","card")}</div>
+       <div class="fight-card-copy">
+         <div class="fight-card-name">${o.name}</div>
+         <div class="fight-card-tags">${o.rivalReturn?'<span class="threat-badge">RETURNING</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div>
+       </div>
+       <div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+     </div>
+     <div class="fight-card-stats">
+       <div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div>
+       <div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div>
+       <div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div>
+     </div>
+     <div class="fight-card-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} toward fleeing`:``}`:""}</div>
+     <div class="fight-card-actions">
+       <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
+       <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
+       <button class="btn red small" onclick="fight(${i},false)" ${state.st<stCost?"disabled":""}>ATTACK · ${staminaCostMarkup(stCost)}</button>
+     </div>
+   </div>`;
+ }).join(""):`<div class="fight-card-empty">No Fight List rivals remain. Refresh the list when the refresh timer is ready.</div>`;
 
  revengeEl.innerHTML=state.revenge.length?state.revenge.map(o=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${spriteIconHtml("2:revenge","sm")} ${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>REVENGE · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
- }).join(""):"<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit">
+     <div class="fight-card-head">
+       <div class="fight-card-icon">${spriteIconHtml("2:revenge","card")}</div>
+       <div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">REVENGE</span><span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div>
+       <div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+     </div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div><div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div></div>
+     <div class="fight-card-actions two"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<stCost?"disabled":""}>REVENGE · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
+ }).join(""):`<div class="fight-card-empty">No outstanding revenge targets.</div>`;
 
  const placed=state.playerBounties.map(o=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit user-bounty">
+     <div class="fight-card-head"><div class="fight-card-icon">${spriteIconHtml("2:bounty","card")}</div><div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">YOUR BOUNTY</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div><div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div></div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>REWARD</span><b>${compactMoney(o.bounty)}</b></div><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div></div>
+     <div class="fight-card-record">You paid ${money(o.placedCost)} to put this rival on the street.</div>
+     <div class="fight-card-actions one"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<stCost?"disabled":""}>CLAIM · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
  }).join("");
- const dynamic=[0,1,2].map(i=>{
-   const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
+ const dynamic=streetBounties.map((o,i)=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit">
+     <div class="fight-card-head"><div class="fight-card-icon">${spriteIconHtml("2:bounty","card")}</div><div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div><div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div></div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>BOUNTY</span><b>${compactMoney(o.bounty)}</b></div><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div></div>
+     <div class="fight-card-actions two"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},true,null,event)">?</button><button class="btn red small" onclick="fight(${i},true)" ${state.st<stCost?"disabled":""}>CLAIM · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
  }).join("");
- hitEl.innerHTML=placed+dynamic;
+ hitEl.innerHTML=placed+dynamic||`<div class="fight-card-empty">No bounties remain. Refresh the lists when the timer is ready.</div>`;
 }
 
 function gearEffectLabel(g){
@@ -7263,19 +7538,12 @@ function renderProfile(){
 }
 
 
-const ENERGY_REGEN_MS=60000;
+const ENERGY_REGEN_MS=180000;
 const STAMINA_REGEN_MS=180000;
 const HEALTH_REGEN_MS=90000;
 
-function energyRegenPeriod(current){
-  const e=Math.max(0,Math.floor(Number(current)||0));
-  if(e<=2)return 60000;
-  if(e<=5)return 90000;
-  if(e<=9)return 120000;
-  if(e<=14)return 180000;
-  if(e<=19)return 300000;
-  if(e<=29)return 480000;
-  return 720000;
+function energyRegenPeriod(){
+  return ENERGY_REGEN_MS;
 }
 function energyRateLabel(current=state.en){
   return `1 Energy every ${formatRegenTime(energyRegenPeriod(current))}`;
@@ -7325,15 +7593,13 @@ function applyRegeneration(t=now()){
     state.lastEnergyRegen=t;
   }else{
     if(!Number.isFinite(state.lastEnergyRegen))state.lastEnergyRegen=t;
-    let cursor=state.lastEnergyRegen,safety=0;
-    while(state.en<state.maxEn&&safety<5000){
-      const period=energyRegenPeriod(state.en);
-      if(t-cursor<period)break;
-      cursor+=period;
-      state.en=Math.min(state.maxEn,state.en+1);
-      safety++;
+    const elapsed=Math.max(0,t-state.lastEnergyRegen);
+    const gain=Math.floor(elapsed/ENERGY_REGEN_MS);
+    if(gain>0){
+      state.en=Math.min(state.maxEn,state.en+gain);
+      state.lastEnergyRegen+=gain*ENERGY_REGEN_MS;
+      if(state.en>=state.maxEn)state.lastEnergyRegen=t;
     }
-    state.lastEnergyRegen=state.en>=state.maxEn?t:cursor;
   }
 
   if(state.st>=state.maxSt){
@@ -7376,7 +7642,7 @@ function tick(){
  // Heat uses its own clock. Endgame infrastructure can shorten the decay interval.
  if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=t;
  if(state.heat>0){
-   const interval=heatDecayMs();
+   const interval=heatDecayMs(t);
    const elapsed=Math.max(0,t-state.lastHeatDecay);
    const cool=Math.floor(elapsed/interval);
    if(cool>0){
@@ -7536,6 +7802,473 @@ function bannerAssetError(img){
  if(img)img.style.display="none";
 }
 
+
+/* AVATAR BUILDER OVERRIDES */
+const AVATAR_SHEET_COLS=4,AVATAR_SHEET_ROWS=4,AVATAR_PART_COUNT=16;
+const AVATAR_ASSET_PATHS={
+  face:"./Assets/ue-avatar-faces.png",
+  hair:"./Assets/ue-avatar-hair.png",
+  bg:"./Assets/ue-avatar-backgrounds.png"
+};
+const avatarAssets={face:null,hair:null,bg:null,ready:false,loading:false,promise:null};
+const avatarRenderCache=new Map();
+let pendingPlayerAvatarSpec=null;
+let pendingPlayerUseBuilder=false;
+let pendingCustomAvatarSpec=null;
+let pendingCustomUseBuilder=true;
+
+function clampAvatarIndex(v){
+  return Number.isFinite(v)?((Math.floor(v)%AVATAR_PART_COUNT)+AVATAR_PART_COUNT)%AVATAR_PART_COUNT:null;
+}
+function cloneAvatarSpec(spec){
+  return spec?{bg:spec.bg,face:spec.face,hair:spec.hair}:null;
+}
+function hashString(input){
+  const text=String(input||"avatar").toLowerCase();
+  let h=2166136261>>>0;
+  for(let i=0;i<text.length;i++){
+    h^=text.charCodeAt(i);
+    h=Math.imul(h,16777619);
+  }
+  return h>>>0;
+}
+function seededAvatarSpec(seedKey){
+  const base=String(seedKey||"avatar");
+  return {
+    bg:hashString(base+"|bg")%AVATAR_PART_COUNT,
+    face:hashString(base+"|face")%AVATAR_PART_COUNT,
+    hair:hashString(base+"|hair")%AVATAR_PART_COUNT
+  };
+}
+function normalizeAvatarSpec(spec,seedKey="avatar"){
+  const fallback=seededAvatarSpec(seedKey);
+  return {
+    bg:clampAvatarIndex(spec?.bg)??fallback.bg,
+    face:clampAvatarIndex(spec?.face)??fallback.face,
+    hair:clampAvatarIndex(spec?.hair)??fallback.hair
+  };
+}
+function randomAvatarSpec(){
+  return {
+    bg:Math.floor(Math.random()*AVATAR_PART_COUNT),
+    face:Math.floor(Math.random()*AVATAR_PART_COUNT),
+    hair:Math.floor(Math.random()*AVATAR_PART_COUNT)
+  };
+}
+function avatarInitials(name=""){
+  return String(name||"Boss").trim().split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0]?.toUpperCase()||"").join("")||"EH";
+}
+function avatarFallbackDataUrl(name,spec){
+  const palette=["#1f2937","#334155","#1d4ed8","#0f766e","#166534","#854d0e","#7f1d1d","#7c2d12","#6b21a8","#92400e","#e5d3ad","#4b5563"];
+  const bg=palette[(normalizeAvatarSpec(spec,name).bg)%palette.length];
+  const text=avatarInitials(name);
+  return 'data:image/svg+xml;utf8,'+encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">'+
+    '<rect width="128" height="128" rx="14" fill="'+bg+'"/>'+
+    '<rect x="3" y="3" width="122" height="122" rx="12" fill="none" stroke="#665640" stroke-width="4"/>'+
+    '<text x="64" y="73" text-anchor="middle" font-family="Arial, sans-serif" font-size="42" font-weight="700" fill="#f2e3be">'+text+'</text>'+
+    '</svg>'
+  );
+}
+function loadAvatarAsset(path){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>resolve(img);
+    img.onerror=()=>reject(new Error('Failed to load '+path));
+    img.src=path;
+  });
+}
+function initAvatarAssets(){
+  if(avatarAssets.ready)return Promise.resolve();
+  if(avatarAssets.loading)return avatarAssets.promise;
+  avatarAssets.loading=true;
+  avatarAssets.promise=Promise.all([
+    loadAvatarAsset(AVATAR_ASSET_PATHS.face),
+    loadAvatarAsset(AVATAR_ASSET_PATHS.hair),
+    loadAvatarAsset(AVATAR_ASSET_PATHS.bg)
+  ]).then(([face,hair,bg])=>{
+    avatarAssets.face=face;avatarAssets.hair=hair;avatarAssets.bg=bg;
+    avatarAssets.ready=true;avatarAssets.loading=false;avatarRenderCache.clear();
+    try{render()}catch(e){}
+  }).catch(err=>{
+    console.warn('Avatar assets failed to load.',err);
+    avatarAssets.loading=false;
+  });
+  return avatarAssets.promise;
+}
+function avatarCellSize(img){
+  return {w:img.width/AVATAR_SHEET_COLS,h:img.height/AVATAR_SHEET_ROWS};
+}
+function drawAvatarCell(ctx,img,index,x,y,w,h){
+  const cell=avatarCellSize(img);
+  const col=index%AVATAR_SHEET_COLS,row=Math.floor(index/AVATAR_SHEET_COLS);
+  ctx.drawImage(img,col*cell.w,row*cell.h,cell.w,cell.h,x,y,w,h);
+}
+function roundedRectPath(ctx,x,y,w,h,r){
+  const radius=Math.min(r,w/2,h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+radius,y);
+  ctx.arcTo(x+w,y,x+w,y+h,radius);
+  ctx.arcTo(x+w,y+h,x,y+h,radius);
+  ctx.arcTo(x,y+h,x,y,radius);
+  ctx.arcTo(x,y,x+w,y,radius);
+  ctx.closePath();
+}
+function composeAvatarDataUrl(spec,name="",size=128){
+  const avatarSpec=normalizeAvatarSpec(spec,name||"avatar");
+  const key=`${size}|${avatarSpec.bg}|${avatarSpec.face}|${avatarSpec.hair}`;
+  if(avatarRenderCache.has(key))return avatarRenderCache.get(key);
+  if(!avatarAssets.ready||!avatarAssets.face||!avatarAssets.hair||!avatarAssets.bg){
+    return avatarFallbackDataUrl(name,avatarSpec);
+  }
+  const canvas=document.createElement('canvas');
+  canvas.width=size;canvas.height=size;
+  const ctx=canvas.getContext('2d');
+  ctx.save();
+  roundedRectPath(ctx,0,0,size,size,12);
+  ctx.clip();
+  drawAvatarCell(ctx,avatarAssets.bg,avatarSpec.bg,0,0,size,size);
+  ctx.fillStyle='rgba(0,0,0,.08)';
+  ctx.fillRect(0,0,size,size);
+  drawAvatarCell(ctx,avatarAssets.face,avatarSpec.face,0,0,size,size);
+  drawAvatarCell(ctx,avatarAssets.hair,avatarSpec.hair,0,0,size,size);
+  ctx.restore();
+  roundedRectPath(ctx,2,2,size-4,size-4,10);
+  ctx.lineWidth=4;
+  ctx.strokeStyle='#665640';
+  ctx.stroke();
+  const url=canvas.toDataURL('image/png');
+  avatarRenderCache.set(key,url);
+  return url;
+}
+function playerAvatarSpec(){
+  return normalizeAvatarSpec(state.playerAvatarSpec,state.playerAvatarSeed||state.playerName||"east-harbor-boss");
+}
+function personAvatarSpec(id,name=""){
+  const custom=state.customFriends?.[id]||{};
+  const displayName=custom.name||name||getBasePersonDef(id).name||id;
+  return normalizeAvatarSpec(custom.avatarSpec,`person-${id}-${displayName}`);
+}
+function avatarUrl(id,name=""){
+  return composeAvatarDataUrl(personAvatarSpec(id,name),name||id,128);
+}
+function generatedPlayerAvatarUrl(){
+  return composeAvatarDataUrl(playerAvatarSpec(),state.playerName||"Boss",128);
+}
+function playerAvatarUrl(){
+  return state.playerPhoto||generatedPlayerAvatarUrl();
+}
+function personAvatarUrl(id,name){
+  const d=getPersonDef(id);
+  return d.customPhoto||composeAvatarDataUrl(personAvatarSpec(id,d.name||name),d.name||name||id,128);
+}
+function setAvatarValueText(id,spec){
+  const el=document.getElementById(id);
+  if(el)el.textContent=`${(spec??0)+1} / ${AVATAR_PART_COUNT}`;
+}
+function updatePlayerAvatarControls(){
+  if(!pendingPlayerAvatarSpec)pendingPlayerAvatarSpec=cloneAvatarSpec(playerAvatarSpec());
+  setAvatarValueText('playerAvatarBgValue',pendingPlayerAvatarSpec.bg);
+  setAvatarValueText('playerAvatarFaceValue',pendingPlayerAvatarSpec.face);
+  setAvatarValueText('playerAvatarHairValue',pendingPlayerAvatarSpec.hair);
+  const preview=document.getElementById('editPlayerPreview');
+  const mode=document.getElementById('editPlayerPreviewMode');
+  if(preview)preview.src=(pendingPlayerPhoto&&!pendingPlayerUseBuilder)?pendingPlayerPhoto:composeAvatarDataUrl(pendingPlayerAvatarSpec,state.playerName||'Boss',128);
+  if(mode)mode.textContent=(pendingPlayerPhoto&&!pendingPlayerUseBuilder)?'Using uploaded photo.' : 'Using sprite avatar builder.';
+}
+function cyclePlayerAvatarPart(part,delta){
+  if(!pendingPlayerAvatarSpec)pendingPlayerAvatarSpec=cloneAvatarSpec(playerAvatarSpec());
+  pendingPlayerUseBuilder=true;
+  pendingPlayerPhoto='';
+  const input=document.getElementById('editPlayerPhoto');
+  if(input)input.value='';
+  pendingPlayerAvatarSpec[part]=((pendingPlayerAvatarSpec[part]||0)+delta+AVATAR_PART_COUNT)%AVATAR_PART_COUNT;
+  updatePlayerAvatarControls();
+}
+function randomizePlayerAvatarBuilder(){
+  pendingPlayerAvatarSpec=randomAvatarSpec();
+  pendingPlayerUseBuilder=true;
+  pendingPlayerPhoto='';
+  const input=document.getElementById('editPlayerPhoto');
+  if(input)input.value='';
+  updatePlayerAvatarControls();
+  toast('Random avatar selected.');
+}
+function usePlayerUploadedPhoto(){
+  if(!pendingPlayerPhoto&&!state.playerPhoto)return toast('Upload a photo first.');
+  pendingPlayerUseBuilder=false;
+  const preview=document.getElementById('editPlayerPreview');
+  if(preview)preview.src=pendingPlayerPhoto||state.playerPhoto||composeAvatarDataUrl(pendingPlayerAvatarSpec,state.playerName||'Boss',128);
+  const mode=document.getElementById('editPlayerPreviewMode');
+  if(mode)mode.textContent=(pendingPlayerPhoto||state.playerPhoto)?'Using uploaded photo.' : 'Using sprite avatar builder.';
+}
+function openEditProfile(){
+  const modal=document.getElementById("editProfileModal");
+  const name=document.getElementById("editPlayerName");
+  const photo=document.getElementById("editPlayerPhoto");
+  const preview=document.getElementById("editPlayerPreview");
+  const previewName=document.getElementById("editPlayerPreviewName");
+  pendingPlayerPhoto="";
+  pendingPlayerAvatarSpec=cloneAvatarSpec(playerAvatarSpec());
+  pendingPlayerUseBuilder=!state.playerPhoto;
+  if(name)name.value=state.playerName||"";
+  if(photo)photo.value="";
+  if(preview)preview.src=playerAvatarUrl();
+  if(previewName)previewName.textContent=state.playerName||"Unknown";
+  modal?.classList.add("show");
+  updatePlayerAvatarControls();
+  setTimeout(()=>name?.focus(),100);
+}
+function previewPlayerPhoto(event){
+  const file=event.target.files?.[0];
+  pendingPlayerPhoto="";
+  if(!file)return;
+  if(!file.type.startsWith("image/")){
+    toast("Select an image file.");
+    event.target.value="";
+    return;
+  }
+  if(file.size>8*1024*1024){
+    toast("Image is too large. Use an image under 8 MB.");
+    event.target.value="";
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const size=256;
+      const canvas=document.createElement("canvas");
+      canvas.width=size;canvas.height=size;
+      const c=canvas.getContext("2d");
+      const scale=Math.max(size/img.width,size/img.height);
+      const w=img.width*scale,h=img.height*scale;
+      c.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+      pendingPlayerPhoto=canvas.toDataURL("image/jpeg",0.82);
+      pendingPlayerUseBuilder=false;
+      const preview=document.getElementById("editPlayerPreview");
+      if(preview)preview.src=pendingPlayerPhoto;
+      const mode=document.getElementById('editPlayerPreviewMode');
+      if(mode)mode.textContent='Using uploaded photo.';
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function saveEditedProfile(){
+  const input=document.getElementById("editPlayerName");
+  const name=(input?.value||"").trim().replace(/\s+/g," ");
+  if(name.length<2)return toast("Enter a name with at least 2 characters.");
+  state.playerName=name.slice(0,24);
+  state.playerAvatarSpec=normalizeAvatarSpec(pendingPlayerAvatarSpec,state.playerName||'east-harbor-boss');
+  if(pendingPlayerPhoto)state.playerPhoto=pendingPlayerPhoto;
+  else if(pendingPlayerUseBuilder)state.playerPhoto="";
+  pendingPlayerPhoto="";
+  save();
+  closeModal("editProfileModal");
+  render();
+  S.ok();
+  toast("Profile updated.");
+}
+function removePlayerPhoto(){
+  state.playerPhoto="";
+  pendingPlayerPhoto="";
+  pendingPlayerAvatarSpec=randomAvatarSpec();
+  pendingPlayerUseBuilder=true;
+  const photo=document.getElementById("editPlayerPhoto");
+  if(photo)photo.value="";
+  const preview=document.getElementById("editPlayerPreview");
+  if(preview)preview.src=composeAvatarDataUrl(pendingPlayerAvatarSpec,state.playerName||'Boss',128);
+  const mode=document.getElementById('editPlayerPreviewMode');
+  if(mode)mode.textContent='Using sprite avatar builder.';
+  state.playerAvatarSpec=normalizeAvatarSpec(pendingPlayerAvatarSpec,state.playerName||'east-harbor-boss');
+  save();
+  render();
+  updatePlayerAvatarControls();
+  toast("Random avatar selected.");
+}
+function savePlayerName(){
+  const input=document.getElementById("playerNameInput");
+  const value=(input?.value||"").trim().replace(/\s+/g," ");
+  if(value.length<2)return toast("Enter a name with at least 2 characters.");
+  state.playerName=value.slice(0,24);
+  state.playerAvatarSpec=normalizeAvatarSpec(state.playerAvatarSpec,state.playerName||'east-harbor-boss');
+  save();
+  document.getElementById("nameModal")?.classList.remove("show");
+  render();
+  if(!state.tutorialDone)setTimeout(startTutorial,250);
+}
+function getPersonDef(id){
+  const base=getBasePersonDef(id);
+  const custom=state.customFriends?.[id];
+  if(!custom)return base;
+  return {
+    ...base,
+    name:custom.name||base.name,
+    customPhoto:custom.customPhoto||"",
+    avatarSpec:custom.avatarSpec||null,
+    customized:true,
+    originalName:base.name
+  };
+}
+function openCustomFriendModal(){
+  const modal=document.getElementById("customFriendModal");
+  const select=document.getElementById("customFriendReplaceId");
+  const photo=document.getElementById("customFriendPhoto");
+  const ids=crewIds().filter(id=>state.friends[id]?.crew);
+  if(!ids.length)return showRequirementPopup("Recruit at least one crew member before creating a custom identity.");
+  if(select){
+    select.innerHTML=ids.map(id=>{
+      const d=getPersonDef(id),base=getBasePersonDef(id);
+      return `<option value="${id}">${d.name}${d.customized?` (replaces ${base.name})`:""} · ${base.role}</option>`;
+    }).join("");
+  }
+  if(photo)photo.value="";
+  pendingCustomPhoto="";
+  pendingCustomUseBuilder=true;
+  modal?.classList.add("show");
+  selectCustomReplacement();
+}
+function updateCustomAvatarControls(){
+  if(!pendingCustomAvatarSpec){
+    const id=document.getElementById('customFriendReplaceId')?.value;
+    pendingCustomAvatarSpec=id?cloneAvatarSpec(personAvatarSpec(id,getPersonDef(id).name)):randomAvatarSpec();
+  }
+  setAvatarValueText('customAvatarBgValue',pendingCustomAvatarSpec.bg);
+  setAvatarValueText('customAvatarFaceValue',pendingCustomAvatarSpec.face);
+  setAvatarValueText('customAvatarHairValue',pendingCustomAvatarSpec.hair);
+  const id=document.getElementById('customFriendReplaceId')?.value;
+  const preview=document.getElementById('customFriendPreview');
+  const name=(document.getElementById('customFriendName')?.value||'').trim()||(id?getBasePersonDef(id).name:'Custom');
+  if(preview){
+    if(pendingCustomPhoto&&!pendingCustomUseBuilder)preview.src=pendingCustomPhoto;
+    else preview.src=composeAvatarDataUrl(pendingCustomAvatarSpec,name,128);
+  }
+  const mode=document.getElementById('customFriendPreviewMode');
+  if(mode)mode.textContent=(pendingCustomPhoto&&!pendingCustomUseBuilder)?'Using uploaded photo.' : 'Using sprite avatar builder.';
+}
+function selectCustomReplacement(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id)return;
+  const d=getPersonDef(id),base=getBasePersonDef(id),custom=state.customFriends?.[id];
+  const name=document.getElementById("customFriendName");
+  const preview=document.getElementById("customFriendPreview");
+  const previewName=document.getElementById("customFriendPreviewName");
+  const note=document.getElementById("customFriendBalanceNote");
+  const restore=document.getElementById("restoreCustomFriendBtn");
+  pendingCustomPhoto="";
+  pendingCustomAvatarSpec=cloneAvatarSpec(custom?.avatarSpec||personAvatarSpec(id,custom?.name||base.name));
+  pendingCustomUseBuilder=!custom?.customPhoto;
+  const photo=document.getElementById("customFriendPhoto");
+  if(photo)photo.value="";
+  if(name)name.value=custom?.name||base.name;
+  if(preview)preview.src=personAvatarUrl(id,d.name);
+  if(previewName)previewName.textContent=custom?.name||base.name;
+  if(note)note.textContent=`Preserved: ${base.role} role, Reputation, Trust, Respect, crew status, activity, cooldowns, and reward state.`;
+  if(restore)restore.disabled=!custom;
+  updateCustomAvatarControls();
+}
+function updateCustomReplacementPreview(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id)return;
+  const name=(document.getElementById("customFriendName")?.value||"").trim();
+  const previewName=document.getElementById("customFriendPreviewName");
+  if(previewName)previewName.textContent=name||getBasePersonDef(id).name;
+  updateCustomAvatarControls();
+}
+function cycleCustomAvatarPart(part,delta){
+  if(!pendingCustomAvatarSpec)pendingCustomAvatarSpec=randomAvatarSpec();
+  pendingCustomUseBuilder=true;
+  pendingCustomPhoto='';
+  const input=document.getElementById('customFriendPhoto');
+  if(input)input.value='';
+  pendingCustomAvatarSpec[part]=((pendingCustomAvatarSpec[part]||0)+delta+AVATAR_PART_COUNT)%AVATAR_PART_COUNT;
+  updateCustomAvatarControls();
+}
+function randomizeCustomAvatarBuilder(){
+  pendingCustomAvatarSpec=randomAvatarSpec();
+  pendingCustomUseBuilder=true;
+  pendingCustomPhoto='';
+  const input=document.getElementById('customFriendPhoto');
+  if(input)input.value='';
+  updateCustomAvatarControls();
+  toast('Random avatar selected.');
+}
+function useCustomUploadedPhoto(){
+  const id=document.getElementById('customFriendReplaceId')?.value;
+  if(!pendingCustomPhoto&&!state.customFriends?.[id]?.customPhoto)return toast('Upload a photo first.');
+  pendingCustomUseBuilder=false;
+  updateCustomAvatarControls();
+}
+function previewCustomFriendPhoto(event){
+  const file=event.target.files?.[0];
+  pendingCustomPhoto="";
+  if(!file)return;
+  if(!file.type.startsWith("image/")){
+    toast("Select an image file.");
+    event.target.value="";
+    return;
+  }
+  if(file.size>8*1024*1024){
+    toast("Image is too large. Use an image under 8 MB.");
+    event.target.value="";
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const size=192,canvas=document.createElement("canvas");
+      canvas.width=size;canvas.height=size;
+      const ctx=canvas.getContext("2d");
+      const scale=Math.max(size/img.width,size/img.height);
+      const w=img.width*scale,h=img.height*scale;
+      ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+      pendingCustomPhoto=canvas.toDataURL("image/jpeg",0.78);
+      pendingCustomUseBuilder=false;
+      const preview=document.getElementById("customFriendPreview");
+      if(preview)preview.src=pendingCustomPhoto;
+      updateCustomAvatarControls();
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function saveCustomFriend(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  const f=state.friends[id];
+  if(!id||!f||!f.crew)return showRequirementPopup("Select a currently recruited crew member.");
+  const input=document.getElementById("customFriendName");
+  const name=(input?.value||"").trim().replace(/\s+/g," ");
+  if(name.length<2)return toast("Enter a name with at least 2 characters.");
+  const base=getBasePersonDef(id);
+  const prior=state.customFriends[id]||{};
+  state.customFriends[id]={
+    name:name.slice(0,28),
+    customPhoto:pendingCustomPhoto?pendingCustomPhoto:(pendingCustomUseBuilder?"":(prior.customPhoto||"")),
+    avatarSpec:normalizeAvatarSpec(pendingCustomAvatarSpec||prior.avatarSpec,`custom-${id}-${name}`),
+    replacedName:base.name,
+    customizedAt:now()
+  };
+  pendingCustomPhoto="";
+  closeModal("customFriendModal");
+  log(`${base.name} is now represented by custom crew identity ${name}. Underlying progression was preserved.`);
+  save();render();S.ok();
+  showActionFlash("CREW IDENTITY REPLACED",`${base.name} → ${name} · No new crew slot created`,"good");
+}
+function restoreCustomFriendIdentity(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id||!state.customFriends?.[id])return;
+  const customName=state.customFriends[id].name;
+  const base=getBasePersonDef(id);
+  delete state.customFriends[id];
+  pendingCustomPhoto="";
+  save();render();
+  selectCustomReplacement();
+  S.ok();
+  toast(`${customName} restored to ${base.name}.`);
+}
+
 function go(v){
  const target=document.getElementById("view-"+v);if(!target)return;
  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
@@ -7565,6 +8298,7 @@ setInterval(()=>{try{checkSkillReminder()}catch(e){}},600000);
 setTimeout(()=>{try{checkSkillReminder()}catch(e){}},5000);
 setTimeout(()=>{try{checkForNewBuild()}catch(e){}},10000);
 setInterval(()=>{try{checkForNewBuild()}catch(e){}},BUILD_CHECK_INTERVAL_MS);
+initAvatarAssets();
 try{tick()}catch(e){console.error("Initial tick failed",e);try{render()}catch(renderError){console.error("Initial render failed",renderError)}}
 setTimeout(()=>{try{if(state.playerName)startTutorial();else promptForPlayerName()}catch(e){console.error("Onboarding failed",e)}},350);
 setTimeout(()=>{try{tryAutoTheme()}catch(e){console.error("Theme startup failed",e)}},500);
