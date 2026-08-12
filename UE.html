@@ -1198,6 +1198,22 @@ body.compact-stats .mini-hud{
 .version-check-status.bad{color:#c98578}
 .version-check-status.info{color:#c8ae5b}
 
+
+/* GEAR TAB GROUPING */
+.gear-section-fold{margin-bottom:6px}
+.gear-section-fold>summary{
+  font-size:10px!important;
+  letter-spacing:.03em;
+}
+.gear-section-fold .fold-body{padding-top:6px}
+#gearSupplyExchange{margin:0 0 6px}
+#gearSupplyExchange .supply-exchange{margin-top:0}
+#ownedEquipment .inventory-equipment{margin-top:0}
+.owned-equipment-empty{
+  padding:8px;border:1px solid #343638;background:#090b0d;
+  color:#8f887d;font-size:9px
+}
+
 </style>
 </head>
 <body>
@@ -1335,11 +1351,28 @@ body.compact-stats .mini-hud{
 </section>
 
 <section id="view-gear" class="view">
- <div class="section-title"><h2>Inventory</h2><span>resources and equipment you own</span></div>
- <div id="inventory"></div>
+ <details class="fold-card gear-section-fold" open>
+   <summary>MAIN INVENTORY <span>cash / gold / supplies</span></summary>
+   <div class="fold-body">
+     <div id="inventory"></div>
+   </div>
+ </details>
 
- <div class="section-title" style="margin-top:10px"><h2>Equipment Sets</h2><span>organization bonuses</span></div>
- <div id="equipmentSets"></div>
+ <div id="gearSupplyExchange"></div>
+
+ <details class="fold-card gear-section-fold">
+   <summary>OWNED EQUIPMENT <span id="ownedEquipmentCount">0 items</span></summary>
+   <div class="fold-body">
+     <div id="ownedEquipment"></div>
+   </div>
+ </details>
+
+ <details class="fold-card gear-section-fold">
+   <summary>EQUIPMENT SETS <span>organization bonuses</span></summary>
+   <div class="fold-body">
+     <div id="equipmentSets"></div>
+   </div>
+ </details>
 
  <div class="section-title" style="margin-top:10px"><h2>Equipment Shop</h2><span id="upkeepLabel"></span></div>
  <div class="filter-strip gear-filter-strip" id="gearFilters">
@@ -1614,7 +1647,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.7";
+const BUILD_NUMBER="0.17.8";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4779,20 +4812,54 @@ function supplyExchangeHtml(){
 }
 
 function renderInventory(){
- const el=document.getElementById("inventory");if(!el)return;
- const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0),shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
- const ep=Math.max(0,Number(state.loot["Energy Pack"])||0),sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
+ const el=document.getElementById("inventory");
+ const exchange=document.getElementById("gearSupplyExchange");
+ const equipment=document.getElementById("ownedEquipment");
+ const count=document.getElementById("ownedEquipmentCount");
+ if(!el)return;
+
+ const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ const ep=Math.max(0,Number(state.loot["Energy Pack"])||0);
+ const sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
+ const ownedQty=owned.reduce((n,g)=>n+gearQty(g.id),0);
+
  el.innerHTML=`<div class="inventory-resources">
    <div class="inventory-resource"><div class="ir-label">CASH</div><b>${compactMoney(state.cash)}</b></div>
    <div class="inventory-resource gold"><div class="ir-label">GOLD BARS</div><b>🪙 ${state.goldBars||0}</b></div>
-   <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()"><div class="ir-label">ENERGY DRINKS</div><b>🥤 ${drinks}</b></div>
-   <div class="inventory-resource stamina"><div class="ir-label">ADRENALINE</div><b>💉 ${shots}</b><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
-   <div class="inventory-resource pack"><div class="ir-label">ENERGY PACKS</div><b>📦 ${ep}</b><button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
-   <div class="inventory-resource pack"><div class="ir-label">STAMINA PACKS</div><b>📦 ${sp}</b><button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
- </div>
- ${supplyExchangeHtml()}
- <div class="inventory-equipment">${owned.length?owned.map(g=>`<div class="inventory-item"><div><div class="ii-name">${g.name}</div><div class="ii-desc">${g.desc}</div></div><div class="ii-qty">x${gearQty(g.id)}</div></div>`).join(""):`<div class="inventory-empty">You do not own any shop equipment yet.</div>`}</div>`;
+   <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()">
+     <div class="ir-label">ENERGY DRINKS</div><b>🥤 ${drinks}</b>
+   </div>
+   <div class="inventory-resource stamina">
+     <div class="ir-label">ADRENALINE</div><b>💉 ${shots}</b>
+     <button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button>
+   </div>
+   <div class="inventory-resource pack">
+     <div class="ir-label">ENERGY PACKS</div><b>📦 ${ep}</b>
+     <button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button>
+   </div>
+   <div class="inventory-resource pack">
+     <div class="ir-label">STAMINA PACKS</div><b>📦 ${sp}</b>
+     <button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button>
+   </div>
+ </div>`;
+
+ if(exchange)exchange.innerHTML=supplyExchangeHtml();
+
+ if(count)count.textContent=`${owned.length} type${owned.length===1?"":"s"} · ${ownedQty.toLocaleString()} total`;
+
+ if(equipment){
+   equipment.innerHTML=owned.length
+     ?`<div class="inventory-equipment">${owned.map(g=>`<div class="inventory-item">
+        <div>
+          <div class="ii-name">${g.name}</div>
+          <div class="ii-desc">${g.desc}</div>
+        </div>
+        <div class="ii-qty">x${gearQty(g.id)}</div>
+       </div>`).join("")}</div>`
+     :`<div class="owned-equipment-empty">You do not own any shop equipment yet.</div>`;
+ }
 }
 
 
