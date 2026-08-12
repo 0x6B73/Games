@@ -1262,6 +1262,27 @@ body:after{
   }
 }
 
+
+/* MESSAGE FOCUS MODE */
+.inbox-focus-overlay{
+  position:fixed;
+  inset:0;
+  z-index:2147483040;
+  background:rgba(0,0,0,.44);
+  -webkit-backdrop-filter:blur(5px) brightness(.52) saturate(.75);
+  backdrop-filter:blur(5px) brightness(.52) saturate(.75);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .16s ease;
+}
+.inbox-focus-overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+.inbox-panel{
+  isolation:isolate;
+}
+
 </style>
 </head>
 <body>
@@ -1539,6 +1560,7 @@ body:after{
 </div></nav>
 
 <button class="inbox-fab" onclick="toggleInbox()">✉<span class="count" id="inboxCount">0</span></button>
+<div class="inbox-focus-overlay" id="inboxFocusOverlay" onclick="toggleInbox()" aria-hidden="true"></div>
 <div class="inbox-panel" id="inboxPanel"><div class="inbox-head">Messages</div><div id="inboxItems"></div></div>
 <div class="friend-request-pop" id="socialPop"><div class="fr-head">Incoming Message</div><div class="fr-body" id="socialPopBody"></div></div>
 <div class="chatbox" id="chatbox"><div class="chatwin"><div class="chathead" id="chatTitle"></div><div class="chatlog" id="chatLog"></div><div class="chatopts" id="chatOptions"></div><button class="btn secondary" style="border-radius:0" onclick="closeChat()">Close</button></div></div>
@@ -1696,7 +1718,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.18.1";
+const BUILD_NUMBER="0.18.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4077,7 +4099,22 @@ function addInbox(x){
  save();renderInbox();
 }
 function unread(){return state.inbox.filter(x=>!x.read).length}
-function toggleInbox(){inboxPanel.classList.toggle("show");if(inboxPanel.classList.contains("show")){state.inbox.forEach(x=>x.read=true);save();renderInbox()}}
+function setInboxFocus(open){
+ const overlay=document.getElementById("inboxFocusOverlay");
+ if(overlay){
+   overlay.classList.toggle("show",!!open);
+   overlay.setAttribute("aria-hidden",open?"false":"true");
+ }
+}
+function toggleInbox(){
+ const open=inboxPanel.classList.toggle("show");
+ setInboxFocus(open);
+ if(open){
+   state.inbox.forEach(x=>x.read=true);
+   save();
+   renderInbox();
+ }
+}
 function dismissInbox(id){state.inbox=state.inbox.filter(x=>x.id!==id);save();renderInbox()}
 function answerInbox(id,choice){
  const x=state.inbox.find(y=>y.id===id);if(!x)return;
@@ -4197,6 +4234,7 @@ function renderInbox(){
  if(state.inbox.length===0){
    const panel=document.getElementById("inboxPanel");
    if(panel)panel.classList.remove("show");
+   setInboxFocus(false);
  }
 
  inboxCount.textContent=unread();
