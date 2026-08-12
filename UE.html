@@ -1134,6 +1134,8 @@ body.compact-stats .top{padding-bottom:4px!important}
  <div class="skillgrid" id="skills"></div>
  <div class="section-title" style="margin-top:10px"><h2>Recent Intelligence</h2><span>latest activity</span></div>
  <div class="card" id="log"></div>
+
+ <div class="build-number" id="homeBuildNumber">BUILD</div>
 </section>
 
 <section id="view-jobs" class="view">
@@ -4348,7 +4350,7 @@ function showFightBreakdown(i,hit=false,revengeId=null,e){
  document.getElementById("statHelpModal").classList.add("show");
 }
 
-function render(){syncStatHudMode();const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",state.heat>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;
+function render(){syncStatHudMode();const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",state.heat>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;const hbn=document.getElementById("homeBuildNumber");if(hbn)hbn.textContent=`BUILD ${BUILD_NUMBER}`;
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
  if(heroName)heroName.textContent=state.playerName?`${displayName}'s Criminal Empire`:"Build Your Criminal Empire.";
