@@ -1836,6 +1836,228 @@ body:after{
 }
 .fold-card[open] summary:before{content:""!important;transform:rotate(45deg) translateY(-1px)}
 
+
+/* EQUIPMENT SHOP REWORK — BUILD 0.22 */
+.gear-shop-toolbar{
+  margin-bottom:6px;
+  padding:6px;
+  border:1px solid #373632;
+  background:linear-gradient(#111315,#090a0b);
+}
+.gear-shop-filter-row{
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr);
+  gap:5px;
+  align-items:center;
+}
+.gear-shop-filter-row+.gear-shop-filter-row{
+  margin-top:5px;
+  padding-top:5px;
+  border-top:1px solid #282925;
+}
+.gear-shop-filter-name{
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.09em;
+  color:#827b70;
+}
+.gear-shop-chips{
+  display:flex;
+  gap:3px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+.gear-shop-chips::-webkit-scrollbar{display:none}
+.gear-chip{
+  flex:0 0 auto;
+  min-height:25px;
+  padding:4px 7px;
+  border:1px solid #3b3d3f;
+  border-radius:2px;
+  background:#0b0c0d;
+  color:#999187;
+  font:900 7px/1 Arial,Helvetica,sans-serif;
+  letter-spacing:.035em;
+}
+.gear-chip.active{
+  border-color:#9d7b35;
+  background:linear-gradient(#231c10,#110e08);
+  color:#efd36a;
+  box-shadow:inset 0 -2px 0 #ad8535;
+}
+.gear-filter-summary{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:6px!important;
+  padding-top:5px!important;
+  border-top:1px solid #282925!important;
+  font-size:7px!important;
+  color:#817b72!important;
+}
+.gear-filter-summary b{color:#c9b16e;font-size:8px}
+.gear-shop-list{display:grid;gap:5px}
+.gear-shop-item{
+  position:relative;
+  min-width:0;
+  padding:7px;
+  border:1px solid #36383a;
+  border-left:3px solid #4c5053;
+  background:linear-gradient(135deg,#111315,#08090a 72%);
+  box-shadow:0 5px 14px #0004;
+}
+.gear-shop-item.grade-mid{border-left-color:#8a6639}
+.gear-shop-item.grade-high{
+  border-color:#594922;
+  border-left-color:#bd9235;
+  background:linear-gradient(135deg,#17140d,#090a0a 72%);
+}
+.gear-shop-item.locked{opacity:.76}
+.gear-shop-main{
+  display:grid;
+  grid-template-columns:58px minmax(0,1fr) auto;
+  gap:7px;
+  align-items:start;
+}
+.gear-shop-icon{
+  width:58px;height:58px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid #343638;
+  background:radial-gradient(circle at 50% 42%,#23201a,#090a0b 68%);
+  overflow:hidden;
+}
+.gear-shop-item.grade-high .gear-shop-icon{border-color:#5d4a25;background:radial-gradient(circle at 50% 42%,#2a2112,#090a0b 70%)}
+.gear-shop-icon .ue-sprite{width:49px;height:49px;box-shadow:none;filter:brightness(1.08) saturate(1.02)}
+.gear-shop-icon .ue-sprite.sheet-2{width:51px;height:51px}
+.gear-shop-copy{min-width:0}
+.gear-shop-name-row{display:flex;align-items:center;gap:4px;min-width:0}
+.gear-shop-name{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font:900 11px/1.15 Arial,Helvetica,sans-serif;
+  color:#ddd6c9;
+}
+.gear-shop-item.grade-high .gear-shop-name{color:#e0ca92}
+.gear-grade-tag{
+  flex:0 0 auto;
+  padding:2px 4px;
+  border:1px solid #474a4d;
+  background:#101112;
+  font-size:6px;
+  font-weight:900;
+  color:#a7aaad;
+}
+.gear-grade-tag.mid{border-color:#665237;color:#c8a36b;background:#15110c}
+.gear-grade-tag.high{border-color:#7b6027;color:#e0bf63;background:#1a1509}
+.gear-shop-statline{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px 7px;
+  margin-top:4px;
+  font-size:8px;
+  color:#928b81;
+}
+.gear-shop-statline b{color:#cfc5b3}
+.gear-shop-desc{
+  margin-top:4px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
+  font-size:8px;
+  line-height:1.3;
+  color:#7f7971;
+}
+.gear-shop-price{text-align:right;white-space:nowrap}
+.gear-shop-price b{display:block;font-size:12px;color:#d4ba6a}
+.gear-shop-price span{display:block;margin-top:2px;font-size:6px;color:#756f67}
+.gear-shop-requirements{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+  margin-top:5px;
+}
+.gear-req{
+  padding:2px 4px;
+  border:1px solid #37393a;
+  background:#0a0b0c;
+  font-size:7px;
+  color:#8f887d;
+}
+.gear-req.met{border-color:#39502f;color:#91b879;background:#0b1009}
+.gear-req.missing{border-color:#623831;color:#cf8b80;background:#130b09}
+.gear-shop-purchase{
+  display:grid;
+  grid-template-columns:auto minmax(110px,1fr);
+  gap:5px;
+  align-items:center;
+  margin-top:6px;
+  padding-top:6px;
+  border-top:1px solid #292a27;
+}
+.gear-qty-pills{display:grid;grid-template-columns:repeat(4,31px);gap:2px}
+.gear-qty-pill{
+  height:27px;
+  padding:0;
+  border:1px solid #3b3c3b;
+  background:#0a0b0c;
+  color:#8e887f;
+  font:900 8px/1 Arial,Helvetica,sans-serif;
+}
+.gear-qty-pill.active{
+  border-color:#8c6e33;
+  background:#211a0e;
+  color:#efd36a;
+}
+.gear-shop-buy{
+  min-height:31px!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  gap:8px;
+  padding:6px 9px!important;
+  text-align:left;
+}
+.gear-shop-buy span{font-size:8px}
+.gear-shop-buy b{font-size:10px;white-space:nowrap}
+.gear-shop-note{
+  margin-top:4px;
+  min-height:10px;
+  font-size:7px;
+  color:#7f7971;
+}
+.gear-shop-note.savings{color:#94ae73}
+.gear-shop-note.locked{color:#c17e72}
+.gear-shop-details{margin-top:5px!important}
+.gear-shop-details summary{padding:4px 5px!important;font-size:7px!important}
+@media(min-width:760px){
+  .gear-shop-list{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .gear-shop-main{grid-template-columns:52px minmax(0,1fr)}
+  .gear-shop-icon{width:52px;height:52px}
+  .gear-shop-icon .ue-sprite{width:44px;height:44px}
+  .gear-shop-icon .ue-sprite.sheet-2{width:46px;height:46px}
+  .gear-shop-price{grid-column:2;text-align:left;display:flex;align-items:baseline;gap:5px;margin-top:-1px}
+  .gear-shop-price b{font-size:10px}.gear-shop-price span{margin:0}
+  .gear-shop-purchase{grid-template-columns:1fr}
+  .gear-qty-pills{grid-template-columns:repeat(4,1fr)}
+  .gear-qty-pill{width:100%}
+}
+
+/* FIGHT LIST SUSTAINABILITY — BUILD 0.22 */
+.fight-access-note{
+  margin-top:4px;padding:4px 5px;border:1px solid #35422f;background:#0b1009;
+  font-size:7px;color:#91ad7c
+}
+.fight-stamina-badge{
+  display:inline-block;margin-left:4px;padding:2px 4px;border:1px solid #55482f;
+  background:#151109;color:#d1b764;font-size:7px;font-weight:900
+}
+
 </style>
 </head>
 <body>
@@ -2091,30 +2313,30 @@ body:after{
  <details class="fold-card gear-section-fold tab-section-fold" open>
    <summary>EQUIPMENT SHOP <span id="upkeepLabel"></span></summary>
    <div class="fold-body">
-     <div class="gear-filter-panel" id="gearFilters">
-       <div class="gear-filter-group">
-         <div class="gear-filter-label">TYPE</div>
-         <div class="filter-strip gear-filter-strip">
-           <button class="btn small" data-filter="all" onclick="setGearFilter('all')">ALL</button>
-           <button class="btn small secondary" data-filter="attack" onclick="setGearFilter('attack')">ATTACK</button>
-           <button class="btn small secondary" data-filter="defense" onclick="setGearFilter('defense')">DEFENSE</button>
-           <button class="btn small secondary" data-filter="vehicle" onclick="setGearFilter('vehicle')">VEHICLES</button>
-           <button class="btn small secondary" data-filter="utility" onclick="setGearFilter('utility')">JOB TOOLS</button>
-           <button class="btn small secondary" data-filter="affordable" onclick="setGearFilter('affordable')">AFFORDABLE</button>
+     <div class="gear-shop-toolbar" id="gearFilters">
+       <div class="gear-shop-filter-row">
+         <span class="gear-shop-filter-name">TYPE</span>
+         <div class="gear-shop-chips">
+           <button class="gear-chip" data-filter="all" onclick="setGearFilter('all')">ALL</button>
+           <button class="gear-chip" data-filter="attack" onclick="setGearFilter('attack')">WEAPONS</button>
+           <button class="gear-chip" data-filter="defense" onclick="setGearFilter('defense')">ARMOR</button>
+           <button class="gear-chip" data-filter="vehicle" onclick="setGearFilter('vehicle')">VEHICLES</button>
+           <button class="gear-chip" data-filter="utility" onclick="setGearFilter('utility')">TOOLS</button>
+           <button class="gear-chip" data-filter="affordable" onclick="setGearFilter('affordable')">AFFORDABLE</button>
          </div>
        </div>
-       <div class="gear-filter-group">
-         <div class="gear-filter-label">GRADE</div>
-         <div class="filter-strip gear-filter-strip grade-filter-strip">
-           <button class="btn small" data-grade="all" onclick="setGearGradeFilter('all')">ALL GRADES</button>
-           <button class="btn small secondary" data-grade="low" onclick="setGearGradeFilter('low')">LOW END</button>
-           <button class="btn small secondary" data-grade="mid" onclick="setGearGradeFilter('mid')">MID GRADE</button>
-           <button class="btn small secondary" data-grade="high" onclick="setGearGradeFilter('high')">HIGH END</button>
+       <div class="gear-shop-filter-row">
+         <span class="gear-shop-filter-name">GRADE</span>
+         <div class="gear-shop-chips grade-filter-strip">
+           <button class="gear-chip" data-grade="all" onclick="setGearGradeFilter('all')">ALL</button>
+           <button class="gear-chip" data-grade="low" onclick="setGearGradeFilter('low')">LOW</button>
+           <button class="gear-chip" data-grade="mid" onclick="setGearGradeFilter('mid')">MID</button>
+           <button class="gear-chip" data-grade="high" onclick="setGearGradeFilter('high')">HIGH</button>
          </div>
        </div>
        <div class="gear-filter-summary" id="gearFilterSummary"></div>
      </div>
-     <div class="grid cards" id="gear"></div>
+     <div class="gear-shop-list" id="gear"></div>
    </div>
  </details>
 
@@ -2412,7 +2634,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.21.6";
+const BUILD_NUMBER="0.22.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3641,7 +3863,7 @@ function fresh(){
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:2,helpCaches:[],
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
@@ -3705,10 +3927,10 @@ function migrate(){
  state.helpCaches=state.helpCaches.filter(x=>x&&typeof x==="object").slice(0,MAX_HELP_CACHES);
  if(!state.bossLastFight||typeof state.bossLastFight!=="object")state.bossLastFight={};
  if(!state.bossRematches||typeof state.bossRematches!=="object")state.bossRematches={};
- if(!Number.isInteger(state.combatBalanceVersion)||state.combatBalanceVersion<2){
+ if(!Number.isInteger(state.combatBalanceVersion)||state.combatBalanceVersion<3){
    state.fightList=[];
    state.lastFightRefresh=0;
-   state.combatBalanceVersion=2;
+   state.combatBalanceVersion=3;
  }
  const validCustomTargets=new Set([
    ...friendDefs.map(x=>x.id),
@@ -3948,11 +4170,10 @@ function heatDecayMs(){
 }
 function fightStaminaCost(o){
  const threat=opponentThreat(o);
- if(threat<=2)return 1;
- if(threat<=4)return 2;
- if(threat<=6)return 3;
- if(threat===7)return 4;
- return 5;
+ if(threat<=3)return 1;
+ if(threat<=5)return 2;
+ if(threat<=7)return 3;
+ return 4;
 }
 function buyEndgameAutomation(kind){
  const def=ENDGAME_AUTO_DEFS[kind];
@@ -4797,12 +5018,12 @@ function updateRivalHistory(o,playerWon){
 
 function removeFleeingRivalFromFightList(id){
  if(!id||!Array.isArray(state.fightList))return;
- const before=state.fightList.length;
+ const removed=state.fightList.find(x=>x.id===id);
+ if(!removed)return;
+ const replacementIndex=Math.max(0,Math.min(4,opponentThreat(removed)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- if(state.fightList.length===before)return;
-
  while(state.fightList.length<5){
-   state.fightList.push(makeFightRival(state.fightList.length));
+   state.fightList.push(makeFightRival(replacementIndex));
  }
 }
 
@@ -4818,8 +5039,9 @@ function placeBountyOnRival(id){
  state.cash-=cost;state.lifetimeCashSpent+=cost;
  state.playerBounties.unshift({...o,bounty:Math.round(cost*.35),placedCost:cost,placedAt:now()});
  state.playerBounties=state.playerBounties.slice(0,10);
+ const replacementIndex=Math.max(0,Math.min(4,opponentThreat(o)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- state.fightList.push(makeFightRival(4));
+ state.fightList.push(makeFightRival(replacementIndex));
  showActionFlash("BOUNTY POSTED",`${o.name} · Cost ${money(cost)} · Hitlist reward ${money(Math.round(cost*.35))}`,"cash");
  save();render();
 }
@@ -4874,7 +5096,13 @@ function genOpponent(i,hit=false,context="fight"){
  modeledPower*=earlyScale;
  const playerAnchor=combatPower("attack");
  const relative=[.72,.86,1.00,1.16,1.34,1.52,1.72,1.95][threat-1];
- const power=Math.max(8,Math.round(modeledPower*.65+playerAnchor*relative*.35));
+ let power=Math.max(8,Math.round(modeledPower*.65+playerAnchor*relative*.35));
+
+ // The first two Fight List bands are intended to remain playable even as
+ // the organization grows. They still scale with the player, but do not
+ // spike beyond a reasonable matchup simply because crew modeling grew.
+ if(!hit&&threat===1)power=Math.min(power,Math.max(8,playerAnchor+2));
+ if(!hit&&threat===2)power=Math.min(power,Math.max(8,playerAnchor+6));
 
  return {
    name:names[(baseIndex+state.level+(hit?3:0))%names.length],
@@ -6322,7 +6550,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Fight Stamina now scales with Threat: Street/Tough 1, Dangerous/Hard 2, Brutal/Elite 3, Kingpin 4, Nightmare 5.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Stamina scales more gradually: Street through Dangerous cost 1, Hard/Brutal cost 2, Elite/Kingpin cost 3, and Nightmare costs 4.</div><div class="fight-access-note">Fight List replacements now stay in the same Threat band. Beating or placing a bounty on an easy rival no longer replaces them with a high-Threat rival.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
@@ -6331,7 +6559,7 @@ function renderFight(){
  fightEl.innerHTML=list.map((o,i)=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o);
    return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
-    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span><span class="fight-stamina-badge">${fightStaminaCost(o)} ST</span></div>
     <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
     <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} intimidation`:``}`:""}</div>
    </div><div class="fight-row-actions">
@@ -6463,25 +6691,21 @@ function renderGear(){
  if(!upkeepEl||!gearEl)return;
  renderEquipmentSets();
 
- upkeepEl.textContent=`Gear upkeep ${money(gearUpkeep())}/hr`;
+ upkeepEl.textContent=`${money(gearUpkeep())}/hr upkeep`;
 
  document.querySelectorAll("#gearFilters [data-filter]").forEach(b=>{
-   const active=b.dataset.filter===gearShopFilter;
-   b.classList.toggle("active",active);
-   b.classList.toggle("secondary",!active);
+   b.classList.toggle("active",b.dataset.filter===gearShopFilter);
  });
  document.querySelectorAll("#gearFilters [data-grade]").forEach(b=>{
-   const active=b.dataset.grade===gearGradeFilter;
-   b.classList.toggle("active",active);
-   b.classList.toggle("secondary",!active);
+   b.classList.toggle("active",b.dataset.grade===gearGradeFilter);
  });
 
  const visible=gearDefs.filter(gearMatchesFilter);
  const summary=document.getElementById("gearFilterSummary");
  if(summary){
-   const typeLabel=gearShopFilter==="all"?"All types":gearShopFilter==="affordable"?"Affordable":gearShopFilter==="vehicle"?"Vehicles":gearShopFilter==="utility"?"Job Tools":gearShopFilter.charAt(0).toUpperCase()+gearShopFilter.slice(1);
-   const gradeLabel=gearGradeFilter==="all"?"All grades":gearGradeFilter==="low"?"Low End · under $5K":gearGradeFilter==="mid"?"Mid Grade · $5K–$49,999":"High End · $50K+";
-   summary.textContent=`Showing ${visible.length} of ${gearDefs.length} · ${typeLabel} · ${gradeLabel}`;
+   const typeLabel=gearShopFilter==="all"?"All equipment":gearShopFilter==="affordable"?"Affordable now":gearShopFilter==="vehicle"?"Vehicles":gearShopFilter==="utility"?"Job tools":gearShopFilter==="attack"?"Weapons":"Armor";
+   const gradeLabel=gearGradeFilter==="all"?"All grades":gearGradeFilter==="low"?"Low end":gearGradeFilter==="mid"?"Mid grade":"High end";
+   summary.innerHTML=`<span><b>${visible.length}</b> of ${gearDefs.length} items · ${typeLabel} · ${gradeLabel}</span><span>Cash <b>${compactMoney(state.cash)}</b></span>`;
  }
 
  gearEl.innerHTML=visible.length?visible.map(g=>{
@@ -6489,37 +6713,53 @@ function renderGear(){
    const savings=g.cost*qty-price.total;
    const access=catalogAccess(g),lock=access.locked;
    const discount=qty===5?3:qty===10?7:qty===50?10:0;
-   const grade=gearGrade(g),elite=grade.id==="high";
+   const grade=gearGrade(g),owned=gearQty(g.id);
+   const icon=spriteForGear(g);
+   const gradeClass=grade.id==="high"?"high":grade.id==="mid"?"mid":"low";
+   const needCash=state.cash<price.total;
+   const purchaseDisabled=lock||needCash;
+   const reqs=[];
+   reqs.push(`<span class="gear-req ${access.levelMet?"met":"missing"}">LVL ${access.levelReq}</span>`);
+   if(access.crewReq)reqs.push(`<span class="gear-req ${access.crewMet?"met":"missing"}">CREW ${crewSize()}/${access.crewReq}</span>`);
+   if(g.upkeep)reqs.push(`<span class="gear-req">${money(g.upkeep)}/hr upkeep</span>`);
+   if(uses.length)reqs.push(`<span class="gear-req">${uses.length} Job${uses.length===1?"":"s"}</span>`);
 
-   return `<div class="card ${elite?"elite-catalog-item":""}">
-     <div class="sprite-art ${String(spriteForGear(g)).startsWith("2:")?"sheet2-art":""}">${spriteIconHtml(spriteForGear(g),"hero")}</div>
-     <h3>${g.name}</h3>
-     <div class="meta">
-       <span class="badge ${grade.cls}">${grade.label}</span>
-       <span class="badge">${gearEffectLabel(g)}</span>
-       <span class="badge">Owned ${gearQty(g.id)}</span>
-       <span class="badge">${money(g.cost)} each</span>
-       ${g.crewReq?`<span class="badge ${access.crewMet?"green":"red"}">Crew ${crewSize()}/${g.crewReq}</span>`:""}
-       ${g.upkeep?`<span class="badge red">${money(g.upkeep)}/hr upkeep</span>`:""}
+   let note="";
+   if(lock)note=`Requires ${[!access.levelMet?`Level ${access.levelReq}`:"",!access.crewMet?`Crew ${access.crewReq}`:""].filter(Boolean).join(" and ")}.`;
+   else if(needCash)note=`Need ${money(price.total-state.cash)} more Cash.`;
+   else if(discount)note=`Bulk discount ${discount}% · Save ${money(savings)}.`;
+   else note="Choose a quantity, then buy.";
+
+   return `<div class="gear-shop-item grade-${gradeClass} ${lock?"locked":""}">
+     <div class="gear-shop-main">
+       <div class="gear-shop-icon">${spriteIconHtml(icon,"shop")}</div>
+       <div class="gear-shop-copy">
+         <div class="gear-shop-name-row">
+           <div class="gear-shop-name">${g.name}</div>
+           <span class="gear-grade-tag ${gradeClass}">${grade.id==="low"?"LOW":grade.id==="mid"?"MID":"HIGH"}</span>
+         </div>
+         <div class="gear-shop-statline">
+           <span><b>${gearEffectLabel(g)}</b></span>
+           <span>Owned <b>${owned}</b></span>
+         </div>
+         <div class="gear-shop-desc">${g.desc}</div>
+       </div>
+       <div class="gear-shop-price"><b>${money(g.cost)}</b><span>EACH</span></div>
      </div>
-     <details class="compact-details">
-       <summary>ITEM DETAILS</summary>
-       <div class="compact-details-body"><b>${grade.label}</b> · ${grade.range}<br>${g.desc}<br>${g.crewReq?`Organization requirement: Level ${g.level} · Crew ${g.crewReq}.<br>`:""}${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
-     </details>
-     <div class="gear-buy-controls">
-       <select class="gear-qty-select" onchange="setGearBuyQty('${g.id}',this.value)" ${lock?"disabled":""}>
-         <option value="1" ${qty===1?"selected":""}>BUY 1 · no discount</option>
-         <option value="5" ${qty===5?"selected":""}>BUY 5 · 3% off</option>
-         <option value="10" ${qty===10?"selected":""}>BUY 10 · 7% off</option>
-         <option value="50" ${qty===50?"selected":""}>BUY 50 · 10% off</option>
-       </select>
-       <button class="btn" onclick="buyGearSelected('${g.id}')" ${lock||state.cash<price.total?"disabled":""}>
-         ${lock?catalogLockText(g):`BUY · ${money(price.total)}`}
+     <div class="gear-shop-requirements">${reqs.join("")}</div>
+     <div class="gear-shop-purchase">
+       <div class="gear-qty-pills" aria-label="Purchase quantity">
+         ${[1,5,10,50].map(n=>`<button class="gear-qty-pill ${qty===n?"active":""}" onclick="setGearBuyQty('${g.id}',${n})" ${lock?"disabled":""}>×${n}</button>`).join("")}
+       </div>
+       <button class="btn gear-shop-buy" onclick="buyGearSelected('${g.id}')" ${purchaseDisabled?"disabled":""}>
+         <span>${lock?"LOCKED":needCash?"NOT ENOUGH CASH":`BUY ×${qty}`}</span>
+         <b>${money(price.total)}</b>
        </button>
      </div>
-     <div class="gear-buy-note">${lock?`Locked until ${[!access.levelMet?`Level ${access.levelReq}`:"",!access.crewMet?`Crew ${access.crewReq}`:""].filter(Boolean).join(" and ")}.`:discount?`${discount}% bulk discount · Saved ${money(savings)} vs individual price.`:"Select a larger quantity for a bulk discount."}</div>
+     <div class="gear-shop-note ${lock||needCash?"locked":discount?"savings":""}">${note}</div>
+     <details class="compact-details gear-shop-details"><summary>DETAILS</summary><div class="compact-details-body"><b>${grade.label}</b> · ${grade.range}<br>${g.desc}<br>${uses.length?`Required by: ${uses.slice(0,5).join(" · ")}${uses.length>5?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div></details>
    </div>`;
- }).join(""):`<div class="tab-empty">No equipment matches this type and grade combination.</div>`;
+ }).join(""):`<div class="tab-empty">No equipment matches these filters.</div>`;
 }
 function factionPressure(f){
  const linked=territoryDefs.filter(t=>t.enemy===f.name);
