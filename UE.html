@@ -1241,7 +1241,7 @@ body{
   background-color:#040404!important;
   background-image:
     linear-gradient(to bottom,rgba(4,4,4,.48),rgba(4,4,4,.72) 42%,rgba(4,4,4,.88)),
-    url("./assets/underworld-background.png")!important;
+    url("https://0x6b73.github.io/Games/assets/underworld-background.png")!important;
   background-position:center top,center top!important;
   background-size:cover,cover!important;
   background-repeat:no-repeat,no-repeat!important;
@@ -1301,6 +1301,36 @@ body:after{
   .tab-banner{margin:0 0 6px;}
 }
 
+
+/* HIGH-END ECONOMY */
+.elite-catalog-item{
+  border-color:#5b4a27!important;
+  box-shadow:inset 0 0 0 1px rgba(194,155,63,.08);
+}
+.elite-catalog-item h3{color:#d6c08a}
+.badge.gold{border-color:#65552e;color:#d6bb69;background:#151208}
+
+
+/* BANNER ASSET FALLBACK */
+.tab-banner.asset-missing{
+  min-height:76px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-color:#744037;
+  background:linear-gradient(135deg,#17110f,#080808 65%,#20100e);
+}
+.tab-banner.asset-missing:after{
+  content:attr(data-banner) " · ASSET NOT FOUND";
+  color:#b77a69;
+  font:900 11px/1.2 Georgia,serif;
+  letter-spacing:.06em;
+}
+
+
+.boss-requirements{clear:both;margin:6px 0;display:grid;gap:2px}
+.boss-requirement{padding:4px 5px;border:1px solid #3e3029;background:#100b09;color:#bd8173;font-size:8px}
+.boss-requirement.met{border-color:#354b2b;background:#0b1009;color:#8fb474}
 </style>
 </head>
 <body>
@@ -1350,7 +1380,7 @@ body:after{
 
 <main class="main">
 <section id="view-home" class="view active">
- <div class="tab-banner"><img src="./assets/banner-home.png" alt="Criminal Empire banner"></div>
+ <div class="tab-banner" data-banner="CRIMINAL EMPIRE"><img src="https://0x6b73.github.io/Games/assets/banner-home.png" alt="Criminal Empire banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="hero">
   <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
   <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
@@ -1377,7 +1407,7 @@ body:after{
 </section>
 
 <section id="view-jobs" class="view">
- <div class="tab-banner"><img src="./assets/banner-jobs.png" alt="Jobs banner"></div>
+ <div class="tab-banner" data-banner="JOBS"><img src="https://0x6b73.github.io/Games/assets/banner-jobs.png" alt="Jobs banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div id="energyJobs"></div>
  <div id="jobResult" class="job-result"></div><div class="section-title"><h2>Jobs</h2><span id="tierName"></span></div>
  <div class="grid cards" id="jobs"></div>
@@ -1386,7 +1416,7 @@ body:after{
 </section>
 
 <section id="view-crew" class="view">
- <div class="tab-banner"><img src="./assets/banner-crew.png" alt="Crew banner"></div>
+ <div class="tab-banner" data-banner="CREW"><img src="https://0x6b73.github.io/Games/assets/banner-crew.png" alt="Crew banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="crew-fold" open>
   <summary>
     <span>YOUR CREW</span>
@@ -1431,7 +1461,7 @@ body:after{
 </section>
 
 <section id="view-fight" class="view">
- <div class="tab-banner"><img src="./assets/banner-fight.png" alt="Fight banner"></div>
+ <div class="tab-banner" data-banner="FIGHT"><img src="https://0x6b73.github.io/Games/assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
  <div id="combatInfo"></div>
  <div id="fightRefreshBar" class="fight-refresh-bar"></div>
@@ -1443,7 +1473,7 @@ body:after{
 </section>
 
 <section id="view-gear" class="view">
- <div class="tab-banner"><img src="./assets/banner-gear.png" alt="Gear banner"></div>
+ <div class="tab-banner" data-banner="GEAR"><img src="https://0x6b73.github.io/Games/assets/banner-gear.png" alt="Gear banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="fold-card gear-section-fold" open>
    <summary>MAIN INVENTORY <span>cash / gold / supplies</span></summary>
    <div class="fold-body">
@@ -1486,7 +1516,7 @@ body:after{
 </section>
 
 <section id="view-territory" class="view">
- <div class="tab-banner"><img src="./assets/banner-territory.png" alt="Territory banner"></div>
+ <div class="tab-banner" data-banner="TERRITORY"><img src="https://0x6b73.github.io/Games/assets/banner-territory.png" alt="Territory banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
  <details class="compact-details explainer-details">
    <summary>HOW PROPERTIES WORK <span>?</span></summary>
@@ -1497,7 +1527,7 @@ body:after{
 </section>
 
 <section id="view-more" class="view">
- <div class="tab-banner"><img src="./assets/banner-more.png" alt="More banner"></div>
+ <div class="tab-banner" data-banner="MORE"><img src="https://0x6b73.github.io/Games/assets/banner-more.png" alt="More banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
  <div class="card" style="margin-bottom:8px">
   <div class="edit-profile-row">
@@ -1743,7 +1773,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.18.3";
+const BUILD_NUMBER="0.19.1";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -1815,7 +1845,7 @@ const cities=[
 const tiers=[
  {name:"Street Thug",level:1,boss:"Marlon Pike"},{name:"Associate",level:5,boss:"Victor Marrow"},
  {name:"Soldier",level:10,boss:"Rosa Bellini"},{name:"Enforcer",level:16,boss:"The Dockmaster"},
- {name:"Hitman",level:23,boss:"Anton Varga"},{name:"Capo",level:31,boss:"Dominic Vale"}
+ {name:"Hitman",level:24,boss:"Anton Varga"},{name:"Capo",level:31,boss:"Dominic Vale"}
 ];
 const jobDefs=[
  {id:"boost",tier:0,city:"east",name:"Boost a Parked Car",energy:3,cash:[110,180],xp:8,crew:1,heat:2,risk:8,role:"Driver",img:"car",req:{lockpick:1},loot:["Burner Phone","Stolen Plate"]},
@@ -1830,7 +1860,10 @@ const jobDefs=[
  {id:"judge",tier:3,city:"downtown",name:"Compromise a City Judge",energy:20,cash:[3400,4700],xp:75,crew:18,heat:13,risk:26,role:"Fixer",img:"skyline",req:{rifle:7,armored:4,encrypted:2,suppressor:2},loot:["Court Docket"]},
  {id:"convoy",tier:3,city:"north",name:"Hit an Armored Convoy",energy:23,cash:[4600,6400],xp:88,crew:22,heat:18,risk:38,role:"Driver",img:"car",req:{rifle:10,armored:6,nightvision:2,tacticalvan:2},loot:["Security Badge","Route Schedule"]},
  {id:"family",tier:4,city:"north",name:"Break a Rival Family's Supply Line",energy:26,cash:[6200,8500],xp:110,crew:28,heat:20,risk:42,role:"Strategist",img:"docks",req:{rifle:14,armored:10,plates:12,bodyarmor:4,comms:2},loot:["Family Ledger"]},
- {id:"bank",tier:4,city:"north",name:"Take the Reserve Vault",energy:30,cash:[8500,12000],xp:135,crew:34,heat:24,risk:48,role:"Safecracker",img:"skyline",req:{rifle:20,armored:14,plates:18,safeKit:5,breach:4,lmg:2},loot:["Reserve Bond"]}
+ {id:"bank",tier:4,city:"north",name:"Take the Reserve Vault",energy:30,cash:[8500,12000],xp:135,crew:34,heat:24,risk:48,role:"Safecracker",img:"skyline",req:{rifle:20,armored:14,plates:18,safeKit:5,breach:4,lmg:2},loot:["Reserve Bond"]},
+ {id:"evidence",tier:5,city:"north",name:"Hijack a Federal Evidence Transfer",energy:34,cash:[12000,17500],xp:160,crew:40,heat:25,risk:50,role:"Driver",img:"car",req:{rifle:22,armored:16,bodyarmor:8,tacticalvan:4,dmr:2},loot:["Sealed Evidence Tag","Federal Route Sheet"]},
+ {id:"securitycontract",tier:5,city:"downtown",name:"Take Over a Private Security Contract",energy:37,cash:[16500,23500],xp:195,crew:46,heat:27,risk:52,role:"Strategist",img:"suit",req:{dmr:4,ceramicSuit:4,armoredSUV:2,comms:6,encrypted:4},loot:["Executive Access Card","Security Retainer Ledger"]},
+ {id:"north treasury",tier:5,city:"north",name:"Seize the Northside Treasury",energy:42,cash:[24000,35000],xp:240,crew:55,heat:30,risk:56,role:"Safecracker",img:"skyline",req:{dmr:8,ceramicSuit:8,armoredSUV:4,lmg:6,breach:6,safeKit:8},loot:["Vale Treasury Key","Capo Black Ledger"]}
 ];
 const gearDefs=[
  {id:"lockpick",name:"Professional Lockpick Set",type:"utility",power:0,cost:180,upkeep:0,level:1,img:"gun",desc:"A compact set for getting through cheap locks without announcing yourself. JOB TOOL — required by early theft operations."},
@@ -1854,7 +1887,21 @@ const gearDefs=[
  {id:"bodyarmor",name:"Executive Body Armor",type:"defense",power:11,cost:6800,upkeep:12,level:18,img:"suit",desc:"Tailored protection that looks like business attire until somebody makes a bad decision. +11 Defense."},
  {id:"breach",name:"Industrial Breaching Kit",type:"utility",power:0,cost:8200,upkeep:4,level:20,img:"warehouse",desc:"Hydraulic spreaders, cutting tools, charges, and everything required when the front door has become a suggestion. JOB TOOL."},
  {id:"comms",name:"Encrypted Crew Comms",type:"utility",power:0,cost:11000,upkeep:5,level:23,img:"suit",desc:"A hardened radio network for coordinating a large organization without shouting into the void. JOB TOOL."},
- {id:"lmg",name:"Belt-Fed Support Gun",type:"attack",power:14,cost:12500,upkeep:25,level:24,img:"gun",desc:"Not subtle, not cheap, and absolutely capable of changing the direction of a fight. +14 Attack."}
+ {id:"lmg",name:"Belt-Fed Support Gun",type:"attack",power:14,cost:12500,upkeep:25,level:24,img:"gun",desc:"Not subtle, not cheap, and absolutely capable of changing the direction of a fight. +14 Attack."},
+ {id:"dmr",name:"Designated Marksman Rifle",type:"attack",power:18,cost:28000,upkeep:45,level:28,crewReq:20,img:"gun",desc:"Precision firepower for an organization that has outgrown street weapons. +18 Attack. Requires a crew large enough to support a dedicated weapons program."},
+ {id:"ceramicSuit",name:"Ceramic Tactical Suit",type:"defense",power:17,cost:36000,upkeep:70,level:30,crewReq:25,img:"suit",desc:"Low-profile armor built around modern ceramic protection. +17 Defense."},
+ {id:"armoredSUV",name:"Armored SUV Convoy",type:"vehicle",power:16,cost:42000,upkeep:90,level:30,crewReq:25,img:"car",desc:"A hardened convoy package for moving senior crew through hostile territory. Vehicle power +16."},
+ {id:"assaultPackage",name:"Crew Assault Package",type:"attack",power:24,cost:75000,upkeep:125,level:36,crewReq:40,img:"gun",desc:"Matched rifles, optics, ammunition, and support equipment purchased as an organization-level package. +24 Attack."},
+ {id:"securityDetail",name:"Executive Security Detail",type:"defense",power:24,cost:110000,upkeep:180,level:40,crewReq:50,img:"suit",desc:"Ballistic protection, trained escorts, and hardened movement procedures for senior leadership. +24 Defense."},
+ {id:"luxuryFleet",name:"Luxury Escape Fleet",type:"vehicle",power:22,cost:125000,upkeep:220,level:40,crewReq:50,img:"car",desc:"Multiple high-performance vehicles, clean plates, and rotating storage locations. Vehicle power +22."},
+ {id:"syndicateArmory",name:"Syndicate Armory",type:"attack",power:33,cost:240000,upkeep:390,level:50,crewReq:85,img:"gun",desc:"A secured private armory capable of supplying a serious criminal organization. +33 Attack."},
+ {id:"armoredConvoy",name:"Heavy Armored Convoy",type:"vehicle",power:30,cost:275000,upkeep:450,level:50,crewReq:85,img:"car",desc:"Multiple reinforced vehicles with coordinated drivers and support crews. Vehicle power +30."},
+ {id:"executiveProtection",name:"Executive Protection Package",type:"defense",power:34,cost:300000,upkeep:480,level:55,crewReq:100,img:"suit",desc:"Professional-grade protective equipment and security infrastructure. +34 Defense."},
+ {id:"mobileCommand",name:"Mobile Command Vehicle",type:"vehicle",power:40,cost:550000,upkeep:850,level:62,crewReq:125,img:"car",desc:"An armored command platform with communications, surveillance, and enough room to coordinate a city-wide operation. Vehicle power +40."},
+ {id:"blackOpsArsenal",name:"Black Operations Arsenal",type:"attack",power:45,cost:650000,upkeep:950,level:68,crewReq:150,img:"gun",desc:"Specialized weapons, optics, breaching tools, and ammunition reserved for the organization’s most serious work. +45 Attack."},
+ {id:"fortressArmor",name:"Fortress Protection System",type:"defense",power:46,cost:700000,upkeep:1000,level:68,crewReq:150,img:"suit",desc:"Layered personal protection and hardened support equipment designed for sustained conflict. +46 Defense."},
+ {id:"armoredLimo",name:"Armored Limousine Convoy",type:"vehicle",power:50,cost:950000,upkeep:1400,level:75,crewReq:200,img:"car",desc:"Executive-class armored transport backed by escort vehicles and dedicated drivers. Vehicle power +50."},
+ {id:"privateJet",name:"Private Aviation Package",type:"vehicle",power:62,cost:2200000,upkeep:3500,level:90,crewReq:300,img:"car",desc:"A private aircraft, ground support contracts, secure hangar access, and the logistics needed to move leadership without asking permission. Vehicle power +62."}
 ];
 const propDefs=[
  {id:"garage",name:"Back-Alley Garage",city:"east",cost:700,income:55,upkeep:8,level:1,img:"warehouse",desc:"A grease-stained two-bay garage with a locked rear room and neighbors trained not to ask questions. It gives your crew a place to hide cars, strip plates, and look like they belong somewhere."},
@@ -1862,7 +1909,13 @@ const propDefs=[
  {id:"laundry",name:"Laundry Front",city:"east",cost:3900,income:320,upkeep:55,level:6,img:"warehouse",desc:"Rows of machines, steady cash business, and a back office with two sets of books. Respectable from the sidewalk; extremely useful behind the counter."},
  {id:"club",name:"Nightclub",city:"downtown",cost:9000,income:760,upkeep:120,level:10,img:"club",desc:"Velvet rope, private booths, loud music, expensive bottles, and half the city trying to impress the wrong people. This is where your organization stops looking small."},
  {id:"hotel",name:"Boutique Hotel",city:"downtown",cost:22000,income:1850,upkeep:300,level:16,img:"hotel",desc:"Polished marble upstairs, private entrances downstairs. Guests pay for rooms; your people pay for discretion, meeting space, and a place nobody thinks to search."},
- {id:"terminal",name:"Freight Terminal",city:"north",cost:48000,income:3900,upkeep:700,level:24,img:"docks",desc:"Loading bays, manifests, forklifts, and access to everything that moves through Northside by truck. Owning it makes your operation feel less like a crew and more like infrastructure."}
+ {id:"terminal",name:"Freight Terminal",city:"north",cost:48000,income:3900,upkeep:700,level:24,img:"docks",desc:"Loading bays, manifests, forklifts, and access to everything that moves through Northside by truck. Owning it makes your operation feel less like a crew and more like infrastructure."},
+ {id:"casinoFloor",name:"Private Gaming Club",city:"downtown",cost:95000,income:7800,upkeep:1800,level:30,crewReq:25,img:"club",desc:"Invitation-only tables, private rooms, and enough legitimate-looking revenue to hide much more interesting money."},
+ {id:"marina",name:"Private Marina",city:"east",cost:250000,income:21000,upkeep:5000,level:40,crewReq:50,img:"docks",desc:"Slips, repair bays, storage buildings, and quiet access to the water. A useful business for an organization that moves more than people."},
+ {id:"distribution",name:"Regional Distribution Center",city:"north",cost:650000,income:55000,upkeep:14000,level:52,crewReq:85,img:"warehouse",desc:"A large logistics hub with docks, trucks, storage, and paperwork capable of making almost any shipment look ordinary."},
+ {id:"towerHotel",name:"Luxury Hotel Tower",city:"downtown",cost:1250000,income:110000,upkeep:30000,level:65,crewReq:125,img:"hotel",desc:"A landmark property with private floors, controlled entrances, conference space, and a permanent stream of wealthy guests."},
+ {id:"casinoResort",name:"Waterfront Casino Resort",city:"downtown",cost:2750000,income:250000,upkeep:75000,level:80,crewReq:200,img:"club",desc:"Gaming, hospitality, restaurants, private rooms, and a waterfront footprint large enough to become an institution."},
+ {id:"shippingCo",name:"International Shipping Company",city:"north",cost:5000000,income:470000,upkeep:150000,level:95,crewReq:300,img:"docks",desc:"Ships, contracts, containers, warehouses, and international routes. At this scale, the organization no longer hides inside infrastructure—it owns it."}
 ];
 const territoryDefs=[
  {id:"dock9",name:"Dock 9",city:"east",reqNot:0,income:120,enemy:"Harbor Kings",desc:"A rusted stretch of waterfront where containers arrive before paperwork does. Control Dock 9 and everyone moving quiet cargo through East Harbor has to acknowledge your name."},
@@ -2625,7 +2678,8 @@ const bossLootDefs=[
  ["Rossi Family Ledger","Union Boss Cufflinks"],
  ["Bellini Signet","Casino Master Key"],
  ["Judge's Black Book","Armored Convoy Token"],
- ["Varga War Medal","Reserve Vault Crest"]
+ ["Varga War Medal","Reserve Vault Crest"],
+ ["Vale Signet","Capo's Black Ledger"]
 ];
 const FIGHT_REFRESH_COOLDOWN_MS=2*60000;
 const RIVAL_FLEE_STREAK=3;
@@ -2655,8 +2709,8 @@ function getUnlockCatalog(){
  const out=[];
  tiers.forEach((t,i)=>out.push({id:`rank:${i}`,level:t.level,title:`Rank: ${t.name}`,detail:`Boss operation: ${t.boss}`}));
  cities.forEach(c=>out.push({id:`city:${c.id}`,level:c.level,title:`City: ${c.name}`,detail:c.sub}));
- gearDefs.forEach(g=>out.push({id:`gear:${g.id}`,level:g.level,title:`Equipment: ${g.name}`,detail:g.desc||gearEffectLabel(g)}));
- propDefs.forEach(p=>out.push({id:`property:${p.id}`,level:p.level,title:`Property: ${p.name}`,detail:`${money(p.income)}/hr income`}));
+ gearDefs.forEach(g=>out.push({id:`gear:${g.id}`,level:g.level,title:`Equipment: ${g.name}`,detail:`${g.desc||gearEffectLabel(g)}${g.crewReq?` · Crew ${g.crewReq} required`:""}`}));
+ propDefs.forEach(p=>out.push({id:`property:${p.id}`,level:p.level,title:`Property: ${p.name}`,detail:`${money(p.income)}/hr income${p.crewReq?` · Crew ${p.crewReq} required`:""}`}));
  jobDefs.forEach(j=>{
    const level=Math.max(tiers[j.tier]?.level||1,cities.find(c=>c.id===j.city)?.level||1);
    out.push({id:`job:${j.id}`,level,title:`Job: ${j.name}`,detail:`${cities.find(c=>c.id===j.city)?.name||"New city"} operation`});
@@ -3574,7 +3628,27 @@ function chanceClass(p){
 }
 
 function bossDef(t){return 35+t*32}
-function bossReady(t){const relevant=jobDefs.filter(j=>j.tier===t);return relevant.length&&relevant.every(j=>jobState(j.id).mastery>=1)}
+function bossReady(t){
+ const relevant=jobDefs.filter(j=>j.tier===t);
+ if(!relevant.length)return false;
+ return relevant.every(j=>{
+   const city=cities.find(c=>c.id===j.city);
+   return (!city||state.level>=city.level)&&jobState(j.id).mastery>=1;
+ });
+}
+function bossJobProgress(t){
+ const relevant=jobDefs.filter(j=>j.tier===t);
+ return relevant.map(j=>{
+   const city=cities.find(c=>c.id===j.city);
+   const cityLocked=!!city&&state.level<city.level;
+   return {job:j,mastered:jobState(j.id).mastery>=1,cityLocked,cityLevel:city?.level||1};
+ });
+}
+function currentBossTier(){
+ const max=activeTier();
+ for(let i=0;i<=max;i++)if(!state.bosses[i])return i;
+ return max;
+}
 
 
 
@@ -3810,7 +3884,10 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
 }
 
 function fightBoss(t){
- if(!bossReady(t))return toast("Master every job in this rank at least once.");
+ if(!bossReady(t)){
+   const missing=bossJobProgress(t).filter(x=>!x.mastered||x.cityLocked).map(x=>x.cityLocked?`${x.job.name} (LVL ${x.cityLevel})`:`${x.job.name} mastery`).join(" · ");
+   return showRequirementPopup(`Boss locked: ${missing||"master every rank Job at least once"}.`);
+ }
  const first=!state.bosses[t],last=Number(state.bossLastFight[t]||0),wait=first?0:Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last));
  if(wait>0)return showRequirementPopup(`${tiers[t].boss} can be challenged again in ${fmt(wait)}.`);
  const staminaCost=first?3:4;
@@ -3849,7 +3926,9 @@ function buyGear(id,qty=1){
  const g=gearDefs.find(x=>x.id===id);
  if(!g)return toast("Equipment unavailable.");
  qty=[1,5,10,50].includes(Number(qty))?Number(qty):1;
- if(state.level<g.level)return toast(`Unlocks at level ${g.level}.`);
+ const access=catalogAccess(g);
+ if(!access.levelMet)return showRequirementPopup(`${g.name} requires Level ${access.levelReq}. You are Level ${state.level}.`);
+ if(!access.crewMet)return showRequirementPopup(`${g.name} requires a Crew of ${access.crewReq}. Your current Crew is ${crewSize()}.`);
 
  const price=bulkGearPrice(g,qty);
  if(state.cash<price.total)return showRequirementPopup(`Buying ${qty} ${g.name}${qty===1?"":"s"} costs ${money(price.total)}. You have ${money(state.cash)}.`);
@@ -3867,8 +3946,10 @@ function buyProp(id){
  const p=propDefs.find(x=>x.id===id);
  if(!p)return toast("Property unavailable.");
  const q=state.props[id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
- if(state.level<p.level)return toast(`Unlocks at level ${p.level}.`);
- if(state.cash<c)return toast("Not enough cash.");
+ const access=catalogAccess(p);
+ if(!access.levelMet)return showRequirementPopup(`${p.name} requires Level ${access.levelReq}. You are Level ${state.level}.`);
+ if(!access.crewMet)return showRequirementPopup(`${p.name} requires a Crew of ${access.crewReq}. Your current Crew is ${crewSize()}.`);
+ if(state.cash<c)return showRequirementPopup(`${p.name} costs ${money(c)}. You have ${money(state.cash)}.`);
  state.cash-=c;
  state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+c;
  state.props[id]=q+1;
@@ -4708,9 +4789,22 @@ function setGearBuyQty(id,qty){
 function buyGearSelected(id){
  buyGear(id,gearSelectedQty(id));
 }
+function catalogAccess(item){
+ const levelReq=Math.max(1,Number(item?.level)||1);
+ const crewReq=Math.max(0,Number(item?.crewReq)||0);
+ const levelMet=state.level>=levelReq;
+ const crewMet=crewSize()>=crewReq;
+ return {levelReq,crewReq,levelMet,crewMet,locked:!levelMet||!crewMet};
+}
+function catalogLockText(item){
+ const a=catalogAccess(item),missing=[];
+ if(!a.levelMet)missing.push(`LVL ${a.levelReq}`);
+ if(!a.crewMet)missing.push(`CREW ${a.crewReq}`);
+ return missing.length?`NEED ${missing.join(" · ")}`:"";
+}
 function gearMatchesFilter(g){
  if(gearShopFilter==="all")return true;
- if(gearShopFilter==="affordable")return state.level>=g.level&&state.cash>=bulkGearPrice(g,gearSelectedQty(g.id)).total;
+ if(gearShopFilter==="affordable")return !catalogAccess(g).locked&&state.cash>=bulkGearPrice(g,gearSelectedQty(g.id)).total;
  return g.type===gearShopFilter;
 }
 function setCrewFilter(filter){
@@ -4801,6 +4895,7 @@ function renderJobs(){
    else if(age<1800){resultEl.className="job-result";resultEl.innerHTML=""}
  }
  const t=activeTier();
+ const bossT=currentBossTier();
  tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
  const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
@@ -4820,13 +4915,16 @@ function renderJobs(){
    </div>`;
  }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
 
- const done=!!state.bosses[t],last=Number(state.bossLastFight[t]||0),wait=done?Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last)):0,rematches=Number(state.bossRematches[t]||0);
- const power=bossDef(t)+rematches*22,pool=bossLootDefs[t]||[];
- bossEl.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3>${tiers[t].boss}</h3>
+ const done=!!state.bosses[bossT],last=Number(state.bossLastFight[bossT]||0),wait=done?Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last)):0,rematches=Number(state.bossRematches[bossT]||0);
+ const power=bossDef(bossT)+rematches*22,pool=bossLootDefs[bossT]||[],bossProgress=bossJobProgress(bossT),ready=bossReady(bossT);
+ const bossReqHtml=bossProgress.length?bossProgress.map(x=>`<div class="boss-requirement ${x.mastered&&!x.cityLocked?"met":""}">${x.mastered&&!x.cityLocked?"✓":"○"} ${x.job.name} · Mastery ${jobState(x.job.id).mastery}/3${x.cityLocked?` · Unlocks LVL ${x.cityLevel}`:""}</div>`).join(""):`<div class="boss-requirement">No rank operations are available.</div>`;
+ bossEl.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3>${tiers[bossT].boss}</h3>
+  ${bossT<t?`<div class="lock">UNFINISHED BOSS FROM ${tiers[bossT].name.toUpperCase()} RANK</div>`:""}
   <div class="meta"><span class="badge">🥊 ${done?4:3}</span><span class="badge">Power ${power}</span><span class="badge">Rematches ${rematches}</span></div>
   <div class="boss-loot">Exclusive loot: ${pool.join(" · ")} · first victory guarantees a drop, rematches have a 35% chance.</div>
-  <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once. After the first victory, this boss becomes repeatable every 30 minutes, grows stronger each win, and can continue dropping exclusive loot.</div></details>
-  <button class="btn red" onclick="fightBoss(${t})" ${!bossReady(t)||wait>0?"disabled":""}>${!bossReady(t)?"REQUIREMENTS NOT MET":wait>0?`REMATCH ${fmt(wait)}`:done?"REMATCH BOSS":"FIGHT BOSS"}</button></div>`;
+  <div class="boss-requirements">${bossReqHtml}</div>
+  <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once. Unfinished bosses remain available even if you level into a higher rank. After the first victory, this boss becomes repeatable every 30 minutes and grows stronger each win.</div></details>
+  <button class="btn red" onclick="fightBoss(${bossT})" ${!ready||wait>0?"disabled":""}>${!ready?"MASTER RANK JOBS FIRST":wait>0?`REMATCH ${fmt(wait)}`:done?"REMATCH BOSS":"FIGHT BOSS"}</button></div>`;
 }
 function crewStatus(f){
  if(f.inactive)return "INACTIVE CREW";
@@ -5108,21 +5206,24 @@ function renderGear(){
  gearEl.innerHTML=visible.length?visible.map(g=>{
    const uses=jobsUsingGear(g.id),qty=gearSelectedQty(g.id),price=bulkGearPrice(g,qty);
    const savings=g.cost*qty-price.total;
-   const lock=state.level<g.level;
+   const access=catalogAccess(g),lock=access.locked;
    const discount=qty===5?3:qty===10?7:qty===50?10:0;
+   const elite=g.cost>=25000;
 
-   return `<div class="card">
+   return `<div class="card ${elite?"elite-catalog-item":""}">
      <img class="art" src="${IMG[g.img]||IMG.suit}" alt="">
      <h3>${g.name}</h3>
      <div class="meta">
        <span class="badge">${gearEffectLabel(g)}</span>
        <span class="badge">Owned ${gearQty(g.id)}</span>
        <span class="badge">${money(g.cost)} each</span>
+       ${elite?`<span class="badge gold">HIGH-END</span>`:""}
+       ${g.crewReq?`<span class="badge ${access.crewMet?"green":"red"}">Crew ${crewSize()}/${g.crewReq}</span>`:""}
        ${g.upkeep?`<span class="badge red">${money(g.upkeep)}/hr upkeep</span>`:""}
      </div>
      <details class="compact-details">
        <summary>ITEM DETAILS</summary>
-       <div class="compact-details-body">${g.desc}<br>${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
+       <div class="compact-details-body">${g.desc}<br>${g.crewReq?`Organization requirement: Level ${g.level} · Crew ${g.crewReq}.<br>`:""}${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
      </details>
      <div class="gear-buy-controls">
        <select class="gear-qty-select" onchange="setGearBuyQty('${g.id}',this.value)" ${lock?"disabled":""}>
@@ -5132,10 +5233,10 @@ function renderGear(){
          <option value="50" ${qty===50?"selected":""}>BUY 50 · 10% off</option>
        </select>
        <button class="btn" onclick="buyGearSelected('${g.id}')" ${lock||state.cash<price.total?"disabled":""}>
-         ${lock?`UNLOCK LVL ${g.level}`:`BUY · ${money(price.total)}`}
+         ${lock?catalogLockText(g):`BUY · ${money(price.total)}`}
        </button>
      </div>
-     <div class="gear-buy-note">${discount?`${discount}% bulk discount · Saved ${money(savings)} vs individual price.`:"Select a larger quantity for a bulk discount."}</div>
+     <div class="gear-buy-note">${lock?`Locked until ${[!access.levelMet?`Level ${access.levelReq}`:"",!access.crewMet?`Crew ${access.crewReq}`:""].filter(Boolean).join(" and ")}.`:discount?`${discount}% bulk discount · Saved ${money(savings)} vs individual price.`:"Select a larger quantity for a bulk discount."}</div>
    </div>`;
  }).join(""):`<div class="tab-empty">No equipment matches this filter.</div>`;
 }
@@ -5162,20 +5263,23 @@ function renderTerritory(){
 
  propsEl.innerHTML=propDefs.map(p=>{
    const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
-   return `<div class="card">
+   const access=catalogAccess(p),elite=p.cost>=75000;
+   return `<div class="card ${elite?"elite-catalog-item":""}">
      <img class="art" src="${IMG[p.img]}" alt="">
      <h3>${p.name}</h3>
      <div class="meta">
        <span class="badge">Owned ${q}</span>
        <span class="badge green">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
        <span class="badge">${money(c)} next</span>
+       ${elite?`<span class="badge gold">HIGH-END</span>`:""}
+       ${p.crewReq?`<span class="badge ${access.crewMet?"green":"red"}">Crew ${crewSize()}/${p.crewReq}</span>`:""}
      </div>
      <details class="compact-details">
        <summary>PROPERTY DETAILS</summary>
-       <div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each. Buying another permanently increases passive income.</div>
+       <div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each.${p.crewReq?`<br>Organization requirement: Level ${p.level} · Crew ${p.crewReq}.`:""} Buying another permanently increases passive income.</div>
      </details>
-     <button class="btn green" onclick="buyProp('${p.id}')" ${state.level<p.level||state.cash<c?"disabled":""}>
-       ${state.level<p.level?`UNLOCK LVL ${p.level}`:`BUY PROPERTY · ${money(c)}`}
+     <button class="btn green" onclick="buyProp('${p.id}')" ${access.locked||state.cash<c?"disabled":""}>
+       ${access.locked?catalogLockText(p):`BUY PROPERTY · ${money(c)}`}
      </button>
    </div>`;
  }).join("");
@@ -5564,6 +5668,12 @@ async function manualBuildCheck(){
    status.className="version-check-status bad";
    status.textContent="Could not check for updates. Try again later.";
  }
+}
+
+function bannerAssetError(img){
+ const box=img?.closest?.(".tab-banner");
+ if(box)box.classList.add("asset-missing");
+ if(img)img.style.display="none";
 }
 
 function go(v){
