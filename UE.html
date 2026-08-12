@@ -833,6 +833,79 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   margin-top:3px;font-size:8px;color:#8f887d;line-height:1.35
 }
 
+
+/* UI CLEANUP */
+.compact-details{
+  margin:5px 0;border:1px solid #3d3b35;background:#0d0e0e
+}
+.compact-details>summary{
+  list-style:none;cursor:pointer;padding:5px 7px;font-size:8px;font-weight:900;
+  color:#bcb3a4;display:flex;justify-content:space-between;gap:8px
+}
+.compact-details>summary::-webkit-details-marker{display:none}
+.compact-details>summary:after{content:"▸";color:#c6a33e}
+.compact-details[open]>summary:after{content:"▾"}
+.compact-details-body{
+  border-top:1px solid #302e29;padding:6px 7px;color:#999187;font-size:8px;line-height:1.45
+}
+.explainer-details{margin-bottom:6px}
+.explainer-details>summary span{margin-left:auto;color:#d2b44f}
+
+.compact-job .job-head{
+  display:flex;align-items:center;gap:7px;margin-bottom:4px
+}
+.compact-job .job-head .art{
+  width:52px!important;height:42px!important;min-width:52px;float:none!important;margin:0!important
+}
+.compact-job .job-head h3{margin:0}
+.compact-job .meta{margin-top:3px}
+.compact-job .job-primary{
+  display:flex;gap:4px;align-items:stretch;margin-top:5px
+}
+.compact-job .job-primary>.btn{flex:1}
+.compact-job .job-mini-help{
+  width:28px;min-width:28px;padding:0!important
+}
+.compact-job .lock{margin-top:4px}
+
+.fight-row-main{display:flex;align-items:flex-start;gap:5px}
+.fight-row-copy{min-width:0;flex:1}
+.fight-row-actions{display:flex;align-items:stretch;gap:3px}
+.fight-help-btn{width:27px!important;min-width:27px!important;padding:0!important}
+.fight-power-line{font-size:8px;color:#8f887d;margin-top:2px}
+
+.filter-strip{
+  display:flex;gap:3px;flex-wrap:wrap;margin:5px 0
+}
+.filter-strip .btn{width:auto!important;min-width:0!important}
+.filter-strip .btn.active{
+  border-color:#c1a240!important;color:#efd36a!important;background:#17140c!important
+}
+.gear-filter-strip{padding:5px;border:1px solid #353431;background:#0b0c0d}
+.gear-buy-controls{
+  display:grid;grid-template-columns:minmax(82px,.7fr) 1.3fr;gap:4px;margin-top:6px
+}
+.gear-qty-select{
+  width:100%;background:#080909;color:#ddd;border:1px solid #514d43;padding:5px;font-size:9px
+}
+.gear-buy-note{font-size:7px;color:#948c81;margin-top:3px}
+
+.crew-tools{margin:5px 0 7px}
+.compact-search{
+  width:100%;box-sizing:border-box;background:#090a0b;color:#ddd;border:1px solid #4b4840;
+  padding:6px 7px;font-size:9px
+}
+.crew-filter-empty{padding:9px;font-size:9px;color:#8f887d;border:1px solid #302e29;background:#0b0c0d}
+
+.stat-clickable{cursor:pointer}
+.stat-clickable:hover{filter:brightness(1.08)}
+
+@media(max-width:430px){
+  .gear-buy-controls{grid-template-columns:1fr}
+  .fight-row-main{display:block}
+  .fight-row-actions{margin-top:5px}
+}
+
 </style>
 </head>
 <body>
@@ -840,13 +913,13 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <header class="top">
  <div class="brandrow"><div class="brand">UNDERWORLD EMPIRE</div><div class="lvl" id="lvl"></div></div>
  <div class="stats">
-  <div class="stat">❤️ HEALTH<button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
+  <div class="stat stat-clickable" onclick="showStatHelp('health',event)">❤️ HEALTH<button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
   <div class="stat stat-clickable" id="energyStat" onclick="openEnergyReserve()">⚡ ENERGY<button class="stat-help" onclick="showStatHelp('energy',event)">?</button><b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
   <div class="stat stat-clickable" id="staminaStat" onclick="openStaminaReserve()">🥊 STAMINA<button class="stat-help" onclick="showStatHelp('stamina',event)">?</button><b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
-  <div class="stat">💵 CASH<button class="stat-help" onclick="showStatHelp('cash',event)">?</button><b id="cashT"></b></div>
-  <div class="stat gold-stat">🪙 GOLD BARS<button class="stat-help" onclick="showStatHelp('gold',event)">?</button><b id="goldT">0</b></div>
-  <div class="stat">👥 CREW<button class="stat-help" onclick="showStatHelp('crew',event)">?</button><b id="crewT"></b></div>
-  <div class="stat">🔥 HEAT<button class="stat-help" onclick="showStatHelp('heat',event)">?</button><b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
+  <div class="stat stat-clickable" onclick="showStatHelp('cash',event)">💵 CASH<button class="stat-help" onclick="showStatHelp('cash',event)">?</button><b id="cashT"></b></div>
+  <div class="stat gold-stat stat-clickable" onclick="openGoldVaultFromStat()">🪙 GOLD BARS<button class="stat-help" onclick="showStatHelp('gold',event)">?</button><b id="goldT">0</b></div>
+  <div class="stat stat-clickable" onclick="go('crew')">👥 CREW<button class="stat-help" onclick="showStatHelp('crew',event)">?</button><b id="crewT"></b></div>
+  <div class="stat stat-clickable" onclick="showStatHelp('heat',event)">🔥 HEAT<button class="stat-help" onclick="showStatHelp('heat',event)">?</button><b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
  </div>
  
 </header>
@@ -861,10 +934,10 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 </div>
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
-  <div class="mini-hud-item health">❤️ <b id="miniHp">100</b></div>
+  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)">❤️ <b id="miniHp">100</b></div>
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
   <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
-  <div class="mini-hud-item cash">💵 <b id="miniCash">$0</b></div>
+  <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)">💵 <b id="miniCash">$0</b></div>
 </div>
 
 
@@ -916,6 +989,15 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
         <div class="sub">Create your own contact and add them directly to your network.</div>
         <button class="btn small" onclick="openCustomFriendModal()">ADD FRIEND</button>
       </div>
+      <div class="crew-tools">
+        <input id="crewSearch" class="compact-search" placeholder="Search name, role, or note..." oninput="setCrewSearch(this.value)">
+        <div class="filter-strip" id="crewFilters">
+          <button class="btn small" data-filter="all" onclick="setCrewFilter('all')">ALL</button>
+          <button class="btn small secondary" data-filter="active" onclick="setCrewFilter('active')">ACTIVE</button>
+          <button class="btn small secondary" data-filter="offline" onclick="setCrewFilter('offline')">OFFLINE</button>
+          <button class="btn small secondary" data-filter="inactive" onclick="setCrewFilter('inactive')">INACTIVE</button>
+        </div>
+      </div>
       <div id="friends"></div>
     </div>
   </div>
@@ -951,9 +1033,17 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
  <div id="inventory"></div>
 
  <div class="section-title" style="margin-top:10px"><h2>Equipment Shop</h2><span id="upkeepLabel"></span></div>
+ <div class="filter-strip gear-filter-strip" id="gearFilters">
+   <button class="btn small" data-filter="all" onclick="setGearFilter('all')">ALL</button>
+   <button class="btn small secondary" data-filter="attack" onclick="setGearFilter('attack')">ATTACK</button>
+   <button class="btn small secondary" data-filter="defense" onclick="setGearFilter('defense')">DEFENSE</button>
+   <button class="btn small secondary" data-filter="vehicle" onclick="setGearFilter('vehicle')">VEHICLES</button>
+   <button class="btn small secondary" data-filter="utility" onclick="setGearFilter('utility')">JOB TOOLS</button>
+   <button class="btn small secondary" data-filter="affordable" onclick="setGearFilter('affordable')">AFFORDABLE</button>
+ </div>
  <div class="grid cards" id="gear"></div>
 
- <div class="section-title" style="margin-top:10px"><h2>Gold Bar Vault</h2><span>rare permanent unlocks</span></div>
+ <div class="section-title" id="goldVaultSection" style="margin-top:10px"><h2>Gold Bar Vault</h2><span>rare permanent unlocks</span></div>
  <div class="card gold-vault-card">
    <p>Gold Bars unlock equipment and favors that ordinary cash cannot buy. Contacts at 95+ Reputation can search for one once per hour, or you can exchange cash at an intentionally brutal rate.</p>
    <div id="goldVault"></div>
@@ -962,10 +1052,10 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 
 <section id="view-territory" class="view">
  <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
- <div class="property-explainer">
-   <b>WHY BUY PROPERTIES?</b>
-   <p>Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</p>
- </div>
+ <details class="compact-details explainer-details">
+   <summary>HOW PROPERTIES WORK <span>?</span></summary>
+   <div class="compact-details-body">Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</div>
+ </details>
  <div class="grid cards" id="props"></div>
  <div id="factions" style="margin-top:10px"></div>
 </section>
@@ -1193,7 +1283,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.14.0";
+const BUILD_NUMBER="0.15.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -2518,6 +2608,17 @@ function showStatHelp(key,e){
        <span>Pay 10 Gold Bars to wipe your current Heat to 0 immediately. Expensive, corrupt, and effective.</span>
        <button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button>
      </div>`;
+   }else if(key==="cash"){
+     const gross=propertyIncome()+territoryIncome(),upkeep=propertyUpkeep()+gearUpkeep(),net=netIncome();
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b">
+       <b style="color:#efd36a">HOURLY CASH FLOW</b>
+       <span>Properties + Territory: ${money(gross)}/hr<br>Property + Gear Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr</span>
+       <button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('territory')">OPEN PROPERTIES</button>
+     </div>`;
+   }else if(key==="gold"){
+     actions.innerHTML=`<button class="btn" onclick="closeModal('statHelpModal');openGoldVaultFromStat()">OPEN GOLD BAR VAULT</button>`;
+   }else if(key==="crew"){
+     actions.innerHTML=`<button class="btn" onclick="closeModal('statHelpModal');go('crew')">OPEN CREW</button>`;
    }else{
      actions.innerHTML="";
    }
@@ -3536,6 +3637,69 @@ function renderEnergyDrinkQuick(){
  el.innerHTML=`<div class="row"><div><div class="title">🥤 Energy Drinks <span class="badge gold">x${qty}</span></div><div class="sub">Restore 3–7 Energy per drink · Stack limit 999</div></div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div>`;
 }
 
+
+let gearShopFilter="all";
+const gearBuySelections={};
+let crewListFilter="all";
+let crewSearchText="";
+
+function setGearFilter(filter){
+ gearShopFilter=filter||"all";
+ renderGear();
+}
+function gearSelectedQty(id){
+ const q=Number(gearBuySelections[id]||1);
+ return [1,5,10,50].includes(q)?q:1;
+}
+function setGearBuyQty(id,qty){
+ gearBuySelections[id]=Number(qty);
+ renderGear();
+}
+function buyGearSelected(id){
+ buyGear(id,gearSelectedQty(id));
+}
+function gearMatchesFilter(g){
+ if(gearShopFilter==="all")return true;
+ if(gearShopFilter==="affordable")return state.level>=g.level&&state.cash>=bulkGearPrice(g,gearSelectedQty(g.id)).total;
+ return g.type===gearShopFilter;
+}
+function setCrewFilter(filter){
+ crewListFilter=filter||"all";
+ renderCrew();
+}
+function setCrewSearch(value){
+ crewSearchText=String(value||"").trim().toLowerCase();
+ renderCrew();
+}
+function crewListMatches(id){
+ const f=state.friends[id],d=getPersonDef(id);
+ if(!f||!d)return false;
+ const responsive=contactCanRespond(f);
+ if(crewListFilter==="active"&&(!responsive||f.inactive))return false;
+ if(crewListFilter==="offline"&&(f.inactive||responsive))return false;
+ if(crewListFilter==="inactive"&&!f.inactive)return false;
+ if(crewSearchText){
+   const hay=`${d.name||""} ${d.role||""} ${d.tag||""} ${f.response||""}`.toLowerCase();
+   if(!hay.includes(crewSearchText))return false;
+ }
+ return true;
+}
+function openGoldVaultFromStat(){
+ go("gear");
+ setTimeout(()=>document.getElementById("goldVaultSection")?.scrollIntoView({behavior:"smooth",block:"start"}),30);
+}
+function showFightBreakdown(i,hit=false,revengeId=null,e){
+ if(e?.stopPropagation)e.stopPropagation();
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);
+ if(!o)return;
+ const p=offensiveFightProfile(o),chance=fightWinChance(o);
+ document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
+ document.getElementById("statHelpText").textContent=`${fightThreatLabel(opponentThreat(o))} threat. Enemy Power ${o.power}; your Effective Power ${p.total}. The percentage uses the same random-roll model as the actual fight.`;
+ const a=document.getElementById("statHelpActions");
+ if(a)a.innerHTML=`<div class="sub">Attack contribution: ${p.stat}<br>Gear contribution: ${p.gear}<br>Active Crew contribution: ${p.crew}${p.defenseSupport?`<br>Defense support: ${p.defenseSupport}`:""}<br>Notoriety contribution: ${p.notoriety}<br><br>Harder foes increase the value of strong stats, better equipment, and a larger active crew.</div>`;
+ document.getElementById("statHelpModal").classList.add("show");
+}
+
 function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",state.heat>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
@@ -3586,43 +3750,46 @@ function renderJobs(){
 
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const jobStateData=jobState(j.id);
-   const miss=reqMissing(j);
-   const pct=Math.max(0,Math.min(100,jobStateData.runs*20));
-   const ch=jobChance(j);
-   const art=IMG[j.img]||IMG.suit;
-   const statKind=jobStatKind(j);
-   const statBonus=jobStatBonus(j);
-   const dash=dashJobCost(j);
-   const dashMarkup=dash.total-dash.base;
+   const s=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,s.runs*20));
+   const ch=jobChance(j),art=IMG[j.img]||IMG.suit,statKind=jobStatKind(j),statBonus=jobStatBonus(j);
+   const dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
+   const payout=`${money(j.cash[0])}–${money(j.cash[1])}`;
 
-   return `<div class="card job-card" id="job-${j.id}">
-     <img class="art" src="${art}" alt="">
-     <h3>${j.name}</h3>
-     <div class="meta">
-       <span class="badge">⚡ ${j.energy}</span><span class="badge">⭐ ${j.xp}</span>
-       <span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span>
-       <span class="badge gold">${ch}% success</span><span class="badge">${statKind==="attack"?"⚔ ATTACK":statKind==="defense"?"🛡 DEFENSE":"⚔🛡 BOTH"} +${statBonus}%</span>
-     </div>
-     <div class="role">Preferred role: ${j.role}</div>
-     <div class="job-stat-note">${statKind==="attack"?"Attack raises this job’s success chance.":statKind==="defense"?"Defense raises this job’s success chance and reduces failure losses.":"Attack and Defense both contribute to this job."}</div>
-     <div class="sub">Mastery ${jobStateData.mastery}/3</div>
-     <div class="mastery"><div style="width:${pct}%"></div></div>
-     ${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}
-     ${dash.items.length?`<div class="job-dash">
-       <div class="job-dash-head">
-         <span class="job-dash-brand">DASH</span>
-         <button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button>
+   return `<div class="card job-card compact-job" id="job-${j.id}">
+     <div class="job-head">
+       <img class="art" src="${art}" alt="">
+       <div>
+         <h3>${j.name}</h3>
+         <div class="meta">
+           <span class="badge">⚡ ${j.energy}</span>
+           <span class="badge green">💵 ${payout}</span>
+           <span class="badge">⭐ ${j.xp}</span>
+           <span class="badge gold">${ch}% SUCCESS</span>
+         </div>
        </div>
-       <div class="job-dash-desc">Instantly deliver the missing shop equipment for this Job.</div>
+     </div>
+     <div class="sub">Mastery ${s.mastery}/3</div>
+     <div class="mastery"><div style="width:${pct}%"></div></div>
+     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
+     ${dash.items.length?`<div class="job-dash">
+       <div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
        <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
-       <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>
-         DASH REQUIRED ITEMS · <span class="job-dash-price">${money(dash.total)}</span>
-       </button>
-       <div class="sub">Includes ${money(dashMarkup)} convenience markup (+50%).</div>
+       <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button>
+       <div class="sub">+50% convenience markup (${money(dashMarkup)}).</div>
      </div>`:""}
-     <p>Possible rare items: ${j.loot.join(", ")}</p>
-     <button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button>
+     <div class="job-primary">
+       <button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button>
+     </div>
+     <details class="compact-details">
+       <summary>JOB DETAILS</summary>
+       <div class="compact-details-body">
+         Preferred role: ${j.role}<br>
+         ${statKind==="attack"?"Attack raises this Job’s success chance.":statKind==="defense"?"Defense raises success chance and reduces failure losses.":"Attack and Defense both contribute."}
+         Current ${statKind==="attack"?"Attack":statKind==="defense"?"Defense":"stat"} bonus: +${statBonus}%.<br>
+         Crew requirement: ${j.crew} · Heat: +${j.heat}<br>
+         Possible rare items: ${j.loot.join(", ")}
+       </div>
+     </details>
    </div>`;
  }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
 
@@ -3630,8 +3797,8 @@ function renderJobs(){
  bossEl.innerHTML=`<div class="card">
    <img class="art" src="${IMG.suit}" alt="">
    <h3>${tiers[t].boss}</h3>
-   <p>Control this rank by defeating the organization standing above you.</p>
    <div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div>
+   <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once, then defeat the organization above you to control the rank.</div></details>
    <button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"FIGHT BOSS":"REQUIREMENTS NOT MET"}</button>
  </div>`;
 }
@@ -3680,7 +3847,14 @@ function renderCrew(){
  const inactiveCrew=crewIds().filter(id=>state.friends[id]?.inactive).length;
  crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
 
- friends.innerHTML=Object.keys(state.friends).map(id=>{
+ document.querySelectorAll("#crewFilters [data-filter]").forEach(b=>{
+   const active=b.dataset.filter===crewListFilter;
+   b.classList.toggle("active",active);
+   b.classList.toggle("secondary",!active);
+ });
+
+ const visibleIds=Object.keys(state.friends).filter(crewListMatches);
+ friends.innerHTML=visibleIds.length?visibleIds.map(id=>{
    const d=getPersonDef(id),f=state.friends[id];
    const a=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
    const r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);
@@ -3695,14 +3869,15 @@ function renderCrew(){
        <div class="ftag">${d.tag||"Trusted contact"}</div>
        <div class="fmeta">${d.role} · ${crewStatus(f)}</div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
-       ${inactive?`<div class="inactive-note">Still listed in your organization, but this person has stopped playing and will not answer help, gift, recruitment, or Gold Bar requests.</div>`:""}
-       <div class="relationship-grid">
-         <div class="relstat">REP<b>${rep}</b></div><div class="relstat">TRUST<b>${f.trust}</b></div>
-         <div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div>
-         <div class="relstat">RESENT<b>${f.resentment}</b></div>
-       </div>
-       <div class="gold-contact">${inactive?"Inactive — cannot provide Gold Bars.":!responsive?"Offline — Gold Bar requests unavailable.":rep>=95?(gb>0?`Gold Bar available again in ${fmt(gb)}`:"Eligible to provide a Gold Bar"):`Gold Bars require 95 Reputation`}</div>
-       ${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}
+       ${inactive?`<div class="inactive-note">Still listed, but no longer responds or contributes active combat power.</div>`:""}
+       <details class="compact-details">
+         <summary>RELATIONSHIP</summary>
+         <div class="compact-details-body">
+           Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
+           ${inactive?"Cannot provide Gold Bars.":!responsive?"Offline — requests unavailable.":rep>=95?(gb>0?`Gold Bar available in ${fmt(gb)}.`:"Eligible to provide a Gold Bar."):`Gold Bars require 95 Reputation.`}
+           ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
+         </div>
+       </details>
      </div>
      <div class="fbtns">
        <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"REQUEST HELP"}</button>
@@ -3712,7 +3887,7 @@ function renderCrew(){
        <button onclick="claimGoldBar('${id}')" ${!responsive||rep<95||gb>0?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":rep<95?"GOLD: REP 95":gb>0?`GOLD ${fmt(gb)}`:"ASK FOR GOLD BAR"}</button>
      </div>
    </div>`;
- }).join("");
+ }).join(""):`<div class="crew-filter-empty">No contacts match this filter${crewSearchText?" or search":""}.</div>`;
 
  const potentialList=allPotentialDefs()
    .filter(p=>state.potentials[p.id]&&!state.potentials[p.id].added&&!state.friends[p.id])
@@ -3743,50 +3918,58 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<div class="combat-info">
-     <div class="combat-info-grid">
-       <div class="combat-stat"><div class="label">⚔ BASE ATTACK POWER</div><b>${atk}</b><div class="desc">Your normal Attack Power before opponent difficulty scaling.</div></div>
-       <div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Reduces fight losses by ${mit}% and begins contributing directly to the hardest offensive fights.</div></div>
-     </div>
-     <div class="combat-note">Harder foes now scale aggressively. Your effective offensive power is built from Attack, your best Attack/Vehicle equipment, active crew, and Notoriety. As threat rises, Attack investment, equipment quality, and active crew contribute more heavily; Defense also begins providing tactical support against high-tier enemies. The listed Win Chance uses the same roll model as the actual fight.</div>
-   </div>`;
+   combatInfo.innerHTML=`<details class="compact-details">
+     <summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary>
+     <div class="compact-details-body">Harder foes increasingly reward Attack, strong equipment, and active crew. Defense reduces losses by ${mit}% and supports high-threat offensive fights. Each listed Win Chance uses the same roll model as the actual fight.</div>
+   </details>`;
  }
 
  fightEl.innerHTML=[0,1,2,3,4].map(i=>{
-   const o=genOpponent(i),profile=offensiveFightProfile(o),chance=fightWinChance(o);
+   const o=genOpponent(i),p=offensiveFightProfile(o),chance=fightWinChance(o);
    return `<div class="row">
-     <div>
-       <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-       <div class="sub">LVL ${o.level} · Crew ${o.crew} · Enemy Power ${o.power} · Your Effective Power ${profile.total}</div>
-       <div class="fight-breakdown">Your power: Attack ${profile.stat} · Gear ${profile.gear} · Crew ${profile.crew}${profile.defenseSupport?` · Defense Support ${profile.defenseSupport}`:""} · Notoriety ${profile.notoriety}</div>
+     <div class="fight-row-main">
+       <div class="fight-row-copy">
+         <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+         <div class="sub">LVL ${o.level} · Crew ${o.crew}</div>
+         <div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
+       </div>
+       <div class="fight-row-actions">
+         <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
+         <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
+       </div>
      </div>
-     <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
    </div>`;
  }).join("");
 
  revengeEl.innerHTML=state.revenge.length
    ? state.revenge.map(o=>{
-       const profile=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-       return `<div class="row hit">
-         <div>
+       const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
+       return `<div class="row hit"><div class="fight-row-main">
+         <div class="fight-row-copy">
            <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-           <div class="sub">Attacked your operation · Enemy Power ${o.power} · Your Effective Power ${profile.total}</div>
+           <div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div>
          </div>
-         <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
-       </div>`;
+         <div class="fight-row-actions">
+           <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button>
+           <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
+         </div>
+       </div></div>`;
      }).join("")
    : "<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
 
  hitEl.innerHTML=[0,1,2].map(i=>{
-   const idx=i+2,o=genOpponent(idx,true),profile=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit">
-     <div>
+   const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
+   return `<div class="row hit"><div class="fight-row-main">
+     <div class="fight-row-copy">
        <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-       <div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew} · Enemy Power ${o.power}</div>
-       <div class="fight-breakdown">Your Effective Power ${profile.total} · Hitlist targets are substantially stronger than ordinary rivals.</div>
+       <div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div>
+       <div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
      </div>
-     <button class="btn red small" onclick="fight(${idx},true)">CLAIM</button>
-   </div>`;
+     <div class="fight-row-actions">
+       <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button>
+       <button class="btn red small" onclick="fight(${idx},true)">CLAIM</button>
+     </div>
+   </div></div>`;
  }).join("");
 }
 
@@ -3822,15 +4005,19 @@ function renderGear(){
  if(!upkeepEl||!gearEl)return;
 
  upkeepEl.textContent=`Gear upkeep ${money(gearUpkeep())}/hr`;
- gearEl.innerHTML=gearDefs.map(g=>{
-   const uses=jobsUsingGear(g.id);
-   const p1=bulkGearPrice(g,1),p5=bulkGearPrice(g,5),p10=bulkGearPrice(g,10),p50=bulkGearPrice(g,50);
+
+ document.querySelectorAll("#gearFilters [data-filter]").forEach(b=>{
+   const active=b.dataset.filter===gearShopFilter;
+   b.classList.toggle("active",active);
+   b.classList.toggle("secondary",!active);
+ });
+
+ const visible=gearDefs.filter(gearMatchesFilter);
+ gearEl.innerHTML=visible.length?visible.map(g=>{
+   const uses=jobsUsingGear(g.id),qty=gearSelectedQty(g.id),price=bulkGearPrice(g,qty);
+   const savings=g.cost*qty-price.total;
    const lock=state.level<g.level;
-   const buyButton=(qty,p,label,discount="")=>`<button class="btn ${qty>1?"secondary":""}" onclick="buyGear('${g.id}',${qty})" ${lock||state.cash<p.total?"disabled":""}>
-     ${lock?`LVL ${g.level}`:label}
-     ${discount?`<span class="bulk-discount">${discount} OFF</span>`:""}
-     <span class="bulk-price">${money(p.total)}</span>
-   </button>`;
+   const discount=qty===5?3:qty===10?7:qty===50?10:0;
 
    return `<div class="card">
      <img class="art" src="${IMG[g.img]||IMG.suit}" alt="">
@@ -3839,18 +4026,26 @@ function renderGear(){
        <span class="badge">${gearEffectLabel(g)}</span>
        <span class="badge">Owned ${gearQty(g.id)}</span>
        <span class="badge">${money(g.cost)} each</span>
-       <span class="badge red">Upkeep ${money(g.upkeep)}/hr each</span>
+       ${g.upkeep?`<span class="badge red">${money(g.upkeep)}/hr upkeep</span>`:""}
      </div>
-     <p class="item-flavor">${g.desc}</p>
-     <div class="item-use">${uses.length?`Required by: ${uses.slice(0,3).join(" · ")}${uses.length>3?" · +more":""}`:"Optional equipment — improves the organization without gating a Job."}</div>
-     <div class="bulk-buy-grid">
-       ${buyButton(1,p1,"BUY 1")}
-       ${buyButton(5,p5,"BUY 5","3%")}
-       ${buyButton(10,p10,"BUY 10","7%")}
-       ${buyButton(50,p50,"BUY 50","10%")}
+     <details class="compact-details">
+       <summary>ITEM DETAILS</summary>
+       <div class="compact-details-body">${g.desc}<br>${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
+     </details>
+     <div class="gear-buy-controls">
+       <select class="gear-qty-select" onchange="setGearBuyQty('${g.id}',this.value)" ${lock?"disabled":""}>
+         <option value="1" ${qty===1?"selected":""}>BUY 1 · no discount</option>
+         <option value="5" ${qty===5?"selected":""}>BUY 5 · 3% off</option>
+         <option value="10" ${qty===10?"selected":""}>BUY 10 · 7% off</option>
+         <option value="50" ${qty===50?"selected":""}>BUY 50 · 10% off</option>
+       </select>
+       <button class="btn" onclick="buyGearSelected('${g.id}')" ${lock||state.cash<price.total?"disabled":""}>
+         ${lock?`UNLOCK LVL ${g.level}`:`BUY · ${money(price.total)}`}
+       </button>
      </div>
+     <div class="gear-buy-note">${discount?`${discount}% bulk discount · Saved ${money(savings)} vs individual price.`:"Select a larger quantity for a bulk discount."}</div>
    </div>`;
- }).join("");
+ }).join(""):`<div class="tab-empty">No equipment matches this filter.</div>`;
 }
 function factionPressure(f){
  const linked=territoryDefs.filter(t=>t.enemy===f.name);
@@ -3871,7 +4066,7 @@ function renderTerritory(){
  const propsEl=document.getElementById("props");
  if(!incomeEl||!factionsEl||!propsEl)return;
 
- incomeEl.textContent=`Net ${money(Math.max(0,netIncome()))}/hr after upkeep`;
+ incomeEl.textContent=`Net ${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr`;
 
  propsEl.innerHTML=propDefs.map(p=>{
    const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
@@ -3880,12 +4075,13 @@ function renderTerritory(){
      <h3>${p.name}</h3>
      <div class="meta">
        <span class="badge">Owned ${q}</span>
-       <span class="badge green">+${money(p.income)}/hr each</span>
-       <span class="badge red">-${money(p.upkeep)}/hr upkeep each</span>
-       <span class="badge">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
+       <span class="badge green">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
+       <span class="badge">${money(c)} next</span>
      </div>
-     <p class="property-flavor">${p.desc}</p>
-     <div class="item-use">Buying another permanently increases hourly income by ${money(p.income)} before its ${money(p.upkeep)} upkeep. Current next-copy cost: ${money(c)}.</div>
+     <details class="compact-details">
+       <summary>PROPERTY DETAILS</summary>
+       <div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each. Buying another permanently increases passive income.</div>
+     </details>
      <button class="btn green" onclick="buyProp('${p.id}')" ${state.level<p.level||state.cash<c?"disabled":""}>
        ${state.level<p.level?`UNLOCK LVL ${p.level}`:`BUY PROPERTY · ${money(c)}`}
      </button>
@@ -3899,10 +4095,13 @@ function renderTerritory(){
    return `<div class="row">
      <div>
        <div class="title">${f.name}</div>
-       <div class="sub">${cities.find(c=>c.id===f.city).name} · Combat Strength ${f.strength} · Your Pressure ${pressure}%</div>
+       <div class="sub">${cities.find(c=>c.id===f.city).name} · Strength ${f.strength} · Pressure ${pressure}% · Controlled ${controlled}/${linked.length}</div>
        <div class="factionbar"><div style="width:${pressure}%"></div></div>
        <span class="faction-status ${status.cls}">${status.label}</span>
-       <div class="faction-detail">${f.desc}<br><b>How it changes:</b> successful moves against territories they control raise your pressure. <b>Why it matters:</b> their Strength is the resistance roll you face when taking territory; beating them converts contested districts into permanent income and Notoriety. Controlled territory: ${controlled}/${linked.length}.</div>
+       <details class="compact-details">
+         <summary>FACTION DETAILS</summary>
+         <div class="compact-details-body">${f.desc}<br>Successful territory moves raise your pressure. Their Strength is the resistance you face when taking ground; breaking their control converts districts into permanent income and Notoriety.</div>
+       </details>
      </div>
    </div>`;
  }).join("");
@@ -3913,19 +4112,19 @@ function renderTerritory(){
    return `<div class="row territory ${s.owned?"owned":"enemy"}">
      <div>
        <div class="title">${t.name}</div>
-       <div class="sub">${cities.find(c=>c.id===t.city).name} · Rival: ${t.enemy} · Income ${money(t.income)}/hr · Requires ${t.reqNot} Notoriety</div>
-       <div class="territory-flavor">${t.desc}</div>
-       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="sub">Takeover progress: ${s.progress}% · Successful territory moves add 35%.</div>`:"<div class='sub'>Controlled · permanent territory income active.</div>"}
+       <div class="sub">${cities.find(c=>c.id===t.city).name} · ${t.enemy} · ${money(t.income)}/hr · ${t.reqNot} Notoriety</div>
+       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="sub">Takeover ${s.progress}% · successful moves add 35%</div>`:"<div class='sub'>Controlled · income active</div>"}
+       <details class="compact-details"><summary>TERRITORY DETAILS</summary><div class="compact-details-body">${t.desc}</div></details>
      </div>
      <button class="btn ${s.owned?"green":"red"} small" onclick="takeTerritory('${t.id}')" ${s.owned||state.notoriety<t.reqNot?"disabled":""}>
-       ${s.owned?"CONTROLLED":"TAKE TERRITORY · 2 STAMINA"}
+       ${s.owned?"CONTROLLED":"TAKE · 2 STAMINA"}
      </button>
    </div>`;
  }).join("");
 
  factionsEl.innerHTML=`
    <div class="section-title"><h2>Rival Factions</h2><span>who controls the ground you want</span></div>
-   <div class="faction-explainer"><b>WHAT ARE RIVAL FACTIONS?</b><p>These are the established organizations standing between you and new territory. Their <strong>Strength</strong> makes territory attacks harder. Your <strong>Pressure</strong> rises as you successfully contest their districts. Factions do not grant passive bonuses by themselves — they are the resistance you dismantle to convert territory into income, Notoriety, and control.</p></div>
+   <details class="compact-details explainer-details"><summary>HOW RIVAL FACTIONS WORK <span>?</span></summary><div class="compact-details-body">Rival factions are the organizations standing between you and new territory. Strength makes their districts harder to take. Pressure rises as you successfully contest them. The reward is not the faction itself: it is the income, Notoriety, and control you gain by dismantling their hold.</div></details>
    ${factionRows}
    <div class="section-title" style="margin-top:10px"><h2>Territory Takeovers</h2><span>2 stamina per move</span></div>
    ${territoryRows}
