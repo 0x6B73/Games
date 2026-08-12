@@ -2919,7 +2919,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.9";
+const BUILD_NUMBER="0.22.10";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4161,7 +4161,7 @@ function fresh(){
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
- currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,cashBribeWindowStart:0,cashBribeCount:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
@@ -4388,6 +4388,10 @@ function migrate(){
  if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=regenBase;
  if(!Number.isFinite(state.lastHeatGain))state.lastHeatGain=regenBase;
  if(!Number.isFinite(state.lastLayLow))state.lastLayLow=0;
+ if(!Number.isFinite(state.cashBribeWindowStart)||state.cashBribeWindowStart<0)state.cashBribeWindowStart=0;
+ if(!Number.isFinite(state.cashBribeCount)||state.cashBribeCount<0)state.cashBribeCount=0;
+ state.cashBribeCount=Math.floor(state.cashBribeCount);
+ if(state.cashBribeWindowStart&&now()-state.cashBribeWindowStart>=60*60000){state.cashBribeWindowStart=0;state.cashBribeCount=0;}
  if(!Number.isFinite(state.lastIncome))state.lastIncome=now();
  if(!Number.isFinite(state.lastUpkeep))state.lastUpkeep=now();
  if(!Number.isFinite(state.lastSocial))state.lastSocial=now();
@@ -4474,6 +4478,7 @@ const HEAT_QUIET_AFTER_MS=5*60000;
 const HEAT_QUIET_MULTIPLIER=.40;
 const HEAT_QUIET_MIN_MS=60000;
 const LAY_LOW_COOLDOWN_MS=10*60000;
+const CASH_BRIBE_WINDOW_MS=60*60000;
 
 function heatBaseDecayMs(){
  const tier=endgameTier("heat");
@@ -4499,8 +4504,27 @@ function addHeat(amount){
 function layLowRemaining(){
  return Math.max(0,LAY_LOW_COOLDOWN_MS-(now()-(Number(state.lastLayLow)||0)));
 }
+function syncCashBribeWindow(t=now()){
+ const start=Number(state.cashBribeWindowStart)||0;
+ const count=Math.max(0,Math.floor(Number(state.cashBribeCount)||0));
+ if(!start||!count||t-start>=CASH_BRIBE_WINDOW_MS){
+   state.cashBribeWindowStart=0;
+   state.cashBribeCount=0;
+   return;
+ }
+ state.cashBribeCount=count;
+}
 function cashHeatBribeCost(){
- return Math.min(5000,500+Math.max(0,(Number(state.level)||1)-1)*75);
+ return Math.max(2000,Math.max(1,Math.floor(Number(state.level)||1))*2000);
+}
+function cashHeatBribePercent(t=now()){
+ syncCashBribeWindow(t);
+ return Math.max(1,10-(Number(state.cashBribeCount)||0));
+}
+function cashHeatBribeResetRemaining(t=now()){
+ syncCashBribeWindow(t);
+ if(!(state.cashBribeCount>0)||!state.cashBribeWindowStart)return 0;
+ return Math.max(0,CASH_BRIBE_WINDOW_MS-(t-state.cashBribeWindowStart));
 }
 function staminaCostMarkup(cost){return `${spriteIconHtml("stamina","xs")} ${cost}`;}
 function fightStaminaCost(o){
@@ -4910,8 +4934,9 @@ function showStatHelp(key,e){
  const actions=document.getElementById("statHelpActions");
  if(actions){
    if(key==="heat"){
-     const layWait=layLowRemaining(),cashCost=cashHeatBribeCost(),quiet=heatQuietRecoveryActive(),decay=heatDecayMs();
-     actions.innerHTML=`<div class="bribe-box" style="border-color:#5f5134;background:#141108"><b style="color:#efd36a">HEAT CONTROL</b><span>${quiet?"Quiet recovery active":"Stay clean for 5 minutes to accelerate passive recovery"} · Current decay: -1 every ${formatRegenTime(decay)}.<br>The fallback Job <b style="display:inline;color:#ddd3c1">Deliver a Sealed Package</b> stays available at any Heat and generates no Heat.</span><button class="btn green" style="margin-top:6px" onclick="layLow()" ${state.heat<=0||layWait>0?"disabled":""}>${layWait>0?`LAY LOW · ${fmt(layWait)}`:"LAY LOW · FREE · -15 HEAT"}</button><button class="btn secondary" style="margin-top:5px" onclick="cashHeatBribe()" ${state.heat<=0||state.cash<cashCost?"disabled":""}>CASH BRIBE · ${money(cashCost)} · -25 HEAT</button><button class="btn red" style="margin-top:5px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>FULL WIPE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
+     const layWait=layLowRemaining(),cashCost=cashHeatBribeCost(),cashPct=cashHeatBribePercent(),cashReset=cashHeatBribeResetRemaining(),quiet=heatQuietRecoveryActive(),decay=heatDecayMs();
+     const bribeResetText=cashReset>0?` · Effectiveness resets in ${fmt(cashReset)}`:" · First bribe this hour";
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#5f5134;background:#141108"><b style="color:#efd36a">HEAT CONTROL</b><span>${quiet?"Quiet recovery active":"Stay clean for 5 minutes to accelerate passive recovery"} · Current decay: -1 every ${formatRegenTime(decay)}.<br>The fallback Job <b style="display:inline;color:#ddd3c1">Deliver a Sealed Package</b> stays available at any Heat and generates no Heat.<br>Cash bribes cost $2,000 × Level. The first bribe removes 10% Heat; each additional bribe in the same hour removes 1% less, to a minimum of 1%${bribeResetText}.</span><button class="btn green" style="margin-top:6px" onclick="layLow()" ${state.heat<=0||layWait>0?"disabled":""}>${layWait>0?`LAY LOW · ${fmt(layWait)}`:"LAY LOW · FREE · -15 HEAT"}</button><button class="btn secondary" style="margin-top:5px" onclick="cashHeatBribe()" ${state.heat<=0||state.cash<cashCost?"disabled":""}>CASH BRIBE · ${money(cashCost)} · -${cashPct}% HEAT</button><button class="btn red" style="margin-top:5px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>FULL WIPE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
      const gross=propertyIncome()+facilityIncome()+territoryIncome(),upkeep=propertyUpkeep()+facilityUpkeep()+gearUpkeep(),net=netIncome();
      actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Facilities + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
@@ -6457,15 +6482,22 @@ function layLow(){
 }
 function cashHeatBribe(){
  if(state.heat<=0)return toast("Your Heat is already at 0.");
+ syncCashBribeWindow();
  const cost=cashHeatBribeCost();
- if(state.cash<cost)return showRequirementPopup(`A cash bribe costs ${money(cost)}. You have ${money(state.cash)}.`);
+ const pct=cashHeatBribePercent();
+ if(state.cash<cost)return showRequirementPopup(`A cash bribe costs ${money(cost)} at Level ${state.level}. You have ${money(state.cash)}.`);
  const oldHeat=state.heat;
  state.cash-=cost;
  state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
- state.heat=Math.max(0,state.heat-25);
- const heatDrop=Math.floor(oldHeat-state.heat);
- log(`Paid ${money(cost)} in cash bribes and reduced Heat by ${heatDrop}.`);
- showActionFlash("CASH BRIBE PAID",`${money(cost)} · -${heatDrop} Heat`,"cash");
+ // Apply the current bribe effectiveness to the player's current Heat, rounded to whole Heat.
+ const heatDrop=Math.min(oldHeat,Math.max(1,Math.round(oldHeat*(pct/100))));
+ state.heat=Math.max(0,oldHeat-heatDrop);
+ if(!(state.cashBribeCount>0)||!state.cashBribeWindowStart)state.cashBribeWindowStart=now();
+ state.cashBribeCount=(Number(state.cashBribeCount)||0)+1;
+ const nextPct=cashHeatBribePercent();
+ const reset=cashHeatBribeResetRemaining();
+ log(`Paid ${money(cost)} in cash bribes and reduced Heat by ${heatDrop} (${pct}% of current Heat).`);
+ showActionFlash("CASH BRIBE PAID",`${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");
  S.cash();save();render();
 }
 function claimDaily(){
@@ -6724,7 +6756,7 @@ function prestigeGame(){
  if(!canPrestige())return showRequirementPopup("Prestige requires Level 100 and every rank boss defeated.");
  if(!confirm("Become a higher-tier Kingpin? This resets level, cash, jobs, bosses, properties, territory, equipment, and run statistics. Crew, custom identities, Gold Bars, Gold Vault unlocks, rare loot, achievements, and completed collections are preserved."))return;
  state.prestige=(state.prestige||0)+1;
- state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.lastHeatGain=now();state.lastLayLow=0;state.notoriety=10*state.prestige;
+ state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.lastHeatGain=now();state.lastLayLow=0;state.cashBribeWindowStart=0;state.cashBribeCount=0;state.notoriety=10*state.prestige;
  state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
  state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
  state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
