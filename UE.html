@@ -1241,7 +1241,7 @@ body{
   background-color:#040404!important;
   background-image:
     linear-gradient(to bottom,rgba(4,4,4,.48),rgba(4,4,4,.72) 42%,rgba(4,4,4,.88)),
-    url("https://0x6b73.github.io/Games/assets/underworld-background.png")!important;
+    url("https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/underworld-background.png")!important;
   background-position:center top,center top!important;
   background-size:cover,cover!important;
   background-repeat:no-repeat,no-repeat!important;
@@ -1380,7 +1380,7 @@ body:after{
 
 <main class="main">
 <section id="view-home" class="view active">
- <div class="tab-banner" data-banner="CRIMINAL EMPIRE"><img src="https://0x6b73.github.io/Games/assets/banner-home.png" alt="Criminal Empire banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="CRIMINAL EMPIRE"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-home.png" alt="Criminal Empire banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="hero">
   <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
   <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
@@ -1407,7 +1407,7 @@ body:after{
 </section>
 
 <section id="view-jobs" class="view">
- <div class="tab-banner" data-banner="JOBS"><img src="https://0x6b73.github.io/Games/assets/banner-jobs.png" alt="Jobs banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="JOBS"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-jobs.png" alt="Jobs banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div id="energyJobs"></div>
  <div id="jobResult" class="job-result"></div><div class="section-title"><h2>Jobs</h2><span id="tierName"></span></div>
  <div class="grid cards" id="jobs"></div>
@@ -1416,7 +1416,7 @@ body:after{
 </section>
 
 <section id="view-crew" class="view">
- <div class="tab-banner" data-banner="CREW"><img src="https://0x6b73.github.io/Games/assets/banner-crew.png" alt="Crew banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="CREW"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-crew.png" alt="Crew banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="crew-fold" open>
   <summary>
     <span>YOUR CREW</span>
@@ -1461,7 +1461,7 @@ body:after{
 </section>
 
 <section id="view-fight" class="view">
- <div class="tab-banner" data-banner="FIGHT"><img src="https://0x6b73.github.io/Games/assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="FIGHT"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
  <div id="combatInfo"></div>
  <div id="fightRefreshBar" class="fight-refresh-bar"></div>
@@ -1473,7 +1473,7 @@ body:after{
 </section>
 
 <section id="view-gear" class="view">
- <div class="tab-banner" data-banner="GEAR"><img src="https://0x6b73.github.io/Games/assets/banner-gear.png" alt="Gear banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="GEAR"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-gear.png" alt="Gear banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="fold-card gear-section-fold" open>
    <summary>MAIN INVENTORY <span>cash / gold / supplies</span></summary>
    <div class="fold-body">
@@ -1516,7 +1516,7 @@ body:after{
 </section>
 
 <section id="view-territory" class="view">
- <div class="tab-banner" data-banner="TERRITORY"><img src="https://0x6b73.github.io/Games/assets/banner-territory.png" alt="Territory banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="TERRITORY"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-territory.png" alt="Territory banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
  <details class="compact-details explainer-details">
    <summary>HOW PROPERTIES WORK <span>?</span></summary>
@@ -1527,7 +1527,7 @@ body:after{
 </section>
 
 <section id="view-more" class="view">
- <div class="tab-banner" data-banner="MORE"><img src="https://0x6b73.github.io/Games/assets/banner-more.png" alt="More banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <div class="tab-banner" data-banner="MORE"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-more.png" alt="More banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
  <div class="card" style="margin-bottom:8px">
   <div class="edit-profile-row">
@@ -1773,7 +1773,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.19.1";
+const BUILD_NUMBER="0.19.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
