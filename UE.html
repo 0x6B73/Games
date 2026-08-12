@@ -2098,6 +2098,63 @@ body:after{
 @media(max-width:420px){.territory-summary-bar{grid-template-columns:1fr}.fbtns{grid-template-columns:1fr}}
 
 .inbox-fab .nav-icon{width:24px;height:24px;background-size:144px 96px;background-position:-96px -24px;filter:none}
+
+
+/* TERRITORY STREAMLINE + MORE UNIFORMITY — BUILD 0.22.4 */
+#view-territory .fold-body{padding:5px}
+#view-territory .explainer-details{margin:0 0 5px!important}
+.territory-toolbar{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;
+  margin-top:4px;padding-top:4px;border-top:1px solid #282925
+}
+.territory-toolbar-stat{min-width:0;padding:4px 5px;border:1px solid #343638;background:#0a0b0c}
+.territory-toolbar-stat span{display:block;font-size:6px;font-weight:900;letter-spacing:.07em;color:#777168}
+.territory-toolbar-stat b{display:block;margin-top:2px;font-size:9px;color:#d2b866;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.territory-property-list{display:grid;gap:5px}
+.territory-property-item{
+  position:relative;min-width:0;padding:7px;border:1px solid #36383a;border-left:3px solid #59605d;
+  background:linear-gradient(135deg,#111315,#08090a 72%);box-shadow:0 5px 14px #0004
+}
+.territory-property-item.elite{border-color:#594922;border-left-color:#bd9235;background:linear-gradient(135deg,#17140d,#090a0a 72%)}
+.territory-property-item.locked{opacity:.76}
+.territory-property-main{display:grid;grid-template-columns:58px minmax(0,1fr) auto;gap:7px;align-items:start}
+.territory-property-icon{width:58px;height:58px;display:flex;align-items:center;justify-content:center;border:1px solid #343638;background:radial-gradient(circle at 50% 42%,#23201a,#090a0b 68%);overflow:hidden}
+.territory-property-item.elite .territory-property-icon{border-color:#5d4a25;background:radial-gradient(circle at 50% 42%,#2a2112,#090a0b 70%)}
+.territory-property-icon .ue-sprite{width:49px;height:49px;box-shadow:none;filter:brightness(1.08) saturate(1.02)}
+.territory-property-icon .ue-sprite.sheet-2{width:51px;height:51px}
+.territory-property-copy{min-width:0}
+.territory-property-name-row{display:flex;align-items:center;gap:4px;min-width:0}
+.territory-property-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 11px/1.15 Arial,Helvetica,sans-serif;color:#ddd6c9}
+.territory-property-item.elite .territory-property-name{color:#e0ca92}
+.territory-property-statline{display:flex;flex-wrap:wrap;gap:3px 7px;margin-top:4px;font-size:8px;color:#928b81}
+.territory-property-statline b{color:#cfc5b3}
+.territory-property-desc{margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:8px;line-height:1.3;color:#7f7971}
+.territory-property-price{text-align:right;white-space:nowrap}.territory-property-price b{display:block;font-size:12px;color:#d4ba6a}.territory-property-price span{display:block;margin-top:2px;font-size:6px;color:#756f67}
+.territory-property-buyrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center;margin-top:6px;padding-top:6px;border-top:1px solid #292a27}
+.territory-property-income{font-size:7px;color:#807a72;line-height:1.3}
+.territory-property-buy{min-height:29px!important;white-space:nowrap}
+.territory-subhead{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 6px;margin:1px 0 5px;border:1px solid #36383a;border-left:3px solid #745d31;background:linear-gradient(#151719,#0a0b0c)}
+.territory-subhead b{font-size:8px;letter-spacing:.055em;color:#d9c681}.territory-subhead span{font-size:7px;color:#817b72}.territory-subhead-spaced{margin-top:7px}
+#view-territory .faction-list,#view-territory .territory-list{gap:5px}
+#view-territory .faction-card,#view-territory .territory-card{padding:7px;box-shadow:0 5px 14px #0004}
+#view-territory .faction-icon-wrap,#view-territory .territory-icon-wrap{width:42px;height:42px;flex:0 0 42px;background:radial-gradient(circle at 50% 42%,#23201a,#090a0b 68%)}
+#view-territory .faction-icon-wrap .ue-sprite,#view-territory .territory-icon-wrap .ue-sprite{width:34px;height:34px;box-shadow:none}
+#view-territory .faction-title-row .title,#view-territory .territory-title-row .title{font-size:11px}
+#view-territory .faction-note,#view-territory .territory-note{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:#7f7971}
+#view-territory .territory-action{margin-top:5px;min-height:29px!important;width:100%!important}
+#view-more>.fold-card{margin:0 0 6px}
+#view-more>.fold-card>summary{min-height:31px;padding:6px 8px!important;font-size:10px!important;letter-spacing:.035em;text-transform:uppercase}
+#view-more>.fold-card>summary span{font-size:8px!important;color:#8f887d!important;font-weight:700!important;text-transform:none}
+#view-more>.fold-card>.fold-body{padding:6px}
+#view-more .profile-grid{gap:3px}
+#view-more .profile-grid .card{padding:6px!important;min-height:54px;display:flex;flex-direction:column;justify-content:center}
+@media(min-width:760px){.territory-property-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:390px){
+  .territory-property-main{grid-template-columns:52px minmax(0,1fr)}
+  .territory-property-icon{width:52px;height:52px}.territory-property-icon .ue-sprite{width:44px;height:44px}.territory-property-icon .ue-sprite.sheet-2{width:46px;height:46px}
+  .territory-property-price{grid-column:2;text-align:left;display:flex;align-items:baseline;gap:5px;margin-top:-1px}.territory-property-price b{font-size:10px}.territory-property-price span{margin:0}
+  .territory-property-buyrow{grid-template-columns:1fr}.territory-property-buy{width:100%!important}
+}
 </style>
 </head>
 <body>
@@ -2400,7 +2457,7 @@ body:after{
        <summary>HOW PROPERTIES WORK <span>?</span></summary>
        <div class="compact-details-body">Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</div>
      </details>
-     <div class="grid cards" id="props"></div>
+     <div class="territory-property-list" id="props"></div>
    </div>
  </details>
 
@@ -2442,28 +2499,28 @@ body:after{
      </div>
    </div>
  </details>
-<details class="fold-card">
-  <summary>Profile Stats <span>tap to expand</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>PROFILE STATS <span>overview</span></summary>
   <div class="fold-body"><div class="profile-grid" id="profile"></div></div>
 </details>
-<details class="fold-card">
-  <summary>Campaign Progress <span>tap to expand</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>CAMPAIGN PROGRESS <span>chapters / rewards</span></summary>
   <div class="fold-body"><div id="campaignList" class="campaign-list"></div></div>
 </details>
-<details class="fold-card">
-  <summary>Collections & Rare Loot <span>tap to expand</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>COLLECTIONS & RARE LOOT <span>inventory / sets</span></summary>
   <div class="fold-body"><div id="collections"></div></div>
 </details>
-<details class="fold-card">
-  <summary>Achievements <span>tap to expand</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>ACHIEVEMENTS <span>milestones</span></summary>
   <div class="fold-body"><div id="ach"></div></div>
 </details>
-<details class="fold-card">
-  <summary>Underworld Services <span>bank / hospital</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>UNDERWORLD SERVICES <span>bank / hospital</span></summary>
   <div class="fold-body"><div id="underworldServices"></div></div>
 </details>
-<details class="fold-card">
-  <summary>Kingpin Prestige <span>endgame progression</span></summary>
+<details class="fold-card tab-section-fold">
+  <summary>KINGPIN PRESTIGE <span>endgame progression</span></summary>
   <div class="fold-body"><div id="prestigePanel"></div></div>
 </details>
 
@@ -2486,7 +2543,7 @@ body:after{
 </details>
 
 <details class="fold-card tab-section-fold">
-  <summary>AUDIO CREDITS <span>Web Audio</span></summary>
+  <summary>AUDIO CREDITS <span>web audio</span></summary>
   <div class="fold-body"><p>Theme music and gameplay sound effects are generated locally with Web Audio for reliable playback.</p></div>
 </details>
 
@@ -2674,7 +2731,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.3";
+const BUILD_NUMBER="0.22.4";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -6838,32 +6895,36 @@ function renderTerritory(){
 
  const ownedCount=territoryDefs.filter(t=>state.territory[t.id]?.owned).length;
  const totalTerritoryIncome=territoryDefs.filter(t=>state.territory[t.id]?.owned).reduce((n,t)=>n+t.income,0);
- incomeEl.innerHTML=`<div class="territory-summary-bar">
-   <div class="territory-summary-chip"><b>Empire Income</b><span>Net <strong>${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr</strong></span></div>
-   <div class="territory-summary-chip"><b>Controlled Ground</b><span><strong>${ownedCount}/${territoryDefs.length}</strong> districts · ${money(totalTerritoryIncome)}/hr from territory</span></div>
-   <div class="territory-summary-chip"><b>Heat & Pressure</b><span>Use fights and takeovers to cool Heat while pushing rival factions off the board.</span></div>
+ incomeEl.innerHTML=`<div class="territory-toolbar">
+   <div class="territory-toolbar-stat"><span>NET INCOME</span><b>${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr</b></div>
+   <div class="territory-toolbar-stat"><span>CONTROL</span><b>${ownedCount}/${territoryDefs.length}</b></div>
+   <div class="territory-toolbar-stat"><span>TERRITORY</span><b>+${money(totalTerritoryIncome)}/hr</b></div>
  </div>`;
 
  propsEl.innerHTML=propDefs.map(p=>{
    const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
    const access=catalogAccess(p),elite=p.cost>=75000;
-   return `<div class="card ${elite?"elite-catalog-item":""}">
-     <div class="sprite-art ${String(spriteForProperty(p)).startsWith("2:")?"sheet2-art":""}">${spriteIconHtml(spriteForProperty(p),"hero")}</div>
-     <h3>${p.name}</h3>
-     <div class="meta">
-       <span class="badge">Owned ${q}</span>
-       <span class="badge green">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
-       <span class="badge">${money(c)} next</span>
-       ${elite?`<span class="badge gold">HIGH-END</span>`:""}
-       ${p.crewReq?`<span class="badge ${access.crewMet?"green":"red"}">Crew ${crewSize()}/${p.crewReq}</span>`:""}
+   const netEach=Math.max(0,p.income-p.upkeep);
+   const reqs=[
+     `<span class="gear-req ${state.level>=p.level?"met":"missing"}">LVL ${p.level}</span>`,
+     p.crewReq?`<span class="gear-req ${access.crewMet?"met":"missing"}">CREW ${crewSize()}/${p.crewReq}</span>`:""
+   ].filter(Boolean).join("");
+   return `<div class="territory-property-item ${elite?"elite":""} ${access.locked?"locked":""}">
+     <div class="territory-property-main">
+       <div class="territory-property-icon">${spriteIconHtml(spriteForProperty(p),"shop")}</div>
+       <div class="territory-property-copy">
+         <div class="territory-property-name-row"><div class="territory-property-name">${p.name}</div>${elite?'<span class="gear-grade-tag high">HIGH-END</span>':""}</div>
+         <div class="territory-property-statline"><span>OWNED <b>${q}</b></span><span>NET <b>+${money(netEach)}/hr</b></span><span>UPKEEP <b>${money(p.upkeep)}/hr</b></span></div>
+         <div class="territory-property-desc">${p.desc}</div>
+       </div>
+       <div class="territory-property-price"><b>${money(c)}</b><span>NEXT</span></div>
      </div>
-     <details class="compact-details">
-       <summary>PROPERTY DETAILS</summary>
-       <div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each.${p.crewReq?`<br>Organization requirement: Level ${p.level} · Crew ${p.crewReq}.`:""} Buying another permanently increases passive income.</div>
-     </details>
-     <button class="btn green" onclick="buyProp('${p.id}')" ${access.locked||state.cash<c?"disabled":""}>
-       ${access.locked?catalogLockText(p):`BUY PROPERTY · ${money(c)}`}
-     </button>
+     <div class="gear-shop-requirements">${reqs}</div>
+     <div class="territory-property-buyrow">
+       <div class="territory-property-income">Gross ${money(p.income)}/hr each · permanent passive income</div>
+       <button class="btn green territory-property-buy" onclick="buyProp('${p.id}')" ${access.locked||state.cash<c?"disabled":""}>${access.locked?catalogLockText(p):`BUY · ${money(c)}`}</button>
+     </div>
+     <details class="compact-details gear-shop-details"><summary>DETAILS</summary><div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each.${p.crewReq?`<br>Organization requirement: Level ${p.level} · Crew ${p.crewReq}.`:""}</div></details>
    </div>`;
  }).join("");
 
@@ -6937,7 +6998,7 @@ function renderTerritory(){
    </div>`;
  }).join("")}</div>`;
 
- factionsEl.innerHTML=`<div class="section-title"><h2>Rival Factions</h2><span>who controls the ground you want</span></div><details class="compact-details explainer-details"><summary>HOW RIVAL FACTIONS WORK <span>?</span></summary><div class="compact-details-body">Rival factions are the organizations standing between you and new territory. Strength makes their districts harder to take. Pressure rises as you successfully contest them. The reward is not the faction itself: it is the income, Notoriety, and control you gain by dismantling their hold.</div></details>${factionRows}<div class="section-title" style="margin-top:10px"><h2>Territory Takeovers</h2><span>2 stamina per move</span></div>${territoryRows}`;
+ factionsEl.innerHTML=`<div class="territory-subhead"><b>RIVAL FACTIONS</b><span>pressure / resistance</span></div><details class="compact-details explainer-details"><summary>HOW RIVAL FACTIONS WORK <span>?</span></summary><div class="compact-details-body">Rival factions are the organizations standing between you and new territory. Strength makes their districts harder to take. Pressure rises as you successfully contest them. The reward is not the faction itself: it is the income, Notoriety, and control you gain by dismantling their hold.</div></details>${factionRows}<div class="territory-subhead territory-subhead-spaced"><b>TERRITORY TAKEOVERS</b><span>${spriteIconHtml("stamina","xs")} 2 per move</span></div>${territoryRows}`;
 }
 function achievementDefs(){
  const defs=[],add=(category,prefix,targets,current,labelFn)=>targets.forEach((t,i)=>defs.push({id:`${prefix}_${t}`,category,title:labelFn(t,i),target:t,current:Math.floor(current())}));
