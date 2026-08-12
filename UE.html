@@ -3041,7 +3041,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.28";
+const BUILD_NUMBER="0.22.29";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5145,6 +5145,22 @@ const STAT_HELP={
  heat:{title:"Heat",text:"Heat is separate for East Harbor, Downtown, and Northside. The HUD shows the currently selected location. Higher local Heat lowers local Job success and can trigger cleanup costs or arrests. Each location also has its own passive recovery timer."}
 };
 let heatMenuSelectedCity="";
+const HEAT_INFLUENCE_TARGETS=[
+ "guard","judge","prosecutor","witness","detective","court clerk","patrol captain","evidence technician","investigator","inspector","dispatcher","records clerk"
+];
+let heatMenuFlavor={cash:"",blackmail:""};
+function randomHeatInfluenceTarget(exclude=""){
+ const pool=HEAT_INFLUENCE_TARGETS.filter(x=>x!==exclude);
+ return pool[rnd(0,pool.length-1)]||HEAT_INFLUENCE_TARGETS[0];
+}
+function rollHeatMenuFlavor(){
+ const cash=randomHeatInfluenceTarget();
+ heatMenuFlavor={cash,blackmail:randomHeatInfluenceTarget(cash)};
+}
+function heatInfluenceTargetLabel(target){
+ const t=String(target||"").trim();
+ return `${/^[aeiou]/i.test(t)?"AN":"A"} ${t.toUpperCase()}`;
+}
 function heatMenuCity(){
  return heatCityId(heatMenuSelectedCity||state.currentCity);
 }
@@ -5169,7 +5185,8 @@ function showStatHelp(key,e){
    if(key==="heat"){
      const modal=document.getElementById("statHelpModal");
      const wasHeatOpen=modal?.classList.contains("show")&&document.getElementById("statHelpTitle")?.textContent==="Heat";
-     if(!wasHeatOpen||!heatMenuSelectedCity)heatMenuSelectedCity=heatCityId(state.currentCity);
+     if(!wasHeatOpen||!heatMenuSelectedCity){heatMenuSelectedCity=heatCityId(state.currentCity);rollHeatMenuFlavor()}
+     if(!heatMenuFlavor.cash||!heatMenuFlavor.blackmail)rollHeatMenuFlavor();
      const city=heatMenuCity(),heat=heatForCity(city),layWait=layLowRemaining(city),cashCost=cashHeatBribeCost(),cashPct=cashHeatBribePercent(now(),city),cashReset=cashHeatBribeResetRemaining(now(),city),quiet=heatQuietRecoveryActive(now(),city),decay=heatDecayMs(now(),city),blackmail=Math.max(0,Math.floor(Number(state.loot["Blackmail"])||0));
      const status=heatActionStatusText(city);
      const bribeResetText=cashReset>0?`Resets in ${fmt(cashReset)}`:"First bribe this hour";
@@ -5193,11 +5210,11 @@ function showStatHelp(key,e){
          </div>
          <div class="heat-action">
            <div><div class="heat-action-title">CASH BRIBE</div><div class="heat-action-desc">Costs $2,000 × Level. Effectiveness decreases with consecutive bribes during the one-hour window.</div></div>
-           <button class="btn secondary" onclick="cashHeatBribe('${city}')" ${heat<=0||state.cash<cashCost?"disabled":""}>${money(cashCost)} · -${cashPct}% HEAT</button>
+           <button class="btn secondary" onclick="cashHeatBribe('${city}')" ${heat<=0||state.cash<cashCost?"disabled":""}>BRIBE ${heatInfluenceTargetLabel(heatMenuFlavor.cash)} · ${money(cashCost)} · -${cashPct}% HEAT</button>
          </div>
          <div class="heat-action">
            <div><div class="heat-action-title">BLACKMAIL</div><div class="heat-action-desc">Consume one Blackmail from your stash to reduce local Heat.</div></div>
-           <button class="btn secondary" onclick="useBlackmail('${city}')" ${heat<=0||blackmail<=0?"disabled":""}>USE 1 · -5 HEAT</button>
+           <button class="btn secondary" onclick="useBlackmail('${city}')" ${heat<=0||blackmail<=0?"disabled":""}>BLACKMAIL ${heatInfluenceTargetLabel(heatMenuFlavor.blackmail)} · 1 BLACKMAIL · -5 HEAT</button>
          </div>
          <div class="heat-action">
            <div><div class="heat-action-title">FULL WIPE</div><div class="heat-action-desc">Spend 10 Gold Bars to immediately clear all Heat in ${heatCityName(city)}.</div></div>
@@ -6919,7 +6936,7 @@ function cashHeatBribe(city=state.currentCity){
  if(!(meta.bribeCount>0)||!meta.bribeWindowStart)meta.bribeWindowStart=now();meta.bribeCount=(Number(meta.bribeCount)||0)+1;
  const nextPct=cashHeatBribePercent(now(),city),reset=cashHeatBribeResetRemaining(now(),city);
  log(`Paid ${money(cost)} in ${heatCityName(city)} cash bribes and reduced Heat by ${heatDrop} (${pct}% of current Heat).`);
- showActionFlash("CASH BRIBE PAID",`${heatCityName(city)} · ${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");S.cash();save();render();refreshOpenHeatControls();
+ showActionFlash("CASH BRIBE PAID",`${heatCityName(city)} · ${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");S.cash();save();render();rollHeatMenuFlavor();refreshOpenHeatControls();
 }
 function useBlackmail(city=state.currentCity){
  const qty=Math.max(0,Math.floor(Number(state.loot["Blackmail"])||0));if(qty<=0)return toast("You do not have any Blackmail.");
@@ -6929,7 +6946,7 @@ function useBlackmail(city=state.currentCity){
  state.loot["Blackmail"]=qty-1;if(state.loot["Blackmail"]<=0)delete state.loot["Blackmail"];
  setHeatForCity(city,heat-heatDrop);heatMeta(city).lastDecay=now();
  log(`Used Blackmail to reduce ${heatCityName(city)} Heat by ${heatDrop}.`);
- showActionFlash("BLACKMAIL USED",`${heatCityName(city)} · -${heatDrop} Heat · ${Math.max(0,qty-1)} remaining`,"good");save();render();refreshOpenHeatControls();
+ showActionFlash("BLACKMAIL USED",`${heatCityName(city)} · -${heatDrop} Heat · ${Math.max(0,qty-1)} remaining`,"good");save();render();rollHeatMenuFlavor();refreshOpenHeatControls();
 }
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);
