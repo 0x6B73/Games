@@ -1151,17 +1151,134 @@ function fresh(){
  return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
- currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
 let state=load();migrate();
-function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
-function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!("playerPhoto" in state))state.playerPhoto="";if(!state.customFriends)state.customFriends={};if(!Number.isInteger(state.campaignIndex))state.campaignIndex=0;if(!state.campaignClaimed)state.campaignClaimed={};if(!state.achievementUnlocked)state.achievementUnlocked={};["lifetimeJobs","lifetimeCashEarned","lifetimeCashSpent","lifetimeFights","lifetimeTerritoryMoves","lifetimeEnergyPurchases"].forEach(k=>{if(!Number.isFinite(state[k]))state[k]=0});if(!("whale" in state))state.whale=false;if(!Object.keys(state.campaignClaimed||{}).some(k=>k.startsWith("campaign_"))){state.campaignClaimed={};state.campaignIndex=0;}if(state.lifetimeJobs===0)state.lifetimeJobs=Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0)*5+(j.runs||0),0);if(state.lifetimeFights===0)state.lifetimeFights=(state.wins||0)+(state.losses||0);if(state.lifetimeCashEarned===0)state.lifetimeCashEarned=Math.max(0,Math.floor(state.cash||0));if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];
- const regenBase=state.lastTick||now();
- if(!state.lastEnergyRegen)state.lastEnergyRegen=regenBase;
- if(!state.lastStaminaRegen)state.lastStaminaRegen=regenBase;
- if(!state.lastHealthRegen)state.lastHealthRegen=regenBase;if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
-function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function load(){
+ try{
+   const raw=localStorage.getItem(KEY);
+   if(!raw)return fresh();
+   const parsed=JSON.parse(raw);
+   if(!parsed||typeof parsed!=="object"||Array.isArray(parsed))return fresh();
+   return Object.assign(fresh(),parsed);
+ }catch(e){
+   console.error("Save load failed; starting from a clean state.",e);
+   return fresh();
+ }
+}
+function migrate(){
+ const defaults=fresh();
+
+ if(!state||typeof state!=="object")state=defaults;
+
+ // Primitive/default fields.
+ for(const [k,v] of Object.entries(defaults)){
+   if(!(k in state)||state[k]===null||state[k]===undefined)state[k]=v;
+ }
+
+ if(typeof state.playerName!=="string")state.playerName="";
+ if(typeof state.playerPhoto!=="string")state.playerPhoto="";
+ if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
+ if(!state.campaignClaimed||typeof state.campaignClaimed!=="object")state.campaignClaimed={};
+ if(!state.achievementUnlocked||typeof state.achievementUnlocked!=="object")state.achievementUnlocked={};
+
+ if(!Number.isInteger(state.campaignIndex)||state.campaignIndex<0)state.campaignIndex=0;
+ state.campaignIndex=Math.min(state.campaignIndex,Math.max(0,campaignDefs.length-1));
+
+ ["lifetimeJobs","lifetimeCashEarned","lifetimeCashSpent","lifetimeFights","lifetimeTerritoryMoves","lifetimeEnergyPurchases"]
+   .forEach(k=>{if(!Number.isFinite(state[k])||state[k]<0)state[k]=0});
+
+ if(typeof state.whale!=="boolean")state.whale=false;
+
+ // Reconstruct lifetime stats for older saves.
+ if(state.lifetimeJobs===0){
+   state.lifetimeJobs=Object.values(state.jobs||{}).reduce((n,j)=>n+((j?.mastery||0)*5)+(j?.runs||0),0);
+ }
+ if(state.lifetimeFights===0)state.lifetimeFights=(state.wins||0)+(state.losses||0);
+ if(state.lifetimeCashEarned===0)state.lifetimeCashEarned=Math.max(0,Math.floor(Number(state.cash)||0));
+
+ // Core dictionaries.
+ for(const key of ["gear","props","jobs","loot","factions","bosses"]){
+   if(!state[key]||typeof state[key]!=="object")state[key]={...defaults[key]};
+ }
+ if(!Array.isArray(state.inbox))state.inbox=[];
+ if(!Array.isArray(state.revenge))state.revenge=[];
+ if(!Array.isArray(state.pendingAttacks))state.pendingAttacks=[];
+ if(!Array.isArray(state.log))state.log=[...defaults.log];
+
+ // Normalize built-in contacts while retaining custom contacts.
+ if(!state.friends||typeof state.friends!=="object")state.friends={};
+ const baseFriends=defaults.friends;
+ for(const [id,base] of Object.entries(baseFriends)){
+   state.friends[id]=Object.assign({},base,state.friends[id]||{});
+ }
+ for(const [id,f] of Object.entries(state.friends)){
+   if(!f||typeof f!=="object"){delete state.friends[id];continue}
+   state.friends[id]=Object.assign({
+     rel:50,trust:50,respect:50,fear:10,resentment:0,crew:false,
+     lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],
+     injuredUntil:0,arrestedUntil:0,gifts:0
+   },f);
+   if(!Array.isArray(state.friends[id].chat))state.friends[id].chat=[];
+ }
+
+ if(!state.potentials||typeof state.potentials!=="object")state.potentials={};
+ for(const [id,base] of Object.entries(defaults.potentials)){
+   state.potentials[id]=Object.assign({},base,state.potentials[id]||{});
+   if(!Array.isArray(state.potentials[id].chat))state.potentials[id].chat=[];
+ }
+
+ if(!state.territory||typeof state.territory!=="object")state.territory={};
+ for(const [id,base] of Object.entries(defaults.territory)){
+   state.territory[id]=Object.assign({},base,state.territory[id]||{});
+ }
+
+ if(!state.daily||typeof state.daily!=="object")state.daily={last:"",streak:0};
+ if(!state.event||typeof state.event!=="object")state.event={id:"weekend",ends:now()+86400000};
+
+ const regenBase=Number(state.lastTick)||now();
+ if(!Number.isFinite(state.lastEnergyRegen))state.lastEnergyRegen=regenBase;
+ if(!Number.isFinite(state.lastStaminaRegen))state.lastStaminaRegen=regenBase;
+ if(!Number.isFinite(state.lastHealthRegen))state.lastHealthRegen=regenBase;
+ if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=regenBase;
+ if(!Number.isFinite(state.lastIncome))state.lastIncome=now();
+ if(!Number.isFinite(state.lastUpkeep))state.lastUpkeep=now();
+ if(!Number.isFinite(state.lastSocial))state.lastSocial=now();
+ if(!Number.isFinite(state.lastAttack))state.lastAttack=now();
+ if(!Number.isFinite(state.lastTick))state.lastTick=now();
+
+ if(!cities.some(c=>c.id===state.currentCity))state.currentCity="east";
+
+ // Clamp important numeric values.
+ const numericDefaults=["level","xp","skill","cash","hp","maxHp","en","maxEn","st","maxSt","attack","defense","wins","losses","heat","notoriety"];
+ numericDefaults.forEach(k=>{
+   if(!Number.isFinite(Number(state[k])))state[k]=defaults[k];
+   else state[k]=Number(state[k]);
+ });
+ state.level=Math.max(1,Math.floor(state.level));
+ state.cash=Math.max(0,state.cash);
+ state.maxHp=Math.max(1,state.maxHp); state.hp=Math.max(0,Math.min(state.hp,state.maxHp));
+ state.maxEn=Math.max(1,state.maxEn); state.en=Math.max(0,Math.min(state.en,state.maxEn));
+ state.maxSt=Math.max(1,state.maxSt); state.st=Math.max(0,Math.min(state.st,state.maxSt));
+ state.heat=Math.max(0,Math.min(100,state.heat));
+
+ // Whale status is permanent after the fifth simulated purchase.
+ if(state.lifetimeEnergyPurchases>=5)state.whale=true;
+}
+function save(){
+ try{
+   localStorage.setItem(KEY,JSON.stringify(state));
+   return true;
+ }catch(e){
+   console.error("Save failed.",e);
+   const msg=e?.name==="QuotaExceededError"
+     ?"Save storage is full. Large custom profile pictures may need to be removed."
+     :"Progress could not be saved in this browser.";
+   if(typeof toast==="function")toast(msg);
+   return false;
+ }
+}
 function xpNeed(){return 100+(state.level-1)*65}
 function activeTier(){let t=0;tiers.forEach((x,i)=>{if(state.level>=x.level)t=i});return t}
 function cityDef(){return cities.find(c=>c.id===state.currentCity)||cities[0]}
@@ -1828,11 +1945,47 @@ function applyRegeneration(t=now()){
 
 function tick(){
  const t=now();
+
  applyRegeneration(t);
- if(state.heat>0){const cool=Math.floor(d/300000);if(cool)state.heat=Math.max(0,state.heat-cool)}
- const hrs=(t-state.lastIncome)/3600000;if(hrs>=1/60){state.cash+=Math.max(0,netIncome())*hrs;state.lastIncome=t}
- if(t-state.lastUpkeep>3600000&&netIncome()<0){state.cash=Math.max(0,state.cash+netIncome());state.lastUpkeep=t;log("Upkeep exceeded income. Cash reserves were used.")}
- save();render();maybeSocialEvent();maybeGift();maybeIncomingAttack()
+
+ // Heat cools by 1 every 5 minutes and uses its own clock.
+ if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=t;
+ if(state.heat>0){
+   const elapsed=Math.max(0,t-state.lastHeatDecay);
+   const cool=Math.floor(elapsed/300000);
+   if(cool>0){
+     state.heat=Math.max(0,state.heat-cool);
+     state.lastHeatDecay+=cool*300000;
+     if(state.heat<=0)state.lastHeatDecay=t;
+   }
+ }else{
+   state.lastHeatDecay=t;
+ }
+
+ // Passive income.
+ if(!Number.isFinite(state.lastIncome))state.lastIncome=t;
+ const hrs=Math.max(0,(t-state.lastIncome)/3600000);
+ if(hrs>=1/60){
+   const earned=Math.max(0,netIncome())*hrs;
+   state.cash+=earned;
+   state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+earned;
+   state.lastIncome=t;
+ }
+
+ // Negative hourly economy, if applicable.
+ if(!Number.isFinite(state.lastUpkeep))state.lastUpkeep=t;
+ if(t-state.lastUpkeep>=3600000&&netIncome()<0){
+   state.cash=Math.max(0,state.cash+netIncome());
+   state.lastUpkeep=t;
+   log("Upkeep exceeded income. Cash reserves were used.");
+ }
+
+ save();
+
+ try{render()}catch(e){console.error("Render failed",e)}
+ try{maybeSocialEvent()}catch(e){console.error("Social event failed",e)}
+ try{maybeGift()}catch(e){console.error("Gift event failed",e)}
+ try{maybeIncomingAttack()}catch(e){console.error("Incoming attack failed",e)}
 }
 function go(v){const target=document.getElementById("view-"+v);if(!target)return;document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.v===v));window.scrollTo({top:0,behavior:"auto"});S.tap()}
 function exportSave(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(state))));navigator.clipboard?.writeText(d).then(()=>toast("Save copied")).catch(()=>prompt("Copy save:",d))}
@@ -1847,7 +2000,12 @@ document.addEventListener("click",e=>{
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
-setInterval(tick,15000);setInterval(updateRegenTimers,1000);setInterval(processPendingAttacks,1000);tick();setTimeout(()=>{if(state.playerName)startTutorial();else promptForPlayerName()},350);setTimeout(tryAutoTheme,500);
+setInterval(()=>{try{tick()}catch(e){console.error("Tick failed",e)}},15000);
+setInterval(()=>{try{updateRegenTimers()}catch(e){}},1000);
+setInterval(()=>{try{processPendingAttacks()}catch(e){console.error("Attack timer failed",e)}},1000);
+try{tick()}catch(e){console.error("Initial tick failed",e);try{render()}catch(renderError){console.error("Initial render failed",renderError)}}
+setTimeout(()=>{try{if(state.playerName)startTutorial();else promptForPlayerName()}catch(e){console.error("Onboarding failed",e)}},350);
+setTimeout(()=>{try{tryAutoTheme()}catch(e){console.error("Theme startup failed",e)}},500);
 
 function updateMiniHudVisibility(){
  const hud=document.getElementById("miniHud");
