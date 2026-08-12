@@ -101,7 +101,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .facility-name .ue-sprite,.gold-infra-name .ue-sprite{width:20px;height:20px}
 
 .meta{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.badge{font-size:10px;padding:4px 6px;border:1px solid #40382c;background:#0b0a08}.badge.red{border-color:#6a2c2c;color:#d6aaa0}.badge.gold{color:#d2aa65}
-.btn{border:1px solid #6d542b;background:var(--gold);color:#100c07;font-weight:900;padding:9px 10px;width:100%;border-radius:2px}.btn:disabled{opacity:.38;cursor:not-allowed}.btn.secondary{background:#26221b;color:var(--text);border-color:#4b4032}.btn.red{background:var(--red);color:#fff;border-color:#a83b3b}.btn.green{background:var(--green);color:#fff}.btn.small{width:auto;padding:6px 8px;font-size:10px}
+.btn{border:1px solid #6d542b;background:var(--gold);color:#100c07;font-weight:900;padding:9px 10px;width:100%;border-radius:2px}.btn:disabled{opacity:.38;cursor:not-allowed}.btn.secondary{background:#26221b;color:var(--text);border-color:#4b4032}.btn.red{background:var(--red);color:#fff;border-color:#a83b3b}.btn.green{background:var(--green);color:#fff}.btn.green:disabled{background:#2b2b2b!important;border-color:#555!important;color:#777!important;opacity:.72}.btn.small{width:auto;padding:6px 8px;font-size:10px}
 .row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:9px}.row+.row{margin-top:5px}.title{font-weight:900}.sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}.right{text-align:right}
 .notice{background:#1b0d0c;border:1px solid #602424;border-left:5px solid #9a3030;padding:9px;margin-bottom:8px}.notice h3{margin:0 0 3px;font-size:14px}.notice p{font-size:11px;color:#c0aa99;margin:0 0 7px;line-height:1.4}.actions{display:grid;grid-template-columns:1fr;gap:5px}
 .skillgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.skill{background:#0e0d0b;border:1px solid var(--line);padding:7px;text-align:center;font-size:10px}.skill strong{display:block;font-size:18px;margin:2px 0}
@@ -2958,7 +2958,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.19";
+const BUILD_NUMBER="0.22.20";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -6659,12 +6659,16 @@ function maybeHeatEvent(city=state.currentCity){
    showActionFlash("HEAT CLEANUP",`${heatCityName(id)} · ${money(250)} paid · Heat reduced by 12`,"cash");
  }else arrestRandomCrew();
 }
+function refreshOpenHeatControls(){
+ const modal=document.getElementById("statHelpModal");
+ if(modal?.classList.contains("show")&&document.getElementById("statHelpTitle")?.textContent==="Heat")showStatHelp("heat");
+}
 function layLow(){
  const city=state.currentCity,heat=currentHeat();if(heat<=0)return toast(`${heatCityName(city)} Heat is already at 0.`);
  const remaining=layLowRemaining(city);if(remaining>0)return showRequirementPopup(`Lay Low in ${heatCityName(city)} is available again in ${fmt(remaining)}.`);
  const oldHeat=heat;setHeatForCity(city,heat-15);heatMeta(city).lastLayLow=now();
  const heatDrop=Math.floor(oldHeat-currentHeat());log(`You laid low in ${heatCityName(city)} and reduced Heat by ${heatDrop}.`);
- showActionFlash("LAID LOW",`${heatCityName(city)} · -${heatDrop} Heat · Ready again in 10m`,"good");save();render();
+ showActionFlash("LAID LOW",`${heatCityName(city)} · -${heatDrop} Heat · Ready again in 10m`,"good");save();render();refreshOpenHeatControls();
 }
 function cashHeatBribe(){
  const city=state.currentCity,heat=currentHeat();if(heat<=0)return toast(`${heatCityName(city)} Heat is already at 0.`);
@@ -6675,7 +6679,7 @@ function cashHeatBribe(){
  if(!(meta.bribeCount>0)||!meta.bribeWindowStart)meta.bribeWindowStart=now();meta.bribeCount=(Number(meta.bribeCount)||0)+1;
  const nextPct=cashHeatBribePercent(now(),city),reset=cashHeatBribeResetRemaining(now(),city);
  log(`Paid ${money(cost)} in ${heatCityName(city)} cash bribes and reduced Heat by ${heatDrop} (${pct}% of current Heat).`);
- showActionFlash("CASH BRIBE PAID",`${heatCityName(city)} · ${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");S.cash();save();render();
+ showActionFlash("CASH BRIBE PAID",`${heatCityName(city)} · ${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");S.cash();save();render();refreshOpenHeatControls();
 }
 function useBlackmail(){
  const qty=Math.max(0,Math.floor(Number(state.loot["Blackmail"])||0));if(qty<=0)return toast("You do not have any Blackmail.");
@@ -6684,7 +6688,7 @@ function useBlackmail(){
  state.loot["Blackmail"]=qty-1;if(state.loot["Blackmail"]<=0)delete state.loot["Blackmail"];
  setHeatForCity(city,heat-heatDrop);heatMeta(city).lastDecay=now();
  log(`Used Blackmail to reduce ${heatCityName(city)} Heat by ${heatDrop}.`);
- showActionFlash("BLACKMAIL USED",`${heatCityName(city)} · -${heatDrop} Heat · ${Math.max(0,qty-1)} remaining`,"good");save();render();
+ showActionFlash("BLACKMAIL USED",`${heatCityName(city)} · -${heatDrop} Heat · ${Math.max(0,qty-1)} remaining`,"good");save();render();refreshOpenHeatControls();
 }
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);
