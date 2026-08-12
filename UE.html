@@ -125,16 +125,16 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .checkout-grid{display:grid;gap:7px;margin:9px 0}.checkout-grid label{font-size:10px;color:#b5a898}.checkout-grid input{width:100%;margin-top:3px;padding:8px;background:#070706;color:#ddd;border:1px solid #4a4034}
 .nav{position:fixed;inset:auto 0 0 0;z-index:2147483000;height:calc(var(--navh) + var(--safe));background:#080706;border-top:1px solid #4a4033;box-shadow:0 -8px 24px #000b;padding-bottom:var(--safe)}.navin{height:var(--navh);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;padding:2px 3px}.nav button{min-width:0;border:0;background:transparent;color:#91897e;padding:2px 1px 3px;font-size:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;overflow:visible}
 .nav button.active{background:linear-gradient(180deg,rgba(209,173,67,.08),rgba(209,173,67,.025));color:#fff}
-.nav button .ico{display:flex;align-items:center;justify-content:center;width:29px;height:29px;margin:0;overflow:visible}
-.nav-icon{display:block;width:27px;height:27px;background-image:var(--ue-nav-sprite);background-repeat:no-repeat;background-size:700% 100%;filter:brightness(1.10) saturate(1.10);transform:translateZ(0)}
-.nav-icon-home{background-position:0% 0}
-.nav-icon-jobs{background-position:16.6667% 0}
-.nav-icon-crew{background-position:33.3333% 0}
-.nav-icon-fight{background-position:50% 0}
-.nav-icon-gear{background-position:66.6667% 0}
-.nav-icon-territory{background-position:83.3333% 0}
-.nav-icon-more{background-position:100% 0}
-.nav button .nav-label{line-height:1;letter-spacing:.035em;font-size:7px;font-weight:900}
+.nav button .ico{display:flex;align-items:center;justify-content:center;width:30px;height:30px;margin:0 auto;overflow:hidden}
+.nav-icon{display:block;width:28px;height:28px;background-image:var(--ue-nav-sprite);background-repeat:no-repeat;background-size:392px 56px;filter:brightness(1.12) saturate(1.14);transform:translateZ(0);background-position:0 0}
+.nav-icon-home{background-position:0 0}
+.nav-icon-jobs{background-position:-56px 0}
+.nav-icon-crew{background-position:-112px 0}
+.nav-icon-fight{background-position:-168px 0}
+.nav-icon-gear{background-position:-224px 0}
+.nav-icon-territory{background-position:-280px 0}
+.nav-icon-more{background-position:-336px 0}
+.nav button .nav-label{line-height:1;letter-spacing:.035em;font-size:7px;font-weight:900;margin-top:1px}
 .nav button.active .nav-label{color:#f1dfb0}
 .nav button.active .nav-icon{filter:brightness(1.32) saturate(1.18) drop-shadow(0 0 5px rgba(221,177,65,.6))}
 .nav button.active:after{content:"";position:absolute;left:17%;right:17%;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#d8b54e,transparent);box-shadow:0 0 5px rgba(216,181,78,.55)}
@@ -2058,6 +2058,44 @@ body:after{
   background:#151109;color:#d1b764;font-size:7px;font-weight:900
 }
 
+
+/* TERRITORY + CREW + FIGHT POLISH */
+.territory-summary-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:0 0 8px}
+.territory-summary-chip{padding:7px 8px;border:1px solid #403a2d;border-left:3px solid #7a6336;background:linear-gradient(#151412,#090a0b);min-width:0}
+.territory-summary-chip b{display:block;font-size:10px;color:#e3d6bf}
+.territory-summary-chip span{display:block;margin-top:2px;font-size:8px;color:#958d80;line-height:1.3}
+.territory-summary-chip strong{color:#d4b259}
+.faction-list,.territory-list{display:grid;gap:6px}
+.faction-card,.territory-card{border:1px solid #38393b;background:linear-gradient(#131517,#090a0b);padding:8px}
+.faction-card{border-left:3px solid #705833}.territory-card{border-left:3px solid #6b522f}
+.territory-card.enemy{border-left-color:#7e3d34}.territory-card.owned{border-left-color:#5b7d43;background:linear-gradient(#121812,#080b08)}
+.faction-card-head,.territory-card-head{display:flex;gap:8px;align-items:flex-start}
+.faction-title-copy,.territory-title-copy{min-width:0;flex:1}
+.faction-title-row,.territory-title-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.faction-title-row .title,.territory-title-row .title{font-size:12px;color:#e7dcc8}
+.faction-icon-wrap,.territory-icon-wrap{width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:1px solid #423c33;background:linear-gradient(#17191b,#0b0c0d)}
+.territory-card.owned .territory-icon-wrap{border-color:#4a5b40}
+.faction-meta,.territory-meta{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.faction-note,.territory-note,.territory-progress-copy,.territory-subline{font-size:8px;line-height:1.4}
+.faction-note,.territory-note,.territory-progress-copy{margin-top:4px;color:#9f978b}.territory-subline{margin-top:2px;color:#a6a093}
+.faction-pressure{margin-top:5px}.territory-action{margin-top:7px;width:100%}
+.crew-directory{display:grid;gap:6px}
+.friend{grid-template-columns:44px minmax(0,1fr);gap:8px;padding:8px;border:1px solid #383a3d;border-left:3px solid #75623b;background:linear-gradient(#131517,#090a0b);border-bottom:0}
+.friend.contact-offline{border-left-color:#5d5447;background:linear-gradient(#111214,#090a0b)}
+.friend.contact-inactive{border-left-color:#7a3f38;background:linear-gradient(#151110,#090807);opacity:.9}
+.profile-avatar{width:44px;height:44px;border-color:#6b5a43}.fmeta{display:none}
+.fname{font-size:11px;color:#e4d6be;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.ftag{font-size:8px;color:#b59f74;margin:3px 0 0;font-style:normal;line-height:1.35}
+.crew-meta-pills{display:flex;flex-wrap:wrap;gap:3px;margin-top:5px}
+.crew-pill{display:inline-flex;align-items:center;gap:3px;padding:2px 4px;border:1px solid #47413a;background:#0d0f10;color:#bdb2a0;font-size:7px;font-weight:900;letter-spacing:.04em}
+.crew-pill.good{border-color:#48613a;color:#9fc47f}.crew-pill.warn{border-color:#7a6132;color:#dfc06c}.crew-pill.bad{border-color:#6d3d36;color:#d59a90}.crew-pill.info{border-color:#3d4b58;color:#9ab0c5}
+.presence-line{margin-top:5px;padding:4px 5px;border:1px solid #34363a;background:#0b0c0e}.presence-line.online{border-color:#415639;background:#090d08}.presence-line.offline{border-color:#5b533f;background:#0f0d0a}.presence-line.inactive{border-color:#6d3d37;background:#120908}
+.fbtns{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-top:4px}
+.fbtns button{min-height:31px;font-size:8px;padding:5px 4px;border:1px solid #4c4133;background:linear-gradient(#d8ccb3,#baa98a);font-weight:900;color:#201812}
+.fbtns button:disabled{background:linear-gradient(#4a4741,#32302b);color:#8e877b;border-color:#5a554e}
+.fight-stamina-badge{display:inline-flex;align-items:center;gap:3px}.fight-stamina-badge .ue-sprite{box-shadow:none}
+@media(max-width:420px){.territory-summary-bar{grid-template-columns:1fr}.fbtns{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -2634,7 +2672,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.21.7";
+const BUILD_NUMBER="0.22.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4168,6 +4206,7 @@ function heatDecayMs(){
  const seconds=ENDGAME_TIER_DEFS.heat.rates[tier-1]||300;
  return seconds*1000;
 }
+function staminaCostMarkup(cost){return `${spriteIconHtml("stamina","xs")} ${cost}`;}
 function fightStaminaCost(o){
  const threat=opponentThreat(o);
  if(threat<=3)return 1;
@@ -6490,6 +6529,7 @@ function renderCrew(){
  });
 
  const visibleIds=Object.keys(state.friends).filter(crewListMatches);
+ friends.classList.add("crew-directory");
  friends.innerHTML=visibleIds.length?visibleIds.map(id=>{
    const d=getPersonDef(id),f=state.friends[id];
    const a=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
@@ -6497,13 +6537,19 @@ function renderCrew(){
    const rep=contactReputation(f);
    const presence=contactPresence(f),responsive=contactCanRespond(f);
    const inactive=f.inactive;
+   const repCls=rep>=95?"good":rep>=70?"warn":rep>=45?"info":"bad";
+   const statusCls=f.crew&&!inactive?"good":inactive?"bad":responsive?"info":"warn";
 
    return `<div class="friend ${inactive?"contact-inactive":responsive?"":"contact-offline"}">
      <img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}">
      <div>
        <div class="fname">${d.name} ${f.crew?spriteIconHtml("crew","xs"):""}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
        <div class="ftag">${d.tag||"Trusted contact"}</div>
-       <div class="fmeta">${d.role} · ${crewStatus(f)}</div>
+       <div class="crew-meta-pills">
+         <span class="crew-pill info">${d.role}</span>
+         <span class="crew-pill ${statusCls}">${crewStatus(f)}</span>
+         <span class="crew-pill ${repCls}">REP ${rep}</span>
+       </div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
        ${inactive?`<div class="inactive-note">Still listed, but no longer responds or contributes active combat power.</div>`:""}
        <details class="compact-details" data-rel-id="${id}" ${openRelationshipDetails.has(id)?"open":""} ontoggle="setRelationshipOpen('${id}',this.open)">
@@ -6528,6 +6574,7 @@ function renderCrew(){
    .filter(p=>state.potentials[p.id]&&!state.potentials[p.id].added&&!state.friends[p.id])
    .sort((a,b)=>(state.potentials[b.id]?.generatedAt||0)-(state.potentials[a.id]?.generatedAt||0));
 
+ potentials.classList.add("crew-directory");
  potentials.innerHTML=potentialList.map(p=>{
    const f=state.potentials[p.id],presence={text:`Last online ${formatPresenceAge(f.lastOnline)}`,cls:(now()-f.lastOnline<CONTACT_RESPONSE_WINDOW_MS)?"online":"offline"};
    return `<div class="friend ${presence.cls==="offline"?"contact-offline":""}">
@@ -6535,7 +6582,11 @@ function renderCrew(){
      <div>
        <div class="fname">${p.name}${p.generated?'<span class="generated-badge">NEW NETWORK</span>':""}</div>
        <div class="ftag">${p.tag}</div>
-       <div class="fmeta">${p.role} · Rapport ${f.rel}/100</div>
+       <div class="crew-meta-pills">
+         <span class="crew-pill info">${p.role}</span>
+         <span class="crew-pill warn">RAPPORT ${f.rel}/100</span>
+         <span class="crew-pill ${presence.cls==="online"?"good":"warn"}">${presence.cls==="online"?"AVAILABLE":"QUIET"}</span>
+       </div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
        <div class="relbar"><div style="width:${f.rel}%"></div></div>
      </div>
@@ -6559,28 +6610,28 @@ function renderFight(){
  fightEl.innerHTML=list.map((o,i)=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o);
    return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
-    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span><span class="fight-stamina-badge">${fightStaminaCost(o)} ST</span></div>
+    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span><span class="fight-stamina-badge">${staminaCostMarkup(fightStaminaCost(o))}</span></div>
     <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
     <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} intimidation`:``}`:""}</div>
    </div><div class="fight-row-actions">
     <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
     <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
-    <button class="btn red small" onclick="fight(${i},false)" ${state.st<fightStaminaCost(o)?"disabled":""}>ATTACK · ${fightStaminaCost(o)} ST</button>
+    <button class="btn red small" onclick="fight(${i},false)" ${state.st<fightStaminaCost(o)?"disabled":""}>ATTACK · ${staminaCostMarkup(fightStaminaCost(o))}</button>
    </div></div></div>`;
  }).join("");
 
  revengeEl.innerHTML=state.revenge.length?state.revenge.map(o=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${spriteIconHtml("2:revenge","sm")} ${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>REVENGE · ${fightStaminaCost(o)} ST</button></div></div></div>`;
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${spriteIconHtml("2:revenge","sm")} ${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>REVENGE · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
  }).join(""):"<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
 
  const placed=state.playerBounties.map(o=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${fightStaminaCost(o)} ST</button></div></div></div>`;
+   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
  }).join("");
  const dynamic=[0,1,2].map(i=>{
    const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${fightStaminaCost(o)} ST</button></div></div></div>`;
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
  }).join("");
  hitEl.innerHTML=placed+dynamic;
 }
@@ -6783,7 +6834,13 @@ function renderTerritory(){
  const facilitySummary=document.getElementById("facilitySummary");
  if(!incomeEl||!factionsEl||!propsEl)return;
 
- incomeEl.textContent=`Net ${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr`;
+ const ownedCount=territoryDefs.filter(t=>state.territory[t.id]?.owned).length;
+ const totalTerritoryIncome=territoryDefs.filter(t=>state.territory[t.id]?.owned).reduce((n,t)=>n+t.income,0);
+ incomeEl.innerHTML=`<div class="territory-summary-bar">
+   <div class="territory-summary-chip"><b>Empire Income</b><span>Net <strong>${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr</strong></span></div>
+   <div class="territory-summary-chip"><b>Controlled Ground</b><span><strong>${ownedCount}/${territoryDefs.length}</strong> districts · ${money(totalTerritoryIncome)}/hr from territory</span></div>
+   <div class="territory-summary-chip"><b>Heat & Pressure</b><span>Use fights and takeovers to cool Heat while pushing rival factions off the board.</span></div>
+ </div>`;
 
  propsEl.innerHTML=propDefs.map(p=>{
    const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
@@ -6841,47 +6898,44 @@ function renderTerritory(){
    if(endgameFacilitiesEl)renderEndgameFacilities();
  }
 
- const factionRows=factions.map(f=>{
+ const factionRows=`<div class="faction-list">${factions.map(f=>{
    const pressure=factionPressure(f),status=factionStatus(pressure);
    const linked=territoryDefs.filter(t=>t.enemy===f.name);
    const controlled=linked.filter(t=>state.territory[t.id]?.owned).length;
-   return `<div class="row">
-     <div>
-       <div class="title">${f.name}</div>
-       <div class="sub">${cities.find(c=>c.id===f.city).name} · Strength ${f.strength} · Pressure ${pressure}% · Controlled ${controlled}/${linked.length}</div>
-       <div class="factionbar"><div style="width:${pressure}%"></div></div>
-       <span class="faction-status ${status.cls}">${status.label}</span>
-       <details class="compact-details">
-         <summary>FACTION DETAILS</summary>
-         <div class="compact-details-body">${f.desc}<br>Successful territory moves raise your pressure. Their Strength is the resistance you face when taking ground; breaking their control converts districts into permanent income and Notoriety.</div>
-       </details>
+   return `<div class="faction-card">
+     <div class="faction-card-head">
+       <div class="faction-icon-wrap">${spriteIconHtml("target","sm")}</div>
+       <div class="faction-title-copy">
+         <div class="faction-title-row"><div class="title">${f.name}</div><span class="faction-status ${status.cls}">${status.label}</span></div>
+         <div class="territory-subline">${cities.find(c=>c.id===f.city).name} · Strength ${f.strength} · Controlled ${controlled}/${linked.length}</div>
+         <div class="faction-meta"><span class="badge">Pressure ${pressure}%</span><span class="badge ${controlled>0?"gold":""}">Districts ${linked.length}</span></div>
+         <div class="faction-pressure"><div class="factionbar"><div style="width:${pressure}%"></div></div></div>
+         <div class="faction-note">${f.desc}</div>
+         <details class="compact-details"><summary>FACTION DETAILS</summary><div class="compact-details-body">Successful territory moves raise your pressure. Their Strength is the resistance you face when taking ground; breaking their control converts districts into permanent income and Notoriety.</div></details>
+       </div>
      </div>
    </div>`;
- }).join("");
+ }).join("")}</div>`;
 
- const territoryRows=territoryDefs.map(t=>{
+ const territoryRows=`<div class="territory-list">${territoryDefs.map(t=>{
    if(!state.territory[t.id])state.territory[t.id]={owned:false,progress:0};
    const s=state.territory[t.id];
-   return `<div class="row territory ${s.owned?"owned":"enemy"}">
-     <div>
-       <div class="title">${t.name}</div>
-       <div class="sub">${cities.find(c=>c.id===t.city).name} · ${t.enemy} · ${money(t.income)}/hr · ${t.reqNot} Notoriety</div>
-       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="sub">Takeover ${s.progress}% · successful moves add 35%</div>`:"<div class='sub'>Controlled · income active</div>"}
-       <details class="compact-details"><summary>TERRITORY DETAILS</summary><div class="compact-details-body">${t.desc}</div></details>
+   return `<div class="territory-card ${s.owned?"owned":"enemy"}">
+     <div class="territory-card-head">
+       <div class="territory-icon-wrap">${spriteIconHtml("territory","sm")}</div>
+       <div class="territory-title-copy">
+         <div class="territory-title-row"><div class="title">${t.name}</div>${s.owned?'<span class="badge green">CONTROLLED</span>':`<span class="badge">${t.enemy}</span>`}</div>
+         <div class="territory-subline">${cities.find(c=>c.id===t.city).name} · ${money(t.income)}/hr · Requires ${t.reqNot} Notoriety</div>
+         <div class="territory-meta"><span class="badge ${state.notoriety>=t.reqNot?"green":"red"}">Notoriety ${state.notoriety}/${t.reqNot}</span><span class="badge">${spriteIconHtml("stamina","xs")} 2 to move</span></div>
+         ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="territory-progress-copy">Takeover ${s.progress}% · successful moves add 35%</div>`:`<div class='territory-note'>Controlled territory is already feeding your hourly income and organization reputation.</div>`}
+         <details class="compact-details"><summary>TERRITORY DETAILS</summary><div class="compact-details-body">${t.desc}</div></details>
+       </div>
      </div>
-     <button class="btn ${s.owned?"green":"red"} small" onclick="takeTerritory('${t.id}')" ${s.owned||state.notoriety<t.reqNot?"disabled":""}>
-       ${s.owned?"CONTROLLED":"TAKE · 2 STAMINA"}
-     </button>
+     <button class="btn ${s.owned?"green":"red"} small territory-action" onclick="takeTerritory('${t.id}')" ${s.owned||state.notoriety<t.reqNot?"disabled":""}>${s.owned?"CONTROLLED":`TAKE OVER · ${spriteIconHtml("stamina","xs")} 2`}</button>
    </div>`;
- }).join("");
+ }).join("")}</div>`;
 
- factionsEl.innerHTML=`
-   <div class="section-title"><h2>Rival Factions</h2><span>who controls the ground you want</span></div>
-   <details class="compact-details explainer-details"><summary>HOW RIVAL FACTIONS WORK <span>?</span></summary><div class="compact-details-body">Rival factions are the organizations standing between you and new territory. Strength makes their districts harder to take. Pressure rises as you successfully contest them. The reward is not the faction itself: it is the income, Notoriety, and control you gain by dismantling their hold.</div></details>
-   ${factionRows}
-   <div class="section-title" style="margin-top:10px"><h2>Territory Takeovers</h2><span>2 stamina per move</span></div>
-   ${territoryRows}
- `;
+ factionsEl.innerHTML=`<div class="section-title"><h2>Rival Factions</h2><span>who controls the ground you want</span></div><details class="compact-details explainer-details"><summary>HOW RIVAL FACTIONS WORK <span>?</span></summary><div class="compact-details-body">Rival factions are the organizations standing between you and new territory. Strength makes their districts harder to take. Pressure rises as you successfully contest them. The reward is not the faction itself: it is the income, Notoriety, and control you gain by dismantling their hold.</div></details>${factionRows}<div class="section-title" style="margin-top:10px"><h2>Territory Takeovers</h2><span>2 stamina per move</span></div>${territoryRows}`;
 }
 function achievementDefs(){
  const defs=[],add=(category,prefix,targets,current,labelFn)=>targets.forEach((t,i)=>defs.push({id:`${prefix}_${t}`,category,title:labelFn(t,i),target:t,current:Math.floor(current())}));
