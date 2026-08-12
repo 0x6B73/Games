@@ -2752,7 +2752,7 @@ body:after{
   <summary>PREFERENCES <span>messages / audio</span></summary>
   <div class="fold-body">
     <div class="toggle-row">
-      <div><b>Message Popups</b><div class="sub">Messages still arrive in the inbox when popups are disabled.</div></div>
+      <div><b>Popup Notifications</b><div class="sub">Turns off action and social popups. Required warnings still appear, and messages/intelligence are still recorded.</div></div>
       <button class="btn small" id="messagePopupToggle" onclick="toggleMessagePopups()">ON</button>
     </div>
     <div class="toggle-row" style="margin-top:7px">
@@ -2761,7 +2761,7 @@ body:after{
     </div>
     <div class="toggle-row" style="margin-top:7px">
       <div><b>Sound Effects</b><div class="sub">Jobs, fights, purchases, alerts, and interface sounds.</div></div>
-      <button class="btn secondary small" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
+      <button class="btn secondary small" id="soundToggle" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
     </div>
   </div>
 </details>
@@ -3025,8 +3025,8 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.24";
-const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const BUILD_NUMBER="0.22.25";
+const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
 let dismissedUpdateBuild="";
@@ -3164,11 +3164,11 @@ function themeHat(delay=0,open=false){if(!themeOn)return;const c=ctx();if(!c)ret
 function themeSnare(delay=0){if(!themeOn)return;themeHat(delay,true);const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="triangle";o.frequency.value=180;g.gain.setValueAtTime(.012,t);g.gain.exponentialRampToValueAtTime(.0001,t+.08);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.09)}
 function themeBass(note,delay=0,d=.2){const c=ctx();if(!c||!themeOn)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=note;g.gain.setValueAtTime(.035,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
 function themeBeat(){if(!themeOn||!audioUnlocked){themeTimer=null;return}const bpm=136,beat=60/bpm,step=beat/4,roots=[43.65,38.89,51.91,36.71],root=roots[Math.floor(themeStep/16)%roots.length];for(let i=0;i<16;i++){const d=i*step;themeHat(d,i===7||i===15);if([0,7,10].includes(i))themeKick(d);if(i===4||i===12)themeSnare(d);if([0,3,7,10,14].includes(i))themeBass(root,d,step*2.7)}themeStep+=16;themeTimer=setTimeout(themeBeat,beat*4*1000-25)}
-function toggleTheme(){themeOn=!themeOn;unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}else if(!themeOn){clearTimeout(themeTimer);themeTimer=null}const b=document.getElementById("musicBtn");if(b)b.textContent=themeOn?"■ THEME":"▶ THEME"}
-function toggleSound(){state.sound=!state.sound;save();const e=document.getElementById("sfxState");if(e)e.textContent=state.sound?"ON":"OFF"}
-function tryAutoTheme(){themeOn=true;const arm=()=>{unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}document.removeEventListener("pointerdown",arm,true);document.removeEventListener("touchstart",arm,true)};document.addEventListener("pointerdown",arm,true);document.addEventListener("touchstart",arm,true);const b=document.getElementById("musicBtn");if(b)b.textContent="■ THEME"}
+function toggleTheme(){state.themeMusic=state.themeMusic===false;themeOn=state.themeMusic;savePreferences();save();unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}else if(!themeOn){clearTimeout(themeTimer);themeTimer=null}renderPreferences()}
+function toggleSound(){state.sound=!state.sound;savePreferences();save();renderPreferences()}
+function tryAutoTheme(){themeOn=state.themeMusic!==false;renderPreferences();if(!themeOn)return;const arm=()=>{unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}document.removeEventListener("pointerdown",arm,true);document.removeEventListener("touchstart",arm,true)};document.addEventListener("pointerdown",arm,true);document.addEventListener("touchstart",arm,true)}
 function renderAudioStatus(){const text=document.getElementById("audioStatusText"),list=document.getElementById("audioStatusList");if(text)text.textContent="Audio engine: READY · self-contained Web Audio";if(list)list.innerHTML=`<span class="audio-good">${statusMarkHtml(true)}THEME</span> · <span class="audio-good">${statusMarkHtml(true)}JOB SFX</span> · <span class="audio-good">${statusMarkHtml(true)}COMBAT</span> · <span class="audio-good">${statusMarkHtml(true)}CASH</span> · <span class="audio-good">${statusMarkHtml(true)}ALERTS</span>`}
-async function testAudioPack(){state.sound=true;save();unlockAudio();for(const fn of [fxClick,fxCash,fxMessage,fxReload,fxGun,fxEngine,fxWin,fxSiren]){runScene([[0,fn]]);await new Promise(r=>setTimeout(r,650))}cancelSfxScene();renderAudioStatus()}
+async function testAudioPack(){state.sound=true;savePreferences();save();unlockAudio();for(const fn of [fxClick,fxCash,fxMessage,fxReload,fxGun,fxEngine,fxWin,fxSiren]){runScene([[0,fn]]);await new Promise(r=>setTimeout(r,650))}cancelSfxScene();renderAudioStatus()}
 setTimeout(renderAudioStatus,250);
 
 
@@ -4297,14 +4297,41 @@ function fresh(){
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",playerAvatarSpec:{},customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
  bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
- campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,themeMusic:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,heatByCity:{east:0,downtown:0,north:0},heatMetaByCity:{east:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},downtown:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},north:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0}},notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,cashBribeWindowStart:0,cashBribeCount:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
-let state=load();migrate();
+function readSavedPreferences(){
+ try{
+   const raw=localStorage.getItem(PREFS_KEY);
+   if(!raw)return {};
+   const prefs=JSON.parse(raw);
+   return prefs&&typeof prefs==="object"&&!Array.isArray(prefs)?prefs:{};
+ }catch(e){return {}}
+}
+function applySavedPreferences(){
+ const prefs=readSavedPreferences();
+ if(typeof prefs.messagePopups==="boolean")state.messagePopups=prefs.messagePopups;
+ if(typeof prefs.sound==="boolean")state.sound=prefs.sound;
+ if(typeof prefs.themeMusic==="boolean")state.themeMusic=prefs.themeMusic;
+}
+function savePreferences(){
+ try{
+   localStorage.setItem(PREFS_KEY,JSON.stringify({
+     messagePopups:state.messagePopups!==false,
+     sound:state.sound!==false,
+     themeMusic:state.themeMusic!==false
+   }));
+   return true;
+ }catch(e){
+   console.warn("Preference save failed.",e);
+   return false;
+ }
+}
+let state=load();migrate();applySavedPreferences();
 function load(){
  try{
    const raw=localStorage.getItem(KEY);
@@ -4955,6 +4982,11 @@ function showActionFlash(title,detail="",type="good"){
  recordIntel(title,detail,type);
 
  const box=document.getElementById("actionFlash");
+ if(state.messagePopups===false){
+   clearTimeout(window._actionFlashTimer);
+   if(box)box.classList.remove("show");
+   return;
+ }
  const t=document.getElementById("actionFlashTitle");
  const d=document.getElementById("actionFlashDetail");
  if(!box||!t||!d)return;
@@ -8127,15 +8159,34 @@ function toggleMessagePopups(){
  state.messagePopups=state.messagePopups===false;
  if(state.messagePopups===false){
    const p=document.getElementById("socialPop");if(p)p.classList.remove("show");
+   const a=document.getElementById("actionFlash");if(a)a.classList.remove("show");
+   clearTimeout(window._actionFlashTimer);
  }
- save();renderPreferences();
+ savePreferences();save();renderPreferences();
 }
 function renderPreferences(){
- const b=document.getElementById("messagePopupToggle");if(!b)return;
- const on=state.messagePopups!==false;
- b.textContent=on?"ON":"OFF";
- b.classList.toggle("green",on);
- b.classList.toggle("red",!on);
+ const popup=document.getElementById("messagePopupToggle");
+ const music=document.getElementById("musicBtn");
+ const sound=document.getElementById("soundToggle");
+ const sfx=document.getElementById("sfxState");
+ const popOn=state.messagePopups!==false;
+ const musicOn=state.themeMusic!==false;
+ const soundOn=state.sound!==false;
+ if(popup){
+   popup.textContent=popOn?"ON":"OFF";
+   popup.classList.toggle("green",popOn);
+   popup.classList.toggle("red",!popOn);
+ }
+ if(music){
+   music.textContent=musicOn?"■ THEME":"▶ THEME";
+   music.classList.toggle("green",musicOn);
+   music.classList.toggle("red",!musicOn);
+ }
+ if(sound){
+   sound.classList.toggle("green",soundOn);
+   sound.classList.toggle("red",!soundOn);
+ }
+ if(sfx)sfx.textContent=soundOn?"ON":"OFF";
 }
 
 
