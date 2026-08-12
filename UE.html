@@ -1125,6 +1125,79 @@ body.compact-stats .mini-hud{
 .mastery.mastered{border-color:#49683a;background:#071006}
 .mastery.mastered>div{background:linear-gradient(#7fae5a,#4f7b38)}
 
+
+/* TOP HUD DOM REPAIR / MATCHED STATUS STRIPS */
+.campaign-top,
+.latest-notification-bar{
+  display:block!important;
+  box-sizing:border-box!important;
+  width:auto!important;
+  height:46px!important;
+  min-height:46px!important;
+  margin:4px 4px 0!important;
+  padding:5px 7px!important;
+  border:1px solid #45484b!important;
+  border-left:3px solid #c6a33e!important;
+  background:linear-gradient(#17191b,#090a0b)!important;
+  overflow:hidden!important;
+}
+.latest-notification-bar{margin-bottom:5px!important}
+.latest-notification-bar.good{border-left-color:#719c45!important}
+.latest-notification-bar.bad{border-left-color:#a54035!important}
+.latest-notification-bar.cash{border-left-color:#c5a346!important}
+.latest-notification-bar.info{border-left-color:#535a61!important}
+
+.latest-notification-head{
+  display:flex;justify-content:space-between;gap:8px;
+  font-size:8px;font-weight:900;color:#aa9f89
+}
+.latest-notification-label{
+  border:0!important;padding:0!important;color:#d2b44f!important;
+  font-size:8px!important;font-weight:900!important;letter-spacing:0!important
+}
+.latest-notification-age{
+  font-size:8px!important;color:#777168!important;white-space:nowrap
+}
+.latest-notification-line{
+  display:flex;align-items:baseline;gap:5px;
+  margin:2px 0 4px;min-width:0;white-space:nowrap;overflow:hidden
+}
+.latest-notification-line b{
+  flex:0 0 auto;max-width:42%;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px;color:#d9d0bf
+}
+.latest-notification-line span{
+  min-width:0;overflow:hidden;text-overflow:ellipsis;
+  font-size:9px;color:#969087
+}
+
+/* The compact HUD must be a single four-cell row above Campaign/Latest. */
+.mini-hud{
+  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+}
+body.compact-stats .mini-hud{
+  position:sticky!important;
+  top:0!important;
+  display:grid!important;
+  width:auto!important;
+  height:38px!important;
+  margin:0!important;
+}
+
+
+/* MANUAL BUILD CHECK */
+.version-check-box{
+  margin-top:8px;padding:7px;border:1px solid #343638;background:#0b0c0d;
+  text-align:center
+}
+.version-check-box .btn{width:auto}
+.version-check-status{
+  margin-top:5px;font-size:8px;color:#8f887d;min-height:10px
+}
+.version-check-status.good{color:#7fae5a}
+.version-check-status.bad{color:#c98578}
+.version-check-status.info{color:#c8ae5b}
+
 </style>
 </head>
 <body>
@@ -1146,6 +1219,10 @@ body.compact-stats .mini-hud{
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
   <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)">❤️ <b id="miniHp">100</b></div>
+  <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
+  <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
+  <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)">💵 <b id="miniCash">$0</b></div>
+</div>
 
 <div id="campaignTop" class="campaign-top" onclick="go('home')" title="Open current campaign">
   <div class="campaign-top-head">
@@ -1155,19 +1232,17 @@ body.compact-stats .mini-hud{
   <div id="campaignTopObjective" class="campaign-top-objective">Loading current objective...</div>
   <div class="campaign-top-track"><div id="campaignTopFill"></div></div>
 </div>
+
 <div id="latestNotificationBar" class="latest-notification-bar" onclick="go('home')" title="Open Recent Intelligence">
-  <div class="latest-notification-label">LATEST</div>
-  <div class="latest-notification-copy">
+  <div class="latest-notification-head">
+    <span class="latest-notification-label">LATEST</span>
+    <span id="latestNotificationAge" class="latest-notification-age"></span>
+  </div>
+  <div class="latest-notification-line">
     <b id="latestNotificationTitle">No recent activity</b>
     <span id="latestNotificationDetail">Notifications will appear here.</span>
   </div>
-  <div id="latestNotificationAge" class="latest-notification-age"></div>
 </div>
-  <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
-  <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
-  <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)">💵 <b id="miniCash">$0</b></div>
-</div>
-
 
 <main class="main">
 <section id="view-home" class="view active">
@@ -1362,6 +1437,10 @@ body.compact-stats .mini-hud{
  </div>
 
 <div class="card" style="margin-top:8px"><h3>Save</h3><p>Progress is stored locally in this browser.</p><button class="btn secondary" onclick="exportSave()">Export Save</button><button class="btn secondary" style="margin-top:5px" onclick="importSave()">Import Save</button><button class="btn red" style="margin-top:5px" onclick="resetGame()">Reset</button></div>
+<div class="version-check-box">
+  <button class="btn secondary small" id="manualBuildCheckBtn" onclick="manualBuildCheck()">CHECK FOR NEW VERSION</button>
+  <div class="version-check-status" id="manualBuildCheckStatus">Updates are also checked automatically.</div>
+</div>
 <div class="build-number" id="buildNumber">BUILD</div>
 </section>
 </main>
@@ -1535,7 +1614,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.5";
+const BUILD_NUMBER="0.17.7";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5153,20 +5232,52 @@ function refreshToLatestBuild(){
 }
 async function checkForNewBuild(){
  // Local file copies are intentionally ignored; the live GitHub Pages build
- // checks itself. Network/CORS failures fail silently and retry later.
- if(!/^https?:$/.test(location.protocol))return;
+ // checks itself. Network/CORS failures fail silently during automatic checks.
+ if(!/^https?:$/.test(location.protocol))return {status:"local",latest:""};
  try{
    const join=UPDATE_URL.includes("?")?"&":"?";
    const response=await fetch(`${UPDATE_URL}${join}_ue_build_check=${Date.now()}`,{
      cache:"no-store",
      headers:{"Cache-Control":"no-cache"}
    });
-   if(!response.ok)return;
+   if(!response.ok)return {status:"error",latest:""};
    const text=await response.text();
    const latest=extractRemoteBuild(text);
-   if(latest&&compareBuildNumbers(latest,BUILD_NUMBER)>0)showBuildUpdate(latest);
+   if(!latest)return {status:"error",latest:""};
+   if(compareBuildNumbers(latest,BUILD_NUMBER)>0){
+     showBuildUpdate(latest);
+     return {status:"new",latest};
+   }
+   return {status:"current",latest};
  }catch(e){
    console.debug("Build update check unavailable.",e);
+   return {status:"error",latest:""};
+ }
+}
+
+async function manualBuildCheck(){
+ const btn=document.getElementById("manualBuildCheckBtn");
+ const status=document.getElementById("manualBuildCheckStatus");
+ if(btn)btn.disabled=true;
+ if(status){status.className="version-check-status info";status.textContent="Checking published build…";}
+
+ const result=await checkForNewBuild();
+
+ if(btn)btn.disabled=false;
+ if(!status)return;
+
+ if(result.status==="new"){
+   status.className="version-check-status info";
+   status.textContent=`Build ${result.latest} is available.`;
+ }else if(result.status==="current"){
+   status.className="version-check-status good";
+   status.textContent=`You are up to date · Build ${BUILD_NUMBER}`;
+ }else if(result.status==="local"){
+   status.className="version-check-status bad";
+   status.textContent="Version checks are available from the hosted game.";
+ }else{
+   status.className="version-check-status bad";
+   status.textContent="Could not check for updates. Try again later.";
  }
 }
 
