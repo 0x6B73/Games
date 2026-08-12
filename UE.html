@@ -1122,6 +1122,9 @@ body.compact-stats .mini-hud{
 .latest-notification-bar.cash{border-left-color:#c5a346!important}
 .latest-notification-bar.info{border-left-color:#535a61!important}
 
+.mastery.mastered{border-color:#49683a;background:#071006}
+.mastery.mastered>div{background:linear-gradient(#7fae5a,#4f7b38)}
+
 </style>
 </head>
 <body>
@@ -1532,7 +1535,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.3";
+const BUILD_NUMBER="0.17.5";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4364,6 +4367,12 @@ let gearShopFilter="all";
 const gearBuySelections={};
 let crewListFilter="all";
 let crewSearchText="";
+const openRelationshipDetails=new Set();
+
+function setRelationshipOpen(id,isOpen){
+ if(isOpen)openRelationshipDetails.add(id);
+ else openRelationshipDetails.delete(id);
+}
 
 function setGearFilter(filter){
  gearShopFilter=filter||"all";
@@ -4466,13 +4475,13 @@ function renderJobs(){
  const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const s=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
+   const s=jobState(j.id),miss=reqMissing(j),pct=s.mastery>=3?100:Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
    const statKind=jobStatKind(j),statBonus=jobStatBonus(j),dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
    const lo=Math.floor(j.cash[0]*jobMasteryCashMult(j)*prestigeCashMult()),hi=Math.floor(j.cash[1]*jobMasteryCashMult(j)*prestigeCashMult());
    const xp=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
    return `<div class="card job-card compact-job" id="job-${j.id}">
     <div class="job-head"><img class="art" src="${art}" alt=""><div><h3>${j.name}</h3><div class="meta"><span class="badge">⚡ ${j.energy}</span><span class="badge green">💵 ${money(lo)}–${money(hi)}</span><span class="badge">⭐ ${xp}</span><span class="badge gold">${ch}% SUCCESS</span></div></div></div>
-    <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery"><div style="width:${pct}%"></div></div>
+    <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
     <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>
     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
     ${dash.items.length?`<div class="job-dash"><div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div><div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div><button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button><div class="sub">+50% convenience markup (${money(dashMarkup)}).</div></div>`:""}
@@ -4531,6 +4540,15 @@ function updateNetworkArrivalTimer(){
  statusEl.textContent=`${potentials}/${MAX_POTENTIAL_ASSOCIATES} waiting · New associate guaranteed within the displayed maximum time.`;
 }
 function renderCrew(){
+ // Crew cooldown/presence labels refresh every second. Preserve any Relationship
+ // panels the player has expanded before rebuilding the contact rows.
+ document.querySelectorAll("#friends details[data-rel-id]").forEach(el=>{
+   const id=el.dataset.relId;
+   if(!id)return;
+   if(el.open)openRelationshipDetails.add(id);
+   else openRelationshipDetails.delete(id);
+ });
+
  const inactiveCrew=crewIds().filter(id=>state.friends[id]?.inactive).length;
  crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
 
@@ -4557,7 +4575,7 @@ function renderCrew(){
        <div class="fmeta">${d.role} · ${crewStatus(f)}</div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
        ${inactive?`<div class="inactive-note">Still listed, but no longer responds or contributes active combat power.</div>`:""}
-       <details class="compact-details">
+       <details class="compact-details" data-rel-id="${id}" ${openRelationshipDetails.has(id)?"open":""} ontoggle="setRelationshipOpen('${id}',this.open)">
          <summary>RELATIONSHIP</summary>
          <div class="compact-details-body">
            Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
