@@ -120,7 +120,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .chatwin{width:100%;height:calc(100dvh - 20px);background:#d7cfc0;color:#111;border:2px solid #25211c;display:flex;flex-direction:column}.chathead{background:#1f1b17;color:#fff;padding:8px;font-weight:bold;text-transform:uppercase}.chatlog{flex:1;overflow:auto;padding:8px;background:#eee7db}.bubble{max-width:84%;margin:6px 0;padding:6px 8px;border:1px solid #999;font-size:11px;background:#fff}.bubble.me{margin-left:auto;background:#d9e5ef}.chatopts{padding:7px;background:#c7bdad;border-top:1px solid #8b8174;display:grid;gap:5px}.chatopts button{font-size:10px;padding:7px;border:1px solid #5d5245;background:#eee3d0;font-weight:bold}
 .inbox-fab{position:fixed;right:10px;bottom:calc(var(--navh) + 10px + var(--safe));z-index:2147483050;background:#6d542b;color:#fff;border:1px solid #9e7a40;width:44px;height:44px;border-radius:50%;font-size:18px;font-weight:bold;box-shadow:0 10px 24px #0009}.count{position:absolute;right:-4px;top:-5px;background:#a52a2a;border:2px solid #090806;color:#fff;width:20px;height:20px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center}
 .inbox-panel{display:none;position:fixed;left:8px;right:8px;bottom:calc(var(--navh) + 60px + var(--safe));z-index:2147483060;max-height:58dvh;background:#12100d;border:1px solid #594a36;box-shadow:0 18px 60px #000c;overflow:auto}.inbox-panel.show{display:block}.inbox-head{position:sticky;top:0;background:#201a13;padding:8px;border-bottom:1px solid #4a3e2f;font-weight:bold;text-transform:uppercase}.inbox-item{padding:8px;border-bottom:1px solid #322a20}.inbox-item b{display:block;font-size:11px}.inbox-item p{margin:4px 0 6px;color:#a99c8d;font-size:10px;line-height:1.35}.inbox-actions{display:flex;gap:4px}.inbox-actions button{flex:1}
-.friend-request-pop{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483210;width:calc(100vw - 24px);max-height:calc(100dvh - 100px);overflow:auto;background:#d5cbb9;color:#111;border:3px solid #26221c;box-shadow:0 18px 60px #000c}.friend-request-pop.show{display:block}.fr-head{background:#151515;color:#fff;padding:7px;font-weight:bold;text-transform:uppercase}.fr-body{padding:10px;font-size:11px}
+.friend-request-pop{display:none;position:fixed;left:50%;top:25%;transform:translate(-50%,-50%);z-index:2147483210;width:calc(100vw - 24px);max-height:calc(100dvh - 100px);overflow:auto;background:#d5cbb9;color:#111;border:3px solid #26221c;box-shadow:0 18px 60px #000c}.friend-request-pop.show{display:block}.fr-head{background:#151515;color:#fff;padding:7px;font-weight:bold;text-transform:uppercase}.fr-body{padding:10px;font-size:11px}
 .toast{position:fixed;left:50%;bottom:calc(var(--navh) + 10px + var(--safe));transform:translateX(-50%) translateY(15px);opacity:0;background:#080706;border:1px solid #4a4033;padding:9px 12px;z-index:2147483300;transition:.2s;width:calc(100vw - 24px);text-align:center;font-size:11px}.toast.show{opacity:1;transform:translateX(-50%)}
 .checkout-grid{display:grid;gap:7px;margin:9px 0}.checkout-grid label{font-size:10px;color:#b5a898}.checkout-grid input{width:100%;margin-top:3px;padding:8px;background:#070706;color:#ddd;border:1px solid #4a4034}
 .nav{position:fixed;inset:auto 0 0 0;z-index:2147483000;height:calc(var(--navh) + var(--safe));background:#080706;border-top:1px solid #4a4033;box-shadow:0 -8px 24px #000b;padding-bottom:var(--safe)}.navin{height:var(--navh);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;padding:2px 3px}.nav button{min-width:0;border:0;background:transparent;color:#91897e;padding:2px 1px 3px;font-size:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;overflow:visible}
@@ -519,7 +519,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .action-flash{
   position:fixed;
   left:50%;
-  top:50%;
+  top:25%;
   transform:translate(-50%,-50%) scale(.96);
   z-index:2147483400;
   width:min(88vw,390px);
@@ -551,14 +551,14 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 @keyframes actionFlashMove{
   0%{opacity:0;transform:translate(-50%,-50%) scale(.92)}
   12%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  58%{opacity:1;top:50%;transform:translate(-50%,-50%) scale(1)}
+  58%{opacity:1;top:25%;transform:translate(-50%,-50%) scale(1)}
   82%{opacity:1;top:58px;transform:translate(-50%,0) scale(.96)}
   100%{opacity:0;top:58px;transform:translate(-50%,-8px) scale(.94)}
 }
 
 
 .requirement-popup{
-  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  position:fixed;left:50%;top:25%;transform:translate(-50%,-50%);
   z-index:2147483450;width:min(86vw,360px);padding:10px;
   background:linear-gradient(#241515,#0c0909);border:1px solid #75413b;
   border-left:4px solid #a94d42;box-shadow:0 18px 50px #000c;
@@ -2926,7 +2926,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.11";
+const BUILD_NUMBER="0.22.13";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -6168,6 +6168,9 @@ function answerInbox(id,choice){
 
  if(x.type==="gift"&&choice==="accept"){
    const item=String(x.item||"");
+   const qty=Math.max(1,Math.min(5,Math.floor(Number(x.qty)||1)));
+
+   // Backward compatibility for gift messages created by older builds.
    if(item==="Cash Envelope"){
      const amount=Math.max(100,Math.floor(Number(x.amount)||250));
      state.cash+=amount;
@@ -6175,16 +6178,30 @@ function answerInbox(id,choice){
      log(`${x.from} sent you a Cash Envelope worth ${money(amount)}.`);
      showActionFlash("CASH GIFT RECEIVED",`${x.from} · +${money(amount)}`,"cash");
      S.ok();
+   }else if(x.giftKind==="gear"&&x.itemId){
+     const g=gearDefs.find(def=>def.id===x.itemId);
+     if(g){
+       state.gear[g.id]=(state.gear[g.id]||0)+qty;
+       log(`${x.from} sent you ${g.name} ×${qty}.`);
+       showActionFlash("CREW GIFT RECEIVED",`${x.from} · ${g.name} ×${qty} · Owned: ${state.gear[g.id]}`,"good");
+       S.ok();
+     }else{
+       log(`${x.from}'s gift could not be identified.`);
+       showActionFlash("GIFT ERROR",`Unknown item · Nothing added`,"bad");
+       S.bad();
+     }
    }else{
      const caps={"Energy Drink":999,"Adrenaline Shot":999,"Energy Pack":99,"Stamina Pack":99};
      const cap=caps[item]||999;
-     const added=addLootItem(item,1,cap);
+     const added=addLootItem(item,qty,cap);
      if(added>0){
-       log(`${x.from} sent you ${item}.`);
-       showActionFlash("GIFT RECEIVED",`${x.from} · ${item} ×1${caps[item]?` · Stash: ${state.loot[item]}/${cap}`:""}`,"good");
+       const partial=added<qty?` · ${qty-added} could not be stored`:"";
+       log(`${x.from} sent you ${item} ×${added}.${partial}`);
+       const stash=state.loot[item];
+       showActionFlash("CREW GIFT RECEIVED",`${x.from} · ${item} ×${added} · Stash: ${stash}/${cap}${partial}`,"good");
        S.ok();
      }else{
-       log(`${x.from}'s ${item} could not be stored because your stash is full.`);
+       log(`${x.from}'s ${item} gift could not be stored because your stash is full.`);
        showActionFlash("GIFT STASH FULL",`${item} · Maximum stack: ${cap}`,"bad");
        S.bad();
      }
@@ -6222,6 +6239,34 @@ function maybeSocialEvent(){
  }
  save();
 }
+function weightedCrewGiftQuantity(){
+ // 1 is deliberately most common, with steadily lower odds through 5.
+ const roll=Math.random()*100;
+ if(roll<45)return 1;
+ if(roll<70)return 2;
+ if(roll<85)return 3;
+ if(roll<95)return 4;
+ return 5;
+}
+function accessibleCrewGiftItems(){
+ const supplies=[
+   {kind:"loot",item:"Energy Drink",cap:999},
+   {kind:"loot",item:"Adrenaline Shot",cap:999},
+   {kind:"loot",item:"Energy Pack",cap:99},
+   {kind:"loot",item:"Stamina Pack",cap:99}
+ ].filter(x=>Math.max(0,Number(state.loot[x.item])||0)<x.cap);
+
+ const availableGear=gearDefs
+   .filter(g=>state.level>=g.level&&(!g.crewReq||crewSize()>=g.crewReq))
+   .map(g=>({kind:"gear",item:g.name,itemId:g.id}));
+
+ return [...supplies,...availableGear];
+}
+function rollCrewGiftItem(){
+ const pool=accessibleCrewGiftItems();
+ if(!pool.length)return null;
+ return pool[rnd(0,pool.length-1)];
+}
 function maybeGift(){
  const t=now();
  if(t-(state.lastGiftEvent||0)<45*60000)return;
@@ -6236,11 +6281,12 @@ function maybeGift(){
  if(!ids.length){save();return}
 
  const id=ids[rnd(0,ids.length-1)];
- const item=["Energy Drink","Adrenaline Shot","Burner Phone","Cash Envelope"][rnd(0,3)];
- const amount=item==="Cash Envelope"?rnd(250,700)+Math.max(1,state.level)*20:0;
- const giftText=item==="Cash Envelope"?`Sent you a Cash Envelope worth ${money(amount)}.`:`Sent you a ${item}.`;
- addInbox({type:"gift",from:nameOf(id),personId:id,item,amount,text:giftText});
- showSocial("Gift waiting",`${nameOf(id)} sent you ${item==="Cash Envelope"?money(amount):`a ${item}`}. Open Messages to accept it.`);
+ const gift=rollCrewGiftItem();
+ if(!gift){save();return}
+ const qty=weightedCrewGiftQuantity();
+ const giftText=`Sent you ${gift.item} ×${qty}.`;
+ addInbox({type:"gift",from:nameOf(id),personId:id,item:gift.item,itemId:gift.itemId||"",giftKind:gift.kind,qty,text:giftText});
+ showSocial("Gift waiting",`${nameOf(id)} sent you ${gift.item} ×${qty}. Open Messages to accept it.`);
 }
 function showSocial(title,text){
  recordIntel(title,text,"info");
