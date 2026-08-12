@@ -1083,6 +1083,45 @@ body.compact-stats .top{padding-bottom:4px!important}
   display:block;margin-top:2px;font-size:15px;color:#e7cd6d
 }
 
+
+/* COMPACT HUD ORDER / SCROLL BEHAVIOR */
+body.compact-stats .top{position:relative}
+body.compact-stats .mini-hud{
+  position:sticky!important;
+  top:0!important;
+  left:auto!important;
+  right:auto!important;
+  z-index:2147482500!important;
+  width:auto!important;
+  height:38px!important;
+  margin:0!important;
+  padding:3px 4px!important;
+  transform:none!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+  box-shadow:0 4px 14px rgba(0,0,0,.55)!important;
+}
+
+/* CAMPAIGN / LATEST MATCHED BOXES */
+.campaign-top,
+.latest-notification-bar{
+  box-sizing:border-box!important;
+  height:46px!important;
+  min-height:46px!important;
+  margin-left:4px!important;
+  margin-right:4px!important;
+  padding:5px 7px!important;
+  border:1px solid #45484b!important;
+  border-left-width:3px!important;
+  background:linear-gradient(#17191b,#090a0b)!important;
+}
+.campaign-top{margin-top:4px!important;margin-bottom:0!important}
+.latest-notification-bar{margin-top:4px!important;margin-bottom:5px!important}
+.latest-notification-bar.good{border-left-color:#719c45!important}
+.latest-notification-bar.bad{border-left-color:#a54035!important}
+.latest-notification-bar.cash{border-left-color:#c5a346!important}
+.latest-notification-bar.info{border-left-color:#535a61!important}
+
 </style>
 </head>
 <body>
@@ -1101,6 +1140,10 @@ body.compact-stats .top{padding-bottom:4px!important}
  
 </header>
 
+
+<div id="miniHud" class="mini-hud" aria-hidden="true">
+  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)">❤️ <b id="miniHp">100</b></div>
+
 <div id="campaignTop" class="campaign-top" onclick="go('home')" title="Open current campaign">
   <div class="campaign-top-head">
     <span id="campaignTopLevel">CAMPAIGN</span>
@@ -1117,9 +1160,6 @@ body.compact-stats .top{padding-bottom:4px!important}
   </div>
   <div id="latestNotificationAge" class="latest-notification-age"></div>
 </div>
-
-<div id="miniHud" class="mini-hud" aria-hidden="true">
-  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)">❤️ <b id="miniHp">100</b></div>
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
   <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
   <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)">💵 <b id="miniCash">$0</b></div>
@@ -1492,7 +1532,7 @@ body.compact-stats .top{padding-bottom:4px!important}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.2";
+const BUILD_NUMBER="0.17.3";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
