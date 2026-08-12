@@ -928,6 +928,74 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 .help-gold-status .req{font-weight:600;color:#756f66}
 .gold-contact.unlocked{color:#d9bf63}
 
+
+/* LATEST NOTIFICATION BELOW CAMPAIGN */
+.latest-notification-bar{
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  gap:6px;
+  padding:5px 7px;
+  margin:0 0 5px;
+  border:1px solid #34342f;
+  border-top:0;
+  background:linear-gradient(#111214,#090a0b);
+  cursor:pointer;
+}
+.latest-notification-label{
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#d2b44f;
+  border-right:1px solid #3a3934;
+  padding-right:6px;
+}
+.latest-notification-copy{
+  min-width:0;
+  display:flex;
+  align-items:baseline;
+  gap:5px;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.latest-notification-copy b{
+  flex:0 0 auto;
+  max-width:42%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:8px;
+  color:#ddd1bc;
+}
+.latest-notification-copy span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  font-size:8px;
+  color:#969087;
+}
+.latest-notification-age{
+  font-size:7px;
+  color:#6f6a62;
+  white-space:nowrap;
+}
+.latest-notification-bar.good{border-left:3px solid #719c45}
+.latest-notification-bar.bad{border-left:3px solid #a54035}
+.latest-notification-bar.cash{border-left:3px solid #c5a346}
+.latest-notification-bar.info{border-left:3px solid #535a61}
+@media(max-width:430px){
+  .latest-notification-copy{
+    display:block;
+  }
+  .latest-notification-copy b{
+    display:block;
+    max-width:100%;
+  }
+  .latest-notification-copy span{
+    display:block;
+    margin-top:1px;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -953,6 +1021,14 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   </div>
   <div id="campaignTopObjective" class="campaign-top-objective">Loading current objective...</div>
   <div class="campaign-top-track"><div id="campaignTopFill"></div></div>
+</div>
+<div id="latestNotificationBar" class="latest-notification-bar" onclick="go('home')" title="Open Recent Intelligence">
+  <div class="latest-notification-label">LATEST</div>
+  <div class="latest-notification-copy">
+    <b id="latestNotificationTitle">No recent activity</b>
+    <span id="latestNotificationDetail">Notifications will appear here.</span>
+  </div>
+  <div id="latestNotificationAge" class="latest-notification-age"></div>
 </div>
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
@@ -1296,7 +1372,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.16.1";
+const BUILD_NUMBER="0.16.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -2605,12 +2681,36 @@ function renderRecentIntel(){
    ${x.detail?`<div class="intel-detail">${x.detail}</div>`:""}
  </div>`).join(""):`<div class="intel-item info"><div class="intel-title">NO RECENT INTELLIGENCE</div></div>`;
 }
+
+function renderLatestNotification(){
+ const bar=document.getElementById("latestNotificationBar");
+ const title=document.getElementById("latestNotificationTitle");
+ const detail=document.getElementById("latestNotificationDetail");
+ const age=document.getElementById("latestNotificationAge");
+ if(!bar||!title||!detail||!age)return;
+
+ const x=(state.intel||[])[0];
+ bar.className="latest-notification-bar "+(x?.type||"info");
+
+ if(!x){
+   title.textContent="No recent activity";
+   detail.textContent="Notifications will appear here.";
+   age.textContent="";
+   return;
+ }
+
+ title.textContent=x.title||"UPDATE";
+ detail.textContent=x.detail||"";
+ age.textContent=intelAge(x.t);
+}
+
 function recordIntel(title,detail="",type="info"){
  if(!state||typeof state!=="object")return;
  if(!Array.isArray(state.intel))state.intel=[];
  state.intel.unshift({t:now(),title:String(title||"UPDATE"),detail:String(detail||""),type});
  state.intel=state.intel.slice(0,20);
  renderRecentIntel();
+ renderLatestNotification();
  try{save()}catch(e){}
 }
 function showActionFlash(title,detail="",type="good"){
@@ -3866,6 +3966,7 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  renderRecentIntel();
+ renderLatestNotification();
  renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();updateNetworkArrivalTimer();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
