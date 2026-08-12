@@ -2731,7 +2731,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.4";
+const BUILD_NUMBER="0.22.5";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2873,6 +2873,7 @@ const tiers=[
  {name:"Hitman",level:24,boss:"Anton Varga"},{name:"Capo",level:31,boss:"Dominic Vale"}
 ];
 const jobDefs=[
+ {id:"streeterrand",tier:0,city:"east",name:"Deliver a Sealed Package",energy:1,cash:[25,45],xp:2,crew:0,heat:0,risk:0,role:"Runner",img:"suit",req:{},loot:[],fallback:true,noMastery:true,guaranteed:true},
  {id:"boost",tier:0,city:"east",name:"Boost a Parked Car",energy:3,cash:[110,180],xp:8,crew:1,heat:2,risk:8,role:"Driver",img:"car",req:{lockpick:1},loot:["Burner Phone","Stolen Plate"]},
  {id:"shake",tier:0,city:"east",name:"Shake Down a Corner Store",energy:4,cash:[160,240],xp:10,crew:2,heat:3,risk:10,role:"Enforcer",img:"suit",req:{pistol:1,burner:1},loot:["Old Ledger"]},
  {id:"truck",tier:0,city:"east",name:"Hijack a Delivery Truck",energy:6,cash:[280,420],xp:16,crew:3,heat:5,risk:14,role:"Driver",img:"warehouse",req:{pistol:2,sedan:1,lockpick:1},loot:["Dock Manifest"]},
@@ -3615,7 +3616,7 @@ function claimCampaign(){
  if(r.notoriety)state.notoriety+=r.notoriety;
  if(r.maxEnergy){state.maxEn+=r.maxEnergy;state.en+=r.maxEnergy}
  if(r.maxStamina){state.maxSt+=r.maxStamina;state.st+=r.maxStamina}
- if(r.loot)state.loot[r.loot]=(state.loot[r.loot]||0)+1;
+ if(r.loot)addLootItem(r.loot,1,999);
 
  state.campaignClaimed[c.id]=true;
  log(`Campaign completed: ${c.title}.`);
@@ -3833,12 +3834,12 @@ function goldHelpStatus(id){
  return {unlocked:true};
 }
 function helpRewardTile(kind,goldUnlocked=true){
- if(kind==="gold"&&goldUnlocked)return `<div class="gold-reel-item gold">${spriteIconHtml("gold","lg")}<br>GOLD BAR</div>`;
- if(kind==="energy")return `<div class="gold-reel-item energy">${spriteIconHtml("drink","lg")}<br>ENERGY DRINK</div>`;
- if(kind==="stamina")return `<div class="gold-reel-item stamina">${spriteIconHtml("adrenaline","lg")}<br>ADRENALINE</div>`;
- if(kind==="energyPack")return `<div class="gold-reel-item pack">${spriteIconHtml("2:energy-pack","lg")}<br>ENERGY PACK</div>`;
- if(kind==="staminaPack")return `<div class="gold-reel-item pack">${spriteIconHtml("2:stamina-pack","lg")}<br>STAMINA PACK</div>`;
- return `<div class="gold-reel-item empty">NOTHING</div>`;
+ if(kind==="gold"&&goldUnlocked)return `<div class="gold-reel-item gold" data-reward-kind="gold">${spriteIconHtml("gold","lg")}<br>GOLD BAR</div>`;
+ if(kind==="energy")return `<div class="gold-reel-item energy" data-reward-kind="energy">${spriteIconHtml("drink","lg")}<br>ENERGY DRINK</div>`;
+ if(kind==="stamina")return `<div class="gold-reel-item stamina" data-reward-kind="stamina">${spriteIconHtml("adrenaline","lg")}<br>ADRENALINE</div>`;
+ if(kind==="energyPack")return `<div class="gold-reel-item pack" data-reward-kind="energyPack">${spriteIconHtml("2:energy-pack","lg")}<br>ENERGY PACK</div>`;
+ if(kind==="staminaPack")return `<div class="gold-reel-item pack" data-reward-kind="staminaPack">${spriteIconHtml("2:stamina-pack","lg")}<br>STAMINA PACK</div>`;
+ return `<div class="gold-reel-item empty" data-reward-kind="nothing">NOTHING</div>`;
 }
 
 function buildGoldReel(outcome,goldUnlocked){
@@ -3874,9 +3875,15 @@ function spinGoldReel(id,outcome,goldStatus){
  modal.classList.add("show");
 
  setTimeout(()=>{
-   const target=(16*94)-((Math.min(window.innerWidth*.86,360)-22)/2-44);
+   const targetIndex=16;
+   const wrap=reel.closest(".gold-reel-wrap");
+   const targetItem=reel.children[targetIndex];
+   if(!wrap||!targetItem)return;
+   const itemCenter=targetItem.offsetLeft+(targetItem.offsetWidth/2);
+   const viewportCenter=wrap.clientWidth/2;
+   const target=Math.max(0,itemCenter-viewportCenter);
    reel.classList.add("spinning");
-   reel.style.transform=`translateX(-${Math.max(0,target)}px)`;
+   reel.style.transform=`translateX(-${target}px)`;
  },80);
 
  setTimeout(()=>{
@@ -3901,7 +3908,8 @@ function spinGoldReel(id,outcome,goldStatus){
      showActionFlash("STAMINA PACK RECEIVED",`${d.name} sent a rare Stamina Pack · Stash: ${state.loot["Stamina Pack"]||0}/99`,"good");
      S.ok();
    }else{
-     recordIntel("HELP REQUEST CAME UP EMPTY",`${d.name} had nothing available this time.`,"info");
+     const stashFull=outcome.resultText==="STASH FULL — NOTHING ADDED";
+     recordIntel(stashFull?"HELP REWARD STASH FULL":"HELP REQUEST CAME UP EMPTY",stashFull?`${d.name} had a reward ready, but the matching stash was full.`:`${d.name} had nothing available this time.`,"info");
      S.bad();
    }
  },2450);
@@ -3933,7 +3941,7 @@ function buyGoldUnlock(id){
  if(id==="ghost_network"){state.maxSt+=5;state.st+=5;state.notoriety+=10}
  if(id==="kingpin_reserve"){
    state.attack+=15;state.defense+=15;state.maxEn+=10;state.en+=10;
-   state.loot["Kingpin Signet"]=(state.loot["Kingpin Signet"]||0)+1;
+   addLootItem("Kingpin Signet",1,99);
  }
  log(`Gold Bar unlock acquired: ${u.name}.`);
  queueUnlockPopup(u.name,u.desc);
@@ -4089,6 +4097,12 @@ function migrate(){
  // Core dictionaries.
  for(const key of ["gear","props","facilities","jobs","loot","factions","bosses"]){
    if(!state[key]||typeof state[key]!=="object")state[key]={...defaults[key]};
+ }
+ // Keep inventory quantities sane without silently shrinking legitimate legacy stacks.
+ for(const [item,value] of Object.entries(state.loot)){
+   const qty=Math.floor(Number(value));
+   if(!item||!Number.isFinite(qty)||qty<=0)delete state.loot[item];
+   else state.loot[item]=qty;
  }
  if(!Array.isArray(state.inbox))state.inbox=[];
  const inboxNow=now();
@@ -4285,8 +4299,7 @@ function buyEndgameAutomation(kind){
  state.endgameInfra[kind]=true;
  state.endgameInfra[`${kind}Enabled`]=true;
  log(`${def.name} installed for ${def.cost} Gold Bars.`);
- recordIntel("GOLD INFRASTRUCTURE",`${def.name} installed · automation enabled`,"cash");
- showActionFlash("AUTOMATION INSTALLED",`${def.name} · ${def.cost} Gold Bars`,"cash");
+  showActionFlash("AUTOMATION INSTALLED",`${def.name} · ${def.cost} Gold Bars`,"cash");
  S.cash();save();render();
 }
 function toggleEndgameAutomation(kind){
@@ -4313,8 +4326,7 @@ function upgradeEndgameTier(kind){
  if(kind==="heat")state.lastHeatDecay=now();
 
  log(`${def.name} upgraded to Tier ${tier+1} for ${cost} Gold Bars.`);
- recordIntel("INFRASTRUCTURE UPGRADED",`${def.name} · Tier ${tier+1}`,"cash");
- showActionFlash("TIER UPGRADE",`${def.name} · Tier ${tier+1} · ${cost} Gold Bars`,"cash");
+  showActionFlash("TIER UPGRADE",`${def.name} · Tier ${tier+1} · ${cost} Gold Bars`,"cash");
  S.cash();save();render();
 }
 function processProduction(t=now()){
@@ -4328,9 +4340,7 @@ function processProduction(t=now()){
    const hours=Math.floor(Math.max(0,t-last)/3600000);
    if(hours<=0)return;
    const qty=hours*rate;
-   const before=Math.max(0,Number(state.loot[item])||0);
-   state.loot[item]=Math.min(999,before+qty);
-   const made=state.loot[item]-before;
+   const made=addLootItem(item,qty,999);
    infra[lastKey]=last+hours*3600000;
    if(made>0){
      log(`${ENDGAME_TIER_DEFS[kind].name} produced ${made} ${item}${made===1?"":"s"}.`);
@@ -4832,7 +4842,19 @@ function dashJobPanel(j,dash,dashMarkup){
  </div>`;
 }
 
-function reqMissing(j){const m=[];if(crewSize()<j.crew)m.push(`${j.crew} crew`);Object.entries(j.req).forEach(([id,q])=>{if(gearQty(id)<q)m.push(`${q} ${gearDefs.find(g=>g.id===id).name}`)});if(cities.find(c=>c.id===j.city).level>state.level)m.push(`LVL ${cities.find(c=>c.id===j.city).level}`);return m}
+function reqMissing(j){
+ const m=[];
+ if(!j)return ["Unknown job"];
+ if(crewSize()<Math.max(0,Number(j.crew)||0))m.push(`${j.crew} crew`);
+ Object.entries(j.req||{}).forEach(([id,q])=>{
+   const g=gearDefs.find(x=>x.id===id);
+   if(!g){m.push(`Unknown equipment: ${id}`);return}
+   if(gearQty(id)<q)m.push(`${q} ${g.name}`);
+ });
+ const city=cities.find(c=>c.id===j.city);
+ if(city&&city.level>state.level)m.push(`LVL ${city.level}`);
+ return m;
+}
 function jobStatKind(j){
  if(["Enforcer","Collector","Smuggler"].includes(j.role))return "attack";
  if(["Driver","Fixer","Safecracker"].includes(j.role))return "defense";
@@ -4846,6 +4868,7 @@ function jobStatBonus(j){
 }
 function defenseMitigation(){return Math.min(.50,Math.max(0,state.defense)*.012)}
 function jobChance(j){
+ if(j?.guaranteed)return 100;
  let chance=92-j.risk-state.heat*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30)+jobStatBonus(j);
  return Math.max(30,Math.min(97,Math.round(chance)));
 }
@@ -4907,32 +4930,38 @@ function doJob(id){
    const eventMult=state.event.ends>now()?1.25:1;
    const c=Math.floor(rnd(j.cash[0],j.cash[1])*eventMult*jobMasteryCashMult(j)*prestigeCashMult());
    const xpEarned=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
-   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;jobData.runs++;state.notoriety+=2;
+   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;state.notoriety+=j.fallback?0:2;
 
-   if(jobData.runs>=5){
-     jobData.runs=0;
-     if(jobData.mastery<3){
-       jobData.mastery++;
-       state.skill++;state.notoriety+=5;
-       log(`${j.name} mastery advanced to ${jobData.mastery}/3. +1 skill point.`);
-       grantMasteryReward(j,jobData.mastery);
+   if(!j.noMastery){
+     jobData.runs++;
+     if(jobData.runs>=5){
+       jobData.runs=0;
+       if(jobData.mastery<3){
+         jobData.mastery++;
+         state.skill++;state.notoriety+=5;
+         log(`${j.name} mastery advanced to ${jobData.mastery}/3. +1 skill point.`);
+         grantMasteryReward(j,jobData.mastery);
+       }
      }
    }
 
-   if(Math.random()<.20){
+   if(Array.isArray(j.loot)&&j.loot.length&&Math.random()<.20){
      const item=j.loot[rnd(0,j.loot.length-1)];
-     addLootItem(item,1,999);log(`Recovered rare item: ${item}.`);
+     const added=addLootItem(item,1,999);
+     if(added>0)log(`Recovered rare item: ${item}.`);
    }
    const limited=activeLimitedLoot();
-   if(Math.random()<.08){
-     addLootItem(limited.name,1,99);
-     log(`Limited loot recovered: ${limited.name}.`);
-     showActionFlash("LIMITED LOOT",`${limited.name} · weekly drop`,"cash");
+   if(!j.fallback&&Math.random()<.08){
+     const added=addLootItem(limited.name,1,99);
+     if(added>0){
+       log(`Limited loot recovered: ${limited.name}.`);
+       showActionFlash("LIMITED LOOT",`${limited.name} · weekly drop`,"cash");
+     }
    }
 
    addXp(xpEarned);
    log(`${j.name} completed. Earned ${money(c)} and ${xpEarned} XP.`);
-   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${xpEarned} XP · Mastery ${jobData.mastery}/3`);
+   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${xpEarned} XP${j.noMastery?" · Emergency work":` · Mastery ${jobData.mastery}/3`}`);
    playJobSound(j,true);
  }else{
    const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,220)+state.level*15);
@@ -4946,8 +4975,26 @@ function doJob(id){
  }
  save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700);
 }
-function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
-function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
+function injureRandomCrew(){
+ const ids=availableCrew();if(!ids.length)return null;
+ const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id),minutes=rnd(5,12);
+ state.friends[id].injuredUntil=now()+minutes*60000;
+ log(`${d.name} was injured and is temporarily unavailable for about ${minutes} minutes.`);
+ recordIntel("CREW INJURED",`${d.name} · unavailable about ${minutes}m`,"bad");
+ return {id,name:d.name,minutes};
+}
+function arrestRandomCrew(){
+ S.siren();
+ const ids=availableCrew();if(!ids.length)return null;
+ const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id),minutes=rnd(8,16);
+ const legalCost=Math.min(300,Math.max(0,state.cash));
+ state.friends[id].arrestedUntil=now()+minutes*60000;
+ state.cash=Math.max(0,state.cash-legalCost);
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+legalCost;
+ log(`${d.name} was arrested. Legal costs: ${money(legalCost)}.`);
+ recordIntel("CREW ARRESTED",`${d.name} · ${money(legalCost)} legal cost · unavailable about ${minutes}m`,"bad");
+ return {id,name:d.name,minutes,legalCost};
+}
 
 function opponentThreat(o){
  if(Number.isFinite(o?.threat))return Math.max(1,Math.min(8,Math.floor(o.threat)));
@@ -4993,7 +5040,7 @@ function chanceClass(p){
 
 function bossDef(t){return 35+t*32}
 function bossReady(t){
- const relevant=jobDefs.filter(j=>j.tier===t);
+ const relevant=jobDefs.filter(j=>j.tier===t&&!j.fallback);
  if(!relevant.length)return false;
  return relevant.every(j=>{
    const city=cities.find(c=>c.id===j.city);
@@ -5001,7 +5048,7 @@ function bossReady(t){
  });
 }
 function bossJobProgress(t){
- const relevant=jobDefs.filter(j=>j.tier===t);
+ const relevant=jobDefs.filter(j=>j.tier===t&&!j.fallback);
  return relevant.map(j=>{
    const city=cities.find(c=>c.id===j.city);
    const cityLocked=!!city&&state.level<city.level;
@@ -5278,7 +5325,7 @@ function fightBoss(t){
  const first=!state.bosses[t],last=Number(state.bossLastFight[t]||0),wait=first?0:Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last));
  if(wait>0)return showRequirementPopup(`${tiers[t].boss} can be challenged again in ${fmt(wait)}.`);
  const staminaCost=first?3:4;
- if(state.st<staminaCost)return toast(`Boss operations cost ${staminaCost} stamina.`);
+ if(state.st<staminaCost)return showRequirementPopup(`Boss operations cost ${staminaCost} Stamina. You have ${Math.floor(state.st)}.`);
  state.st-=staminaCost;state.bossLastFight[t]=now();
 
  const rematches=Number(state.bossRematches[t]||0);
@@ -5287,20 +5334,35 @@ function fightBoss(t){
 
  if(power>=enemy){
    const payout=Math.floor(1800*(t+1)*(1+rematches*.15)*prestigeCashMult());
+   const xpEarned=Math.floor((120+50*t+rematches*10)*prestigeXpMult());
    state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.notoriety+=first?25:8;
-   addXp(Math.floor((120+50*t+rematches*10)*prestigeXpMult()));state.heat=Math.min(100,state.heat+12);
+   addXp(xpEarned);state.heat=Math.min(100,state.heat+12);
+
+   const extras=[];
    const pool=bossLootDefs[t]||["Boss Trophy"];
    if(first||Math.random()<.35){
-     const item=pool[rnd(0,pool.length-1)];addLootItem(item,1,99);
-     log(`${name} dropped exclusive loot: ${item}.`);
-     showActionFlash("BOSS LOOT",`${item} · exclusive drop`,"cash");
+     const item=pool[rnd(0,pool.length-1)],added=addLootItem(item,1,99);
+     if(added>0){log(`${name} dropped exclusive loot: ${item}.`);extras.push(item)}
+     else log(`${name} dropped ${item}, but its stack is already full.`);
    }
-   if(!first&&Math.random()<.18)addLootItem(Math.random()<.5?"Energy Pack":"Stamina Pack",1,99);
+   if(!first&&Math.random()<.18){
+     const pack=Math.random()<.5?"Energy Pack":"Stamina Pack";
+     const added=addLootItem(pack,1,99);
+     if(added>0)extras.push(pack);
+     else log(`${name} yielded a ${pack}, but its stack is already full.`);
+   }
    state.bossRematches[t]=rematches+1;
-   log(`${name} was defeated${first?". Your organization controls the rank.":" in a rematch."}`);S.ok();
+   log(`${name} was defeated${first?". Your organization controls the rank.":" in a rematch."}`);
+   showActionFlash("BOSS DEFEATED",`${name} · -${staminaCost} Stamina · +${money(payout)} · +${xpEarned} XP${extras.length?` · Loot: ${extras.join(", ")}`:""}`,"good");
+   S.ok();
  }else{
-   state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900)*(t+1));
-   log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew();
+   const hpBefore=state.hp,cashBefore=state.cash;
+   state.hp=Math.max(1,state.hp-rnd(12,25));
+   state.cash=Math.max(0,state.cash-rnd(300,900)*(t+1));
+   const hpLoss=Math.max(0,Math.floor(hpBefore-state.hp)),cashLoss=Math.max(0,Math.floor(cashBefore-state.cash));
+   log(`${name} stopped the operation. Lost ${money(cashLoss)} and ${hpLoss} Health.`);
+   showActionFlash("BOSS FIGHT LOST",`${name} · -${staminaCost} Stamina · Lost ${money(cashLoss)} · -${hpLoss} Health`,"bad");
+   S.bad();injureRandomCrew();
  }
  save();render();
 }
@@ -5343,8 +5405,7 @@ function buyFacility(id){
  state.facilities[id]=true;
 
  log(`${f.name} opened. ${f.unlockLabel} is now available.`);
- recordIntel("FACILITY OPENED",`${f.name} · ${f.unlockLabel} unlocked`,"cash");
- showActionFlash("FACILITY OPENED",`${f.name} · ${f.unlockLabel} unlocked`,"cash");
+  showActionFlash("FACILITY OPENED",`${f.name} · ${f.unlockLabel} unlocked`,"cash");
  S.cash();save();render();
 }
 
@@ -5375,8 +5436,25 @@ function takeTerritory(id){
  if(!enemy)return toast("Rival faction unavailable.");
  state.st-=2;state.lifetimeTerritoryMoves++;
  const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
- if(p>=e){ts.progress+=35;state.heat=Math.min(100,state.heat+8);if(ts.progress>=100){ts.owned=true;ts.progress=100;state.notoriety+=18;log(`You took control of ${t.name}.`);showActionFlash("TERRITORY TAKEN",`${t.name} is now under your control`,"good")}else log(`You weakened ${t.enemy}'s hold on ${t.name}.`);S.ok()}
- else{state.hp=Math.max(1,state.hp-rnd(8,18));state.heat=Math.min(100,state.heat+5);log(`Your move on ${t.name} failed.`);S.bad()}
+ if(p>=e){
+   ts.progress+=35;state.heat=Math.min(100,state.heat+8);
+   if(ts.progress>=100){
+     ts.owned=true;ts.progress=100;state.notoriety+=18;
+     log(`You took control of ${t.name}.`);
+     showActionFlash("TERRITORY TAKEN",`${t.name} is now under your control`,"good");
+   }else{
+     log(`You weakened ${t.enemy}'s hold on ${t.name}.`);
+     showActionFlash("TERRITORY PRESSURE",`${t.name} · ${Math.min(100,ts.progress)}% takeover progress · -2 Stamina`,"good");
+   }
+   S.ok();
+ }else{
+   const hpBefore=state.hp;
+   state.hp=Math.max(1,state.hp-rnd(8,18));state.heat=Math.min(100,state.heat+5);
+   const hpLoss=Math.max(0,Math.floor(hpBefore-state.hp));
+   log(`Your move on ${t.name} failed.`);
+   showActionFlash("TERRITORY MOVE FAILED",`${t.name} · -2 Stamina · -${hpLoss} Health`,"bad");
+   S.bad();
+ }
  save();render()
 }
 function fstate(id){return state.friends[id]}
@@ -5473,8 +5551,7 @@ function massCrewOperation(kind){
    state.helpCaches.unshift(cache);
    state.helpCaches=state.helpCaches.slice(0,MAX_HELP_CACHES);
    log(`Crew Operations sealed a ${helpCacheTier(cache)} after contacting ${q.count} crew members; ${responders} contributed.`);
-   recordIntel("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} crew contributed`,"good");
-   showActionFlash("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} responses · Open it when ready`,"good");
+      showActionFlash("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} responses · Open it when ready`,"good");
  }
  S.cash();save();render();
 }
@@ -5485,20 +5562,25 @@ function openHelpCache(id=null){
  const cache=state.helpCaches[idx];
  const responders=Math.max(0,Number(cache.responders)||0);
  const rolls=Math.max(1,Math.min(6,1+Math.floor(responders/4)));
- const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,cash:0,limited:0,nothing:0};
+ const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,cash:0,limited:0,nothing:0,blocked:0};
 
  for(let i=0;i<rolls;i++){
    let r=Math.random();
    if(responders===0)r=Math.min(.999,r+.24);
-   if(r<.31){addLootItem("Energy Drink",1,999);rewards.energy++;}
-   else if(r<.58){addLootItem("Adrenaline Shot",1,999);rewards.stamina++;}
-   else if(r<.72){addLootItem("Energy Pack",1,99);rewards.energyPack++;}
-   else if(r<.84){addLootItem("Stamina Pack",1,99);rewards.staminaPack++;}
-   else if(r<.94){
+   if(r<.31){
+     if(addLootItem("Energy Drink",1,999)>0)rewards.energy++;else rewards.blocked++;
+   }else if(r<.58){
+     if(addLootItem("Adrenaline Shot",1,999)>0)rewards.stamina++;else rewards.blocked++;
+   }else if(r<.72){
+     if(addLootItem("Energy Pack",1,99)>0)rewards.energyPack++;else rewards.blocked++;
+   }else if(r<.84){
+     if(addLootItem("Stamina Pack",1,99)>0)rewards.staminaPack++;else rewards.blocked++;
+   }else if(r<.94){
      const amount=rnd(250,700)+Math.max(1,Number(cache.level)||1)*25+responders*20;
      state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;rewards.cash+=amount;
    }else if(r<.98&&responders>=8){
-     const limited=activeLimitedLoot();addLootItem(limited.name,1,99);rewards.limited++;
+     const limited=activeLimitedLoot();
+     if(addLootItem(limited.name,1,99)>0)rewards.limited++;else rewards.blocked++;
    }else rewards.nothing++;
  }
 
@@ -5510,11 +5592,12 @@ function openHelpCache(id=null){
  if(rewards.staminaPack)parts.push(`Stamina Pack ×${rewards.staminaPack}`);
  if(rewards.cash)parts.push(money(rewards.cash));
  if(rewards.limited)parts.push(`Weekly Loot ×${rewards.limited}`);
+ if(rewards.blocked)parts.push(`Stash full ×${rewards.blocked}`);
+ if(rewards.nothing)parts.push(`Nothing ×${rewards.nothing}`);
  if(!parts.length)parts.push("Nothing useful");
  const summary=parts.join(" · ");
  log(`Opened ${helpCacheTier(cache)}: ${summary}.`);
- recordIntel("HELP CACHE OPENED",summary,rewards.nothing===rolls?"info":"good");
- showActionFlash("HELP CACHE OPENED",summary,rewards.nothing===rolls?"info":"good");
+ showActionFlash("HELP CACHE OPENED",summary,(rewards.nothing+rewards.blocked)===rolls?"info":"good");
  save();render();
 }
 function renderCrewOperations(){
@@ -5585,21 +5668,21 @@ function openHelpRequest(id){
  }else if(Math.random()<helpChance){
    const r=Math.random();
    if(r<.38){
-     addLootItem("Energy Drink",1,999);
-     f.response="Sent you an Energy Drink.";
-     outcome={kind:"energy",amount:1,resultText:"ENERGY DRINK"};
+     const added=addLootItem("Energy Drink",1,999);
+     if(added>0){f.response="Sent you an Energy Drink.";outcome={kind:"energy",amount:1,resultText:"ENERGY DRINK"}}
+     else{f.response="Your Energy Drink stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
    }else if(r<.70){
-     addLootItem("Adrenaline Shot",1,999);
-     f.response="Sent you an Adrenaline Shot.";
-     outcome={kind:"stamina",amount:1,resultText:"ADRENALINE SHOT"};
+     const added=addLootItem("Adrenaline Shot",1,999);
+     if(added>0){f.response="Sent you an Adrenaline Shot.";outcome={kind:"stamina",amount:1,resultText:"ADRENALINE SHOT"}}
+     else{f.response="Your Adrenaline Shot stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
    }else if(r<.85){
-     addLootItem("Energy Pack",1,99);
-     f.response="I had an Energy Pack tucked away. It is yours.";
-     outcome={kind:"energyPack",amount:1,resultText:"ENERGY PACK"};
+     const added=addLootItem("Energy Pack",1,99);
+     if(added>0){f.response="I had an Energy Pack tucked away. It is yours.";outcome={kind:"energyPack",amount:1,resultText:"ENERGY PACK"}}
+     else{f.response="Your Energy Pack stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
    }else{
-     addLootItem("Stamina Pack",1,99);
-     f.response="I found a Stamina Pack. Save it for a bad night.";
-     outcome={kind:"staminaPack",amount:1,resultText:"STAMINA PACK"};
+     const added=addLootItem("Stamina Pack",1,99);
+     if(added>0){f.response="I found a Stamina Pack. Save it for a bad night.";outcome={kind:"staminaPack",amount:1,resultText:"STAMINA PACK"}}
+     else{f.response="Your Stamina Pack stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
    }
  }else{
    f.response=meanReplies[rnd(0,meanReplies.length-1)];
@@ -5797,9 +5880,11 @@ function answerInbox(id,choice){
      if(state.cash<cost)return showRequirementPopup(`You need ${money(cost)} Cash to help ${x.from}.`);
      state.cash-=cost;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
      changeRelationship(x.personId,{trust:8,respect:4,resentment:-4,rel:6});
-     socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);S.ok();
+     socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);
+     showActionFlash("FAVOR REQUEST HELPED",`${x.from} · ${money(cost)} paid · Relationship improved`,"good");S.ok();
    }else{
-     changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);S.bad();
+     changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);
+     showActionFlash("FAVOR REQUEST REFUSED",`${x.from} · Trust decreased · Resentment increased`,"bad");S.bad();
    }
  }
 
@@ -5814,26 +5899,33 @@ function answerInbox(id,choice){
      S.ok();
    }else{
      changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`);
+     showActionFlash("BACKUP REQUEST IGNORED",`${x.from} · Trust decreased · Resentment increased`,"bad");S.bad();
    }
  }
 
  if(x.type==="gift"&&choice==="accept"){
-   const item=x.item==="Energy Pack"?"Energy Drink":x.item;
-   if(item==="Energy Drink"||item==="Adrenaline Shot"){
-     const current=Math.max(0,Number(state.loot[item])||0);
-     if(current<999){
-       state.loot[item]=Math.min(999,current+1);
-       log(`${x.from} sent you a ${item}.`);
-       showActionFlash(`${item.toUpperCase()} RECEIVED`,`${x.from} · Stash: ${state.loot[item]}/999`,"good");
+   const item=String(x.item||"");
+   if(item==="Cash Envelope"){
+     const amount=Math.max(100,Math.floor(Number(x.amount)||250));
+     state.cash+=amount;
+     state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     log(`${x.from} sent you a Cash Envelope worth ${money(amount)}.`);
+     showActionFlash("CASH GIFT RECEIVED",`${x.from} · +${money(amount)}`,"cash");
+     S.ok();
+   }else{
+     const caps={"Energy Drink":999,"Adrenaline Shot":999,"Energy Pack":99,"Stamina Pack":99};
+     const cap=caps[item]||999;
+     const added=addLootItem(item,1,cap);
+     if(added>0){
+       log(`${x.from} sent you ${item}.`);
+       showActionFlash("GIFT RECEIVED",`${x.from} · ${item} ×1${caps[item]?` · Stash: ${state.loot[item]}/${cap}`:""}`,"good");
+       S.ok();
      }else{
        log(`${x.from}'s ${item} could not be stored because your stash is full.`);
-       showActionFlash(`${item.toUpperCase()} STASH FULL`,"Maximum stack: 999","bad");
+       showActionFlash("GIFT STASH FULL",`${item} · Maximum stack: ${cap}`,"bad");
+       S.bad();
      }
-   }else{
-     state.loot[item]=(state.loot[item]||0)+1;
-     log(`${x.from} sent you ${item}.`);
    }
-   S.ok();
  }
 
  dismissInbox(id);render();
@@ -5882,12 +5974,14 @@ function maybeGift(){
 
  const id=ids[rnd(0,ids.length-1)];
  const item=["Energy Drink","Adrenaline Shot","Burner Phone","Cash Envelope"][rnd(0,3)];
- addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`});
- showSocial("Gift waiting",`${nameOf(id)} sent you a ${item}. Open Messages to accept it.`);
+ const amount=item==="Cash Envelope"?rnd(250,700)+Math.max(1,state.level)*20:0;
+ const giftText=item==="Cash Envelope"?`Sent you a Cash Envelope worth ${money(amount)}.`:`Sent you a ${item}.`;
+ addInbox({type:"gift",from:nameOf(id),personId:id,item,amount,text:giftText});
+ showSocial("Gift waiting",`${nameOf(id)} sent you ${item==="Cash Envelope"?money(amount):`a ${item}`}. Open Messages to accept it.`);
 }
 function showSocial(title,text){
- if(state.messagePopups===false)return;
  recordIntel(title,text,"info");
+ if(state.messagePopups===false)return;
  socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;
  socialPop.classList.add("show");
 }
@@ -6009,6 +6103,7 @@ function defendAttack(id){
  if(!a)return toast("This attack is no longer active.");
  if(now()>a.expires){resolveExpiredAttack(a);return}
  if(state.st<1)return showRequirementPopup("You need 1 Stamina to defend this attack.");
+ state.st--;
 
  const req=defenseRequirementStatus(a);
  if(!req.met){
@@ -6018,15 +6113,15 @@ function defendAttack(id){
    state.cash-=loss;state.hp=Math.max(1,state.hp-hpLoss);
    state.revenge.unshift({...a,id:"r"+now(),bounty:0});state.revenge=state.revenge.slice(0,8);
    log(`Defense failed against ${a.name}: special requirement was not met. ${req.text}.`);
-   showActionFlash("DEFENSE REQUIREMENT FAILED",`${req.text} · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
+   showActionFlash("DEFENSE REQUIREMENT FAILED",`${req.text} · -1 Stamina · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
    removeAttackMessage(id);save();render();S.bad();return;
  }
 
- state.st--;a.resolved=true;runScene([[0,fxReload],[260,fxGun]]);
+ a.resolved=true;runScene([[0,fxReload],[260,fxGun]]);
  const defensePower=combatPower("defense"),p=defensePower+rnd(1,20),e=a.power+rnd(1,20);
  if(p>=e){
    state.notoriety+=2;log(`You defended against ${a.name}. Defense Power ${defensePower} repelled the attack.`);
-   showActionFlash("ATTACK REPELLED",`${a.name} · Defense Power ${defensePower}`,"good");
+   showActionFlash("ATTACK REPELLED",`${a.name} · -1 Stamina · Defense Power ${defensePower}`,"good");
  }else{
    const mitigation=defenseMitigation();
    const loss=Math.floor(Math.min(state.cash,rnd(80,220)+a.level*20)*(1-mitigation));
@@ -6034,7 +6129,7 @@ function defendAttack(id){
    state.cash-=loss;state.hp=Math.max(1,state.hp-hpLoss);
    state.revenge.unshift({...a,id:"r"+now(),bounty:0});state.revenge=state.revenge.slice(0,8);
    log(`${a.name} broke through your Defense Power ${defensePower} and took ${money(loss)}.`);
-   showActionFlash("DEFENSE FAILED",`${a.name} · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
+   showActionFlash("DEFENSE FAILED",`${a.name} · -1 Stamina · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
  removeAttackMessage(id);save();render();
 }
@@ -6062,6 +6157,7 @@ function resolveExpiredAttack(a){
  state.revenge.unshift({...a,id:"r"+now(),bounty:0});
  state.revenge=state.revenge.slice(0,8);
  log(`${a.name} hit your operation while you did not respond. Lost ${money(cashLoss)}${itemLoss}.`);
+ showActionFlash("ATTACK WINDOW EXPIRED",`${a.name} · Lost ${money(cashLoss)}${itemLoss}`,"bad");
  S.bad();
  removeAttackMessage(a.id);
  save();render()
@@ -6113,11 +6209,38 @@ function maybeHeatEvent(){
    state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;
    state.heat=Math.max(0,state.heat-12);
    log("You paid $250 in legal and cleanup costs to reduce pressure.");
+   showActionFlash("HEAT CLEANUP",`${money(250)} paid · Heat reduced by 12`,"cash");
  }else arrestRandomCrew();
 }
-function layLow(){if(state.cash<300)return toast("You need $300 to disappear for a while.");state.cash-=300;state.lifetimeCashSpent+=300;S.cash();state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);log("You laid low and reduced heat.");save();render()}
+function layLow(){
+ if(state.cash<300)return toast("You need $300 to disappear for a while.");
+ const oldHeat=state.heat,oldEnergy=state.en;
+ state.cash-=300;state.lifetimeCashSpent+=300;S.cash();
+ state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);
+ const heatDrop=Math.floor(oldHeat-state.heat),energyGain=Math.floor(state.en-oldEnergy);
+ log(`You laid low and reduced Heat by ${heatDrop}.`);
+ showActionFlash("LAID LOW",`${money(300)} paid · -${heatDrop} Heat${energyGain?` · +${energyGain} Energy`:""}`,"good");
+ save();render();
+}
 function claimDaily(){
- const today=new Date().toISOString().slice(0,10);if(state.daily.last===today)return;const y=new Date(Date.now()-86400000).toISOString().slice(0,10);state.daily.streak=state.daily.last===y?state.daily.streak+1:1;state.daily.last=today;const c=400+state.daily.streak*120;state.cash+=c;state.en=Math.min(state.maxEn,state.en+5);if(state.daily.streak%3===0)state.loot["Mystery Crate"]=(state.loot["Mystery Crate"]||0)+1;log(`Daily collection: ${money(c)} and +5 energy.`);showActionFlash("DAILY COLLECTION",`${money(c)} · +5 Energy`,"cash");save();render();S.ok()}
+ const today=new Date().toISOString().slice(0,10);
+ if(state.daily.last===today)return;
+ const y=new Date(Date.now()-86400000).toISOString().slice(0,10);
+ state.daily.streak=state.daily.last===y?state.daily.streak+1:1;
+ state.daily.last=today;
+ const c=400+state.daily.streak*120;
+ const oldEnergy=state.en;
+ state.cash+=c;
+ state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;
+ state.en=Math.min(state.maxEn,state.en+5);
+ const energyGain=Math.floor(state.en-oldEnergy);
+ const crateDay=state.daily.streak%3===0;
+ const crateAdded=crateDay?addLootItem("Mystery Crate",1,99):0;
+ const detail=[money(c),energyGain?`+${energyGain} Energy`:null,crateAdded?`Mystery Crate ×${crateAdded}`:crateDay?"Mystery Crate stash full":null].filter(Boolean).join(" · ");
+ log(`Daily collection: ${detail}.`);
+ showActionFlash("DAILY COLLECTION",detail,"cash");
+ save();render();S.ok();
+}
 function switchCity(id){const c=cities.find(x=>x.id===id);if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;save();render()}
 
 
@@ -6187,9 +6310,15 @@ function masteryRewardText(level){
  return level===1?"+5% Job cash permanently · one-time cash bonus":level===2?"+5% Job XP permanently · Energy Pack":level===3?"Maximum mastery · Stamina Pack · +2 Skill Points":"";
 }
 function addLootItem(item,qty=1,cap=999){
- const current=Math.max(0,Number(state.loot[item])||0);
- state.loot[item]=Math.min(cap,current+qty);
- return state.loot[item]-current;
+ const key=String(item||"").trim();
+ const amount=Math.max(0,Math.floor(Number(qty)||0));
+ const max=Math.max(1,Math.floor(Number(cap)||999));
+ if(!key||amount<=0)return 0;
+ const current=Math.max(0,Math.floor(Number(state.loot[key])||0));
+ if(current>=max)return 0;
+ const next=Math.min(max,current+amount);
+ state.loot[key]=next;
+ return next-current;
 }
 function grantMasteryReward(j,level){
  if(level===1){
@@ -6197,11 +6326,11 @@ function grantMasteryReward(j,level){
    state.cash+=c;state.lifetimeCashEarned+=c;
    showActionFlash("MASTERY I",`${j.name} · +${money(c)} · Future cash +5%`,"cash");
  }else if(level===2){
-   addLootItem("Energy Pack",1,99);
-   showActionFlash("MASTERY II",`${j.name} · Energy Pack · Future XP +5%`,"good");
+   const added=addLootItem("Energy Pack",1,99);
+   showActionFlash("MASTERY II",`${j.name} · ${added?"Energy Pack":"Energy Pack stash full"} · Future XP +5%`,added?"good":"info");
  }else if(level===3){
-   addLootItem("Stamina Pack",1,99);state.skill+=2;
-   showActionFlash("MASTERY III",`${j.name} · Stamina Pack · +2 Skill Points`,"good");
+   const added=addLootItem("Stamina Pack",1,99);state.skill+=2;
+   showActionFlash("MASTERY III",`${j.name} · ${added?"Stamina Pack":"Stamina Pack stash full"} · +2 Skill Points`,added?"good":"info");
  }
 }
 function collectionReady(c){
@@ -6237,6 +6366,53 @@ function useStaminaPack(){
  showActionFlash("STAMINA PACK USED",`+${actual} Stamina · ${Math.max(0,q-1)} remaining`,"good");
  save();render();
 }
+function useMysteryCrate(){
+ const q=Math.max(0,Number(state.loot["Mystery Crate"])||0);
+ if(q<=0)return toast("No Mystery Crates available.");
+ state.loot["Mystery Crate"]=q-1;
+ if(state.loot["Mystery Crate"]<=0)delete state.loot["Mystery Crate"];
+
+ const r=Math.random();
+ let detail="",type="good";
+ if(r<.35){
+   const amount=rnd(300,800)+Math.max(1,state.level)*15;
+   state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+   detail=`+${money(amount)} Cash`;
+   type="cash";
+ }else if(r<.60){
+   const added=addLootItem("Energy Drink",1,999);
+   if(added>0)detail="Energy Drink ×1";
+   else{
+     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     detail=`Energy Drink stash full · +${money(amount)} Cash instead`;type="cash";
+   }
+ }else if(r<.82){
+   const added=addLootItem("Adrenaline Shot",1,999);
+   if(added>0)detail="Adrenaline Shot ×1";
+   else{
+     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     detail=`Adrenaline stash full · +${money(amount)} Cash instead`;type="cash";
+   }
+ }else if(r<.92){
+   const added=addLootItem("Energy Pack",1,99);
+   if(added>0)detail="Energy Pack ×1";
+   else{
+     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     detail=`Energy Pack stash full · +${money(amount)} Cash instead`;type="cash";
+   }
+ }else{
+   const added=addLootItem("Stamina Pack",1,99);
+   if(added>0)detail="Stamina Pack ×1";
+   else{
+     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     detail=`Stamina Pack stash full · +${money(amount)} Cash instead`;type="cash";
+   }
+ }
+ log(`Opened a Mystery Crate: ${detail}.`);
+ showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${Math.max(0,q-1)} remaining`,type);
+ S.ok();save();render();
+}
+
 function bankDeposit(pct=1){
  if(state.cash<=0)return toast("No Cash available to deposit.");
  const amount=Math.max(1,Math.floor(state.cash*Math.max(.01,Math.min(1,pct))));
@@ -6479,7 +6655,7 @@ function render(){syncStatHudMode();const sx=document.getElementById("sfxState")
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
-function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and periodic mystery crates.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
+function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and a Mystery Crate every third streak day.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
 function renderEvent(){
  const surge=state.event.ends>now(),limited=activeLimitedLoot(),left=limitedLootEndsAt()-now();
  eventBox.innerHTML=`${surge?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmtLong(state.event.ends-now())}</div></div>`:""}
@@ -6506,12 +6682,14 @@ function renderJobs(){
    const xp=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
    return `<div class="card job-card compact-job" id="job-${j.id}">
     <div class="job-head"><img class="art" src="${art}" alt=""><div><h3>${j.name}</h3><div class="meta"><span class="badge">${spriteIconHtml("energy","xs")} ${j.energy}</span><span class="badge green">${spriteIconHtml("cash","xs")} ${money(lo)}–${money(hi)}</span><span class="badge">${spriteIconHtml("2:prestige-crown","xs")} ${xp} XP</span><span class="badge gold">${ch}% SUCCESS</span></div></div></div>
-    <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
-    <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>
+    ${j.noMastery
+      ?`<div class="mastery-reward">FALLBACK JOB · no gear, crew, Heat, or mastery requirements</div>`
+      :`<div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
+        <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>`}
     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
     ${dashJobPanel(j,dash,dashMarkup)}
     <div class="job-primary"><button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button></div>
-    <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${j.loot.join(", ")}<br><b>Weekly limited drop:</b> ${limited.name} (8% on success)</div></details>
+    <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${Array.isArray(j.loot)&&j.loot.length?j.loot.join(", "):"None"}<br><b>Weekly limited drop:</b> ${j.fallback?"Not available on fallback jobs":`${limited.name} (8% on success)`}</div></details>
    </div>`;
  }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
 
@@ -6751,6 +6929,7 @@ function renderInventory(){
  const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
  const ep=Math.max(0,Number(state.loot["Energy Pack"])||0);
  const sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
+ const mystery=Math.max(0,Number(state.loot["Mystery Crate"])||0);
  const caches=Array.isArray(state.helpCaches)?state.helpCaches.length:0;
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
  const ownedQty=owned.reduce((n,g)=>n+gearQty(g.id),0);
@@ -6762,6 +6941,7 @@ function renderInventory(){
    <div class="inventory-resource stamina"><div class="resource-head">${spriteIconHtml("adrenaline","resource")}<div class="ir-label">ADRENALINE</div><b>${shots}</b></div><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:energy-pack","resource")}<div class="ir-label">ENERGY PACKS</div><b>${ep}</b></div><button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:stamina-pack","resource")}<div class="ir-label">STAMINA PACKS</div><b>${sp}</b></div><button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
+   <div class="inventory-resource cache"><div class="resource-head">${spriteIconHtml("2:help-cache","resource")}<div class="ir-label">MYSTERY CRATES</div><b>${mystery}</b></div><button class="btn small" style="margin-top:4px" onclick="useMysteryCrate()" ${mystery<=0?"disabled":""}>OPEN</button></div>
    <div class="inventory-resource cache"><div class="resource-head">${spriteIconHtml("2:help-cache","resource")}<div class="ir-label">HELP CACHES</div><b>${caches}</b></div><button class="btn small" style="margin-top:4px" onclick="openHelpCache()" ${caches<=0?"disabled":""}>OPEN</button></div>
  </div>`;
 
@@ -7047,13 +7227,14 @@ function renderProfile(){
  ];
  profile.innerHTML=stats.map(x=>`<div class="card profile-hint-card">${x[1]}<button class="profile-hint" onclick="showProfileHelp('${x[0]}',event)">?</button><strong>${x[2]}</strong></div>`).join("");
 
- const consumables=["Energy Drink","Adrenaline Shot","Energy Pack","Stamina Pack"];
+ const consumables=["Energy Drink","Adrenaline Shot","Energy Pack","Stamina Pack","Mystery Crate"];
  const consumeHtml=consumables.filter(k=>(state.loot[k]||0)>0).map(k=>{
    const v=state.loot[k];
    if(k==="Energy Drink")return `<div class="inventory-use"><div><div class="title">${spriteIconHtml("drink","sm")} ${k}</div><div class="sub">Restores 3–7 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
    if(k==="Adrenaline Shot")return `<div class="inventory-use"><div><div class="title">${spriteIconHtml("adrenaline","sm")} ${k}</div><div class="sub">Restores 1–3 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useAdrenalineShot()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
    if(k==="Energy Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:energy-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 10–15 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useEnergyPack()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
-   return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:stamina-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 4–7 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useStaminaPack()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
+   if(k==="Stamina Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:stamina-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 4–7 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useStaminaPack()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
+   return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:help-cache","sm")} ${k}</div><div class="sub">Open for Cash or useful supplies. Full supply stacks convert to Cash.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useMysteryCrate()">OPEN</button></div></div>`;
  }).join("");
 
  const collectionHtml=collectionDefs.map(c=>{
