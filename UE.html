@@ -339,6 +339,27 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   margin-top:4px;
 }
 
+
+/* HUD + JOBS STABILITY */
+.top{position:relative!important;top:auto!important}
+.stats{width:100%;min-width:0}
+.stat{min-width:0!important;overflow:hidden!important}
+.stat b{max-width:100%;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important}
+#cashT{font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+#view-jobs,#view-jobs .cards,#view-jobs .card{width:100%!important;max-width:100%!important;min-width:0!important}
+#view-jobs .card{clear:both}
+#view-jobs .art{max-width:92px!important}
+.mini-hud{position:fixed;top:0;left:0;right:0;z-index:2147482500;height:38px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;padding:3px 4px;background:rgba(6,7,8,.97);border-bottom:1px solid #555;box-shadow:0 4px 14px rgba(0,0,0,.55);transform:translateY(-110%);opacity:0;pointer-events:none;transition:transform .14s ease,opacity .14s ease}
+.mini-hud.show{transform:translateY(0);opacity:1;pointer-events:auto}
+.mini-hud-item{min-width:0;background:linear-gradient(#191b1e,#0a0b0c);border:1px solid #343638;padding:3px 5px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:9px;white-space:nowrap;overflow:hidden}
+.mini-hud-item b{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:#eee}
+.mini-hud-item.energy b{color:#f0d36d}.mini-hud-item.cash b{color:#7fbd54}
+@media(max-width:430px){.mini-hud{height:36px;padding:2px}.mini-hud-item{padding:2px 3px;gap:2px;font-size:8px}.mini-hud-item b{font-size:9px}}
+
+
+/* LONG-TERM PROGRESSION */
+.achievement-summary{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:6px;background:#0b0c0d;border:1px solid #343638;margin-bottom:5px;font-size:10px}
+.achievement-grid{display:grid;gap:2px}.achievement-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px;padding:5px 6px;background:#090b0d;border:1px solid #2e3032}.achievement-row.done{border-left:3px solid #6f9348}.achievement-row .an{font-size:10px;font-weight:900}.achievement-row .ap{font-size:8px;color:#918a80}.achievement-row .av{font-size:9px;color:#c8b77f;white-space:nowrap}.whale-badge{display:inline-block;margin-top:4px;padding:3px 6px;border:1px solid #99762b;background:#241b08;color:#f1d56a;font-size:9px;font-weight:900;letter-spacing:.08em}
 </style>
 </head>
 <body>
@@ -359,6 +380,14 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
    <div class="track">EAST HARBOR RADIO // TRAPPIST — AXTON CROLLEY</div>
  </div>
 </header>
+
+<div id="miniHud" class="mini-hud" aria-hidden="true">
+  <div class="mini-hud-item health">❤️ <b id="miniHp">100</b></div>
+  <div class="mini-hud-item energy">⚡ <b id="miniEn">20</b></div>
+  <div class="mini-hud-item stamina">🥊 <b id="miniSt">10</b></div>
+  <div class="mini-hud-item cash">💵 <b id="miniCash">$0</b></div>
+</div>
+
 
 <main class="main">
 <section id="view-home" class="view active">
@@ -454,15 +483,15 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  
  <div class="card" style="margin-top:8px">
    <h3>Audio System</h3>
-   <p id="audioStatusText">Checking external audio…</p>
+   <p id="audioStatusText">Audio engine ready.</p>
    <div id="audioStatusList" class="sub"></div>
    <button class="btn secondary" onclick="testAudioPack()">TEST AUDIO PACK</button>
  </div>
 
 <div class="card" style="margin-top:8px">
    <h3>Audio Credits</h3>
-   <p>Theme music: “Trappist” by Axton Crolley, CC BY 3.0.</p>
-   <p>Additional SFX are linked from OpenGameArt, including a CC0 engine loop used for vehicle-related jobs. CC0 assets include Click Sounds by pauliuw, Coin Drop by Vinrax, Gunshots by kurt, Gun Reload Sound Effects by BMacZero, Sirens and Alarm Noise by aquinn, and Win Sound Effect by Listener.</p>
+   <p>Theme music and gameplay sound effects are generated locally with Web Audio for reliable playback.</p>
+   
  </div>
 
 <div class="card" style="margin-top:8px"><h3>Save</h3><p>Progress is stored locally in this browser.</p><button class="btn secondary" onclick="exportSave()">Export Save</button><button class="btn secondary" style="margin-top:5px" onclick="importSave()">Import Save</button><button class="btn red" style="margin-top:5px" onclick="resetGame()">Reset</button></div>
@@ -489,7 +518,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <div class="modal" id="energyModal"><div class="mbox"><h2>You do not have enough energy.</h2><p class="sub">Wait for recovery, request help from your contacts, or acquire additional energy.</p><div class="actions"><button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="openCheckout()">ACQUIRE ENERGY</button></div><button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">Wait for recovery</button></div></div>
 
-<div class="modal" id="checkoutModal"><div class="mbox"><h2>Acquire Energy</h2><p class="sub">Demonstration only. Do not enter real financial information.</p><div class="checkout-grid"><label>Fictional Account Number<input id="moneyNumber" placeholder="FAKE-0000-ENERGY"></label><label>Hours of work required to cover this purchase<input id="workHours" type="number" min="0" max="999" step=".5" placeholder="3.5"></label><label>Authorization Note<input id="authorization" placeholder="Approved for immediate use"></label></div><button class="btn" onclick="completeCheckout()">PURCHASE ENERGY</button><button class="btn secondary" style="margin-top:6px" onclick="closeModal('checkoutModal')">Cancel</button></div></div>
+<div class="modal" id="checkoutModal"><div class="mbox"><h2>Acquire Energy</h2><p class="sub">Demonstration only. Do not enter real financial information.</p><div id="energyPurchaseCount" class="sub"></div><div class="checkout-grid"><label>Fictional Account Number<input id="moneyNumber" placeholder="FAKE-0000-ENERGY"></label><label>Hours of work required to cover this purchase<input id="workHours" type="number" min="0" max="999" step=".5" placeholder="3.5"></label><label>Authorization Note<input id="authorization" placeholder="Approved for immediate use"></label></div><button class="btn" onclick="completeCheckout()">PURCHASE ENERGY</button><button class="btn secondary" style="margin-top:6px" onclick="closeModal('checkoutModal')">Cancel</button></div></div>
 
 
 <div class="modal" id="nameModal"><div class="mbox">
@@ -556,6 +585,14 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <script>
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
+
+function compactMoney(n){
+ const v=Math.max(0,Math.floor(Number(n)||0));
+ if(v<100000)return "$"+v.toLocaleString();
+ if(v<1000000)return "$"+(v/1000).toFixed(v>=100000?0:1)+"K";
+ if(v<1000000000)return "$"+(v/1000000).toFixed(v>=100000000?0:1)+"M";
+ return "$"+(v/1000000000).toFixed(1)+"B";
+}
 const IMG={
  city:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80",
  gun:"https://images.unsplash.com/photo-1595590424283-b8f17842773f?auto=format&fit=crop&w=900&q=80",
@@ -567,169 +604,43 @@ const IMG={
  docks:"https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?auto=format&fit=crop&w=900&q=80",
  suit:"https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=900&q=80"
 };
-let audioCtx=null,themeTimer=null,themeOn=false,themeStep=0;
-function ctx(){
- const C=window.AudioContext||window.webkitAudioContext;
- if(!C)return null;
- if(!audioCtx)audioCtx=new C();
- if(audioCtx.state==="suspended")audioCtx.resume();
- return audioCtx;
-}
-function tone(f,d=.07,type="triangle",v=.03,delay=0,slide=null){
- if(!state.sound)return;const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();
- o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
- g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);
- o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)
-}
-function noise(d=.08,v=.025,delay=0,low=7000){
- if(!state.sound)return;const c=ctx();if(!c)return;const len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);
- for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.7);
- const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+delay;s.buffer=buf;f.type="lowpass";f.frequency.value=low;g.gain.value=v;s.connect(f);f.connect(g);g.connect(c.destination);s.start(t)
-}
-
-/* Externally hosted audio. Every SFX has a synthesized fallback. */
-const AUDIO_URLS={
- theme:"https://opengameart.org/sites/default/files/trappist.wav",
- click:"https://opengameart.org/sites/default/files/click_sound_1.mp3",
- message:"https://opengameart.org/sites/default/files/click_sound_4.mp3",
- cash:"https://opengameart.org/sites/default/files/coin_drop_0.mp3",
- gun:"https://opengameart.org/sites/default/files/22%20Pistol.wav",
- reload:"https://opengameart.org/sites/default/files/clipload2.wav",
- siren:"https://opengameart.org/sites/default/files/siren_0.mp3",
- win:"https://opengameart.org/sites/default/files/Win%20sound.wav",
- engine:"https://opengameart.org/sites/default/files/loop_0.wav"
-};
-const audioState={};
-const samples={};
-
-function makeSample(name,url,volume=.45){
- const a=new Audio();
- a.preload="auto";a.src=url;a.volume=volume;
- audioState[name]="loading";
- a.addEventListener("canplaythrough",()=>{audioState[name]="ready";renderAudioStatus()},{once:true});
- a.addEventListener("loadeddata",()=>{if(audioState[name]!=="ready")audioState[name]="ready";renderAudioStatus()},{once:true});
- a.addEventListener("error",()=>{audioState[name]="failed";renderAudioStatus()});
- try{a.load()}catch(e){audioState[name]="failed"}
- samples[name]=a;return a
-}
-const externalTheme=makeSample("theme",AUDIO_URLS.theme,.36);
-externalTheme.loop=true;
-makeSample("click",AUDIO_URLS.click,.30);
-makeSample("message",AUDIO_URLS.message,.35);
-makeSample("cash",AUDIO_URLS.cash,.42);
-makeSample("gun",AUDIO_URLS.gun,.34);
-makeSample("reload",AUDIO_URLS.reload,.40);
-makeSample("siren",AUDIO_URLS.siren,.24);
-makeSample("win",AUDIO_URLS.win,.42);
-makeSample("engine",AUDIO_URLS.engine,.28);
-
-let activeSfxAudio=null;
-let activeSynthNodes=[],sceneTimers=[],sceneToken=0;
-function stopCurrentSfx(){if(activeSfxAudio){try{activeSfxAudio.pause();activeSfxAudio.currentTime=0}catch(e){}activeSfxAudio=null}activeSynthNodes.forEach(n=>{try{n.stop()}catch(e){}});activeSynthNodes=[]}
-function cancelSfxScene(){sceneToken++;sceneTimers.forEach(clearTimeout);sceneTimers=[];stopCurrentSfx()}
-function channelTone(f,d=.07,type="triangle",v=.03,slide=null){if(!state.sound)return;const c=ctx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);activeSynthNodes.push(o);o.start(t);o.stop(t+d+.02)}
-function channelNoise(d=.08,v=.025,low=7000){if(!state.sound)return;const c=ctx();if(!c)return;const len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.7);const src=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;f.type="lowpass";f.frequency.value=low;g.gain.value=v;src.connect(f);f.connect(g);g.connect(c.destination);activeSynthNodes.push(src);src.start()}
-function playSampleRaw(name,{volume=null,rate=1,loop=false}={}){if(!state.sound)return false;const base=samples[name];if(!base||audioState[name]==="failed")return false;try{const a=base.cloneNode(true);if(volume!==null)a.volume=volume;a.playbackRate=rate;a.loop=loop;activeSfxAudio=a;const p=a.play();if(p&&p.catch)p.catch(()=>{audioState[name]="failed";renderAudioStatus()});return true}catch(e){audioState[name]="failed";renderAudioStatus();return false}}
+let audioCtx=null,themeOn=false,themeTimer=null,themeStep=0,audioUnlocked=false;
+let sceneTimers=[],sceneToken=0,activeNodes=[];
+function ctx(){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;if(!audioCtx)audioCtx=new C();if(audioCtx.state==="suspended")audioCtx.resume().catch(()=>{});return audioCtx}
+function unlockAudio(){if(audioUnlocked)return;audioUnlocked=true;const c=ctx();if(c){const b=c.createBuffer(1,1,22050),s=c.createBufferSource();s.buffer=b;s.connect(c.destination);try{s.start(0)}catch(e){}}if(themeOn&&!themeTimer)themeBeat()}
+function stopNodes(){activeNodes.forEach(n=>{try{n.stop()}catch(e){}});activeNodes=[]}
+function cancelSfxScene(){sceneToken++;sceneTimers.forEach(clearTimeout);sceneTimers=[];stopNodes()}
 function later(ms,token,fn){const id=setTimeout(()=>{sceneTimers=sceneTimers.filter(x=>x!==id);if(token===sceneToken)fn()},ms);sceneTimers.push(id)}
-function fallbackClick(){channelTone(360,.025,"square",.012);channelNoise(.018,.006)}
-function fallbackCash(){channelTone(880,.04,"square",.018);const t=sceneToken;later(55,t,()=>channelTone(1320,.04,"square",.014))}
-function fallbackGun(){channelNoise(.12,.075,1800);channelTone(95,.09,"sawtooth",.035,45)}
-function fallbackMsg(){channelTone(740,.045,"square",.018);const t=sceneToken;later(60,t,()=>channelTone(990,.05,"square",.015))}
-function fallbackWin(){channelTone(440,.10,"triangle",.026);const t=sceneToken;later(105,t,()=>channelTone(660,.12,"triangle",.026))}
-function fallbackEngine(){channelTone(72,.45,"sawtooth",.025,95)}
-function metalHit(){channelNoise(.08,.04,2400);channelTone(210,.10,"triangle",.02,120)}
-function knock(){channelTone(115,.055,"sine",.03);const t=sceneToken;later(100,t,()=>channelTone(115,.055,"sine",.03))}
-function glassBreak(){channelNoise(.18,.055,6500);channelTone(1800,.05,"square",.012)}
-function safeDial(){channelTone(720,.025,"square",.014);const t=sceneToken;later(85,t,()=>channelTone(890,.025,"square",.014));later(170,t,()=>channelTone(650,.025,"square",.014))}
-function phoneRing(){channelTone(680,.10,"square",.015);const t=sceneToken;later(130,t,()=>channelTone(890,.10,"square",.015))}
-function oneShot(name,opts,fallback){stopCurrentSfx();if(!playSampleRaw(name,opts))fallback?.()}
-function engineBurst(ms=650){oneShot("engine",{volume:.27,rate:.92,loop:true},fallbackEngine);const t=sceneToken;later(ms,t,stopCurrentSfx)}
-function runScene(steps){cancelSfxScene();if(!state.sound)return;const token=sceneToken;steps.forEach(([ms,fn])=>later(ms,token,()=>{stopCurrentSfx();fn()}))}
-const S={tap:()=>{cancelSfxScene();oneShot("click",{volume:.22,rate:1.06},fallbackClick)},ok:()=>{cancelSfxScene();oneShot("win",{volume:.28,rate:1.08},fallbackWin)},bad:()=>{cancelSfxScene();channelTone(150,.15,"sawtooth",.025,75);channelNoise(.09,.018,1200)},lvl:()=>{cancelSfxScene();oneShot("win",{volume:.38,rate:.92},fallbackWin)},cash:()=>{cancelSfxScene();oneShot("cash",{volume:.38},fallbackCash)},gun:()=>{cancelSfxScene();oneShot("gun",{volume:.32},fallbackGun)},reload:()=>{cancelSfxScene();oneShot("reload",{volume:.38},fallbackClick)},msg:()=>{cancelSfxScene();oneShot("message",{volume:.30},fallbackMsg)},siren:()=>{cancelSfxScene();oneShot("siren",{volume:.22},()=>channelTone(740,.3,"sine",.02,520))}};
-function playJobSound(job,success){
- if(!state.sound)return;
- if(!success){runScene(job.heat>=12?[[0,()=>oneShot("siren",{volume:.18},()=>channelTone(740,.3,"sine",.02,520))],[850,()=>{channelTone(145,.16,"sawtooth",.025,70);metalHit()}]]:[[0,()=>{channelTone(145,.16,"sawtooth",.025,70);metalHit()}]]);return}
- const cash=()=>oneShot("cash",{volume:.36},fallbackCash),gun=()=>oneShot("gun",{volume:.30},fallbackGun),reload=()=>oneShot("reload",{volume:.32},fallbackClick),win=()=>oneShot("win",{volume:.23},fallbackWin),siren=()=>oneShot("siren",{volume:.17},()=>channelTone(740,.25,"sine",.02,520));
- const scenes={boost:[[0,()=>oneShot("click",{volume:.22,rate:.82},fallbackClick)],[190,()=>engineBurst(650)],[930,cash]],shake:[[0,knock],[240,metalHit],[510,cash]],truck:[[0,()=>engineBurst(520)],[610,gun],[900,()=>engineBurst(500)]],bookie:[[0,phoneRing],[310,knock],[620,cash]],warehouse:[[0,metalHit],[290,gun],[620,metalHit]],union:[[0,phoneRing],[320,knock],[650,win]],casino:[[0,cash],[290,glassBreak],[620,cash]],vault:[[0,safeDial],[380,metalHit],[720,cash]],bank:[[0,safeDial],[380,metalHit],[710,cash],[1030,siren]],shipment:[[0,()=>engineBurst(470)],[560,gun],[850,metalHit]],judge:[[0,phoneRing],[340,cash],[650,()=>oneShot("message",{volume:.27},fallbackMsg)]],convoy:[[0,()=>engineBurst(450)],[540,reload],[790,gun],[1100,siren]],family:[[0,reload],[300,gun],[590,gun],[900,win]]};
- runScene(scenes[job.id]||[[0,win]])
-}
-
-function kick(delay=0){const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(145,t);o.frequency.exponentialRampToValueAtTime(43,t+.12);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.2)}
-function hat(delay=0,open=false){noise(open?.11:.025,open?.017:.012,delay,9000)}
-function snare(delay=0){noise(.09,.04,delay,4200);tone(185,.055,"triangle",.015,delay)}
-function bass(note,delay=0,d=.18){const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=note;g.gain.setValueAtTime(.055,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
-function themeBeat(){
- if(!themeOn)return;
- const bpm=138,beat=60/bpm,step=beat/4,base=[43.65,43.65,51.91,38.89],root=base[Math.floor(themeStep/16)%base.length];
- for(let i=0;i<16;i++){const d=i*step;hat(d,i===7||i===15);if(i===0||i===7||i===10)kick(d);if(i===4||i===12)snare(d);if([0,3,7,10,14].includes(i))bass(root,d,step*2.7)}
- themeStep+=16;themeTimer=setTimeout(themeBeat,beat*4*1000-35)
-}
-function toggleTheme(){
- themeOn=!themeOn;ctx();
- if(themeOn){
-   if(audioState.theme!=="failed"){
-     const p=externalTheme.play();
-     if(p&&p.catch)p.catch(()=>{audioState.theme="failed";renderAudioStatus();themeStep=0;themeBeat()});
-   }else{themeStep=0;themeBeat()}
- }else{
-   externalTheme.pause();clearTimeout(themeTimer);themeTimer=null
- }
- const b=document.getElementById("musicBtn");if(b)b.textContent=themeOn?"■ THEME":"▶ THEME"
-}
-async function tryAutoTheme(){
-  if(themeOn)return;
-  themeOn=true;
-  ctx();
-  try{
-    if(audioState.theme!=="failed"){
-      await externalTheme.play();
-    }else{
-      themeStep=0;
-      themeBeat();
-    }
-  }catch(e){
-    // Most mobile browsers block autoplay with sound. Keep the intent armed
-    // and start it on the first user gesture.
-    themeOn=false;
-    const startOnGesture=async()=>{
-      document.removeEventListener("pointerdown",startOnGesture,true);
-      document.removeEventListener("touchstart",startOnGesture,true);
-      if(themeOn)return;
-      themeOn=true;
-      try{
-        if(audioState.theme!=="failed")await externalTheme.play();
-        else{themeStep=0;themeBeat()}
-      }catch(err){
-        if(!themeTimer){themeStep=0;themeBeat()}
-      }
-      const b=document.getElementById("musicBtn");
-      if(b)b.textContent="■ THEME";
-    };
-    document.addEventListener("pointerdown",startOnGesture,true);
-    document.addEventListener("touchstart",startOnGesture,true);
-  }
-  const b=document.getElementById("musicBtn");
-  if(b)b.textContent=themeOn?"■ THEME":"▶ THEME";
-}
-
+function synthTone(f,d=.08,type="triangle",v=.03,slide=null){if(!state.sound)return;const c=ctx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(Math.max(20,f),t);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(20,slide),t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);activeNodes.push(o);o.start(t);o.stop(t+d+.03)}
+function synthNoise(d=.08,v=.025,low=7000,highpass=40){if(!state.sound)return;const c=ctx();if(!c)return;const len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.45);const src=c.createBufferSource(),lp=c.createBiquadFilter(),hp=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;lp.type="lowpass";lp.frequency.value=low;hp.type="highpass";hp.frequency.value=highpass;g.gain.value=v;src.connect(lp);lp.connect(hp);hp.connect(g);g.connect(c.destination);activeNodes.push(src);src.start()}
+function runScene(steps){cancelSfxScene();unlockAudio();if(!state.sound)return;const token=sceneToken;steps.forEach(([ms,fn])=>later(ms,token,fn))}
+function fxClick(){synthTone(480,.025,"square",.015);synthTone(720,.018,"square",.008)}
+function fxCash(){synthTone(1040,.035,"square",.025);const t=sceneToken;later(55,t,()=>synthTone(1450,.04,"square",.022));later(105,t,()=>synthTone(1880,.05,"square",.015))}
+function fxGun(){synthNoise(.13,.09,2200,80);synthTone(105,.1,"sawtooth",.05,42);const t=sceneToken;later(50,t,()=>synthNoise(.09,.035,900,40))}
+function fxReload(){fxClick();const t=sceneToken;later(90,t,()=>{synthTone(280,.035,"square",.018);synthNoise(.025,.012,5000,1200)});later(210,t,()=>fxClick())}
+function fxMessage(){synthTone(760,.065,"square",.025);const t=sceneToken;later(85,t,()=>synthTone(1040,.08,"square",.02))}
+function fxWin(){const t=sceneToken;[330,440,554,660].forEach((f,i)=>later(i*70,t,()=>synthTone(f,.11,"triangle",.028)))}
+function fxBad(){synthTone(155,.18,"sawtooth",.03,70);synthNoise(.1,.025,1300,40)}
+function fxSiren(){const t=sceneToken;for(let i=0;i<6;i++)later(i*130,t,()=>synthTone(i%2?570:760,.14,"sine",.018))}
+function fxEngine(ms=650){const t=sceneToken;for(let i=0;i<Math.max(3,Math.floor(ms/70));i++)later(i*65,t,()=>{synthTone(68+(i%4)*7,.09,"sawtooth",.012,82+(i%3)*5);synthNoise(.045,.006,450,30)})}
+function fxKnock(){synthTone(112,.055,"sine",.035);const t=sceneToken;later(105,t,()=>synthTone(112,.055,"sine",.035))}
+function fxMetal(){synthNoise(.09,.045,3000,400);synthTone(230,.11,"triangle",.02,115)}
+function fxGlass(){synthNoise(.22,.06,9000,1600);const t=sceneToken;later(40,t,()=>synthTone(1900,.05,"square",.012));later(95,t,()=>synthTone(1420,.06,"square",.009))}
+function fxSafe(){const t=sceneToken;[720,850,630,940,690].forEach((f,i)=>later(i*95,t,()=>{synthTone(f,.025,"square",.014);fxClick()}))}
+function fxPhone(){synthTone(680,.11,"square",.017);const t=sceneToken;later(145,t,()=>synthTone(890,.11,"square",.017));later(330,t,()=>synthTone(680,.11,"square",.014))}
+const S={tap:()=>runScene([[0,fxClick]]),ok:()=>runScene([[0,fxWin]]),bad:()=>runScene([[0,fxBad]]),lvl:()=>runScene([[0,fxWin],[420,fxCash]]),cash:()=>runScene([[0,fxCash]]),gun:()=>runScene([[0,fxGun]]),reload:()=>runScene([[0,fxReload]]),msg:()=>runScene([[0,fxMessage]]),siren:()=>runScene([[0,fxSiren]])};
+function playJobSound(job,success){if(!state.sound)return;if(!success){runScene(job.heat>=12?[[0,fxSiren],[700,fxBad]]:[[0,fxBad]]);return}const scenes={boost:[[0,fxClick],[140,()=>fxEngine(700)],[920,fxCash]],shake:[[0,fxKnock],[260,fxMetal],[530,fxCash]],truck:[[0,()=>fxEngine(500)],[590,fxGun],[900,()=>fxEngine(520)]],bookie:[[0,fxPhone],[380,fxKnock],[700,fxCash]],warehouse:[[0,fxMetal],[330,fxGun],[690,fxMetal]],union:[[0,fxPhone],[400,fxKnock],[730,fxWin]],casino:[[0,fxCash],[300,fxGlass],[690,fxCash]],vault:[[0,fxSafe],[550,fxMetal],[850,fxCash]],bank:[[0,fxSafe],[550,fxMetal],[850,fxCash],[1180,fxSiren]],shipment:[[0,()=>fxEngine(460)],[550,fxGun],[880,fxMetal]],judge:[[0,fxPhone],[410,fxCash],[740,fxMessage]],convoy:[[0,()=>fxEngine(430)],[520,fxReload],[800,fxGun],[1120,fxSiren]],family:[[0,fxReload],[340,fxGun],[650,fxGun],[980,fxWin]]};runScene(scenes[job.id]||[[0,fxWin]])}
+function themeKick(delay=0){const c=ctx();if(!c||!themeOn)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(145,t);o.frequency.exponentialRampToValueAtTime(43,t+.12);g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.2)}
+function themeHat(delay=0,open=false){if(!themeOn)return;const c=ctx();if(!c)return;const d=open?.11:.025,len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*(1-i/len);const src=c.createBufferSource(),hp=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;hp.type="highpass";hp.frequency.value=6500;g.gain.value=open?.009:.006;src.connect(hp);hp.connect(g);g.connect(c.destination);src.start(c.currentTime+delay)}
+function themeSnare(delay=0){if(!themeOn)return;themeHat(delay,true);const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="triangle";o.frequency.value=180;g.gain.setValueAtTime(.012,t);g.gain.exponentialRampToValueAtTime(.0001,t+.08);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.09)}
+function themeBass(note,delay=0,d=.2){const c=ctx();if(!c||!themeOn)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=note;g.gain.setValueAtTime(.035,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
+function themeBeat(){if(!themeOn||!audioUnlocked){themeTimer=null;return}const bpm=136,beat=60/bpm,step=beat/4,roots=[43.65,38.89,51.91,36.71],root=roots[Math.floor(themeStep/16)%roots.length];for(let i=0;i<16;i++){const d=i*step;themeHat(d,i===7||i===15);if([0,7,10].includes(i))themeKick(d);if(i===4||i===12)themeSnare(d);if([0,3,7,10,14].includes(i))themeBass(root,d,step*2.7)}themeStep+=16;themeTimer=setTimeout(themeBeat,beat*4*1000-25)}
+function toggleTheme(){themeOn=!themeOn;unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}else if(!themeOn){clearTimeout(themeTimer);themeTimer=null}const b=document.getElementById("musicBtn");if(b)b.textContent=themeOn?"■ THEME":"▶ THEME"}
 function toggleSound(){state.sound=!state.sound;save();const e=document.getElementById("sfxState");if(e)e.textContent=state.sound?"ON":"OFF"}
-
-function renderAudioStatus(){
- const list=document.getElementById("audioStatusList"),text=document.getElementById("audioStatusText");
- if(!list||!text)return;
- const names=["theme","click","message","cash","gun","reload","siren","win","engine"];
- const ready=names.filter(n=>audioState[n]==="ready").length;
- const failed=names.filter(n=>audioState[n]==="failed").length;
- text.textContent=`External audio: ${ready}/${names.length} ready${failed?` · ${failed} using fallback`:""}`;
- list.innerHTML=names.map(n=>`${audioState[n]==="ready"?"✓":audioState[n]==="failed"?"×":"…"} ${n.toUpperCase()}`).join(" · ");
-}
-async function testAudioPack(){
- state.sound=true;save();
- const seq=[["click",350],["cash",550],["message",500],["reload",650],["gun",850],["engine",850],["win",700],["siren",900]];
- for(const [n,wait] of seq){cancelSfxScene();if(n==="engine")runScene([[0,()=>engineBurst(600)]]);else oneShot(n,{volume:n==="siren"?.18:.28},fallbackClick);await new Promise(r=>setTimeout(r,wait))}
- cancelSfxScene();renderAudioStatus()
-}
-setTimeout(renderAudioStatus,500);
+function tryAutoTheme(){themeOn=true;const arm=()=>{unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}document.removeEventListener("pointerdown",arm,true);document.removeEventListener("touchstart",arm,true)};document.addEventListener("pointerdown",arm,true);document.addEventListener("touchstart",arm,true);const b=document.getElementById("musicBtn");if(b)b.textContent="■ THEME"}
+function renderAudioStatus(){const text=document.getElementById("audioStatusText"),list=document.getElementById("audioStatusList");if(text)text.textContent="Audio engine: READY · self-contained Web Audio";if(list)list.innerHTML='<span class="audio-good">✓ THEME</span> · <span class="audio-good">✓ JOB SFX</span> · <span class="audio-good">✓ COMBAT</span> · <span class="audio-good">✓ CASH</span> · <span class="audio-good">✓ ALERTS</span>'}
+async function testAudioPack(){state.sound=true;save();unlockAudio();for(const fn of [fxClick,fxCash,fxMessage,fxReload,fxGun,fxEngine,fxWin,fxSiren]){runScene([[0,fn]]);await new Promise(r=>setTimeout(r,650))}cancelSfxScene();renderAudioStatus()}
+setTimeout(renderAudioStatus,250);
 
 
 const cities=[
@@ -1042,122 +953,30 @@ function personAvatarUrl(id,name){
 }
 
 
-const campaignDefs=[
- {
-   id:"arrival",
-   title:"A Name on the Street",
-   story:"Nobody owns East Harbor without first being noticed. Put together a small crew, prove you can make money, and show the neighborhood you are not temporary.",
-   objectives:[
-     {type:"jobs",target:3,label:"Complete 3 jobs"},
-     {type:"crew",target:3,label:"Build a crew of 3"},
-     {type:"cash",target:1200,label:"Hold $1,200 cash"}
-   ],
-   reward:{cash:750,xp:60,energy:6,notoriety:8},
-   rewardText:"$750 · 60 XP · +6 Energy · +8 Notoriety"
- },
- {
-   id:"armed",
-   title:"Arm the Crew",
-   story:"A crew without equipment is a liability. Put weapons in reliable hands and establish a legitimate-looking front for the money coming in.",
-   objectives:[
-     {type:"gear",target:5,label:"Own 5 pieces of equipment"},
-     {type:"properties",target:1,label:"Own 1 property"},
-     {type:"wins",target:3,label:"Win 3 fights"}
-   ],
-   reward:{cash:1400,xp:100,skill:2,loot:"Weapon Shipment"},
-   rewardText:"$1,400 · 100 XP · +2 Skill Points · Weapon Shipment"
- },
- {
-   id:"harbor",
-   title:"The Harbor Belongs to Someone",
-   story:"The Harbor Kings collect from everyone who moves cargo through the docks. Start taking pieces of their operation until they understand there is a second organization in town.",
-   objectives:[
-     {type:"notoriety",target:40,label:"Reach 40 Notoriety"},
-     {type:"jobMasteries",target:2,label:"Master 2 jobs to Rank I"},
-     {type:"territoryProgress",target:35,label:"Make a move on a territory"}
-   ],
-   reward:{cash:2500,xp:160,stamina:3,notoriety:15},
-   rewardText:"$2,500 · 160 XP · +3 Stamina · +15 Notoriety"
- },
- {
-   id:"organization",
-   title:"Make It an Organization",
-   story:"Street muscle only gets you so far. You need specialists, dependable income, and enough victories that rivals think before testing you.",
-   objectives:[
-     {type:"crew",target:7,label:"Build a crew of 7"},
-     {type:"roles",target:3,label:"Have 3 different crew specialties"},
-     {type:"netIncome",target:250,label:"Reach $250/hr net income"},
-     {type:"wins",target:8,label:"Win 8 fights"}
-   ],
-   reward:{cash:4000,xp:220,skill:3,loot:"Black Book"},
-   rewardText:"$4,000 · 220 XP · +3 Skill Points · Black Book"
- },
- {
-   id:"firstboss",
-   title:"Remove the Man Above You",
-   story:"Your growth has attracted attention from the people who believed you worked beneath them. Master your work and remove the first obstacle to your rise.",
-   objectives:[
-     {type:"masteryTotal",target:3,label:"Earn 3 total job mastery ranks"},
-     {type:"bosses",target:1,label:"Defeat 1 rank boss"},
-     {type:"notoriety",target:80,label:"Reach 80 Notoriety"}
-   ],
-   reward:{cash:6500,xp:350,maxEnergy:5,notoriety:25,loot:"Boss's Ledger"},
-   rewardText:"$6,500 · 350 XP · +5 Max Energy · +25 Notoriety · Boss's Ledger"
- },
- {
-   id:"territory",
-   title:"Take Ground",
-   story:"Money is useful. Ground is power. Take and hold territory, expand your fronts, and force a rival crew to watch your flag go up in their neighborhood.",
-   objectives:[
-     {type:"territories",target:2,label:"Control 2 territories"},
-     {type:"properties",target:4,label:"Own 4 properties"},
-     {type:"cash",target:10000,label:"Hold $10,000 cash"},
-     {type:"crew",target:10,label:"Build a crew of 10"}
-   ],
-   reward:{cash:10000,xp:500,skill:4,notoriety:35,loot:"Territory Map"},
-   rewardText:"$10,000 · 500 XP · +4 Skill Points · +35 Notoriety · Territory Map"
- },
- {
-   id:"downtown",
-   title:"Move Downtown",
-   story:"East Harbor was the beginning. Downtown is where politicians, clubs, judges, and serious money live. Prove you can operate at that level.",
-   objectives:[
-     {type:"level",target:12,label:"Reach Level 12"},
-     {type:"cityJobs",city:"downtown",target:3,label:"Complete 3 Downtown jobs"},
-     {type:"notoriety",target:150,label:"Reach 150 Notoriety"},
-     {type:"wins",target:15,label:"Win 15 fights"}
-   ],
-   reward:{cash:15000,xp:700,maxStamina:3,loot:"Downtown Connections"},
-   rewardText:"$15,000 · 700 XP · +3 Max Stamina · Downtown Connections"
- },
- {
-   id:"familywar",
-   title:"A Seat at the Table",
-   story:"The established families no longer consider you a street problem. They consider you competition. Build enough power that they have to deal with you as an equal.",
-   objectives:[
-     {type:"crew",target:18,label:"Build a crew of 18"},
-     {type:"territories",target:4,label:"Control 4 territories"},
-     {type:"bosses",target:3,label:"Defeat 3 rank bosses"},
-     {type:"notoriety",target:250,label:"Reach 250 Notoriety"}
-   ],
-   reward:{cash:30000,xp:1200,skill:6,maxEnergy:8,notoriety:50,loot:"Family Seal"},
-   rewardText:"$30,000 · 1,200 XP · +6 Skill Points · +8 Max Energy · Family Seal"
- },
- {
-   id:"empire",
-   title:"Underworld Empire",
-   story:"There is no one left to convince. Control the ground, command a large organization, and become the name every crew in the city knows.",
-   objectives:[
-     {type:"territories",target:6,label:"Control all 6 territories"},
-     {type:"crew",target:25,label:"Build a crew of 25"},
-     {type:"wins",target:30,label:"Win 30 fights"},
-     {type:"notoriety",target:400,label:"Reach 400 Notoriety"},
-     {type:"bosses",target:5,label:"Defeat 5 rank bosses"}
-   ],
-   reward:{cash:75000,xp:2500,skill:10,maxEnergy:12,maxStamina:5,loot:"Empire Ring"},
-   rewardText:"$75,000 · 2,500 XP · +10 Skill Points · +12 Max Energy · +5 Max Stamina · Empire Ring"
+const campaignDefs=(()=>{
+ const chapters=[];
+ const chapterNames=["A Name on the Street","Arm the Crew","Harbor Pressure","Make It an Organization","Remove the Man Above You","Take Ground","Downtown Money","Family Business","The Long War","No Longer Small"];
+ for(let i=0;i<60;i++){
+   const phase=Math.floor(i/10),pos=i%10;
+   const jobs=Math.round(10*Math.pow(1.158,i)),wins=Math.round(3*Math.pow(1.155,i)),notoriety=Math.round(20*Math.pow(1.15,i));
+   const cashEarned=Math.round(3500*Math.pow(1.205,i)),gear=Math.round(5+i*5+Math.pow(i,1.35)),props=Math.round(1+i*2.6);
+   const mastery=Math.round(1+i*1.5),crew=Math.round(Math.min(120,3+i*1.65)),level=Math.round(3+i*3.5),spend=Math.round(1200*Math.pow(1.19,i));
+   const pools=[
+    [{type:"lifetimeJobs",target:jobs,label:`Complete ${jobs.toLocaleString()} lifetime jobs`},{type:"crew",target:crew,label:`Build a crew of ${crew}`},{type:"lifetimeCashEarned",target:cashEarned,label:`Earn ${money(cashEarned)} lifetime cash`}],
+    [{type:"gear",target:gear,label:`Own ${gear.toLocaleString()} pieces of equipment`},{type:"wins",target:wins,label:`Win ${wins.toLocaleString()} fights`},{type:"notoriety",target:notoriety,label:`Reach ${notoriety.toLocaleString()} Notoriety`}],
+    [{type:"properties",target:props,label:`Own ${props.toLocaleString()} properties`},{type:"masteryTotal",target:mastery,label:`Earn ${mastery.toLocaleString()} total mastery ranks`},{type:"lifetimeCashSpent",target:spend,label:`Spend ${money(spend)} building the organization`}],
+    [{type:"lifetimeJobs",target:jobs,label:`Complete ${jobs.toLocaleString()} lifetime jobs`},{type:"wins",target:wins,label:`Win ${wins.toLocaleString()} fights`},{type:"level",target:level,label:`Reach Level ${level}`}]
+   ];
+   const objectives=[...pools[pos%4]];
+   if(i>=8&&pos%3===0)objectives.push({type:"territories",target:Math.min(6,1+Math.floor(i/10)),label:`Control ${Math.min(6,1+Math.floor(i/10))} territories`});
+   if(i>=12&&pos%4===1)objectives.push({type:"bosses",target:Math.min(6,1+Math.floor(i/12)),label:`Defeat ${Math.min(6,1+Math.floor(i/12))} rank bosses`});
+   if(i>=18&&pos%5===2)objectives.push({type:"roles",target:Math.min(8,3+Math.floor(i/10)),label:`Maintain ${Math.min(8,3+Math.floor(i/10))} crew specialties`});
+   const cashReward=Math.round(700*Math.pow(1.15,i)),xpReward=Math.round(60*Math.pow(1.12,i));
+   chapters.push({id:`campaign_${i+1}`,title:i<10?chapterNames[i]:`${["East Harbor","Downtown","Northside","The Families","Citywide","Empire"][phase%6]}: ${["Expansion","Pressure","Control","Consolidation","War","Influence","Revenue","Reputation","Dominance","Legacy"][pos]}`,story:i<10?"Build the organization one deliberate step at a time. Every chapter is meant to last longer than the one before it.":`Chapter ${i+1}. Your organization is measured by sustained operations, not one good night. Scale, survive, and keep expanding.`,objectives,reward:{cash:cashReward,xp:xpReward,skill:(i+1)%5===0?2:0,energy:(i+1)%3===0?4:0,notoriety:Math.max(2,Math.floor(i/2))},rewardText:`${money(cashReward)} · ${xpReward.toLocaleString()} XP${(i+1)%5===0?" · +2 Skill Points":""}${(i+1)%3===0?" · +4 Energy":""}`});
  }
-];
+ return chapters;
+})();
+
 
 function totalJobsCompleted(){
  return Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0)*5+(j.runs||0),0);
@@ -1202,11 +1021,13 @@ function completedCityJobs(city){
 function campaignObjectiveValue(o){
  switch(o.type){
    case "jobs":return totalJobsCompleted();
+   case "lifetimeJobs":return state.lifetimeJobs||0;
    case "crew":return crewSize();
    case "cash":return Math.floor(state.cash);
    case "gear":return totalGearOwned();
    case "properties":return totalPropertiesOwned();
    case "wins":return state.wins||0;
+   case "lifetimeFights":return state.lifetimeFights||0;
    case "notoriety":return Math.floor(state.notoriety||0);
    case "jobMasteries":return jobsAtMasteryOne();
    case "masteryTotal":return totalMasteryRanks();
@@ -1217,9 +1038,12 @@ function campaignObjectiveValue(o){
    case "bosses":return defeatedBosses();
    case "level":return state.level||1;
    case "cityJobs":return completedCityJobs(o.city);
+   case "lifetimeCashEarned":return state.lifetimeCashEarned||0;
+   case "lifetimeCashSpent":return state.lifetimeCashSpent||0;
    default:return 0;
  }
 }
+
 function campaignObjectiveDone(o){
  return campaignObjectiveValue(o)>=o.target;
 }
@@ -1236,7 +1060,7 @@ function claimCampaign(){
  if(!campaignComplete(c))return toast("Complete every campaign objective first.");
 
  const r=c.reward||{};
- if(r.cash)state.cash+=r.cash;
+ if(r.cash){state.cash+=r.cash;state.lifetimeCashEarned+=r.cash;}
  if(r.xp)addXp(r.xp);
  if(r.energy)state.en=Math.min(state.maxEn,state.en+r.energy);
  if(r.stamina)state.st=Math.min(state.maxSt,state.st+r.stamina);
@@ -1324,7 +1148,7 @@ function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -1332,7 +1156,7 @@ function fresh(){
 }
 let state=load();migrate();
 function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
-function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!("playerPhoto" in state))state.playerPhoto="";if(!state.customFriends)state.customFriends={};if(!Number.isInteger(state.campaignIndex))state.campaignIndex=0;if(!state.campaignClaimed)state.campaignClaimed={};if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];
+function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!("playerPhoto" in state))state.playerPhoto="";if(!state.customFriends)state.customFriends={};if(!Number.isInteger(state.campaignIndex))state.campaignIndex=0;if(!state.campaignClaimed)state.campaignClaimed={};if(!state.achievementUnlocked)state.achievementUnlocked={};["lifetimeJobs","lifetimeCashEarned","lifetimeCashSpent","lifetimeFights","lifetimeTerritoryMoves","lifetimeEnergyPurchases"].forEach(k=>{if(!Number.isFinite(state[k]))state[k]=0});if(!("whale" in state))state.whale=false;if(!Object.keys(state.campaignClaimed||{}).some(k=>k.startsWith("campaign_"))){state.campaignClaimed={};state.campaignIndex=0;}if(state.lifetimeJobs===0)state.lifetimeJobs=Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0)*5+(j.runs||0),0);if(state.lifetimeFights===0)state.lifetimeFights=(state.wins||0)+(state.losses||0);if(state.lifetimeCashEarned===0)state.lifetimeCashEarned=Math.max(0,Math.floor(state.cash||0));if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];
  const regenBase=state.lastTick||now();
  if(!state.lastEnergyRegen)state.lastEnergyRegen=regenBase;
  if(!state.lastStaminaRegen)state.lastStaminaRegen=regenBase;
@@ -1371,7 +1195,7 @@ function doJob(id){
  if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
  setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);const chance=jobChance(j),success=rnd(1,100)<=chance,js=jobState(id);
  if(success){
-   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);state.cash+=c;js.runs++;state.notoriety+=2;
+   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;js.runs++;state.notoriety+=2;
    if(js.runs>=5){js.runs=0;if(js.mastery<3){js.mastery++;state.skill++;state.notoriety+=5;log(`${j.name} mastery advanced to ${js.mastery}/3. +1 skill point.`)}}
    if(Math.random()<.20){const item=j.loot[rnd(0,j.loot.length-1)];state.loot[item]=(state.loot[item]||0)+1;log(`Recovered rare item: ${item}.`)}
    addXp(j.xp);log(`${j.name} completed. Earned ${money(c)} and ${j.xp} XP.`);showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${j.xp} XP`);playJobSound(j,true)
@@ -1405,8 +1229,8 @@ function genOpponent(i,hit=false){
 function fight(i,hit=false,revengeId=null){
  if(state.st<1)return toast("Not enough stamina.");
  if(state.hp<10)return toast("Health too low.");
- state.st--;
- runScene([[0,()=>oneShot("reload",{volume:.32},fallbackClick)],[260,()=>oneShot("gun",{volume:.33},fallbackGun)]]);
+ state.st--;state.lifetimeFights++;
+ runScene([[0,fxReload],[260,fxGun]]);
  const o=revengeId
    ? state.revenge.find(x=>x.id===revengeId)
    : genOpponent(i,hit);
@@ -1444,8 +1268,8 @@ function fightBoss(t){
  else{state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900));log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew()}
  save();render()
 }
-function buyGear(id){const g=gearDefs.find(x=>x.id===id);if(!g)return toast("Equipment unavailable.");if(state.level<g.level)return toast(`Unlocks at level ${g.level}.`);if(state.cash<g.cost)return toast("Not enough cash.");state.cash-=g.cost;state.gear[id]=gearQty(id)+1;S.cash();save();render()}
-function buyProp(id){const p=propDefs.find(x=>x.id===id);if(!p)return toast("Property unavailable.");const q=state.props[id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));if(state.level<p.level)return toast(`Unlocks at level ${p.level}.`);if(state.cash<c)return toast("Not enough cash.");state.cash-=c;state.props[id]=q+1;state.notoriety+=2;S.cash();save();render()}
+function buyGear(id){const g=gearDefs.find(x=>x.id===id);if(!g)return toast("Equipment unavailable.");if(state.level<g.level)return toast(`Unlocks at level ${g.level}.`);if(state.cash<g.cost)return toast("Not enough cash.");state.cash-=g.cost;state.lifetimeCashSpent+=g.cost;state.gear[id]=gearQty(id)+1;S.cash();save();render()}
+function buyProp(id){const p=propDefs.find(x=>x.id===id);if(!p)return toast("Property unavailable.");const q=state.props[id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));if(state.level<p.level)return toast(`Unlocks at level ${p.level}.`);if(state.cash<c)return toast("Not enough cash.");state.cash-=c;state.lifetimeCashSpent+=c;state.props[id]=q+1;state.notoriety+=2;S.cash();save();render()}
 function takeTerritory(id){
  const t=territoryDefs.find(x=>x.id===id);
  if(!t)return toast("Territory unavailable.");
@@ -1455,7 +1279,7 @@ function takeTerritory(id){
  if(state.st<2)return toast("Territory moves cost 2 stamina.");
  const enemy=factions.find(f=>f.name===t.enemy);
  if(!enemy)return toast("Rival faction unavailable.");
- state.st-=2;
+ state.st-=2;state.lifetimeTerritoryMoves++;
  const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
  if(p>=e){ts.progress+=35;state.heat=Math.min(100,state.heat+8);if(ts.progress>=100){ts.owned=true;ts.progress=100;state.notoriety+=18;log(`You took control of ${t.name}.`)}else log(`You weakened ${t.enemy}'s hold on ${t.name}.`);S.ok()}
  else{state.hp=Math.max(1,state.hp-rnd(8,18));state.heat=Math.min(100,state.heat+5);log(`Your move on ${t.name} failed.`);S.bad()}
@@ -1469,7 +1293,7 @@ function changeRelationship(id,{trust=0,respect=0,fear=0,resentment=0,rel=0}={})
 }
 function doFavor(id){
  const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(cooldown(f.lastFavor,10)>0)return;if(state.cash<100)return toast("Not enough cash.");
- state.cash-=100;S.cash();f.lastFavor=now();changeRelationship(id,{trust:7,respect:3,resentment:-5,rel:6});f.response="I will remember that you came through.";log(`You did a favor for ${d.name}.`);S.ok();save();render()
+ state.cash-=100;state.lifetimeCashSpent+=100;S.cash();f.lastFavor=now();changeRelationship(id,{trust:7,respect:3,resentment:-5,rel:6});f.response="I will remember that you came through.";log(`You did a favor for ${d.name}.`);S.ok();save();render()
 }
 function askEnergy(id){
  const f=fstate(id),d=getPersonDef(id);if(cooldown(f.lastAsk,8)>0)return;
@@ -1487,7 +1311,7 @@ function recruit(id){
  save();render()
 }
 function sendGift(id){
- if(state.cash<250)return toast("Not enough cash for a gift.");state.cash-=250;S.cash();changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});fstate(id).gifts++;fstate(id).response="I received the package. Thank you.";log(`You sent a gift to ${nameOf(id)}.`);save();render();S.ok()
+ if(state.cash<250)return toast("Not enough cash for a gift.");state.cash-=250;state.lifetimeCashSpent+=250;S.cash();changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});fstate(id).gifts++;fstate(id).response="I received the package. Thank you.";log(`You sent a gift to ${nameOf(id)}.`);save();render();S.ok()
 }
 function nameOf(id){return getPersonDef(id)?.name||id}
 function addPotential(id){
@@ -1612,9 +1436,7 @@ function defendAttack(id){
  if(state.st<1)return toast("You need 1 stamina to defend.");
  state.st--;
  a.resolved=true;
- stopSfxChannel();
- if(!playSampleRaw("reload",{volume:.32}))fallbackClick();
- scheduleSfx(260,()=>{stopSfxChannel();if(!playSampleRaw("gun",{volume:.33}))fallbackGun()});
+ runScene([[0,fxReload],[260,fxGun]]);
  const p=combatPower("defense")+rnd(1,20),e=a.power+rnd(1,20);
  if(p>=e){
    state.notoriety+=2;
@@ -1675,12 +1497,25 @@ function processPendingAttacks(){
 function maybeHeatEvent(){
  if(state.heat<60||Math.random()>.25)return;if(state.cash>=250){state.cash-=250;state.heat=Math.max(0,state.heat-12);log("You paid $250 in legal and cleanup costs to reduce pressure.")}else arrestRandomCrew()
 }
-function layLow(){if(state.cash<300)return toast("You need $300 to disappear for a while.");state.cash-=300;S.cash();state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);log("You laid low and reduced heat.");save();render()}
+function layLow(){if(state.cash<300)return toast("You need $300 to disappear for a while.");state.cash-=300;state.lifetimeCashSpent+=300;S.cash();state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);log("You laid low and reduced heat.");save();render()}
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);if(state.daily.last===today)return;const y=new Date(Date.now()-86400000).toISOString().slice(0,10);state.daily.streak=state.daily.last===y?state.daily.streak+1:1;state.daily.last=today;const c=400+state.daily.streak*120;state.cash+=c;state.en=Math.min(state.maxEn,state.en+5);if(state.daily.streak%3===0)state.loot["Mystery Crate"]=(state.loot["Mystery Crate"]||0)+1;log(`Daily collection: ${money(c)} and +5 energy.`);save();render();S.ok()}
 function switchCity(id){const c=cities.find(x=>x.id===id);if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;save();render()}
-function openCheckout(){closeModal("energyModal");checkoutModal.classList.add("show")}
-function completeCheckout(){const num=moneyNumber.value.trim(),hrs=parseFloat(workHours.value);if(!num||Number.isNaN(hrs))return toast("Complete the fictional purchase form.");if(/[0-9]{12,}/.test(num.replace(/\D/g,"")))return toast("Use a fictional account number. Do not enter real financial information.");state.en=state.maxEn;log(`Energy acquired. Estimated labor cost: ${hrs} hours.`);moneyNumber.value="";workHours.value="";authorization.value="";closeModal("checkoutModal");save();render();S.ok();toast("Energy acquired.")}
+function openCheckout(){
+ if(state.lifetimeEnergyPurchases>=5){state.whale=true;save();render();return toast("No more energy purchases for you, whale.");}
+ closeModal("energyModal");checkoutModal.classList.add("show");const c=document.getElementById("energyPurchaseCount");if(c)c.textContent=`Simulated purchases used: ${state.lifetimeEnergyPurchases}/5`;
+}
+
+function completeCheckout(){
+ const num=moneyNumber.value.trim(),hrs=parseFloat(workHours.value);
+ if(state.lifetimeEnergyPurchases>=5){state.whale=true;save();render();closeModal("checkoutModal");log("Energy cashier refused another purchase. Whale status confirmed.");return toast("Easy there, whale. The cashier cut you off after 5 purchases.");}
+ if(!num||Number.isNaN(hrs))return toast("Complete the fictional purchase form.");
+ if(/[0-9]{12,}/.test(num.replace(/\D/g,"")))return toast("Use a fictional account number. Do not enter real financial information.");
+ state.lifetimeEnergyPurchases++;state.en=state.maxEn;
+ if(state.lifetimeEnergyPurchases>=5){state.whale=true;log("Fifth energy purchase completed. WHALE status acquired.");}
+ log(`Energy acquired. Estimated labor cost: ${hrs} hours.`);moneyNumber.value="";workHours.value="";authorization.value="";closeModal("checkoutModal");save();render();S.cash();toast(state.whale?"Energy acquired. Congratulations, whale. You are now cut off.":`Energy acquired. ${5-state.lifetimeEnergyPurchases} purchases remain.`);
+}
+
 function closeModal(id){document.getElementById(id).classList.remove("show")}
 
 const tutorialSteps=[
@@ -1708,8 +1543,13 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  if(profileName)profileName.textContent=displayName;
  const pAvatar=document.getElementById("playerAvatar");
  if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
- lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
+ lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
  hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
+ const miniHp=document.getElementById("miniHp"),miniEn=document.getElementById("miniEn"),miniSt=document.getElementById("miniSt"),miniCash=document.getElementById("miniCash");
+ if(miniHp)miniHp.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;
+ if(miniEn)miniEn.textContent=`${Math.floor(state.en)}/${state.maxEn}`;
+ if(miniSt)miniSt.textContent=`${Math.floor(state.st)}/${state.maxSt}`;
+ if(miniCash){miniCash.textContent=compactMoney(state.cash);miniCash.title=money(state.cash);}
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
@@ -1721,9 +1561,44 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
 function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and periodic mystery crates.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
 function renderEvent(){const active=state.event.ends>now();eventBox.innerHTML=active?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmt(state.event.ends-now())}</div></div>`:""}
 function renderJobs(){
- const t=activeTier();tierName.innerHTML=`${tiers[t].name} · <select onchange="switchCity(this.value)" style="background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
- jobs.innerHTML=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity).map(j=>{const js=jobState(j.id),miss=reqMissing(j),pct=js.runs*20,ch=jobChance(j);return `<div class="card job-card" id="job-${j.id}"><img class="art" src="${IMG[j.img]}" alt=""><h3>${j.name}</h3><div class="meta"><span class="badge">⚡ ${j.energy}</span><span class="badge">⭐ ${j.xp}</span><span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span><span class="badge gold">${ch}% success</span></div><div class="role">Preferred role: ${j.role}</div><div class="sub">Mastery ${js.mastery}/3</div><div class="mastery"><div style="width:${pct}%"></div></div>${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}<p>Possible rare items: ${j.loot.join(", ")}</p><button class="btn" onclick="doJob('${j.id}')" ${miss.length?"disabled":""}>DO JOB</button></div>`}).join("")||`<div class="card"><p>No operations are available in this city at your current rank.</p></div>`;
- const done=!!state.bosses[t];boss.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3>${tiers[t].boss}</h3><p>Control this rank by defeating the organization standing above you.</p><div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div><button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"CHALLENGE BOSS":"MASTER EACH JOB ONCE"}</button></div>`
+ const jobsEl=document.getElementById("jobs");
+ const tierEl=document.getElementById("tierName");
+ const bossEl=document.getElementById("boss");
+ if(!jobsEl||!tierEl||!bossEl)return;
+
+ const t=activeTier();
+ tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">
+   ${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}
+ </select>`;
+
+ const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
+ jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
+   const js=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,js.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
+   return `<div class="card job-card" id="job-${j.id}">
+     <img class="art" src="${art}" alt="">
+     <h3>${j.name}</h3>
+     <div class="meta">
+       <span class="badge">⚡ ${j.energy}</span><span class="badge">⭐ ${j.xp}</span>
+       <span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span>
+       <span class="badge gold">${ch}% success</span>
+     </div>
+     <div class="role">Preferred role: ${j.role}</div>
+     <div class="sub">Mastery ${js.mastery}/3</div>
+     <div class="mastery"><div style="width:${pct}%"></div></div>
+     ${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}
+     <p>Possible rare items: ${j.loot.join(", ")}</p>
+     <button class="btn" onclick="doJob('${j.id}')" ${miss.length||jobBusy?"disabled":""}>DO JOB</button>
+   </div>`;
+ }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
+
+ const done=!!state.bosses[t];
+ bossEl.innerHTML=`<div class="card">
+   <img class="art" src="${IMG.suit}" alt="">
+   <h3>${tiers[t].boss}</h3>
+   <p>Control this rank by defeating the organization standing above you.</p>
+   <div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div>
+   <button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"CHALLENGE BOSS":"MASTER EACH JOB ONCE"}</button>
+ </div>`;
 }
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
 function renderCrew(){
@@ -1841,12 +1716,34 @@ function renderTerritory(){
    </div>`;
  }).join("");
 }
+function achievementDefs(){
+ const defs=[],add=(category,prefix,targets,current,labelFn)=>targets.forEach((t,i)=>defs.push({id:`${prefix}_${t}`,category,title:labelFn(t,i),target:t,current:Math.floor(current())}));
+ add("LEVEL","level",[5,10,25,50,100,200,350,500],()=>state.level,t=>`Reach Level ${t}`);
+ add("JOBS","jobs",[10,50,100,250,500,1000,2500,5000,10000,25000,50000],()=>state.lifetimeJobs||0,t=>`Complete ${t.toLocaleString()} Jobs`);
+ add("COMBAT","wins",[10,25,50,100,250,500,1000,2500,5000,10000,25000],()=>state.wins||0,t=>`Win ${t.toLocaleString()} Fights`);
+ add("CREW","crew",[5,10,15,25,40,60,80,100],()=>crewSize(),t=>`Build a Crew of ${t}`);
+ add("NOTORIETY","notoriety",[50,100,250,500,1000,2500,5000,10000,25000,50000,100000],()=>state.notoriety||0,t=>`Reach ${t.toLocaleString()} Notoriety`);
+ add("MONEY","earned",[10000,50000,100000,500000,1000000,5000000,10000000,50000000,100000000,1000000000],()=>state.lifetimeCashEarned||0,t=>`Earn ${money(t)} Lifetime`);
+ add("SPENDING","spent",[5000,25000,100000,500000,1000000,5000000,10000000,50000000,100000000],()=>state.lifetimeCashSpent||0,t=>`Spend ${money(t)} Building the Empire`);
+ add("GEAR","gear",[10,25,50,100,250,500,1000],()=>totalGearOwned(),t=>`Own ${t.toLocaleString()} Pieces of Gear`);
+ add("PROPERTY","property",[5,10,25,50,100,250,500],()=>totalPropertiesOwned(),t=>`Own ${t.toLocaleString()} Properties`);
+ add("MASTERY","mastery",[5,10,25,50,100,250,500],()=>totalMasteryRanks(),t=>`Earn ${t.toLocaleString()} Mastery Ranks`);
+ add("CAMPAIGN","campaign",[5,10,20,30,40,50,60],()=>Object.keys(state.campaignClaimed||{}).length,t=>`Complete ${t} Campaign Chapters`);
+ add("PURCHASES","energybuy",[1,3,5],()=>state.lifetimeEnergyPurchases||0,t=>t===5?"Become a Whale":`Make ${t} Simulated Energy Purchase${t===1?"":"s"}`);
+ return defs;
+}
+
 function renderProfile(){
  profile.innerHTML=[["Rank",tiers[activeTier()].name],["Notoriety",Math.floor(state.notoriety)],["Crew",crewSize()],["Active Crew",availableCrew().length+1],["Fight Record",`${state.wins}W / ${state.losses}L`],["Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["Net Income",money(netIncome())+"/hr"],["Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]].map(x=>`<div class="card">${x[0]}<strong>${x[1]}</strong></div>`).join("");
  collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>`<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`).join(""):"<p class='sub'>No rare items recovered yet.</p>";
- const a=[["Reach Level 5",state.level>=5],["Recruit 10 Crew Members",crewSize()>=10],["Win 25 Fights",state.wins>=25],["Fully Master a Job",Object.values(state.jobs).some(j=>j.mastery>=3)],["Control 3 Territories",Object.values(state.territory).filter(x=>x.owned).length>=3],["Reach 200 Notoriety",state.notoriety>=200],["Keep 5 Contacts Above 80 Trust",Object.values(state.friends).filter(f=>f.trust>=80).length>=5]];
- ach.innerHTML=a.map(x=>`<div class="row"><div>${x[1]?"✅":"⬜"} ${x[0]}</div></div>`).join("")
+ const defs=achievementDefs(),newly=[];
+ defs.forEach(a=>{if(a.current>=a.target&&!state.achievementUnlocked[a.id]){state.achievementUnlocked[a.id]=now();newly.push(a)}});
+ if(newly.length){newly.forEach(a=>log(`Achievement unlocked: ${a.title}.`));const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.");}save()}
+ const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
+ ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?"✓ ":""}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
+ const playerNameEl=document.getElementById("playerProfileName");if(playerNameEl){const old=playerNameEl.parentElement.querySelector(".whale-badge");if(old)old.remove();if(state.whale)playerNameEl.insertAdjacentHTML("afterend",'<div class="whale-badge">WHALE</div>')}
 }
+
 
 const ENERGY_REGEN_MS=60000;
 const STAMINA_REGEN_MS=180000;
@@ -1952,12 +1849,21 @@ document.addEventListener("click",e=>{
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
 setInterval(tick,15000);setInterval(updateRegenTimers,1000);setInterval(processPendingAttacks,1000);tick();setTimeout(()=>{if(state.playerName)startTutorial();else promptForPlayerName()},350);setTimeout(tryAutoTheme,500);
 
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden && themeOn){externalTheme.pause();}
-  else if(!document.hidden && themeOn && audioState.theme!=="failed"){
-    externalTheme.play().catch(()=>{audioState.theme="failed";renderAudioStatus()});
-  }
-});
+function updateMiniHudVisibility(){
+ const hud=document.getElementById("miniHud");
+ const header=document.querySelector(".top");
+ if(!hud||!header)return;
+ const threshold=Math.max(48,header.offsetHeight-8);
+ const show=window.scrollY>threshold;
+ hud.classList.toggle("show",show);
+ hud.setAttribute("aria-hidden",show?"false":"true");
+}
+window.addEventListener("scroll",updateMiniHudVisibility,{passive:true});
+window.addEventListener("resize",updateMiniHudVisibility,{passive:true});
+setTimeout(updateMiniHudVisibility,250);
+
+
+
 
 </script>
 </body>
