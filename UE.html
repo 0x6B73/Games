@@ -146,6 +146,29 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  width:100%;padding:9px;background:#070706;color:#eee;border:1px solid #5a4d3a;margin:4px 0 10px
 }
 
+
+.custom-friend-box{
+  margin:8px 0;
+  padding:7px;
+  border:1px solid #575048;
+  background:#111214;
+}
+.custom-friend-box .btn{margin-top:4px}
+.custom-friend-preview{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin:7px 0;
+}
+.custom-friend-preview img{
+  width:52px;
+  height:52px;
+  object-fit:cover;
+  border:2px solid #665640;
+  background:#1a1a1a;
+}
+.file-note{font-size:9px;color:#999;margin-top:3px}
+
 </style>
 </head>
 <body>
@@ -203,7 +226,16 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  <div class="myspace">
   <div class="ms-head">UNDERWORLDSPACE — CONTACT NETWORK</div>
   <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
-  <div class="ms-body"><div id="friends"></div><div class="ms-sub" style="margin:10px -7px 0">Potential Associates</div><div id="potentials"></div></div>
+  <div class="ms-body">
+  <div class="custom-friend-box">
+    <b>ADD A CUSTOM FRIEND</b>
+    <div class="sub">Create your own contact and add them directly to your network.</div>
+    <button class="btn small" onclick="openCustomFriendModal()">ADD FRIEND</button>
+  </div>
+  <div id="friends"></div>
+  <div class="ms-sub" style="margin:10px -7px 0">Potential Associates</div>
+  <div id="potentials"></div>
+</div>
  </div>
 </section>
 
@@ -286,6 +318,32 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="name-modal-copy">Every organization starts with a name. This will appear on your profile and throughout East Harbor.</div>
   <input id="playerNameInput" class="name-input" maxlength="24" placeholder="Enter your name">
   <button class="btn" onclick="savePlayerName()">ENTER EAST HARBOR</button>
+</div></div>
+
+
+<div class="modal" id="customFriendModal"><div class="mbox">
+  <h2>Add Custom Friend</h2>
+  <div class="sub">Name is required. Profile picture is optional.</div>
+
+  <label class="sub">Name</label>
+  <input id="customFriendName" class="name-input" maxlength="28" placeholder="Friend name">
+
+  <label class="sub">Profile Picture (optional)</label>
+  <input id="customFriendPhoto" type="file" accept="image/*" class="name-input" onchange="previewCustomFriendPhoto(event)">
+  <div class="file-note">Images are resized and stored locally with the game save.</div>
+
+  <div class="custom-friend-preview">
+    <img id="customFriendPreview" src="" alt="">
+    <div>
+      <div class="sub">Preview</div>
+      <b id="customFriendPreviewName">Random profile if none selected</b>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button class="btn" onclick="saveCustomFriend()">ADD TO CONTACTS</button>
+    <button class="btn secondary" onclick="closeModal('customFriendModal')">CANCEL</button>
+  </div>
 </div></div>
 
 <div class="toast" id="toast"></div>
@@ -573,11 +631,127 @@ function savePlayerName(){
   if(!state.tutorialDone)setTimeout(startTutorial,250);
 }
 
+
+function getPersonDef(id){
+  return friendDefs.find(x=>x.id===id)
+    || potentialDefs.find(x=>x.id===id)
+    || state.customFriends?.[id]
+    || {id,name:"Unknown Contact",role:"Associate",tag:"Custom contact",help:.55,join:.6,temper:.25};
+}
+
+function openCustomFriendModal(){
+  const modal=document.getElementById("customFriendModal");
+  const name=document.getElementById("customFriendName");
+  const photo=document.getElementById("customFriendPhoto");
+  const preview=document.getElementById("customFriendPreview");
+  const previewName=document.getElementById("customFriendPreviewName");
+  if(name)name.value="";
+  if(photo)photo.value="";
+  if(preview)preview.src=avatarUrl("custom-preview-"+Date.now(),"New Contact");
+  if(previewName)previewName.textContent="Random profile if none selected";
+  modal?.classList.add("show");
+  setTimeout(()=>name?.focus(),100);
+}
+
+let pendingCustomPhoto="";
+
+function previewCustomFriendPhoto(event){
+  const file=event.target.files?.[0];
+  pendingCustomPhoto="";
+  if(!file)return;
+
+  if(!file.type.startsWith("image/")){
+    toast("Select an image file.");
+    event.target.value="";
+    return;
+  }
+
+  if(file.size>8*1024*1024){
+    toast("Image is too large. Use an image under 8 MB.");
+    event.target.value="";
+    return;
+  }
+
+  const reader=new FileReader();
+  reader.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const size=192;
+      const canvas=document.createElement("canvas");
+      canvas.width=size;
+      canvas.height=size;
+      const ctx=canvas.getContext("2d");
+      const scale=Math.max(size/img.width,size/img.height);
+      const w=img.width*scale,h=img.height*scale;
+      ctx.drawImage(img,(size-w)/2,(size-h)/2,w,h);
+      pendingCustomPhoto=canvas.toDataURL("image/jpeg",0.78);
+      const preview=document.getElementById("customFriendPreview");
+      if(preview)preview.src=pendingCustomPhoto;
+      const n=document.getElementById("customFriendName")?.value.trim();
+      document.getElementById("customFriendPreviewName").textContent=n||file.name;
+    };
+    img.src=reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveCustomFriend(){
+  const input=document.getElementById("customFriendName");
+  const name=(input?.value||"").trim().replace(/\s+/g," ");
+  if(name.length<2)return toast("Enter a name with at least 2 characters.");
+
+  const id="custom_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
+  const roles=["Driver","Fixer","Enforcer","Scout","Smuggler","Collector","Accountant","Strategist"];
+  const role=roles[rnd(0,roles.length-1)];
+  const photo=pendingCustomPhoto||avatarUrl(id,name);
+
+  state.customFriends[id]={
+    id,
+    name:name.slice(0,28),
+    role,
+    tag:"Personal contact",
+    help:.55+rnd(-8,12)/100,
+    join:.62+rnd(-8,12)/100,
+    temper:.15+rnd(0,25)/100,
+    customPhoto:photo
+  };
+
+  state.friends[id]={
+    rel:rnd(55,75),
+    trust:rnd(50,72),
+    respect:rnd(42,62),
+    fear:rnd(5,20),
+    resentment:0,
+    crew:false,
+    lastAsk:0,
+    lastRecruit:0,
+    lastFavor:0,
+    response:"",
+    chat:[],
+    injuredUntil:0,
+    arrestedUntil:0,
+    gifts:0
+  };
+
+  pendingCustomPhoto="";
+  closeModal("customFriendModal");
+  log(`${name} was added to your contacts.`);
+  save();
+  render();
+  S.ok();
+  toast(`${name} added.`);
+}
+
+function personAvatarUrl(id,name){
+  const d=getPersonDef(id);
+  return d.customPhoto||avatarUrl(id,name);
+}
+
 function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",customFriends:{},level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -585,7 +759,7 @@ function fresh(){
 }
 let state=load();migrate();
 function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
-function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
+function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!state.customFriends)state.customFriends={};if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function xpNeed(){return 100+(state.level-1)*65}
 function activeTier(){let t=0;tiers.forEach((x,i)=>{if(state.level>=x.level)t=i});return t}
@@ -593,7 +767,7 @@ function cityDef(){return cities.find(c=>c.id===state.currentCity)||cities[0]}
 function crewIds(){return Object.keys(state.friends).filter(id=>state.friends[id].crew)}
 function crewSize(){return crewIds().length+1}
 function availableCrew(){return crewIds().filter(id=>state.friends[id].injuredUntil<now()&&state.friends[id].arrestedUntil<now())}
-function roleCount(role){return availableCrew().filter(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);return d?.role===role}).length}
+function roleCount(role){return availableCrew().filter(id=>{const d=getPersonDef(id);return d?.role===role}).length}
 function gearQty(id){return state.gear[id]||0}
 function gearUpkeep(){return gearDefs.reduce((n,g)=>n+gearQty(g.id)*g.upkeep,0)}
 function propertyIncome(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.income,0)}
@@ -631,8 +805,8 @@ function doJob(id){
  }
  save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),950)
 }
-function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
-function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
+function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
+function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
 function bossDef(t){return 35+t*32}
 function bossReady(t){const relevant=jobDefs.filter(j=>j.tier===t);return relevant.length&&relevant.every(j=>jobState(j.id).mastery>=1)}
 
@@ -721,7 +895,7 @@ function doFavor(id){
  state.cash-=100;S.cash();f.lastFavor=now();changeRelationship(id,{trust:7,respect:3,resentment:-5,rel:6});f.response="I will remember that you came through.";log(`You did a favor for ${d.name}.`);S.ok();save();render()
 }
 function askEnergy(id){
- const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(cooldown(f.lastAsk,8)>0)return;
+ const f=fstate(id),d=getPersonDef(id);if(cooldown(f.lastAsk,8)>0)return;
  f.lastAsk=now();const chance=Math.max(.08,Math.min(.96,(d.help||.5)+(f.trust-50)/160-(f.resentment/180)));
  changeRelationship(id,{trust:-2,resentment:3,rel:-2});
  if(Math.random()<chance){const g=rnd(3,7),actual=Math.min(g,state.maxEn-state.en);state.en+=actual;f.response=helpReplies[rnd(0,helpReplies.length-1)]+` (+${actual} energy)`;log(`${d.name} sent energy.`);S.ok()}
@@ -729,7 +903,7 @@ function askEnergy(id){
  save();render()
 }
 function recruit(id){
- const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(f.crew)return;if(cooldown(f.lastRecruit,12)>0)return;f.lastRecruit=now();
+ const f=fstate(id),d=getPersonDef(id);if(f.crew)return;if(cooldown(f.lastRecruit,12)>0)return;f.lastRecruit=now();
  const chance=Math.max(.05,Math.min(.97,(d.join||.5)+(f.trust-50)/120+(f.respect-50)/180-(f.resentment/150)));
  if(Math.random()<chance){f.crew=true;changeRelationship(id,{respect:4,rel:3});f.response=joinReplies[rnd(0,joinReplies.length-1)];state.notoriety+=3;log(`${d.name} joined your crew.`);S.ok()}
  else{changeRelationship(id,{resentment:4,rel:-3});f.response=refuseReplies[rnd(0,refuseReplies.length-1)];S.bad()}
@@ -738,17 +912,17 @@ function recruit(id){
 function sendGift(id){
  if(state.cash<250)return toast("Not enough cash for a gift.");state.cash-=250;S.cash();changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});fstate(id).gifts++;fstate(id).response="I received the package. Thank you.";log(`You sent a gift to ${nameOf(id)}.`);save();render();S.ok()
 }
-function nameOf(id){return (friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id))?.name||id}
+function nameOf(id){return getPersonDef(id)?.name||id}
 function addPotential(id){
  const p=state.potentials[id],d=potentialDefs.find(x=>x.id===id);if(p.added)return;
  const chance=.35+p.rel/160;if(Math.random()<chance){p.added=true;state.friends[id]={rel:p.rel,trust:p.rel,respect:45,fear:10,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"Good to have a direct line.",chat:p.chat||[],injuredUntil:0,arrestedUntil:0,gifts:0};log(`${d.name} accepted your contact request.`);S.ok()}
  else{p.rel=Math.max(0,p.rel-2);toast("They have not accepted yet.");S.bad()}save();render()
 }
-function openChat(id,potential=false){activeChat={id,potential};const d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];if(!f.chat)f.chat=[];chatTitle.textContent=`Chat with ${d.name}`;renderChat();chatbox.classList.add("show")}
+function openChat(id,potential=false){activeChat={id,potential};const d=potential?(potentialDefs.find(x=>x.id===id)||getPersonDef(id)):getPersonDef(id),f=potential?state.potentials[id]:state.friends[id];if(!f.chat)f.chat=[];chatTitle.textContent=`Chat with ${d.name}`;renderChat();chatbox.classList.add("show")}
 function closeChat(){chatbox.classList.remove("show");activeChat=null}
 let activeChat=null;
 function renderChat(){
- if(!activeChat)return;const {id,potential}=activeChat,d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];
+ if(!activeChat)return;const {id,potential}=activeChat,d=potential?(potentialDefs.find(x=>x.id===id)||getPersonDef(id)):getPersonDef(id),f=potential?state.potentials[id]:state.friends[id];
  chatLog.innerHTML=(f.chat||[]).length?f.chat.map(m=>`<div class="bubble ${m.me?"me":""}">${m.text}</div>`).join(""):`<div class="bubble">I heard your name through a mutual contact.</div>`;
  const opts=[`<button onclick="chatAction('smalltalk')">Check in</button>`];
  if(potential&&!f.added)opts.push(`<button onclick="chatAction('add')">Send contact request</button>`);
@@ -756,7 +930,7 @@ function renderChat(){
  chatOptions.innerHTML=opts.join("");setTimeout(()=>chatLog.scrollTop=chatLog.scrollHeight,0)
 }
 function chatAction(type){
- const {id,potential}=activeChat,d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];f.chat=f.chat||[];
+ const {id,potential}=activeChat,d=potential?(potentialDefs.find(x=>x.id===id)||getPersonDef(id)):getPersonDef(id),f=potential?state.potentials[id]:state.friends[id];f.chat=f.chat||[];
  if(type==="smalltalk"){f.chat.push({me:true,text:"I wanted to check in."});f.chat.push({me:false,text:genericReplies[rnd(0,genericReplies.length-1)]});if(potential)f.rel=Math.min(100,f.rel+2);else changeRelationship(id,{trust:2,rel:2})}
  if(type==="add"){f.chat.push({me:true,text:"We should stay in contact."});addPotential(id);f.chat.push({me:false,text:f.added?"Agreed. Keep this line open.":"Not yet."})}
  if(type==="recruit"){f.chat.push({me:true,text:"I am building a crew. I want you in."});recruit(id);f.chat.push({me:false,text:fstate(id)?.crew?"I am in.":"Not yet."})}
@@ -764,7 +938,7 @@ function chatAction(type){
  save();render();renderChat()
 }
 function socialConflict(id){
- const d=friendDefs.find(x=>x.id===id);if(!d?.rival||!state.friends[d.rival])return;
+ const d=getPersonDef(id);if(!d?.rival||!state.friends[d.rival])return;
  if(Math.random()<.35){changeRelationship(d.rival,{resentment:3,trust:-2,rel:-2});log(`${nameOf(d.rival)} noticed your support for ${d.name}.`)}
 }
 function addInbox(x){if(x.type!=="attack")S.msg();x.id="i"+now()+Math.random().toString(16).slice(2);x.read=false;state.inbox.unshift(x);state.inbox=state.inbox.slice(0,25);save();renderInbox()}
@@ -976,7 +1150,7 @@ function renderJobs(){
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
 function renderCrew(){
  crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active`;
- friends.innerHTML=Object.keys(state.friends).map(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
+ friends.innerHTML=Object.keys(state.friends).map(id=>{const d=getPersonDef(id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
  potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(p.id,p.name)}" alt="${p.name}"><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
 }
 function renderFight(){
