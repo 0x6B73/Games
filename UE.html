@@ -1068,6 +1068,21 @@ body.compact-stats .top{padding-bottom:4px!important}
 /* ALIGN LATEST STRIP WITH CAMPAIGN STRIP */
 .latest-notification-bar{margin:0 4px 5px!important}
 
+
+/* BUILD UPDATE CHECKER */
+.update-build-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0
+}
+.update-build-grid>div{
+  border:1px solid #403d36;background:#0b0c0d;padding:7px;text-align:center
+}
+.update-build-grid span{
+  display:block;font-size:7px;color:#827c72;font-weight:900;letter-spacing:.08em
+}
+.update-build-grid b{
+  display:block;margin-top:2px;font-size:15px;color:#e7cd6d
+}
+
 </style>
 </head>
 <body>
@@ -1450,6 +1465,20 @@ body.compact-stats .top{padding-bottom:4px!important}
   <button class="btn" onclick="closeModal('levelUpModal')">CONTINUE</button>
 </div></div>
 
+<div class="modal" id="updateAvailableModal"><div class="mbox">
+  <h2>New Build Available</h2>
+  <div class="sub">A newer version of Underworld Empire is available.</div>
+  <div class="update-build-grid">
+    <div><span>CURRENT</span><b id="updateCurrentBuild">-</b></div>
+    <div><span>AVAILABLE</span><b id="updateLatestBuild">-</b></div>
+  </div>
+  <div class="file-note">Your progress is stored locally in this browser. Refreshing the game does not reset your save.</div>
+  <div class="actions">
+    <button class="btn" onclick="refreshToLatestBuild()">REFRESH NOW</button>
+    <button class="btn secondary" onclick="dismissBuildUpdate()">LATER</button>
+  </div>
+</div></div>
+
 <div id="requirementPopup" class="requirement-popup">
   <b>JOB LOCKED</b>
   <div id="requirementPopupText"></div>
@@ -1463,8 +1492,11 @@ body.compact-stats .top{padding-bottom:4px!important}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.1";
+const BUILD_NUMBER="0.17.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const UPDATE_URL="https://0x6b73.github.io/Games/UE";
+const BUILD_CHECK_INTERVAL_MS=5*60*1000;
+let dismissedUpdateBuild="";
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
 function compactMoney(n){
@@ -5027,6 +5059,59 @@ function syncStatHudMode(){
  }
 }
 
+
+function parseBuildParts(v){
+ return String(v||"0").split(".").map(x=>Math.max(0,parseInt(x,10)||0));
+}
+function compareBuildNumbers(a,b){
+ const aa=parseBuildParts(a),bb=parseBuildParts(b),n=Math.max(aa.length,bb.length);
+ for(let i=0;i<n;i++){
+   const av=aa[i]||0,bv=bb[i]||0;
+   if(av>bv)return 1;
+   if(av<bv)return -1;
+ }
+ return 0;
+}
+function extractRemoteBuild(htmlText){
+ const m=String(htmlText||"").match(/const\s+BUILD_NUMBER\s*=\s*["']([^"']+)["']/);
+ return m?.[1]||"";
+}
+function showBuildUpdate(latest){
+ if(!latest||latest===dismissedUpdateBuild)return;
+ const current=document.getElementById("updateCurrentBuild");
+ const remote=document.getElementById("updateLatestBuild");
+ if(current)current.textContent=BUILD_NUMBER;
+ if(remote)remote.textContent=latest;
+ document.getElementById("updateAvailableModal")?.classList.add("show");
+}
+function dismissBuildUpdate(){
+ const latest=document.getElementById("updateLatestBuild")?.textContent||"";
+ dismissedUpdateBuild=latest;
+ closeModal("updateAvailableModal");
+}
+function refreshToLatestBuild(){
+ const join=UPDATE_URL.includes("?")?"&":"?";
+ window.location.href=`${UPDATE_URL}${join}_ue_refresh=${Date.now()}`;
+}
+async function checkForNewBuild(){
+ // Local file copies are intentionally ignored; the live GitHub Pages build
+ // checks itself. Network/CORS failures fail silently and retry later.
+ if(!/^https?:$/.test(location.protocol))return;
+ try{
+   const join=UPDATE_URL.includes("?")?"&":"?";
+   const response=await fetch(`${UPDATE_URL}${join}_ue_build_check=${Date.now()}`,{
+     cache:"no-store",
+     headers:{"Cache-Control":"no-cache"}
+   });
+   if(!response.ok)return;
+   const text=await response.text();
+   const latest=extractRemoteBuild(text);
+   if(latest&&compareBuildNumbers(latest,BUILD_NUMBER)>0)showBuildUpdate(latest);
+ }catch(e){
+   console.debug("Build update check unavailable.",e);
+ }
+}
+
 function go(v){
  const target=document.getElementById("view-"+v);if(!target)return;
  document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
@@ -5054,6 +5139,8 @@ setInterval(()=>{try{processPendingAttacks()}catch(e){console.error("Attack time
 setInterval(()=>{try{updateNetworkArrivalTimer()}catch(e){}},1000);
 setInterval(()=>{try{checkSkillReminder()}catch(e){}},600000);
 setTimeout(()=>{try{checkSkillReminder()}catch(e){}},5000);
+setTimeout(()=>{try{checkForNewBuild()}catch(e){}},10000);
+setInterval(()=>{try{checkForNewBuild()}catch(e){}},BUILD_CHECK_INTERVAL_MS);
 try{tick()}catch(e){console.error("Initial tick failed",e);try{render()}catch(renderError){console.error("Initial render failed",renderError)}}
 setTimeout(()=>{try{if(state.playerName)startTutorial();else promptForPlayerName()}catch(e){console.error("Onboarding failed",e)}},350);
 setTimeout(()=>{try{tryAutoTheme()}catch(e){console.error("Theme startup failed",e)}},500);
