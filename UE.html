@@ -696,7 +696,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .stat-clickable:hover{border-color:#8a7540!important}
 .stat-help-text{font-size:11px!important;line-height:1.55!important;color:#c7beb1!important}
 .energy-reserve{
-  display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:5px;margin-top:7px
 }
 .energy-reserve .er{
   border:1px solid #3c3d3f;background:#0a0c0e;padding:8px;text-align:center
@@ -2817,6 +2817,7 @@ body:after{
   <div id="energyReserveBody"></div>
   <div class="actions" style="margin-top:8px">
     <button class="btn" id="energyReserveDrinkBtn" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK</button>
+    <button class="btn secondary" id="energyReservePackBtn" onclick="useEnergyPack()">USE ENERGY PACK</button>
     <button class="btn secondary" onclick="closeModal('energyReserveModal')">CLOSE</button>
   </div>
 </div></div>
@@ -2828,6 +2829,7 @@ body:after{
   <div id="staminaReserveBody"></div>
   <div class="actions" style="margin-top:8px">
     <button class="btn" id="staminaReserveUseBtn" onclick="useAdrenalineShot()">USE ADRENALINE SHOT</button>
+    <button class="btn secondary" id="staminaReservePackBtn" onclick="useStaminaPack()">USE STAMINA PACK</button>
     <button class="btn secondary" onclick="go('crew');closeModal('staminaReserveModal')">REQUEST HELP</button>
   </div>
   <button class="btn secondary" style="margin-top:6px" onclick="closeModal('staminaReserveModal')">CLOSE</button>
@@ -2836,10 +2838,11 @@ body:after{
 
 <div class="modal" id="energyModal"><div class="mbox">
 <h2>You do not have enough energy.</h2>
-<p class="sub">Wait for recovery, ask your contacts for Energy Drinks, or use one from your stash.</p>
+<p class="sub">Wait for recovery, ask your crew for supplies, or use an Energy Drink or Energy Pack from your stash.</p>
 <div class="actions">
-<button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button>
+<button class="btn" onclick="go('crew');closeModal('energyModal')">OPEN CREW</button>
 <button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK</button>
+<button class="btn secondary" onclick="useEnergyPack()">USE ENERGY PACK</button>
 </div>
 <button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">WAIT FOR RECOVERY</button>
 </div></div>
@@ -3025,7 +3028,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.25";
+const BUILD_NUMBER="0.22.26";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5206,22 +5209,29 @@ function showStatHelp(key,e){
 
 function renderStaminaReserve(){
  const body=document.getElementById("staminaReserveBody");
- const btn=document.getElementById("staminaReserveUseBtn");
- if(!body||!btn)return;
+ const shotBtn=document.getElementById("staminaReserveUseBtn");
+ const packBtn=document.getElementById("staminaReservePackBtn");
+ if(!body||!shotBtn)return;
 
  const qty=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ const packQty=Math.max(0,Number(state.loot["Stamina Pack"])||0);
  const regen=regenCountdown(state.lastStaminaRegen,STAMINA_REGEN_MS,state.st,state.maxSt);
 
  body.innerHTML=`<div class="energy-reserve">
    <div class="er"><span>CURRENT STAMINA</span><b>${Math.floor(state.st)}/${state.maxSt}</b></div>
    <div class="er"><span>ADRENALINE SHOTS</span><b>${spriteIconHtml("adrenaline","sm")} ${qty}</b></div>
+   <div class="er"><span>STAMINA PACKS</span><b>${spriteIconHtml("2:stamina-pack","sm")} ${packQty}</b></div>
  </div>
  <div class="energy-rate"><b>Natural recovery:</b> ${state.st>=state.maxSt?"FULL":`1 Stamina every ${formatRegenTime(STAMINA_REGEN_MS)} · Next in ${regen.text.replace("+1 IN ","")}`}</div>
- <p class="sub">Stamina powers fights, incoming-attack defenses, and territory moves. Adrenaline Shots restore 1–3 Stamina.</p>
+ <p class="sub">Adrenaline Shots restore 1–3 Stamina. Stamina Packs restore 4–7 Stamina.</p>
  ${supplyExchangeHtml()}`;
 
- btn.textContent=`USE ADRENALINE SHOT${qty?` (x${qty})`:""}`;
- btn.disabled=qty<=0||state.st>=state.maxSt;
+ shotBtn.textContent=`USE ADRENALINE SHOT${qty?` (x${qty})`:""}`;
+ shotBtn.disabled=qty<=0||state.st>=state.maxSt;
+ if(packBtn){
+   packBtn.textContent=`USE STAMINA PACK${packQty?` (x${packQty})`:""}`;
+   packBtn.disabled=packQty<=0||state.st>=state.maxSt;
+ }
 }
 function openStaminaReserve(){
  renderStaminaReserve();
@@ -5229,19 +5239,25 @@ function openStaminaReserve(){
 }
 
 function renderEnergyReserve(){
- const body=document.getElementById("energyReserveBody"),btn=document.getElementById("energyReserveDrinkBtn");
- if(!body||!btn)return;
+ const body=document.getElementById("energyReserveBody"),drinkBtn=document.getElementById("energyReserveDrinkBtn"),packBtn=document.getElementById("energyReservePackBtn");
+ if(!body||!drinkBtn)return;
  const qty=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ const packQty=Math.max(0,Number(state.loot["Energy Pack"])||0);
  const regen=energyRegenCountdown();
  body.innerHTML=`<div class="energy-reserve">
    <div class="er"><span>CURRENT ENERGY</span><b>${Math.floor(state.en)}/${state.maxEn}</b></div>
    <div class="er"><span>ENERGY DRINKS</span><b>${spriteIconHtml("drink","sm")} ${qty}</b></div>
+   <div class="er"><span>ENERGY PACKS</span><b>${spriteIconHtml("2:energy-pack","sm")} ${packQty}</b></div>
  </div>
  <div class="energy-rate"><b>Current natural recovery:</b> ${state.en>=state.maxEn?"FULL":energyRateLabel()}${state.en>=state.maxEn?"":` · Next Energy in ${regen.text.replace("+1 IN ","")}`}</div>
- <p class="sub">Natural recovery is always 1 Energy every 3 minutes. Energy Drinks restore 3–7 Energy.</p>
+ <p class="sub">Energy Drinks restore 3–7 Energy. Energy Packs restore 10–15 Energy.</p>
  ${supplyExchangeHtml()}`;
- btn.textContent=`DRINK ENERGY DRINK${qty?` (x${qty})`:""}`;
- btn.disabled=qty<=0||state.en>=state.maxEn;
+ drinkBtn.textContent=`DRINK ENERGY DRINK${qty?` (x${qty})`:""}`;
+ drinkBtn.disabled=qty<=0||state.en>=state.maxEn;
+ if(packBtn){
+   packBtn.textContent=`USE ENERGY PACK${packQty?` (x${packQty})`:""}`;
+   packBtn.disabled=packQty<=0||state.en>=state.maxEn;
+ }
 }
 function openEnergyReserve(){
  renderEnergyReserve();
@@ -6247,6 +6263,7 @@ function useAdrenalineShot(){
  log(`Used an Adrenaline Shot. Restored ${actual} stamina.`);
  showActionFlash("ADRENALINE SHOT USED",`+${actual} Stamina · ${Math.max(0,qty-1)} remaining`,"good");
  S.ok();save();render();
+ if(document.getElementById("staminaReserveModal")?.classList.contains("show"))renderStaminaReserve();
 }
 
 function recruit(id){
@@ -7017,6 +7034,7 @@ function useEnergyPack(){
  state.en=Math.min(state.maxEn,state.en+roll);
  showActionFlash("ENERGY PACK USED",`+${actual} Energy · ${Math.max(0,q-1)} remaining`,"good");
  save();render();
+ if(document.getElementById("energyReserveModal")?.classList.contains("show"))renderEnergyReserve();
 }
 function useStaminaPack(){
  const q=Number(state.loot["Stamina Pack"]||0);
@@ -7027,6 +7045,7 @@ function useStaminaPack(){
  state.st=Math.min(state.maxSt,state.st+roll);
  showActionFlash("STAMINA PACK USED",`+${actual} Stamina · ${Math.max(0,q-1)} remaining`,"good");
  save();render();
+ if(document.getElementById("staminaReserveModal")?.classList.contains("show"))renderStaminaReserve();
 }
 function useMysteryCrate(){
  const q=Math.max(0,Number(state.loot["Mystery Crate"])||0);
