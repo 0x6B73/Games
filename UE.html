@@ -401,6 +401,51 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   100%{opacity:0;top:58px;transform:translate(-50%,-8px) scale(.94)}
 }
 
+
+.requirement-popup{
+  position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+  z-index:2147483450;width:min(86vw,360px);padding:10px;
+  background:linear-gradient(#241515,#0c0909);border:1px solid #75413b;
+  border-left:4px solid #a94d42;box-shadow:0 18px 50px #000c;
+  opacity:0;pointer-events:none;
+}
+.requirement-popup.show{animation:reqPop 1.8s ease forwards}
+.requirement-popup b{display:block;color:#f0c2b7;font-size:12px;margin-bottom:4px}
+.requirement-popup div{font-size:10px;color:#c8b8af;line-height:1.4}
+@keyframes reqPop{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.94)}
+  12%,70%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-55%) scale(.97)}
+}
+.inventory-use{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:7px;border:1px solid #343638;background:#090b0d;margin-top:4px
+}
+.inventory-use .qty{font-size:11px;color:#f0d36d;font-weight:900}
+
+
+/* GOLD BARS + COMBAT STATS + UNLOCKS */
+.gold-stat b{color:#f1d568!important}
+@media(min-width:700px){.stats{grid-template-columns:repeat(7,minmax(0,1fr))!important}}
+.relationship-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important}
+.gold-vault-card{border-top:3px solid #b9912e!important}
+.gold-balance{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:7px;border:1px solid #665527;background:#171207;margin:5px 0}
+.gold-balance strong{font-size:18px;color:#f2d46a}
+.gold-unlock{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:center;padding:7px;border:1px solid #35322a;background:#0b0c0d;margin-top:3px}
+.gold-unlock.owned{border-left:3px solid #789b4d}
+.gold-unlock .gu-name{font-size:10px;font-weight:900;color:#dfd4bd}
+.gold-unlock .gu-desc{font-size:9px;color:#9c9386;margin-top:2px}
+.gold-unlock .gu-cost{font-size:10px;color:#efd36a;font-weight:900;white-space:nowrap}
+.gold-contact{font-size:8px;color:#8d6c1d;margin-top:3px}
+.combat-info{background:#0b0d0f;border:1px solid #45484b;margin-bottom:5px;padding:7px}
+.combat-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.combat-stat{padding:6px;border:1px solid #35383b;background:#111315}
+.combat-stat b{display:block;font-size:16px;color:#efd36a}
+.combat-stat .label{font-size:9px;font-weight:900}
+.combat-stat .desc{font-size:8px;color:#aaa39a;line-height:1.35;margin-top:2px}
+.combat-note{font-size:8px;color:#9d9589;margin-top:5px;line-height:1.4}
+.job-stat-note{font-size:9px;color:#c6b785;margin:3px 0}
+
 </style>
 </head>
 <body>
@@ -412,13 +457,14 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   <div class="stat" id="energyStat">⚡ ENERGY<b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
   <div class="stat">🥊 STAMINA<b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
   <div class="stat">💵 CASH<b id="cashT"></b></div>
+  <div class="stat gold-stat">🪙 GOLD BARS<b id="goldT">0</b></div>
   <div class="stat">👥 CREW<b id="crewT"></b></div>
   <div class="stat">🔥 HEAT<b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
  </div>
  <div class="soundbar">
    <button class="btn secondary" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
    <button class="btn secondary" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
-   <div class="track">EAST HARBOR RADIO // TRAPPIST — AXTON CROLLEY</div>
+   <div class="track">EAST HARBOR RADIO // DARK TRAP THEME</div>
  </div>
 </header>
 
@@ -483,6 +529,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <section id="view-fight" class="view">
  <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
+ <div id="combatInfo"></div>
  <div id="fightlist"></div>
  <div class="section-title" style="margin-top:10px"><h2>Revenge</h2><span>settle outstanding business</span></div>
  <div id="revenge"></div>
@@ -514,6 +561,11 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
 </div>
 <div class="profile-grid" id="profile"></div>
+<div class="card gold-vault-card" style="margin-top:8px">
+  <h3>Gold Bar Vault</h3>
+  <p>Gold Bars are a rare social currency. Only contacts with 95+ Reputation can provide one, and your organization can receive only one Gold Bar per hour.</p>
+  <div id="goldVault"></div>
+</div>
  <div class="card" style="margin-top:8px">
   <h3>Campaign Progress</h3>
   <div id="campaignList" class="campaign-list"></div>
@@ -557,10 +609,15 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <div class="tutorial" id="tutorial"><div class="tutorial-box"><div class="tutorial-kicker">WELCOME TO EAST HARBOR</div><div class="tutorial-step" id="tutorialStep"></div><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><div class="actions"><button class="btn secondary" onclick="skipTutorial()">Skip</button><button class="btn" onclick="nextTutorial()">Next</button></div></div></div>
 
-<div class="modal" id="energyModal"><div class="mbox"><h2>You do not have enough energy.</h2><p class="sub">Wait for recovery, request help from your contacts, or acquire additional energy.</p><div class="actions"><button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="openCheckout()">ACQUIRE ENERGY</button></div><button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">Wait for recovery</button></div></div>
-
-<div class="modal" id="checkoutModal"><div class="mbox"><h2>Acquire Energy</h2><p class="sub">Demonstration only. Do not enter real financial information.</p><div id="energyPurchaseCount" class="sub"></div><div class="checkout-grid"><label>Fictional Account Number<input id="moneyNumber" placeholder="FAKE-0000-ENERGY"></label><label>Hours of work required to cover this purchase<input id="workHours" type="number" min="0" max="999" step=".5" placeholder="3.5"></label><label>Authorization Note<input id="authorization" placeholder="Approved for immediate use"></label></div><button class="btn" onclick="completeCheckout()">PURCHASE ENERGY</button><button class="btn secondary" style="margin-top:6px" onclick="closeModal('checkoutModal')">Cancel</button></div></div>
-
+<div class="modal" id="energyModal"><div class="mbox">
+<h2>You do not have enough energy.</h2>
+<p class="sub">Wait for recovery, ask your contacts for Energy Drinks, or use one from your stash.</p>
+<div class="actions">
+<button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button>
+<button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK</button>
+</div>
+<button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">WAIT FOR RECOVERY</button>
+</div></div>
 
 <div class="modal" id="nameModal"><div class="mbox">
   <h2>Who are you?</h2>
@@ -621,6 +678,12 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
 </div></div>
 
+
+
+<div id="requirementPopup" class="requirement-popup">
+  <b>JOB LOCKED</b>
+  <div id="requirementPopupText"></div>
+</div>
 
 <div id="actionFlash" class="action-flash">
   <div id="actionFlashTitle" class="action-flash-title"></div>
@@ -978,6 +1041,7 @@ function saveCustomFriend(){
     lastAsk:0,
     lastRecruit:0,
     lastFavor:0,
+    lastGift:0,
     response:"",
     chat:[],
     injuredUntil:0,
@@ -1015,6 +1079,9 @@ const campaignDefs=(()=>{
     [{type:"lifetimeJobs",target:jobs,label:`Complete ${jobs.toLocaleString()} lifetime jobs`},{type:"wins",target:wins,label:`Win ${wins.toLocaleString()} fights`},{type:"level",target:level,label:`Reach Level ${level}`}]
    ];
    const objectives=[...pools[pos%4]];
+   if(i>=3&&pos===4)objectives.push({type:"attack",target:10+Math.floor(i*1.4),label:`Raise Attack to ${10+Math.floor(i*1.4)}`});
+   if(i>=3&&pos===7)objectives.push({type:"defense",target:10+Math.floor(i*1.4),label:`Raise Defense to ${10+Math.floor(i*1.4)}`});
+   if(i>=20&&pos===8)objectives.push({type:"lifetimeGoldBars",target:10+Math.floor((i-20)*2.5),label:`Acquire ${10+Math.floor((i-20)*2.5)} lifetime Gold Bars`});
    if(i>=8&&pos%3===0)objectives.push({type:"territories",target:Math.min(6,1+Math.floor(i/10)),label:`Control ${Math.min(6,1+Math.floor(i/10))} territories`});
    if(i>=12&&pos%4===1)objectives.push({type:"bosses",target:Math.min(6,1+Math.floor(i/12)),label:`Defeat ${Math.min(6,1+Math.floor(i/12))} rank bosses`});
    if(i>=18&&pos%5===2)objectives.push({type:"roles",target:Math.min(8,3+Math.floor(i/10)),label:`Maintain ${Math.min(8,3+Math.floor(i/10))} crew specialties`});
@@ -1087,6 +1154,9 @@ function campaignObjectiveValue(o){
    case "cityJobs":return completedCityJobs(o.city);
    case "lifetimeCashEarned":return state.lifetimeCashEarned||0;
    case "lifetimeCashSpent":return state.lifetimeCashSpent||0;
+   case "attack":return state.attack||0;
+   case "defense":return state.defense||0;
+   case "lifetimeGoldBars":return state.lifetimeGoldBars||0;
    default:return 0;
  }
 }
@@ -1126,6 +1196,7 @@ function claimCampaign(){
    state.campaignIndex=idx+1;
    const next=campaignDefs[state.campaignIndex];
    log(`New campaign unlocked: ${next.title}.`);
+   queueUnlockPopup(`Campaign Chapter ${state.campaignIndex+1}`,next.title);
    toast(`Campaign complete. ${next.title} unlocked.`);
  }else{
    toast("Underworld Empire campaign complete.");
@@ -1192,11 +1263,95 @@ function renderCampaign(){
  }
 }
 
+
+const GOLD_BAR_COOLDOWN_MS=3600000;
+const goldUnlockDefs=[
+ {id:"safehouse_cache",name:"Safehouse Cache",cost:3,desc:"+5 Maximum Energy"},
+ {id:"armored_tailoring",name:"Armored Tailoring",cost:8,desc:"+8 Defense"},
+ {id:"private_armory",name:"Private Armory",cost:20,desc:"+8 Attack"},
+ {id:"underground_clinic",name:"Underground Clinic",cost:50,desc:"+25 Maximum Health and full heal"},
+ {id:"ghost_network",name:"Ghost Network",cost:120,desc:"+5 Maximum Stamina and +10 Notoriety"},
+ {id:"kingpin_reserve",name:"Kingpin's Reserve",cost:250,desc:"+15 Attack, +15 Defense, +10 Maximum Energy, and the Kingpin Signet"}
+];
+
+let unlockQueue=[],unlockQueueRunning=false;
+function queueUnlockPopup(title,detail=""){
+ unlockQueue.push({title,detail});
+ if(!unlockQueueRunning){unlockQueueRunning=true;setTimeout(processUnlockQueue,1850)}
+}
+function processUnlockQueue(){
+ if(!unlockQueue.length){unlockQueueRunning=false;return}
+ const x=unlockQueue.shift();
+ showActionFlash("NEW UNLOCK",`${x.title}${x.detail?" · "+x.detail:""}`,"good");
+ setTimeout(processUnlockQueue,1900);
+}
+function getUnlockCatalog(){
+ const out=[];
+ tiers.forEach((t,i)=>out.push({id:`rank:${i}`,level:t.level,title:`Rank: ${t.name}`,detail:`Boss operation: ${t.boss}`}));
+ cities.forEach(c=>out.push({id:`city:${c.id}`,level:c.level,title:`City: ${c.name}`,detail:c.sub}));
+ gearDefs.forEach(g=>out.push({id:`gear:${g.id}`,level:g.level,title:`Equipment: ${g.name}`,detail:`${g.type.toUpperCase()} +${g.power}`}));
+ propDefs.forEach(p=>out.push({id:`property:${p.id}`,level:p.level,title:`Property: ${p.name}`,detail:`${money(p.income)}/hr income`}));
+ jobDefs.forEach(j=>{
+   const level=Math.max(tiers[j.tier]?.level||1,cities.find(c=>c.id===j.city)?.level||1);
+   out.push({id:`job:${j.id}`,level,title:`Job: ${j.name}`,detail:`${cities.find(c=>c.id===j.city)?.name||"New city"} operation`});
+ });
+ return out;
+}
+function checkForNewUnlocks(){
+ if(!state.unlockTrackingReady)return;
+ const newly=getUnlockCatalog().filter(x=>state.level>=x.level&&!state.seenUnlocks[x.id]);
+ newly.forEach(x=>{state.seenUnlocks[x.id]=true;queueUnlockPopup(x.title,x.detail);log(`Unlocked: ${x.title}.`)});
+ if(newly.length)save();
+}
+function contactReputation(f){return Math.max(0,Math.min(100,Math.floor(Number(f?.rel)||0)))}
+function goldBarCooldown(){
+ return Math.max(0,GOLD_BAR_COOLDOWN_MS-Math.max(0,now()-(state.lastGoldBarClaim||0)));
+}
+function claimGoldBar(id){
+ const f=fstate(id),d=getPersonDef(id);
+ if(!f||!d)return;
+ const rep=contactReputation(f);
+ if(rep<95)return showRequirementPopup(`${d.name} needs 95 Reputation to trust you with a Gold Bar. Current Reputation: ${rep}.`);
+ const wait=goldBarCooldown();
+ if(wait>0)return showRequirementPopup(`Your organization can receive only one Gold Bar per hour. Next bar in ${fmt(wait)}.`);
+ state.goldBars=(state.goldBars||0)+1;
+ state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
+ state.lastGoldBarClaim=now();
+ f.response="I moved one Gold Bar for you. That is all I can do for now.";
+ log(`${d.name} provided a Gold Bar.`);
+ showActionFlash("GOLD BAR RECEIVED",`${d.name} · ${state.goldBars} Gold Bar${state.goldBars===1?"":"s"} available`,"cash");
+ S.ok();save();render();
+}
+function buyGoldUnlock(id){
+ const u=goldUnlockDefs.find(x=>x.id===id);
+ if(!u||state.goldUnlocks[id])return;
+ if((state.goldBars||0)<u.cost)return showRequirementPopup(`${u.name} requires ${u.cost} Gold Bars. You have ${state.goldBars||0}.`);
+ state.goldBars-=u.cost;state.goldUnlocks[id]=true;
+ if(id==="safehouse_cache"){state.maxEn+=5;state.en+=5}
+ if(id==="armored_tailoring")state.defense+=8;
+ if(id==="private_armory")state.attack+=8;
+ if(id==="underground_clinic"){state.maxHp+=25;state.hp=state.maxHp}
+ if(id==="ghost_network"){state.maxSt+=5;state.st+=5;state.notoriety+=10}
+ if(id==="kingpin_reserve"){
+   state.attack+=15;state.defense+=15;state.maxEn+=10;state.en+=10;
+   state.loot["Kingpin Signet"]=(state.loot["Kingpin Signet"]||0)+1;
+ }
+ log(`Gold Bar unlock acquired: ${u.name}.`);
+ queueUnlockPopup(u.name,u.desc);
+ S.ok();save();render();
+}
+function renderGoldVault(){
+ const el=document.getElementById("goldVault");if(!el)return;
+ const wait=goldBarCooldown();
+ el.innerHTML=`<div class="gold-balance"><div><div class="sub">AVAILABLE GOLD BARS</div><strong>🪙 ${state.goldBars||0}</strong></div><div class="right sub">${wait>0?`Next social bar: ${fmt(wait)}`:"A 95+ Reputation contact can provide one now"}</div></div>`+
+ goldUnlockDefs.map(u=>`<div class="gold-unlock ${state.goldUnlocks[u.id]?"owned":""}"><div><div class="gu-name">${state.goldUnlocks[u.id]?"✓ ":""}${u.name}</div><div class="gu-desc">${u.desc}</div></div><div class="right"><div class="gu-cost">🪙 ${u.cost}</div><button class="btn small" onclick="buyGoldUnlock('${u.id}')" ${state.goldUnlocks[u.id]?"disabled":""}>${state.goldUnlocks[u.id]?"UNLOCKED":"UNLOCK"}</button></div></div>`).join("");
+}
+
 function fresh(){
- const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
+ const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -1230,6 +1385,12 @@ function migrate(){
  if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
  if(!state.campaignClaimed||typeof state.campaignClaimed!=="object")state.campaignClaimed={};
  if(!state.achievementUnlocked||typeof state.achievementUnlocked!=="object")state.achievementUnlocked={};
+ if(!Number.isFinite(state.goldBars)||state.goldBars<0)state.goldBars=0;
+ if(!Number.isFinite(state.lifetimeGoldBars)||state.lifetimeGoldBars<0)state.lifetimeGoldBars=state.goldBars;
+ if(!Number.isFinite(state.lastGoldBarClaim))state.lastGoldBarClaim=0;
+ if(!state.goldUnlocks||typeof state.goldUnlocks!=="object")state.goldUnlocks={};
+ if(!state.seenUnlocks||typeof state.seenUnlocks!=="object")state.seenUnlocks={};
+ if(typeof state.unlockTrackingReady!=="boolean")state.unlockTrackingReady=false;
 
  if(!Number.isInteger(state.campaignIndex)||state.campaignIndex<0)state.campaignIndex=0;
  state.campaignIndex=Math.min(state.campaignIndex,Math.max(0,campaignDefs.length-1));
@@ -1265,7 +1426,7 @@ function migrate(){
    if(!f||typeof f!=="object"){delete state.friends[id];continue}
    state.friends[id]=Object.assign({
      rel:50,trust:50,respect:50,fear:10,resentment:0,crew:false,
-     lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],
+     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,response:"",chat:[],
      injuredUntil:0,arrestedUntil:0,gifts:0
    },f);
    if(!Array.isArray(state.friends[id].chat))state.friends[id].chat=[];
@@ -1310,6 +1471,10 @@ function migrate(){
  state.maxEn=Math.max(1,state.maxEn); state.en=Math.max(0,Math.min(state.en,state.maxEn));
  state.maxSt=Math.max(1,state.maxSt); state.st=Math.max(0,Math.min(state.st,state.maxSt));
  state.heat=Math.max(0,Math.min(100,state.heat));
+ if(!state.unlockTrackingReady){
+   getUnlockCatalog().filter(x=>state.level>=x.level).forEach(x=>state.seenUnlocks[x.id]=true);
+   state.unlockTrackingReady=true;
+ }
 
  // Whale status is permanent after the fifth simulated purchase.
  if(state.lifetimeEnergyPurchases>=5)state.whale=true;
@@ -1358,14 +1523,66 @@ function showActionFlash(title,detail="",type="good"){
 }
 
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)}
-function addXp(n){state.xp+=n;while(state.xp>=xpNeed()){state.xp-=xpNeed();state.level++;state.skill+=5;state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;state.notoriety+=10;log(`Level ${state.level}. Five skill points awarded.`);S.lvl()}}
+function addXp(n){
+ state.xp+=n;
+ let leveled=false;
+ while(state.xp>=xpNeed()){
+   state.xp-=xpNeed();state.level++;state.skill+=5;
+   state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;
+   state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;
+   state.notoriety+=10;leveled=true;
+   log(`Level ${state.level}. Five skill points awarded.`);S.lvl();
+ }
+ if(leveled)checkForNewUnlocks();
+}
 function crewRoleBonus(role){return roleCount(role)>0?8:0}
 function gearPower(kind){const slots=availableCrew().length+1,list=[];gearDefs.forEach(g=>{if(g.type===kind||(kind==="attack"&&g.type==="vehicle"))for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});list.sort((a,b)=>b-a);return list.slice(0,slots).reduce((a,b)=>a+b,0)}
 function combatPower(kind){return (kind==="attack"?state.attack:state.defense)+gearPower(kind)+(availableCrew().length+1)*2+Math.floor(state.notoriety/20)}
 function heatLabel(){return state.heat<20?"Low":state.heat<45?"Watched":state.heat<70?"High":"Critical"}
 function spendSkill(k){if(state.skill<1)return toast("No skill points.");state.skill--;if(k==="attack")state.attack++;if(k==="defense")state.defense++;if(k==="energy"){state.maxEn+=2;state.en+=2}if(k==="health"){state.maxHp+=5;state.hp+=5}if(k==="stamina"){state.maxSt++;state.st++}S.tap();save();render()}
+
+function showJobRequirements(id){
+ const j=jobDefs.find(x=>x.id===id);
+ if(!j)return;
+ const missing=reqMissing(j);
+ if(missing.length){
+   return showRequirementPopup(`Missing requirement${missing.length===1?"":"s"}: ${missing.join(" · ")}`);
+ }
+ if(state.en<j.energy){
+   return showRequirementPopup(`Not enough Energy. This job needs ${j.energy}; you have ${Math.floor(state.en)}.`);
+ }
+ doJob(id);
+}
+function showRequirementPopup(text){
+ const box=document.getElementById("requirementPopup");
+ const t=document.getElementById("requirementPopupText");
+ if(!box||!t)return toast(text);
+ clearTimeout(window._reqTimer);
+ box.classList.remove("show");
+ void box.offsetWidth;
+ t.textContent=text;
+ box.classList.add("show");
+ window._reqTimer=setTimeout(()=>box.classList.remove("show"),1850);
+ S.bad();
+}
+
 function reqMissing(j){const m=[];if(crewSize()<j.crew)m.push(`${j.crew} crew`);Object.entries(j.req).forEach(([id,q])=>{if(gearQty(id)<q)m.push(`${q} ${gearDefs.find(g=>g.id===id).name}`)});if(cities.find(c=>c.id===j.city).level>state.level)m.push(`LVL ${cities.find(c=>c.id===j.city).level}`);return m}
-function jobChance(j){let chance=92-j.risk-state.heat*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30);return Math.max(30,Math.min(97,Math.round(chance)))}
+function jobStatKind(j){
+ if(["Enforcer","Collector","Smuggler"].includes(j.role))return "attack";
+ if(["Driver","Fixer","Safecracker"].includes(j.role))return "defense";
+ return "balanced";
+}
+function jobStatBonus(j){
+ const kind=jobStatKind(j);
+ if(kind==="attack")return Math.min(15,Math.floor(state.attack/3));
+ if(kind==="defense")return Math.min(15,Math.floor(state.defense/3));
+ return Math.min(12,Math.floor((state.attack+state.defense)/6));
+}
+function defenseMitigation(){return Math.min(.50,Math.max(0,state.defense)*.012)}
+function jobChance(j){
+ let chance=92-j.risk-state.heat*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30)+jobStatBonus(j);
+ return Math.max(30,Math.min(97,Math.round(chance)));
+}
 let jobBusy=false;
 function showJobResult(success,title,detail){
  const el=document.getElementById("jobResult");
@@ -1387,20 +1604,30 @@ function setJobBusy(id,on){
 }
 function doJob(id){
  if(jobBusy)return;
- const j=jobDefs.find(x=>x.id===id),miss=reqMissing(j);if(miss.length)return toast("Missing: "+miss.join(", "));
+ const j=jobDefs.find(x=>x.id===id),miss=reqMissing(j);
+ if(miss.length)return showRequirementPopup(`Missing requirement${miss.length===1?"":"s"}: ${miss.join(" · ")}`);
  if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
- setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);const chance=jobChance(j),success=rnd(1,100)<=chance,js=jobState(id);
+ setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);
+ const chance=jobChance(j),success=rnd(1,100)<=chance,js=jobState(id);
  if(success){
-   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;js.runs++;state.notoriety+=2;
+   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);
+   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;js.runs++;state.notoriety+=2;
    if(js.runs>=5){js.runs=0;if(js.mastery<3){js.mastery++;state.skill++;state.notoriety+=5;log(`${j.name} mastery advanced to ${js.mastery}/3. +1 skill point.`)}}
    if(Math.random()<.20){const item=j.loot[rnd(0,j.loot.length-1)];state.loot[item]=(state.loot[item]||0)+1;log(`Recovered rare item: ${item}.`)}
-   addXp(j.xp);log(`${j.name} completed. Earned ${money(c)} and ${j.xp} XP.`);showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${j.xp} XP`);playJobSound(j,true)
+   addXp(j.xp);log(`${j.name} completed. Earned ${money(c)} and ${j.xp} XP.`);
+   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${j.xp} XP · ${jobStatKind(j).toUpperCase()} helped success`);
+   playJobSound(j,true);
  }else{
-   const loss=Math.min(state.cash,rnd(80,220)+state.level*15);state.cash-=loss;state.hp=Math.max(1,state.hp-rnd(5,14));log(`${j.name} failed. Lost ${money(loss)} and drew attention.`);showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · Heat increased`);playJobSound(j,false);
-   if(Math.random()<.35)injureRandomCrew();
-   if(state.heat>65&&Math.random()<.25)arrestRandomCrew();
+   const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,220)+state.level*15);
+   const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(5,14)*(1-mitigation)));
+   state.cash-=loss;state.hp=Math.max(1,state.hp-hpLoss);
+   log(`${j.name} failed. Lost ${money(loss)} and ${hpLoss} health. Defense mitigated ${Math.round(mitigation*100)}% of losses.`);
+   showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · -${hpLoss} Health · Defense saved ${Math.round(mitigation*100)}%`);
+   playJobSound(j,false);
+   if(Math.random()<Math.max(.12,.35-mitigation*.35))injureRandomCrew();
+   if(state.heat>65&&Math.random()<Math.max(.08,.25-mitigation*.20))arrestRandomCrew();
  }
- save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700)
+ save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700);
 }
 function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
 function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
@@ -1425,35 +1652,24 @@ function genOpponent(i,hit=false){
 function fight(i,hit=false,revengeId=null){
  if(state.st<1)return toast("Not enough stamina.");
  if(state.hp<10)return toast("Health too low.");
- state.st--;state.lifetimeFights++;
- runScene([[0,fxReload],[260,fxGun]]);
- const o=revengeId
-   ? state.revenge.find(x=>x.id===revengeId)
-   : genOpponent(i,hit);
-
- if(!o)return;
-
- const p=combatPower("attack")+rnd(1,20);
- const e=o.power+rnd(1,20);
-
+ state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);if(!o)return;
+ const attackPower=combatPower("attack"),p=attackPower+rnd(1,20),e=o.power+rnd(1,20);
  if(p>=e){
    const c=rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0);
-   state.cash+=c;
-   state.wins++;
-   state.notoriety+=2;
-   state.hp=Math.max(1,state.hp-rnd(2,9));
-   addXp(10+o.level*2);
-   log(`Defeated ${o.name}. Took ${money(c)}.`);
+   state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;
+   state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));addXp(10+o.level*2);
+   log(`Defeated ${o.name}. Attack Power ${attackPower} carried the offensive fight. Took ${money(c)}.`);
+   showActionFlash("FIGHT WON",`${o.name} · Attack Power ${attackPower} · +${money(c)}`,"good");
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
  }else{
-   const loss=Math.min(state.cash,rnd(80,180)+o.level*20);
-   state.cash-=loss;
-   state.losses++;
-   state.hp=Math.max(1,state.hp-rnd(7,17));
-   log(`Lost to ${o.name}. Lost ${money(loss)}.`);
+   const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,180)+o.level*20);
+   const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7,17)*(1-mitigation)));
+   state.cash-=loss;state.losses++;state.hp=Math.max(1,state.hp-hpLoss);
+   log(`Lost to ${o.name}. Defense reduced losses by ${Math.round(mitigation*100)}%. Lost ${money(loss)}.`);
+   showActionFlash("FIGHT LOST",`Defense saved ${Math.round(mitigation*100)}% · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
- save();
- render();
+ save();render();
 }
 
 function fightBoss(t){
@@ -1526,12 +1742,32 @@ function doFavor(id){
  save();render();
 }
 function askEnergy(id){
- const f=fstate(id),d=getPersonDef(id);if(cooldown(f.lastAsk,8)>0)return;
- f.lastAsk=now();const chance=Math.max(.08,Math.min(.96,(d.help||.5)+(f.trust-50)/160-(f.resentment/180)));
+ const f=fstate(id),d=getPersonDef(id);
+ if(cooldown(f.lastAsk,8)>0)return;
+ f.lastAsk=now();
+
+ const chance=Math.max(.08,Math.min(.96,(d.help||.5)+(f.trust-50)/160-(f.resentment/180)));
  changeRelationship(id,{trust:-2,resentment:3,rel:-2});
- if(Math.random()<chance){const g=rnd(3,7),actual=Math.min(g,state.maxEn-state.en);state.en+=actual;f.response=helpReplies[rnd(0,helpReplies.length-1)]+` (+${actual} energy)`;log(`${d.name} sent energy.`);S.ok()}
- else{f.response=meanReplies[rnd(0,meanReplies.length-1)];changeRelationship(id,{resentment:3,rel:-2});S.bad()}
- save();render()
+
+ if(Math.random()<chance){
+   const current=Math.max(0,Number(state.loot["Energy Drink"])||0);
+   if(current>=999){
+     f.response="I tried to send you an Energy Drink, but your stash is full.";
+     log(`${d.name} tried to send an Energy Drink, but you already have 999.`);
+     showActionFlash("ENERGY DRINK STASH FULL","Maximum stack: 999","bad");
+   }else{
+     state.loot["Energy Drink"]=Math.min(999,current+1);
+     f.response="Sent you an Energy Drink. Save it or drink it when you need energy.";
+     log(`${d.name} sent you an Energy Drink.`);
+     showActionFlash("ENERGY DRINK RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Energy Drink"]}/999`,"good");
+     S.ok();
+   }
+ }else{
+   f.response=meanReplies[rnd(0,meanReplies.length-1)];
+   changeRelationship(id,{resentment:3,rel:-2});
+   S.bad();
+ }
+ save();render();
 }
 function recruit(id){
  const f=fstate(id),d=getPersonDef(id);if(f.crew)return;if(cooldown(f.lastRecruit,12)>0)return;f.lastRecruit=now();
@@ -1541,15 +1777,20 @@ function recruit(id){
  save();render()
 }
 function sendGift(id){
+ const f=fstate(id),d=getPersonDef(id);
+ if(!f||!d)return;
+ const wait=cooldown(f.lastGift||0,30);
+ if(wait>0)return showRequirementPopup(`You already sent ${d.name} a gift. Try again in ${fmt(wait)}.`);
  if(state.cash<250)return toast("Not enough cash for a gift.");
  state.cash-=250;
  state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;
+ f.lastGift=now();
  S.cash();
  changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});
- fstate(id).gifts++;
- fstate(id).response="I received the package. Thank you.";
- log(`You sent a gift to ${nameOf(id)}.`);
- showActionFlash("GIFT SENT",`${nameOf(id)} · $250`,"cash");
+ f.gifts=(f.gifts||0)+1;
+ f.response="I received the package. Thank you.";
+ log(`You sent a gift to ${d.name}.`);
+ showActionFlash("GIFT SENT",`${d.name} · $250 · Next gift in 30m`,"cash");
  save();render();
 }
 function nameOf(id){return getPersonDef(id)?.name||id}
@@ -1596,7 +1837,23 @@ function answerInbox(id,choice){
    else{changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`)}
  }
  if(x.type==="gift"){
-   if(choice==="accept"){state.en=Math.min(state.maxEn,state.en+5);state.loot[x.item]=(state.loot[x.item]||0)+1;log(`${x.from} sent you ${x.item}.`);S.ok()}
+   if(choice==="accept"){
+   if(x.item==="Energy Pack"||x.item==="Energy Drink"){
+     const current=Math.max(0,Number(state.loot["Energy Drink"])||0);
+     if(current<999){
+       state.loot["Energy Drink"]=Math.min(999,current+1);
+       log(`${x.from} sent you an Energy Drink.`);
+       showActionFlash("ENERGY DRINK RECEIVED",`${x.from} · Stash: ${state.loot["Energy Drink"]}/999`,"good");
+     }else{
+       log(`${x.from}'s Energy Drink could not be stored because your stash is full.`);
+       showActionFlash("ENERGY DRINK STASH FULL","Maximum stack: 999","bad");
+     }
+   }else{
+     state.loot[x.item]=(state.loot[x.item]||0)+1;
+     log(`${x.from} sent you ${x.item}.`);
+   }
+   S.ok()
+ }
  }
  dismissInbox(id);render()
 }
@@ -1614,7 +1871,7 @@ function maybeSocialEvent(){
  save()
 }
 function maybeGift(){
- if(Math.random()>.15)return;const ids=Object.keys(state.friends).filter(id=>state.friends[id].trust>65);if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],item=["Energy Pack","Burner Phone","Cash Envelope"][rnd(0,2)];addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`})
+ if(Math.random()>.15)return;const ids=Object.keys(state.friends).filter(id=>state.friends[id].trust>65);if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],item=["Energy Drink","Burner Phone","Cash Envelope"][rnd(0,2)];addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`})
 }
 function showSocial(title,text){socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;socialPop.classList.add("show")}
 function renderInbox(){
@@ -1684,25 +1941,21 @@ function defendAttack(id){
  if(!a)return toast("This attack is no longer active.");
  if(now()>a.expires){resolveExpiredAttack(a);return}
  if(state.st<1)return toast("You need 1 stamina to defend.");
- state.st--;
- a.resolved=true;
- runScene([[0,fxReload],[260,fxGun]]);
- const p=combatPower("defense")+rnd(1,20),e=a.power+rnd(1,20);
+ state.st--;a.resolved=true;runScene([[0,fxReload],[260,fxGun]]);
+ const defensePower=combatPower("defense"),p=defensePower+rnd(1,20),e=a.power+rnd(1,20);
  if(p>=e){
-   state.notoriety+=2;
-   log(`You defended against ${a.name}. They left empty-handed.`);
-   toast("Attack repelled.");
+   state.notoriety+=2;log(`You defended against ${a.name}. Defense Power ${defensePower} repelled the attack.`);
+   showActionFlash("ATTACK REPELLED",`${a.name} · Defense Power ${defensePower}`,"good");
  }else{
-   const loss=Math.min(state.cash,rnd(80,220)+a.level*20);
-   state.cash-=loss;
-   state.hp=Math.max(1,state.hp-rnd(5,14));
-   state.revenge.unshift({...a,id:"r"+now(),bounty:0});
-   state.revenge=state.revenge.slice(0,8);
-   log(`${a.name} broke through your defense and took ${money(loss)}.`);
-   toast("Defense failed.");
+   const mitigation=defenseMitigation();
+   const loss=Math.floor(Math.min(state.cash,rnd(80,220)+a.level*20)*(1-mitigation));
+   const hpLoss=Math.max(1,Math.floor(rnd(5,14)*(1-mitigation)));
+   state.cash-=loss;state.hp=Math.max(1,state.hp-hpLoss);
+   state.revenge.unshift({...a,id:"r"+now(),bounty:0});state.revenge=state.revenge.slice(0,8);
+   log(`${a.name} broke through your Defense Power ${defensePower} and took ${money(loss)}.`);
+   showActionFlash("DEFENSE FAILED",`${a.name} · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
- removeAttackMessage(id);
- save();render()
+ removeAttackMessage(id);save();render();
 }
 
 function resolveExpiredAttack(a){
@@ -1751,20 +2004,9 @@ function layLow(){if(state.cash<300)return toast("You need $300 to disappear for
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);if(state.daily.last===today)return;const y=new Date(Date.now()-86400000).toISOString().slice(0,10);state.daily.streak=state.daily.last===y?state.daily.streak+1:1;state.daily.last=today;const c=400+state.daily.streak*120;state.cash+=c;state.en=Math.min(state.maxEn,state.en+5);if(state.daily.streak%3===0)state.loot["Mystery Crate"]=(state.loot["Mystery Crate"]||0)+1;log(`Daily collection: ${money(c)} and +5 energy.`);showActionFlash("DAILY COLLECTION",`${money(c)} · +5 Energy`,"cash");save();render();S.ok()}
 function switchCity(id){const c=cities.find(x=>x.id===id);if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;save();render()}
-function openCheckout(){
- if(state.lifetimeEnergyPurchases>=5){state.whale=true;save();render();return toast("No more energy purchases for you, whale.");}
- closeModal("energyModal");checkoutModal.classList.add("show");const c=document.getElementById("energyPurchaseCount");if(c)c.textContent=`Simulated purchases used: ${state.lifetimeEnergyPurchases}/5`;
-}
 
-function completeCheckout(){
- const num=moneyNumber.value.trim(),hrs=parseFloat(workHours.value);
- if(state.lifetimeEnergyPurchases>=5){state.whale=true;save();render();closeModal("checkoutModal");log("Energy cashier refused another purchase. Whale status confirmed.");return toast("Easy there, whale. The cashier cut you off after 5 purchases.");}
- if(!num||Number.isNaN(hrs))return toast("Complete the fictional purchase form.");
- if(/[0-9]{12,}/.test(num.replace(/\D/g,"")))return toast("Use a fictional account number. Do not enter real financial information.");
- state.lifetimeEnergyPurchases++;state.en=state.maxEn;
- if(state.lifetimeEnergyPurchases>=5){state.whale=true;log("Fifth energy purchase completed. WHALE status acquired.");}
- log(`Energy acquired. Estimated labor cost: ${hrs} hours.`);moneyNumber.value="";workHours.value="";authorization.value="";closeModal("checkoutModal");showActionFlash("ENERGY ACQUIRED",`Energy restored to ${state.maxEn}/${state.maxEn}`,"cash");save();render();S.cash();toast(state.whale?"Energy acquired. Congratulations, whale. You are now cut off.":`Energy acquired. ${5-state.lifetimeEnergyPurchases} purchases remain.`);
-}
+
+
 
 function closeModal(id){document.getElementById(id).classList.remove("show")}
 
@@ -1784,7 +2026,32 @@ function showTutorial(){tutorialStep.textContent=`STEP ${tut+1} OF ${tutorialSte
 function nextTutorial(){tut++;if(tut>=tutorialSteps.length){state.tutorialDone=true;tutorial.classList.remove("show");save();toast("You are ready to begin.");return}showTutorial()}
 function skipTutorial(){state.tutorialDone=true;tutorial.classList.remove("show");save()}
 
-function renderEnergy(id){const el=document.getElementById(id);if(!el)return;if(state.en<=0){const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Contact your associates, wait for recovery, or acquire more energy.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="energyModal.classList.add('show')">ACQUIRE ENERGY</button></div></div>`;}else if(state.en<=Math.max(3,state.maxEn*.2)){const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors now or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button></div>`;}else el.innerHTML=""}
+function renderEnergy(id){
+ const el=document.getElementById(id);if(!el)return;
+ const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ if(state.en<=0){
+   const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
+   el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Ask contacts for Energy Drinks, use one from your stash, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button>${drinks>0?`<button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK (x${drinks})</button>`:""}</div></div>`;
+ }else if(state.en<=Math.max(3,state.maxEn*.2)){
+   const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
+   el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors, use an Energy Drink, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button>${drinks>0?`<button class="btn secondary small" onclick="drinkEnergyDrink()">DRINK (x${drinks})</button>`:""}</div></div>`;
+ }else el.innerHTML="";
+}
+
+function renderEnergyDrinkQuick(){
+ let el=document.getElementById("energyDrinkQuick");
+ if(!el){
+   const home=document.getElementById("energyHome");
+   if(!home||!home.parentNode)return;
+   el=document.createElement("div");
+   el.id="energyDrinkQuick";
+   home.parentNode.insertBefore(el,home.nextSibling);
+ }
+ const qty=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ if(qty<=0){el.innerHTML="";return}
+ el.innerHTML=`<div class="row"><div><div class="title">🥤 Energy Drinks <span class="badge gold">x${qty}</span></div><div class="sub">Restore 3–7 Energy per drink · Stack limit 999</div></div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div>`;
+}
+
 function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
@@ -1793,7 +2060,7 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  if(profileName)profileName.textContent=displayName;
  const pAvatar=document.getElementById("playerAvatar");
  if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
- lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
+ lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);goldT.textContent=(state.goldBars||0).toLocaleString();crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
  hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
  const miniHp=document.getElementById("miniHp"),miniEn=document.getElementById("miniEn"),miniSt=document.getElementById("miniSt"),miniCash=document.getElementById("miniCash");
  if(miniHp)miniHp.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;
@@ -1804,7 +2071,7 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  document.getElementById("log").innerHTML=state.log.map(x=>`<div class="sub" style="padding:6px 0;border-bottom:1px solid #28221b">${x}</div>`).join("");
- renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
@@ -1823,21 +2090,21 @@ function renderJobs(){
 
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const js=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,js.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
+   const js=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,js.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit,statKind=jobStatKind(j),statBonus=jobStatBonus(j);
    return `<div class="card job-card" id="job-${j.id}">
      <img class="art" src="${art}" alt="">
      <h3>${j.name}</h3>
      <div class="meta">
        <span class="badge">⚡ ${j.energy}</span><span class="badge">⭐ ${j.xp}</span>
        <span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span>
-       <span class="badge gold">${ch}% success</span>
+       <span class="badge gold">${ch}% success</span><span class="badge">${statKind==="attack"?"⚔ ATTACK":statKind==="defense"?"🛡 DEFENSE":"⚔🛡 BOTH"} +${statBonus}%</span>
      </div>
-     <div class="role">Preferred role: ${j.role}</div>
+     <div class="role">Preferred role: ${j.role}</div><div class="job-stat-note">${statKind==="attack"?"Attack raises this job’s success chance.":statKind==="defense"?"Defense raises this job’s success chance and reduces failure losses.":"Attack and Defense both contribute to this job."}</div>
      <div class="sub">Mastery ${js.mastery}/3</div>
      <div class="mastery"><div style="width:${pct}%"></div></div>
      ${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}
      <p>Possible rare items: ${j.loot.join(", ")}</p>
-     <button class="btn" onclick="doJob('${j.id}')" ${miss.length?"disabled":""}>DO JOB</button>
+     <button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button>
    </div>`;
  }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
 
@@ -1853,7 +2120,7 @@ function renderJobs(){
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
 function renderCrew(){
  crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active`;
- friends.innerHTML=Object.keys(state.friends).map(id=>{const d=getPersonDef(id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
+ friends.innerHTML=Object.keys(state.friends).map(id=>{const d=getPersonDef(id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10),rep=contactReputation(f),gb=goldBarCooldown();return `<div class="friend"><img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">REP<b>${rep}</b></div><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div><div class="gold-contact">${rep>=95?(gb>0?`Gold Bar available again in ${fmt(gb)}`:"Eligible to provide a Gold Bar"):`Gold Bars require 95 Reputation`}</div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')" ${(f.lastGift&&cooldown(f.lastGift,30)>0)?"disabled":""}>${(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:"SEND GIFT -$250"}</button><button onclick="claimGoldBar('${id}')" ${rep<95||gb>0?"disabled":""}>${rep<95?"GOLD: REP 95":gb>0?`GOLD ${fmt(gb)}`:"ASK FOR GOLD BAR"}</button></div></div>`}).join("");
  potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(p.id,p.name)}" alt="${p.name}"><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
 }
 function renderFight(){
@@ -1861,6 +2128,11 @@ function renderFight(){
  const revengeEl=document.getElementById("revenge");
  const hitEl=document.getElementById("hitlist");
  if(!fightEl||!revengeEl||!hitEl)return;
+ const combatInfo=document.getElementById("combatInfo");
+ if(combatInfo){
+   const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
+   combatInfo.innerHTML=`<div class="combat-info"><div class="combat-info-grid"><div class="combat-stat"><div class="label">⚔ ATTACK POWER</div><b>${atk}</b><div class="desc">Used when YOU initiate Fight List, Revenge, and Hitlist attacks. Your roll is Attack Power + 1–20 versus the enemy roll.</div></div><div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Used when you respond to incoming attack messages. Defense also reduces failed-job and lost-fight damage by ${mit}%.</div></div></div><div class="combat-note">Power includes your base stat, relevant gear, active crew, and Notoriety. Skill points invested in Attack or Defense now directly change these outcomes.</div></div>`;
+ }
 
  fightEl.innerHTML=[0,1,2,3,4].map(i=>{
    const o=genOpponent(i);
@@ -1979,19 +2251,44 @@ function achievementDefs(){
  add("PROPERTY","property",[5,10,25,50,100,250,500],()=>totalPropertiesOwned(),t=>`Own ${t.toLocaleString()} Properties`);
  add("MASTERY","mastery",[5,10,25,50,100,250,500],()=>totalMasteryRanks(),t=>`Earn ${t.toLocaleString()} Mastery Ranks`);
  add("CAMPAIGN","campaign",[5,10,20,30,40,50,60],()=>Object.keys(state.campaignClaimed||{}).length,t=>`Complete ${t} Campaign Chapters`);
- add("PURCHASES","energybuy",[1,3,5],()=>state.lifetimeEnergyPurchases||0,t=>t===5?"Become a Whale":`Make ${t} Simulated Energy Purchase${t===1?"":"s"}`);
+ add("ATTACK","attack",[10,20,40,75,125,200],()=>state.attack||0,t=>`Raise Attack to ${t}`);
+ add("DEFENSE","defense",[10,20,40,75,125,200],()=>state.defense||0,t=>`Raise Defense to ${t}`);
+ add("GOLD","gold",[1,5,10,25,50,100,250],()=>state.lifetimeGoldBars||0,t=>`Acquire ${t} Lifetime Gold Bar${t===1?"":"s"}`);
+ add("GOLD","goldunlock",[1,3,6],()=>Object.keys(state.goldUnlocks||{}).length,t=>`Unlock ${t} Gold Vault Reward${t===1?"":"s"}`);
  return defs;
 }
 
+
+function drinkEnergyDrink(){
+ const qty=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ if(qty<=0)return toast("You do not have any Energy Drinks.");
+ if(state.en>=state.maxEn)return toast("Your energy is already full.");
+
+ const rolled=rnd(3,7);
+ const actual=Math.min(rolled,state.maxEn-state.en);
+ state.loot["Energy Drink"]=qty-1;
+ if(state.loot["Energy Drink"]<=0)delete state.loot["Energy Drink"];
+ state.en=Math.min(state.maxEn,state.en+rolled);
+
+ log(`Drank an Energy Drink. Restored ${actual} energy.`);
+ showActionFlash("ENERGY DRINK USED",`+${actual} Energy · ${Math.max(0,qty-1)} remaining`,"good");
+ S.ok();
+ save();render();
+}
+
 function renderProfile(){
- profile.innerHTML=[["Rank",tiers[activeTier()].name],["Notoriety",Math.floor(state.notoriety)],["Crew",crewSize()],["Active Crew",availableCrew().length+1],["Fight Record",`${state.wins}W / ${state.losses}L`],["Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["Net Income",money(netIncome())+"/hr"],["Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]].map(x=>`<div class="card">${x[0]}<strong>${x[1]}</strong></div>`).join("");
- collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>`<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`).join(""):"<p class='sub'>No rare items recovered yet.</p>";
+ profile.innerHTML=[["Rank",tiers[activeTier()].name],["Notoriety",Math.floor(state.notoriety)],["Crew",crewSize()],["Active Crew",availableCrew().length+1],["Fight Record",`${state.wins}W / ${state.losses}L`],["Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["Net Income",money(netIncome())+"/hr"],["Gold Bars",state.goldBars||0],["Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]].map(x=>`<div class="card">${x[0]}<strong>${x[1]}</strong></div>`).join("");
+ collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>{
+   if(k==="Energy Drink"){
+     return `<div class="inventory-use"><div><div class="title">🥤 Energy Drink</div><div class="sub">Drink to restore a random 3–7 Energy. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div></div>`;
+   }
+   return `<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`;
+ }).join(""):"<p class='sub'>No rare items recovered yet.</p>";
  const defs=achievementDefs(),newly=[];
  defs.forEach(a=>{if(a.current>=a.target&&!state.achievementUnlocked[a.id]){state.achievementUnlocked[a.id]=now();newly.push(a)}});
- if(newly.length){newly.forEach(a=>log(`Achievement unlocked: ${a.title}.`));const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.");}save()}
+ if(newly.length){newly.forEach(a=>{log(`Achievement unlocked: ${a.title}.`);queueUnlockPopup("Achievement",a.title)});const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.");}save()}
  const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
  ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?"✓ ":""}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
- const playerNameEl=document.getElementById("playerProfileName");if(playerNameEl){const old=playerNameEl.parentElement.querySelector(".whale-badge");if(old)old.remove();if(state.whale)playerNameEl.insertAdjacentHTML("afterend",'<div class="whale-badge">WHALE</div>')}
 }
 
 
