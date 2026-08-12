@@ -2926,7 +2926,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.15";
+const BUILD_NUMBER="0.22.16";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3230,6 +3230,18 @@ const helpReplies=["Sent. Use it well.","I can help this time.","Done. You owe m
 const meanReplies=["You are asking too much of me.","Handle this one yourself.","You only call when you need something.","Do not make a habit of this."];
 const joinReplies=["I am in.","You have my support.","Count me in.","I will stand with you."];
 const refuseReplies=["Not yet.","I am not ready to commit.","I will stay independent for now.","No."];
+const contactDenyReplies=[
+ "Easy. We just met.",
+ "You always move this fast, or am I special?",
+ "That was quick. Try making a better impression first.",
+ "No thanks. I keep my contact list cleaner than that.",
+ "You want my number already? Buy me dinner first.",
+ "Bold request. Bad timing.",
+ "I do not know you well enough to make that mistake yet.",
+ "Not happening. Come back when your name carries more weight.",
+ "You looked more convincing before you asked.",
+ "Cute. The answer is still no."
+];
 
 
 function legacy_avatarUrl(id,name=""){
@@ -3518,6 +3530,7 @@ function legacy_personAvatarUrl(id,name){
 const GENERATED_CONTACT_INTERVAL_MS=30*60000;
 const PRESENCE_UPDATE_MS=10*60000;
 const CONTACT_RESPONSE_WINDOW_MS=90*60000;
+const CONTACT_REQUEST_COOLDOWN_MIN=10;
 const HELP_REQUEST_COOLDOWN_MIN=30;
 const MASS_MONEY_COOLDOWN_MIN=60;
 const MAX_HELP_CACHES=20;
@@ -3627,7 +3640,7 @@ function generatePotentialContact(t=now(),announce=true){
    activityScore,lastOnline,generatedAt:t,generated:true
  };
  state.generatedContacts[id]=d;
- state.potentials[id]={rel:base,added:false,chat:[],lastOnline,activityScore,generatedAt:t};
+ state.potentials[id]={rel:base,added:false,chat:[],lastOnline,activityScore,generatedAt:t,lastContactRequest:0,lastContactReply:""};
 
  // A new person became available, so the 30-minute maximum clock restarts now.
  state.lastGeneratedContact=t;
@@ -4160,7 +4173,7 @@ function renderGoldVault(){
 
 function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
- const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
+ const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now(),lastContactRequest:0,lastContactReply:""});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",playerAvatarSpec:{},customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
  bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
@@ -4373,7 +4386,7 @@ function migrate(){
  for(const id of Object.keys(state.generatedContacts||{})){
    if(!state.potentials[id]&&!state.friends[id]){
      const d=state.generatedContacts[id];
-     state.potentials[id]={rel:d.base||50,added:false,chat:[],lastOnline:d.lastOnline||now(),activityScore:d.activityScore||.55,generatedAt:d.generatedAt||now()};
+     state.potentials[id]={rel:d.base||50,added:false,chat:[],lastOnline:d.lastOnline||now(),activityScore:d.activityScore||.55,generatedAt:d.generatedAt||now(),lastContactRequest:0,lastContactReply:""};
    }
  }
  for(const [id,p] of Object.entries(state.potentials)){
@@ -4382,6 +4395,8 @@ function migrate(){
    if(!Number.isFinite(p.lastOnline))p.lastOnline=now()-rnd(0,90)*60000;
    if(!Number.isFinite(p.activityScore))p.activityScore=.60;
    if(!Number.isFinite(p.generatedAt))p.generatedAt=now();
+   if(!Number.isFinite(p.lastContactRequest))p.lastContactRequest=0;
+   if(typeof p.lastContactReply!=="string")p.lastContactReply="";
    if(typeof p.added!=="boolean")p.added=false;
  }
 
@@ -6036,11 +6051,19 @@ function sendGift(id){
 function nameOf(id){return getPersonDef(id)?.name||id}
 function addPotential(id,force=false){
  const p=state.potentials[id],d=getPersonDef(id);
- if(!p||!d||p.added)return;
+ if(!p||!d||p.added)return false;
+
+ const wait=force?0:cooldown(p.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN);
+ if(wait>0){
+   showRequirementPopup(`${d.name} already turned down your last contact request. Try again in ${fmt(wait)}.`);
+   return false;
+ }
 
  const chance=.35+p.rel/160;
  if(force||Math.random()<chance){
    p.added=true;
+   p.lastContactRequest=0;
+   p.lastContactReply="";
    const generated=!!d.generated;
    const dropOffAt=generated
      ?(Math.random()<.88?now()+rnd(12,240)*3600000:0)
@@ -6055,14 +6078,22 @@ function addPotential(id,force=false){
      inactive:false,dropOffAt,joinedAt:now()
    };
    log(`${d.name} was added to your contacts.`);
+   showActionFlash("CONTACT REQUEST ACCEPTED",`${d.name} added you to their contacts.`,"good");
    S.ok();
- }else{
-   p.rel=Math.max(0,p.rel-2);
-   toast("They have not accepted yet.");
-   S.bad();
+   save();render();
+   updateNetworkArrivalTimer();
+   return true;
  }
+
+ p.rel=Math.max(0,p.rel-2);
+ p.lastContactRequest=now();
+ p.lastContactReply=contactDenyReplies[rnd(0,contactDenyReplies.length-1)];
+ log(`${d.name} denied your contact request: "${p.lastContactReply}"`);
+ showActionFlash("CONTACT REQUEST DENIED",`${d.name}: “${p.lastContactReply}” · Try again in ${CONTACT_REQUEST_COOLDOWN_MIN}m`,"bad");
+ S.bad();
  save();render();
  updateNetworkArrivalTimer();
+ return false;
 }
 function openChat(id,potential=false){activeChat={id,potential};const d=potential?(potentialDefs.find(x=>x.id===id)||getPersonDef(id)):getPersonDef(id),f=potential?state.potentials[id]:state.friends[id];if(!f.chat)f.chat=[];chatTitle.textContent=`Chat with ${d.name}`;renderChat();chatbox.classList.add("show")}
 function closeChat(){chatbox.classList.remove("show");activeChat=null}
@@ -6075,7 +6106,10 @@ function renderChat(){
 
  chatLog.innerHTML=f.chat.length?f.chat.map(m=>`<div class="bubble ${m.me?"me":""}">${m.text}</div>`).join(""):`<div class="bubble">I heard your name through a mutual contact.</div>`;
  const opts=[`<button onclick="chatAction('smalltalk')">Check in</button>`];
- if(potential&&!f.added)opts.push(`<button onclick="chatAction('add')">Send contact request</button>`);
+ if(potential&&!f.added){
+   const contactWait=cooldown(f.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN);
+   opts.push(`<button onclick="chatAction('add')" ${contactWait>0?"disabled":""}>${contactWait>0?`Contact request ${fmt(contactWait)}`:"Send contact request"}</button>`);
+ }
  if(!potential||f.added){
    const responsive=contactCanRespond(f);
    opts.push(`<button onclick="chatAction('recruit')" ${responsive?"":"disabled"}>${responsive?"Ask them to join your crew":"Offline / no response"}</button>`);
@@ -6099,9 +6133,14 @@ function chatAction(type){
    }
  }
  if(type==="add"){
-   f.chat.push({me:true,text:"We should stay in contact."});
-   addPotential(id);
-   f.chat.push({me:false,text:f.added?"Agreed. Keep this line open.":"Not yet."});
+   const contactWait=cooldown(f.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN);
+   if(contactWait>0){
+     f.chat.push({me:false,text:`You already asked. Try again in ${fmt(contactWait)}.`});
+   }else{
+     f.chat.push({me:true,text:"We should stay in contact."});
+     const accepted=addPotential(id);
+     f.chat.push({me:false,text:accepted?"Agreed. Keep this line open.":(f.lastContactReply||"Not yet.")});
+   }
  }
  if(type==="recruit"){
    if(!contactCanRespond(f)){f.chat.push({me:false,text:"No response."});}
@@ -7202,9 +7241,10 @@ function renderCrew(){
          <span class="crew-pill ${presence.cls==="online"?"good":"warn"}">${presence.cls==="online"?"AVAILABLE":"QUIET"}</span>
        </div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
+       ${f.lastContactReply&&cooldown(f.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN)>0?`<div class="fresponse"><b>${p.name}:</b> ${f.lastContactReply}</div>`:""}
        <div class="relbar"><div style="width:${f.rel}%"></div></div>
      </div>
-     <div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div>
+     ${(()=>{const contactWait=cooldown(f.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN);return `<div class="fbtns"><button onclick="addPotential('${p.id}')" ${contactWait>0?"disabled":""}>${contactWait>0?`TRY AGAIN ${fmt(contactWait)}`:"SEND CONTACT REQUEST"}</button></div>`})()}
    </div>`;
  }).join("")||"<div style='padding:8px;font-size:10px'>No potential associates are waiting. The network will generate a new person within 30 minutes while the waiting pool contains fewer than five people.</div>";
  updateNetworkArrivalTimer();
