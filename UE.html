@@ -1417,6 +1417,89 @@ body:after{
 .inventory-resource.cache b{color:#d8ba66}
 @media(max-width:600px){.crew-op-grid{grid-template-columns:1fr}.crew-op-meta{min-height:0}}
 
+
+/* HOME COMPACT HUD + EMPIRE OVERVIEW */
+.home-overview-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  margin-top:7px;
+  padding-top:6px;
+  border-top:1px solid #342f27;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.08em;
+  color:#b8a47e;
+}
+.home-overview-head span:last-child{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:normal;
+  letter-spacing:0;
+  color:#777168;
+}
+.home-overview-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:3px;
+  margin-top:4px;
+}
+.home-overview-item{
+  appearance:none;
+  min-width:0;
+  min-height:49px;
+  padding:5px 4px;
+  border:1px solid #343638;
+  border-left:2px solid #51545a;
+  background:linear-gradient(#121416,#08090a);
+  color:#ddd;
+  text-align:left;
+  font:inherit;
+  cursor:pointer;
+}
+.home-overview-item:active{transform:translateY(1px)}
+.home-overview-item.gold{border-left-color:#a98734}
+.home-overview-item.cash,.home-overview-item.income{border-left-color:#51753c}
+.home-overview-icon{
+  float:left;
+  margin-right:4px;
+  font-size:11px;
+  line-height:12px;
+}
+.home-overview-label{
+  display:block;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:6px;
+  font-weight:900;
+  letter-spacing:.045em;
+  color:#8f897e;
+  line-height:11px;
+}
+.home-overview-item b{
+  display:block;
+  clear:both;
+  min-width:0;
+  margin-top:3px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:10px;
+  line-height:12px;
+  color:#ddd7cc;
+}
+.home-overview-item.gold b{color:#d8ba66}
+.home-overview-item.cash b,.home-overview-item.income b{color:#8bb96c}
+@media(max-width:390px){
+  .home-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .home-overview-item{min-height:46px}
+}
+
 </style>
 </head>
 <body>
@@ -1487,6 +1570,43 @@ body:after{
      <div class="pbox">NOTORIETY<b id="notorietyBox"></b></div>
      <div class="pbox">ATTACK<b id="atkBox"></b></div>
      <div class="pbox">DEFENSE<b id="defBox"></b></div>
+   </div>
+
+   <div class="home-overview-head">
+     <span>EMPIRE OVERVIEW</span>
+     <span>resources / organization / income</span>
+   </div>
+   <div class="home-overview-grid">
+     <button class="home-overview-item gold" onclick="openGoldVaultFromStat()">
+       <span class="home-overview-icon">🪙</span>
+       <span class="home-overview-label">GOLD BARS</span>
+       <b id="homeGoldBars">0</b>
+     </button>
+     <button class="home-overview-item" onclick="go('crew')">
+       <span class="home-overview-icon">👥</span>
+       <span class="home-overview-label">CREW</span>
+       <b id="homeCrewSize">1</b>
+     </button>
+     <button class="home-overview-item" onclick="go('fight')">
+       <span class="home-overview-icon">⚔️</span>
+       <span class="home-overview-label">COMBAT CREW</span>
+       <b id="homeCombatCrew">1 / 25</b>
+     </button>
+     <button class="home-overview-item cash" onclick="go('more')">
+       <span class="home-overview-icon">🏦</span>
+       <span class="home-overview-label">OFFSHORE BANK</span>
+       <b id="homeBankCash">$0</b>
+     </button>
+     <button class="home-overview-item income" onclick="go('territory')">
+       <span class="home-overview-icon">🏢</span>
+       <span class="home-overview-label">NET INCOME</span>
+       <b id="homeNetIncome">+$0/hr</b>
+     </button>
+     <button class="home-overview-item" onclick="go('fight')">
+       <span class="home-overview-icon">🥊</span>
+       <span class="home-overview-label">FIGHT RECORD</span>
+       <b id="homeFightRecord">0W · 0L</b>
+     </button>
    </div>
  </div>
 
@@ -1939,7 +2059,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.20.0";
+const BUILD_NUMBER="0.20.1";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5205,6 +5325,22 @@ function render(){syncStatHudMode();const sx=document.getElementById("sfxState")
    miniHeatItem.classList.toggle("manhunt",state.heat>=90);
    miniHeatItem.title=`Heat ${Math.floor(state.heat)} · ${heatLabel()}`;
  }
+ const homeGoldBars=document.getElementById("homeGoldBars");
+ const homeCrewSize=document.getElementById("homeCrewSize");
+ const homeCombatCrew=document.getElementById("homeCombatCrew");
+ const homeBankCash=document.getElementById("homeBankCash");
+ const homeNetIncome=document.getElementById("homeNetIncome");
+ const homeFightRecord=document.getElementById("homeFightRecord");
+ if(homeGoldBars)homeGoldBars.textContent=(state.goldBars||0).toLocaleString();
+ if(homeCrewSize)homeCrewSize.textContent=crewSize().toLocaleString();
+ if(homeCombatCrew)homeCombatCrew.textContent=`${combatCrewCount()} / ${combatCrewLimit()}`;
+ if(homeBankCash){homeBankCash.textContent=compactMoney(state.bankCash||0);homeBankCash.title=money(state.bankCash||0);}
+ if(homeNetIncome){
+   const ni=netIncome();
+   homeNetIncome.textContent=`${ni>=0?"+":"-"}${compactMoney(Math.abs(ni))}/hr`;
+   homeNetIncome.title=`${ni>=0?"+":"-"}${money(Math.abs(ni))}/hr`;
+ }
+ if(homeFightRecord)homeFightRecord.textContent=`${state.wins||0}W · ${state.losses||0}L`;
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
@@ -5926,16 +6062,11 @@ function activeViewName(){
  return active?.id?.replace("view-","")||"home";
 }
 function syncStatHudMode(){
- const home=activeViewName()==="home";
- document.body.classList.toggle("compact-stats",!home);
+ document.body.classList.add("compact-stats");
  const hud=document.getElementById("miniHud");
  if(!hud)return;
- if(!home){
-   hud.classList.add("show");
-   hud.setAttribute("aria-hidden","false");
- }else{
-   updateMiniHudVisibility();
- }
+ hud.classList.add("show");
+ hud.setAttribute("aria-hidden","false");
 }
 
 
@@ -6064,19 +6195,10 @@ setTimeout(()=>{try{tryAutoTheme()}catch(e){console.error("Theme startup failed"
 
 function updateMiniHudVisibility(){
  const hud=document.getElementById("miniHud");
- const header=document.querySelector(".top");
- if(!hud||!header)return;
-
- if(activeViewName()!=="home"){
-   hud.classList.add("show");
-   hud.setAttribute("aria-hidden","false");
-   return;
- }
-
- const threshold=Math.max(48,header.offsetHeight-8);
- const show=window.scrollY>threshold;
- hud.classList.toggle("show",show);
- hud.setAttribute("aria-hidden",show?"false":"true");
+ if(!hud)return;
+ document.body.classList.add("compact-stats");
+ hud.classList.add("show");
+ hud.setAttribute("aria-hidden","false");
 }
 window.addEventListener("scroll",updateMiniHudVisibility,{passive:true});
 window.addEventListener("resize",updateMiniHudVisibility,{passive:true});
