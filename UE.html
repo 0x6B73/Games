@@ -1500,6 +1500,204 @@ body:after{
   .home-overview-item{min-height:46px}
 }
 
+
+/* FACILITIES */
+.facility-grid{display:grid;gap:5px}
+.facility-card{
+  padding:8px;
+  border:1px solid #393b3e;
+  border-left:3px solid #675b43;
+  background:linear-gradient(#131517,#090a0b);
+}
+.facility-card.owned{
+  border-left-color:#6f964b;
+  background:linear-gradient(#111810,#080b07);
+}
+.facility-card.locked{opacity:.82}
+.facility-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.facility-name{font-size:11px;font-weight:900;color:#e0d7c8}
+.facility-price{font-size:10px;font-weight:900;color:#d5b65d;white-space:nowrap}
+.facility-unlock{
+  margin-top:4px;
+  padding:4px 5px;
+  border:1px solid #403b31;
+  background:#0c0b09;
+  font-size:8px;
+  color:#cbb276;
+}
+.facility-card.owned .facility-unlock{
+  border-color:#405438;
+  color:#91bd70;
+  background:#090e08;
+}
+.facility-desc{
+  margin-top:5px;
+  font-size:9px;
+  line-height:1.35;
+  color:#969087;
+}
+.facility-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+  margin-top:5px;
+}
+.facility-lock{
+  margin-top:5px;
+  font-size:8px;
+  font-weight:900;
+  color:#c77d70;
+}
+.facility-card .btn{margin-top:6px;width:100%}
+.crew-op-lock{
+  margin-top:4px;
+  padding:4px 5px;
+  border:1px solid #533c34;
+  background:#120b09;
+  color:#c98578;
+  font-size:8px;
+}
+.job-dash.locked-facility{
+  border-color:#55402f!important;
+  background:#110d09!important;
+}
+.job-dash.locked-facility .job-dash-brand{color:#b89a61!important}
+
+/* Completed Job mastery must override the generic yellow !important fill. */
+.mastery.mastered{
+  border-color:#4f7b38!important;
+  background:#071006!important;
+}
+.mastery.mastered>div{
+  background:linear-gradient(#8ac768,#4f883c)!important;
+}
+
+
+/* ENDGAME GOLD INFRASTRUCTURE */
+.endgame-facility-divider{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+  margin:10px 0 5px;
+  padding:6px 7px;
+  border:1px solid #66562d;
+  border-left:3px solid #c5a346;
+  background:linear-gradient(#17130b,#0b0905);
+}
+.endgame-facility-divider b{
+  font-size:9px;
+  color:#e2c664;
+  letter-spacing:.06em;
+}
+.endgame-facility-divider span{
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:7px;
+  color:#8e815f;
+}
+.gold-infra-grid{display:grid;gap:5px}
+.gold-infra-card{
+  padding:8px;
+  border:1px solid #4b4329;
+  border-left:3px solid #9f8230;
+  background:linear-gradient(#151208,#090805);
+}
+.gold-infra-card.owned{
+  border-left-color:#769d4e;
+  background:linear-gradient(#11170c,#080b06);
+}
+.gold-infra-card.locked{opacity:.78}
+.gold-infra-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+}
+.gold-infra-name{
+  font-size:11px;
+  font-weight:900;
+  color:#e1d8c5;
+}
+.gold-infra-cost{
+  flex:0 0 auto;
+  font-size:10px;
+  font-weight:900;
+  color:#e0bd4c;
+}
+.gold-infra-desc{
+  margin-top:4px;
+  font-size:8px;
+  line-height:1.4;
+  color:#999184;
+}
+.gold-infra-meta{
+  display:flex;
+  flex-wrap:wrap;
+  gap:3px;
+  margin-top:5px;
+}
+.gold-infra-status{
+  margin-top:5px;
+  padding:4px 5px;
+  border:1px solid #494128;
+  background:#0c0a05;
+  font-size:8px;
+  color:#cbb276;
+}
+.gold-infra-status.good{
+  border-color:#415a34;
+  color:#91bf70;
+  background:#080d06;
+}
+.gold-infra-status.bad{
+  border-color:#5a3932;
+  color:#ca8375;
+  background:#100907;
+}
+.gold-infra-actions{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:4px;
+  margin-top:6px;
+}
+.gold-infra-actions .btn:only-child{grid-column:1/-1}
+.gold-tier-track{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:2px;
+  margin-top:6px;
+}
+.gold-tier-seg{
+  height:5px;
+  border:1px solid #403922;
+  background:#090805;
+}
+.gold-tier-seg.on{
+  border-color:#957a2e;
+  background:linear-gradient(#d1ad3f,#7e6420);
+}
+.gold-production-line{
+  margin-top:5px;
+  font-size:8px;
+  color:#aaa193;
+}
+.gold-production-line b{color:#e0c45e}
+.fight-stamina-cost{
+  display:inline-block;
+  margin-left:4px;
+  font-size:7px;
+  font-weight:900;
+  color:#d6b563;
+}
+
 </style>
 </head>
 <body>
@@ -1805,6 +2003,23 @@ body:after{
      <div class="grid cards" id="props"></div>
    </div>
  </details>
+
+ <details class="fold-card tab-section-fold" id="facilitiesSection">
+   <summary>FACILITIES <span id="facilitySummary">0 / 4 built</span></summary>
+   <div class="fold-body">
+     <details class="compact-details explainer-details">
+       <summary>HOW FACILITIES WORK <span>?</span></summary>
+       <div class="compact-details-body">Facilities are permanent organization infrastructure. They are expensive, one-time purchases that unlock automation systems and provide modest business income. Facilities survive Kingpin Prestige.</div>
+     </details>
+     <div id="facilities"></div>
+     <div class="endgame-facility-divider">
+       <b>GOLD INFRASTRUCTURE</b>
+       <span>permanent endgame automation</span>
+     </div>
+     <div id="endgameFacilities"></div>
+   </div>
+ </details>
+
  <details class="fold-card tab-section-fold">
    <summary>FACTIONS & CONTROL <span>territory pressure</span></summary>
    <div class="fold-body"><div id="factions"></div></div>
@@ -2059,7 +2274,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.20.1";
+const BUILD_NUMBER="0.21.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2203,6 +2418,61 @@ const propDefs=[
  {id:"casinoResort",name:"Waterfront Casino Resort",city:"downtown",cost:2750000,income:250000,upkeep:75000,level:80,crewReq:200,img:"club",desc:"Gaming, hospitality, restaurants, private rooms, and a waterfront footprint large enough to become an institution."},
  {id:"shippingCo",name:"International Shipping Company",city:"north",cost:5000000,income:470000,upkeep:150000,level:95,crewReq:300,img:"docks",desc:"Ships, contracts, containers, warehouses, and international routes. At this scale, the organization no longer hides inside infrastructure—it owns it."}
 ];
+
+const facilityDefs=[
+ {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:75000,income:1000,upkeep:400,level:12,crewReq:15,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
+ {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:20,crewReq:30,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
+ {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:35,crewReq:60,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
+ {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:55,crewReq:100,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
+];
+
+const ENDGAME_AUTO_DEFS={
+ autoMessages:{
+   name:"Automated Liaison Network",
+   cost:500,
+   level:65,
+   crewReq:125,
+   desc:"A staffed communications bureau automatically handles incoming contact requests, gifts, favor requests, and backup requests when the required Cash or Stamina is available."
+ },
+ autoDefense:{
+   name:"Automated Defense Network",
+   cost:1000,
+   level:75,
+   crewReq:150,
+   desc:"A hardened response network automatically answers incoming attacks when the special defense requirement is met and at least 1 Stamina is available."
+ }
+};
+const ENDGAME_TIER_DEFS={
+ energy:{
+   name:"Energy Drink Production",
+   level:70,
+   crewReq:125,
+   costs:[100,200,400,800,1600],
+   rates:[1,3,6,10,15],
+   unit:"Energy Drinks / hr",
+   desc:"An underground bottling line produces Energy Drinks automatically. Each tier increases hourly output."
+ },
+ adrenaline:{
+   name:"Adrenaline Manufacturing",
+   level:75,
+   crewReq:150,
+   costs:[150,300,600,1200,2400],
+   rates:[1,2,4,7,10],
+   unit:"Adrenaline / hr",
+   desc:"A controlled medical supply operation produces Adrenaline Shots automatically. Higher tiers increase hourly output."
+ },
+ heat:{
+   name:"Heat Suppression Bureau",
+   level:80,
+   crewReq:175,
+   costs:[200,400,800,1600,3200],
+   rates:[270,240,210,180,120],
+   unit:"seconds / Heat",
+   desc:"Lawyers, fixers, shell companies, and paid contacts accelerate passive Heat reduction. Tier 5 cuts the base decay interval from 5 minutes to 2 minutes."
+ }
+};
+
+
 const territoryDefs=[
  {id:"dock9",name:"Dock 9",city:"east",reqNot:0,income:120,enemy:"Harbor Kings",desc:"A rusted stretch of waterfront where containers arrive before paperwork does. Control Dock 9 and everyone moving quiet cargo through East Harbor has to acknowledge your name."},
  {id:"market",name:"Old Market",city:"east",reqNot:40,income:240,enemy:"Rossi Crew",desc:"Wholesale stalls by day, envelopes and introductions after dark. Old Market is a web of shopkeepers, drivers, and fixers — exactly the kind of place influence spreads fast."},
@@ -2999,6 +3269,7 @@ function getUnlockCatalog(){
  cities.forEach(c=>out.push({id:`city:${c.id}`,level:c.level,title:`City: ${c.name}`,detail:c.sub}));
  gearDefs.forEach(g=>out.push({id:`gear:${g.id}`,level:g.level,title:`Equipment: ${g.name}`,detail:`${g.desc||gearEffectLabel(g)}${g.crewReq?` · Crew ${g.crewReq} required`:""}`}));
  propDefs.forEach(p=>out.push({id:`property:${p.id}`,level:p.level,title:`Property: ${p.name}`,detail:`${money(p.income)}/hr income${p.crewReq?` · Crew ${p.crewReq} required`:""}`}));
+ facilityDefs.forEach(f=>out.push({id:`facility:${f.id}`,level:f.level,title:`Facility: ${f.name}`,detail:`Unlocks ${f.unlockLabel} · Crew ${f.crewReq} required`}));
  jobDefs.forEach(j=>{
    const level=Math.max(tiers[j.tier]?.level||1,cities.find(c=>c.id===j.city)?.level||1);
    out.push({id:`job:${j.id}`,level,title:`Job: ${j.name}`,detail:`${cities.find(c=>c.id===j.city)?.name||"New city"} operation`});
@@ -3166,8 +3437,9 @@ function fresh(){
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
  bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:2,helpCaches:[],
+ endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
- wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
+ wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
@@ -3208,6 +3480,22 @@ function migrate(){
  if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
  if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
+ if(!state.endgameInfra||typeof state.endgameInfra!=="object")state.endgameInfra={};
+ state.endgameInfra=Object.assign({
+   autoMessages:false,autoMessagesEnabled:false,
+   autoDefense:false,autoDefenseEnabled:false,
+   energyTier:0,adrenalineTier:0,heatTier:0,
+   lastEnergyProduction:now(),lastAdrenalineProduction:now()
+ },state.endgameInfra);
+ state.endgameInfra.autoMessages=!!state.endgameInfra.autoMessages;
+ state.endgameInfra.autoDefense=!!state.endgameInfra.autoDefense;
+ state.endgameInfra.autoMessagesEnabled=state.endgameInfra.autoMessages&&state.endgameInfra.autoMessagesEnabled!==false;
+ state.endgameInfra.autoDefenseEnabled=state.endgameInfra.autoDefense&&state.endgameInfra.autoDefenseEnabled!==false;
+ ["energyTier","adrenalineTier","heatTier"].forEach(k=>{
+   state.endgameInfra[k]=Math.max(0,Math.min(5,Math.floor(Number(state.endgameInfra[k])||0)));
+ });
+ if(!Number.isFinite(state.endgameInfra.lastEnergyProduction))state.endgameInfra.lastEnergyProduction=now();
+ if(!Number.isFinite(state.endgameInfra.lastAdrenalineProduction))state.endgameInfra.lastAdrenalineProduction=now();
  if(!Array.isArray(state.helpCaches))state.helpCaches=[];
  state.helpCaches=state.helpCaches.filter(x=>x&&typeof x==="object").slice(0,MAX_HELP_CACHES);
  if(!state.bossLastFight||typeof state.bossLastFight!=="object")state.bossLastFight={};
@@ -3275,7 +3563,7 @@ function migrate(){
  if(state.lifetimeCashEarned===0)state.lifetimeCashEarned=Math.max(0,Math.floor(Number(state.cash)||0));
 
  // Core dictionaries.
- for(const key of ["gear","props","jobs","loot","factions","bosses"]){
+ for(const key of ["gear","props","facilities","jobs","loot","factions","bosses"]){
    if(!state[key]||typeof state[key]!=="object")state[key]={...defaults[key]};
  }
  if(!Array.isArray(state.inbox))state.inbox=[];
@@ -3416,8 +3704,245 @@ function gearQty(id){return state.gear[id]||0}
 function gearUpkeep(){return gearDefs.reduce((n,g)=>n+gearQty(g.id)*g.upkeep,0)}
 function propertyIncome(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.income,0)}
 function propertyUpkeep(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.upkeep,0)}
+function facilityOwned(id){return !!state.facilities?.[id]}
+function facilityIncome(){return facilityDefs.reduce((n,f)=>n+(facilityOwned(f.id)?f.income:0),0)}
+function facilityUpkeep(){return facilityDefs.reduce((n,f)=>n+(facilityOwned(f.id)?f.upkeep:0),0)}
 function territoryIncome(){return territoryDefs.reduce((n,t)=>n+(state.territory[t.id]?.owned?t.income:0),0)}
-function netIncome(){return propertyIncome()+territoryIncome()-propertyUpkeep()-gearUpkeep()}
+function netIncome(){return propertyIncome()+facilityIncome()+territoryIncome()-propertyUpkeep()-facilityUpkeep()-gearUpkeep()}
+function facilityForFeature(feature){return facilityDefs.find(f=>f.unlock===feature)||null}
+function automationUnlocked(feature){
+ const f=facilityForFeature(feature);
+ return !f||facilityOwned(f.id);
+}
+function automationLockMessage(feature){
+ const f=facilityForFeature(feature);
+ return f?`${f.unlockLabel} requires ${f.name}. Build it in Territory → Facilities.`:"That automation feature is locked.";
+}
+
+function endgameBaseUnlocked(){
+ return facilityOwned("operationsCenter");
+}
+function endgameRequirement(def){
+ const missing=[];
+ if(!endgameBaseUnlocked())missing.push("Underworld Operations Center");
+ if(state.level<def.level)missing.push(`LVL ${def.level}`);
+ if(crewSize()<def.crewReq)missing.push(`CREW ${def.crewReq}`);
+ return missing;
+}
+function endgameCanBuy(def){
+ return endgameRequirement(def).length===0;
+}
+function endgameTier(kind){
+ return Math.max(0,Math.min(5,Math.floor(Number(state.endgameInfra?.[`${kind}Tier`])||0)));
+}
+function heatDecayMs(){
+ const tier=endgameTier("heat");
+ if(tier<=0)return 300000;
+ const seconds=ENDGAME_TIER_DEFS.heat.rates[tier-1]||300;
+ return seconds*1000;
+}
+function fightStaminaCost(o){
+ const threat=opponentThreat(o);
+ if(threat<=2)return 1;
+ if(threat<=4)return 2;
+ if(threat<=6)return 3;
+ if(threat===7)return 4;
+ return 5;
+}
+function buyEndgameAutomation(kind){
+ const def=ENDGAME_AUTO_DEFS[kind];
+ if(!def)return toast("Automation unavailable.");
+ if(state.endgameInfra[kind])return showRequirementPopup(`${def.name} is already installed.`);
+ const missing=endgameRequirement(def);
+ if(missing.length)return showRequirementPopup(`Cannot install ${def.name}. Missing: ${missing.join(" · ")}.`);
+ if((state.goldBars||0)<def.cost)return showRequirementPopup(`${def.name} costs ${def.cost} Gold Bars. You have ${state.goldBars||0}.`);
+
+ state.goldBars-=def.cost;
+ state.endgameInfra[kind]=true;
+ state.endgameInfra[`${kind}Enabled`]=true;
+ log(`${def.name} installed for ${def.cost} Gold Bars.`);
+ recordIntel("GOLD INFRASTRUCTURE",`${def.name} installed · automation enabled`,"cash");
+ showActionFlash("AUTOMATION INSTALLED",`${def.name} · 🪙 ${def.cost}`,"cash");
+ S.cash();save();render();
+}
+function toggleEndgameAutomation(kind){
+ if(!state.endgameInfra?.[kind])return;
+ const key=`${kind}Enabled`;
+ state.endgameInfra[key]=!state.endgameInfra[key];
+ log(`${ENDGAME_AUTO_DEFS[kind]?.name||kind} ${state.endgameInfra[key]?"enabled":"disabled"}.`);
+ save();render();
+}
+function upgradeEndgameTier(kind){
+ const def=ENDGAME_TIER_DEFS[kind];
+ if(!def)return toast("Upgrade unavailable.");
+ const tier=endgameTier(kind);
+ if(tier>=5)return showRequirementPopup(`${def.name} is already Tier 5.`);
+ const missing=endgameRequirement(def);
+ if(missing.length)return showRequirementPopup(`Cannot upgrade ${def.name}. Missing: ${missing.join(" · ")}.`);
+ const cost=def.costs[tier];
+ if((state.goldBars||0)<cost)return showRequirementPopup(`Tier ${tier+1} costs ${cost} Gold Bars. You have ${state.goldBars||0}.`);
+
+ state.goldBars-=cost;
+ state.endgameInfra[`${kind}Tier`]=tier+1;
+ if(kind==="energy")state.endgameInfra.lastEnergyProduction=now();
+ if(kind==="adrenaline")state.endgameInfra.lastAdrenalineProduction=now();
+ if(kind==="heat")state.lastHeatDecay=now();
+
+ log(`${def.name} upgraded to Tier ${tier+1} for ${cost} Gold Bars.`);
+ recordIntel("INFRASTRUCTURE UPGRADED",`${def.name} · Tier ${tier+1}`,"cash");
+ showActionFlash("TIER UPGRADE",`${def.name} · Tier ${tier+1} · 🪙 ${cost}`,"cash");
+ S.cash();save();render();
+}
+function processProduction(t=now()){
+ const infra=state.endgameInfra;if(!infra)return;
+
+ const produce=(kind,item,lastKey)=>{
+   const tier=endgameTier(kind);
+   if(tier<=0){infra[lastKey]=t;return}
+   const rate=ENDGAME_TIER_DEFS[kind].rates[tier-1]||0;
+   const last=Number(infra[lastKey])||t;
+   const hours=Math.floor(Math.max(0,t-last)/3600000);
+   if(hours<=0)return;
+   const qty=hours*rate;
+   const before=Math.max(0,Number(state.loot[item])||0);
+   state.loot[item]=Math.min(999,before+qty);
+   const made=state.loot[item]-before;
+   infra[lastKey]=last+hours*3600000;
+   if(made>0){
+     log(`${ENDGAME_TIER_DEFS[kind].name} produced ${made} ${item}${made===1?"":"s"}.`);
+     recordIntel("AUTOMATED PRODUCTION",`${made} ${item}${made===1?"":"s"} added to inventory`,"good");
+   }
+ };
+ produce("energy","Energy Drink","lastEnergyProduction");
+ produce("adrenaline","Adrenaline Shot","lastAdrenalineProduction");
+}
+function processAutoInbox(){
+ const infra=state.endgameInfra;
+ if(!infra?.autoMessages||!infra.autoMessagesEnabled)return false;
+
+ // Handle one actionable message per pass. Messages that currently cannot
+ // be afforded do not block gifts or contact requests behind them.
+ for(const msg of state.inbox){
+   if(msg.type==="attack")continue;
+
+   if(msg.type==="gift"){
+     answerInbox(msg.id,"accept");
+     document.getElementById("socialPop")?.classList.remove("show");
+     return true;
+   }
+   if(msg.type==="request"){
+     acceptRequest(msg.id);
+     document.getElementById("socialPop")?.classList.remove("show");
+     return true;
+   }
+   if(msg.type==="favor"){
+     const cost=msg.amount||150;
+     if(state.cash<cost)continue;
+     answerInbox(msg.id,"help");
+     document.getElementById("socialPop")?.classList.remove("show");
+     return true;
+   }
+   if(msg.type==="backup"){
+     if(state.st<1)continue;
+     answerInbox(msg.id,"help");
+     document.getElementById("socialPop")?.classList.remove("show");
+     return true;
+   }
+ }
+ return false;
+}
+function processAutoDefense(){
+ const infra=state.endgameInfra;
+ if(!infra?.autoDefense||!infra.autoDefenseEnabled||state.st<1)return false;
+ const a=state.pendingAttacks.find(x=>!x.resolved&&now()<=x.expires&&defenseRequirementStatus(x).met);
+ if(!a)return false;
+ defendAttack(a.id);
+ return true;
+}
+function renderEndgameFacilities(){
+ const el=document.getElementById("endgameFacilities");if(!el)return;
+ const infra=state.endgameInfra||{};
+ const gold=state.goldBars||0;
+
+ const autoCard=(kind)=>{
+   const def=ENDGAME_AUTO_DEFS[kind],owned=!!infra[kind],enabled=!!infra[`${kind}Enabled`];
+   const missing=endgameRequirement(def);
+   return `<div class="gold-infra-card ${owned?"owned":missing.length?"locked":""}">
+     <div class="gold-infra-head">
+       <div class="gold-infra-name">${owned?"✓ ":""}${def.name}</div>
+       <div class="gold-infra-cost">${owned?"INSTALLED":`🪙 ${def.cost}`}</div>
+     </div>
+     <div class="gold-infra-desc">${def.desc}</div>
+     <div class="gold-infra-meta">
+       <span class="badge ${state.level>=def.level?"green":"red"}">LVL ${def.level}</span>
+       <span class="badge ${crewSize()>=def.crewReq?"green":"red"}">Crew ${crewSize()}/${def.crewReq}</span>
+       <span class="badge ${endgameBaseUnlocked()?"green":"red"}">Operations Center</span>
+       <span class="badge gold">Permanent</span>
+     </div>
+     <div class="gold-infra-status ${owned?(enabled?"good":"bad"):(missing.length?"bad":"")}">${owned?`AUTOMATION ${enabled?"ENABLED":"DISABLED"}`:(missing.length?`LOCKED · ${missing.join(" · ")}`:"READY TO INSTALL")}</div>
+     <div class="gold-infra-actions">
+       ${owned
+         ?`<button class="btn ${enabled?"green":"secondary"} small" onclick="toggleEndgameAutomation('${kind}')">${enabled?"ENABLED · TAP TO DISABLE":"DISABLED · TAP TO ENABLE"}</button>`
+         :`<button class="btn gold small" onclick="buyEndgameAutomation('${kind}')" ${missing.length||gold<def.cost?"disabled":""}>INSTALL · 🪙 ${def.cost}</button>`}
+     </div>
+   </div>`;
+ };
+
+ const tierCard=(kind)=>{
+   const def=ENDGAME_TIER_DEFS[kind],tier=endgameTier(kind),missing=endgameRequirement(def);
+   const next=tier<5?def.costs[tier]:0;
+   let rateText="";
+   if(kind==="heat"){
+     rateText=tier?`Passive Heat decay: -1 every ${Math.round(def.rates[tier-1]/6)/10} min`:"Base Heat decay: -1 every 5 min";
+   }else{
+     rateText=tier?`${def.rates[tier-1]} ${def.unit}`:"No automatic production";
+   }
+   return `<div class="gold-infra-card ${tier>0?"owned":missing.length?"locked":""}">
+     <div class="gold-infra-head">
+       <div class="gold-infra-name">${tier>0?"✓ ":""}${def.name}</div>
+       <div class="gold-infra-cost">${tier>=5?"MAX TIER":`🪙 ${next}`}</div>
+     </div>
+     <div class="gold-infra-desc">${def.desc}</div>
+     <div class="gold-tier-track">${[1,2,3,4,5].map(n=>`<div class="gold-tier-seg ${n<=tier?"on":""}"></div>`).join("")}</div>
+     <div class="gold-production-line">Tier <b>${tier}/5</b> · ${rateText}</div>
+     <div class="gold-infra-meta">
+       <span class="badge ${state.level>=def.level?"green":"red"}">LVL ${def.level}</span>
+       <span class="badge ${crewSize()>=def.crewReq?"green":"red"}">Crew ${crewSize()}/${def.crewReq}</span>
+       <span class="badge ${endgameBaseUnlocked()?"green":"red"}">Operations Center</span>
+       <span class="badge gold">Permanent</span>
+     </div>
+     ${missing.length?`<div class="gold-infra-status bad">LOCKED · ${missing.join(" · ")}</div>`:""}
+     <div class="gold-infra-actions">
+       <button class="btn gold small" onclick="upgradeEndgameTier('${kind}')" ${tier>=5||missing.length||gold<next?"disabled":""}>${tier>=5?"TIER 5 COMPLETE":`UPGRADE TO TIER ${tier+1} · 🪙 ${next}`}</button>
+     </div>
+   </div>`;
+ };
+
+ el.innerHTML=`<div class="gold-infra-grid">
+   ${autoCard("autoMessages")}
+   ${autoCard("autoDefense")}
+   ${tierCard("energy")}
+   ${tierCard("adrenaline")}
+   ${tierCard("heat")}
+ </div>`;
+}
+
+function facilityAccess(f){
+ const levelMet=state.level>=f.level;
+ const crewMet=crewSize()>=f.crewReq;
+ const prereqMet=!f.prereq||facilityOwned(f.prereq);
+ return {levelMet,crewMet,prereqMet,locked:!levelMet||!crewMet||!prereqMet};
+}
+function facilityLockText(f){
+ const a=facilityAccess(f),missing=[];
+ if(!a.levelMet)missing.push(`LVL ${f.level}`);
+ if(!a.crewMet)missing.push(`CREW ${f.crewReq}`);
+ if(!a.prereqMet){
+   const p=facilityDefs.find(x=>x.id===f.prereq);
+   missing.push(p?.name||"PREREQUISITE FACILITY");
+ }
+ return missing.join(" · ");
+}
 function jobState(id){if(!state.jobs[id])state.jobs[id]={runs:0,mastery:0};return state.jobs[id]}
 function log(s){
  state.log.unshift({t:now(),s});
@@ -3630,8 +4155,8 @@ function showStatHelp(key,e){
    if(key==="heat"){
      actions.innerHTML=`<div class="bribe-box"><b>BRIBE LAW ENFORCEMENT</b><span>Pay 10 Gold Bars to wipe Heat to 0.</span><button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
-     const gross=propertyIncome()+territoryIncome(),upkeep=propertyUpkeep()+gearUpkeep(),net=netIncome();
-     actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
+     const gross=propertyIncome()+facilityIncome()+territoryIncome(),upkeep=propertyUpkeep()+facilityUpkeep()+gearUpkeep(),net=netIncome();
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Facilities + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
    }else if(key==="health"){
      actions.innerHTML=`<div class="bribe-box"><b>UNDERGROUND HOSPITAL</b><span>Heal to full for ${money(hospitalCost())}.</span><button class="btn green" style="margin-top:6px" onclick="hospitalHeal();closeModal('statHelpModal')" ${state.hp>=state.maxHp||state.cash<hospitalCost()?"disabled":""}>HEAL TO FULL</button></div>`;
    }else if(key==="gold"){
@@ -3734,16 +4259,22 @@ function showDashHelp(jid,e){
  const d=dashJobCost(j);
  const actions=document.getElementById("statHelpActions");
  document.getElementById("statHelpTitle").textContent="DASH";
- document.getElementById("statHelpText").textContent="DoorDash the required equipment for this Job. DASH instantly buys only the shop items you are currently missing. It costs 50% more than buying the same items yourself — but hey, you pay for convenience.";
+ const unlocked=automationUnlocked("dash");
+ document.getElementById("statHelpText").textContent=unlocked
+   ?"DASH instantly buys only the shop items you are currently missing for this Job. It costs 50% more than buying those items yourself."
+   :automationLockMessage("dash");
  if(actions){
-   actions.innerHTML=d.items.length
-     ?`<div class="sub">Missing now: ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}<br>Normal shop price: ${money(d.base)} · DASH price: ${money(d.total)}</div>`
-     :`<div class="sub">You already own all required shop equipment for this Job.</div>`;
+   actions.innerHTML=unlocked
+     ?(d.items.length
+       ?`<div class="sub">Missing now: ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}<br>Normal shop price: ${money(d.base)} · DASH price: ${money(d.total)}</div>`
+       :`<div class="sub">You already own all required shop equipment for this Job.</div>`)
+     :`<div class="sub">Facility required: ${facilityForFeature("dash")?.name||"Logistics Warehouse"}.</div>`;
  }
  document.getElementById("statHelpModal").classList.add("show");
 }
 function dashBuyJobItems(jid){
  const j=jobDefs.find(x=>x.id===jid);if(!j)return;
+ if(!automationUnlocked("dash"))return showRequirementPopup(automationLockMessage("dash"));
  const d=dashJobCost(j);
  if(!d.items.length)return showRequirementPopup("You already own all required equipment for this Job.");
  if(state.cash<d.total)return showRequirementPopup(`DASH delivery costs ${money(d.total)}. You currently have ${money(state.cash)}.`);
@@ -3756,6 +4287,25 @@ function dashBuyJobItems(jid){
  log(`DASH delivered Job equipment for ${j.name}. Paid ${money(d.total)} including the 50% convenience markup.`);
  showActionFlash("DASH DELIVERY COMPLETE",`${j.name} · ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")} · ${money(d.total)}`,"cash");
  save();render();
+}
+
+
+function dashJobPanel(j,dash,dashMarkup){
+ if(!dash.items.length)return "";
+ if(!automationUnlocked("dash")){
+   const f=facilityForFeature("dash");
+   return `<div class="job-dash locked-facility">
+     <div class="job-dash-head"><span class="job-dash-brand">🔒 DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
+     <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
+     <div class="sub">Requires ${f?.name||"Logistics Warehouse"} · Territory → Facilities</div>
+   </div>`;
+ }
+ return `<div class="job-dash">
+   <div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
+   <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
+   <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button>
+   <div class="sub">+50% convenience markup (${money(dashMarkup)}).</div>
+ </div>`;
 }
 
 function reqMissing(j){const m=[];if(crewSize()<j.crew)m.push(`${j.crew} crew`);Object.entries(j.req).forEach(([id,q])=>{if(gearQty(id)<q)m.push(`${q} ${gearDefs.find(g=>g.id===id).name}`)});if(cities.find(c=>c.id===j.city).level>state.level)m.push(`LVL ${cities.find(c=>c.id===j.city).level}`);return m}
@@ -4130,16 +4680,32 @@ function genOpponent(i,hit=false,context="fight"){
 }
 
 function fight(i,hit=false,revengeId=null,bountyId=null){
- if(state.st<1){
-   showActionFlash("NOT ENOUGH STAMINA",`You need 1 Stamina to fight. You have ${Math.floor(state.st)}/${state.maxSt}. Tap Stamina to use an Adrenaline Shot.`,"bad");return;
- }
  if(state.hp<10){
    showActionFlash("HEALTH TOO LOW",`You need at least 10 Health to start a fight. Current Health: ${Math.floor(state.hp)}.`,"bad");return;
  }
 
- state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
- const o=bountyId?state.playerBounties.find(x=>x.id===bountyId):revengeId?state.revenge.find(x=>x.id===revengeId):hit?genOpponent(i,true):ensureFightList()[i];
+ const o=bountyId
+   ?state.playerBounties.find(x=>x.id===bountyId)
+   :revengeId
+     ?state.revenge.find(x=>x.id===revengeId)
+     :hit
+       ?genOpponent(i,true)
+       :ensureFightList()[i];
  if(!o)return;
+
+ const staminaCost=fightStaminaCost(o);
+ if(state.st<staminaCost){
+   showActionFlash(
+     "NOT ENOUGH STAMINA",
+     `${fightThreatLabel(opponentThreat(o))} fights cost ${staminaCost} Stamina. You have ${Math.floor(state.st)}/${state.maxSt}.`,
+     "bad"
+   );
+   return;
+ }
+
+ state.st-=staminaCost;
+ state.lifetimeFights++;
+ runScene([[0,fxReload],[260,fxGun]]);
 
  const profile=offensiveFightProfile(o),rollMax=fightRollMax(o),p=profile.total+rnd(1,rollMax),e=o.power+rnd(1,rollMax);
  const won=p>=e;
@@ -4158,7 +4724,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    }
    showActionFlash(
      rivalUpdate.fled?"RIVAL FLED":"FIGHT WON",
-     `${o.name} · ${profile.total} vs ${o.power} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}${rivalUpdate.fled?` · Gone ${Math.round(RIVAL_FLEE_MS/60000)}m`:""}`,
+     `${o.name} · ${profile.total} vs ${o.power} · -${staminaCost} Stamina · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}${rivalUpdate.fled?` · Gone ${Math.round(RIVAL_FLEE_MS/60000)}m`:""}`,
      "good"
    );
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
@@ -4168,7 +4734,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
    state.cash-=loss;state.losses++;state.hp=Math.max(1,state.hp-hpLoss);
    log(`Lost to ${o.name}. Defense reduced losses by ${Math.round(mitigation*100)}%.`);
-   showActionFlash("FIGHT LOST",`${profile.total} vs ${o.power} · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
+   showActionFlash("FIGHT LOST",`${profile.total} vs ${o.power} · -${staminaCost} Stamina · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
  save();render();
 }
@@ -4232,6 +4798,25 @@ function buyGear(id,qty=1){
  showActionFlash("PURCHASE COMPLETE",`${qty}× ${g.name} · ${money(price.total)}${savings>0?` · Saved ${money(savings)}`:""}`,"cash");
  save();render();
 }
+
+function buyFacility(id){
+ const f=facilityDefs.find(x=>x.id===id);
+ if(!f)return toast("Facility unavailable.");
+ if(facilityOwned(id))return showRequirementPopup(`${f.name} is already operating.`);
+ const access=facilityAccess(f);
+ if(access.locked)return showRequirementPopup(`Cannot build ${f.name}. Missing: ${facilityLockText(f)}.`);
+ if(state.cash<f.cost)return showRequirementPopup(`${f.name} costs ${money(f.cost)}. You have ${money(state.cash)}.`);
+
+ state.cash-=f.cost;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+f.cost;
+ state.facilities[id]=true;
+
+ log(`${f.name} opened. ${f.unlockLabel} is now available.`);
+ recordIntel("FACILITY OPENED",`${f.name} · ${f.unlockLabel} unlocked`,"cash");
+ showActionFlash("FACILITY OPENED",`${f.name} · ${f.unlockLabel} unlocked`,"cash");
+ S.cash();save();render();
+}
+
 function buyProp(id){
  const p=propDefs.find(x=>x.id===id);
  if(!p)return toast("Property unavailable.");
@@ -4300,6 +4885,7 @@ function helpCacheTier(cache){
  return "THIN CACHE";
 }
 function massCrewOperation(kind){
+ if(!automationUnlocked(kind))return showRequirementPopup(automationLockMessage(kind));
  const q=crewBulkQuote(kind);
  if(!q.count)return showRequirementPopup("No recruited crew members are currently eligible for that bulk operation.");
  if(state.cash<q.total)return showRequirementPopup(`This crew operation costs ${money(q.total)}. You have ${money(state.cash)}.`);
@@ -4405,13 +4991,20 @@ function renderCrewOperations(){
  const summary=document.getElementById("crewOpsSummary");
  const qm=crewBulkQuote("money"),qf=crewBulkQuote("favor"),qh=crewBulkQuote("help");
  const caches=Array.isArray(state.helpCaches)?state.helpCaches:[];
- if(summary)summary.textContent=`bulk actions · ${caches.length} sealed cache${caches.length===1?"":"s"}`;
- const opCard=(title,desc,q,kind,label)=>`<div class="crew-op-card">
-   <h4>${title}</h4>
-   <div class="crew-op-meta">${desc}<br>${q.count} eligible · ${money(q.unit)} per crew member</div>
-   <div class="crew-op-cost">${money(q.total)}</div>
-   <button class="btn small ${kind==="money"?"":"secondary"}" onclick="massCrewOperation('${kind}')" ${q.count<1||state.cash<q.total?"disabled":""}>${label}</button>
- </div>`;
+ if(summary)summary.textContent=`automation · ${caches.length} sealed cache${caches.length===1?"":"s"}`;
+
+ const opCard=(title,desc,q,kind,label)=>{
+   const unlocked=automationUnlocked(kind);
+   const facility=facilityForFeature(kind);
+   return `<div class="crew-op-card">
+     <h4>${title}</h4>
+     <div class="crew-op-meta">${desc}<br>${q.count} eligible · ${money(q.unit)} per crew member</div>
+     <div class="crew-op-cost">${unlocked?money(q.total):"LOCKED"}</div>
+     ${!unlocked?`<div class="crew-op-lock">🔒 Requires ${facility?.name||"Facility"} · Territory → Facilities</div>`:""}
+     <button class="btn small ${kind==="money"?"":"secondary"}" onclick="massCrewOperation('${kind}')" ${!unlocked||q.count<1||state.cash<q.total?"disabled":""}>${unlocked?label:"FACILITY REQUIRED"}</button>
+   </div>`;
+ };
+
  el.innerHTML=`<div class="crew-op-grid">
    ${opCard("MASS SEND MONEY","Distribute level-scaled Cash to every eligible recruited crew member. 60m per-person cooldown.",qm,"money","SEND MONEY")}
    ${opCard("MASS RETURN FAVORS","Settle obligations across eligible recruited crew. Uses each contact's normal favor cooldown.",qf,"favor","RETURN FAVORS")}
@@ -4952,6 +5545,11 @@ function processPendingAttacks(){
  expireInboxMessages(t);
  state.pendingAttacks.forEach(a=>{if(!a.resolved&&t>a.expires)resolveExpiredAttack(a)});
  state.pendingAttacks=state.pendingAttacks.filter(a=>!a.resolved||t-a.created<300000);
+
+ // Process at most one automated action per pass to avoid UI/save cascades.
+ if(processAutoDefense())return;
+ if(processAutoInbox())return;
+
  renderInbox();
 }
 
@@ -5380,7 +5978,7 @@ function renderJobs(){
     <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
     <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>
     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
-    ${dash.items.length?`<div class="job-dash"><div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div><div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div><button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button><div class="sub">+50% convenience markup (${money(dashMarkup)}).</div></div>`:""}
+    ${dashJobPanel(j,dash,dashMarkup)}
     <div class="job-primary"><button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button></div>
     <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${j.loot.join(", ")}<br><b>Weekly limited drop:</b> ${limited.name} (8% on success)</div></details>
    </div>`;
@@ -5519,7 +6117,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Fight Stamina now scales with Threat: Street/Tough 1, Dangerous/Hard 2, Brutal/Elite 3, Kingpin 4, Nightmare 5.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
@@ -5534,22 +6132,22 @@ function renderFight(){
    </div><div class="fight-row-actions">
     <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
     <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
-    <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
+    <button class="btn red small" onclick="fight(${i},false)" ${state.st<fightStaminaCost(o)?"disabled":""}>ATTACK · ${fightStaminaCost(o)} ST</button>
    </div></div></div>`;
  }).join("");
 
  revengeEl.innerHTML=state.revenge.length?state.revenge.map(o=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button></div></div></div>`;
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>REVENGE · ${fightStaminaCost(o)} ST</button></div></div></div>`;
  }).join(""):"<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
 
  const placed=state.playerBounties.map(o=>{
    const p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')">CLAIM</button></div></div></div>`;
+   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${fightStaminaCost(o)} ST</button></div></div></div>`;
  }).join("");
  const dynamic=[0,1,2].map(i=>{
    const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)">CLAIM</button></div></div></div>`;
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${fightStaminaCost(o)} ST</button></div></div></div>`;
  }).join("");
  hitEl.innerHTML=placed+dynamic;
 }
@@ -5746,6 +6344,9 @@ function renderTerritory(){
  const incomeEl=document.getElementById("income");
  const factionsEl=document.getElementById("factions");
  const propsEl=document.getElementById("props");
+ const facilitiesEl=document.getElementById("facilities");
+ const endgameFacilitiesEl=document.getElementById("endgameFacilities");
+ const facilitySummary=document.getElementById("facilitySummary");
  if(!incomeEl||!factionsEl||!propsEl)return;
 
  incomeEl.textContent=`Net ${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr`;
@@ -5772,6 +6373,39 @@ function renderTerritory(){
      </button>
    </div>`;
  }).join("");
+
+ if(facilitiesEl){
+   const built=facilityDefs.filter(f=>facilityOwned(f.id)).length;
+   const infra=state.endgameInfra||{};
+   const goldSystems=(infra.autoMessages?1:0)+(infra.autoDefense?1:0)+(endgameTier("energy")>0?1:0)+(endgameTier("adrenaline")>0?1:0)+(endgameTier("heat")>0?1:0);
+   if(facilitySummary)facilitySummary.textContent=`${built}/${facilityDefs.length} cash · ${goldSystems}/5 gold systems`;
+
+   facilitiesEl.innerHTML=`<div class="facility-grid">${facilityDefs.map(f=>{
+     const owned=facilityOwned(f.id),access=facilityAccess(f);
+     const prereq=f.prereq?facilityDefs.find(x=>x.id===f.prereq):null;
+     const net=f.income-f.upkeep;
+     return `<div class="facility-card ${owned?"owned":access.locked?"locked":""}">
+       <div class="facility-head">
+         <div class="facility-name">${owned?"✓ ":""}${f.name}</div>
+         <div class="facility-price">${owned?"OPERATING":money(f.cost)}</div>
+       </div>
+       <div class="facility-unlock">${owned?"UNLOCKED":"UNLOCKS"} · ${f.unlockLabel}</div>
+       <div class="facility-desc">${f.desc}</div>
+       <div class="facility-meta">
+         <span class="badge ${state.level>=f.level?"green":"red"}">LVL ${f.level}</span>
+         <span class="badge ${crewSize()>=f.crewReq?"green":"red"}">Crew ${crewSize()}/${f.crewReq}</span>
+         <span class="badge green">Net +${money(net)}/hr</span>
+         <span class="badge">Permanent</span>
+       </div>
+       ${!owned&&!access.prereqMet?`<div class="facility-lock">REQUIRES ${prereq?.name||"previous facility"}</div>`:""}
+       ${!owned&&(access.locked&&access.prereqMet)?`<div class="facility-lock">${facilityLockText(f)}</div>`:""}
+       <button class="btn ${owned?"green":""}" onclick="buyFacility('${f.id}')" ${owned||access.locked||state.cash<f.cost?"disabled":""}>
+         ${owned?`${f.unlockLabel.toUpperCase()} ACTIVE`:access.locked?`LOCKED · ${facilityLockText(f)}`:`BUILD FACILITY · ${money(f.cost)}`}
+       </button>
+     </div>`;
+   }).join("")}</div>`;
+   if(endgameFacilitiesEl)renderEndgameFacilities();
+ }
 
  const factionRows=factions.map(f=>{
    const pressure=factionPressure(f),status=factionStatus(pressure);
@@ -6001,19 +6635,23 @@ function tick(){
  try{processContactPresence(t)}catch(e){console.error("Presence update failed",e)}
  try{ensureGeneratedContact(t)}catch(e){console.error("Generated contact failed",e)}
 
- // Heat cools by 1 every 5 minutes and uses its own clock.
+ // Heat uses its own clock. Endgame infrastructure can shorten the decay interval.
  if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=t;
  if(state.heat>0){
+   const interval=heatDecayMs();
    const elapsed=Math.max(0,t-state.lastHeatDecay);
-   const cool=Math.floor(elapsed/300000);
+   const cool=Math.floor(elapsed/interval);
    if(cool>0){
      state.heat=Math.max(0,state.heat-cool);
-     state.lastHeatDecay+=cool*300000;
+     state.lastHeatDecay+=cool*interval;
      if(state.heat<=0)state.lastHeatDecay=t;
    }
  }else{
    state.lastHeatDecay=t;
  }
+
+ // Endgame automated manufacturing.
+ try{processProduction(t)}catch(e){console.error("Production automation failed",e)}
 
  // Passive income.
  if(!Number.isFinite(state.lastIncome))state.lastIncome=t;
