@@ -815,6 +815,24 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 .network-arrival.cap{border-color:#6d3c36;background:#160c0a}
 .network-arrival.cap b{color:#df8c81}
 
+
+/* FIGHT DIFFICULTY / WIN CHANCE */
+.fight-chance{
+  display:inline-block;margin-left:4px;padding:2px 4px;border:1px solid #555;
+  background:#111;font-size:8px;font-weight:900;white-space:nowrap
+}
+.fight-chance.high{border-color:#4e6a3d;color:#a8cf88}
+.fight-chance.mid{border-color:#766534;color:#e0c270}
+.fight-chance.low{border-color:#70423a;color:#d99a8f}
+.fight-chance.very-low{border-color:#7b302b;color:#f08075;background:#180908}
+.threat-badge{
+  display:inline-block;margin-left:4px;padding:2px 4px;border:1px solid #4a4842;
+  color:#aaa198;background:#0e0f10;font-size:7px;font-weight:900
+}
+.fight-breakdown{
+  margin-top:3px;font-size:8px;color:#8f887d;line-height:1.35
+}
+
 </style>
 </head>
 <body>
@@ -1175,7 +1193,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.13.4";
+const BUILD_NUMBER="0.14.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -2459,7 +2477,7 @@ const PROFILE_HELP={
  notoriety:{title:"Notoriety",text:"Notoriety is your underworld reputation. It unlocks territory, improves Job success, and contributes to Attack and Defense Power."},
  crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
  activeCrew:{title:"Active Crew",text:"Crew members currently able to work. Injured or arrested associates temporarily stop contributing to combat power."},
- record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and now reduces Heat."},
+ record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and reduces Heat. Harder opponents require stronger Attack, better equipment, and more active crew; Defense also supports the highest-threat offensive fights."},
  heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Winning offensive fights lowers Heat, or you can spend 10 Gold Bars to bribe law enforcement and reset Heat to 0 immediately."},
  income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
  gold:{title:"Gold Bars",text:"Rare currency used for permanent Gold Vault unlocks. Earn them through trusted contacts or exchange $100,000 Cash for one."},
@@ -2714,21 +2732,96 @@ function doJob(id){
 }
 function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
 function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=getPersonDef(id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
+
+function opponentThreat(o){
+ if(Number.isFinite(o?.threat))return Math.max(1,Math.min(8,Math.floor(o.threat)));
+ const gap=Math.max(0,(Number(o?.level)||state.level)-state.level);
+ return Math.max(1,Math.min(8,2+Math.floor(gap/2)));
+}
+function fightThreatLabel(threat){
+ return ["","STREET","TOUGH","DANGEROUS","HARD","BRUTAL","ELITE","KINGPIN","NIGHTMARE"][Math.max(1,Math.min(8,threat))];
+}
+function offensiveFightProfile(o){
+ const threat=opponentThreat(o);
+ const active=availableCrew().length+1;
+
+ // Harder fights increasingly reward investment rather than flat early-game power.
+ const statMult=1+(threat-1)*.06;
+ const gearMult=1+(threat-1)*.04;
+ const crewPer=2+(threat-1)*.18;
+ const defenseSupport=threat>=4?Math.floor(state.defense*(threat-3)*.05):0;
+
+ const stat=Math.round(state.attack*statMult);
+ const gear=Math.round(gearPower("attack")*gearMult);
+ const crew=Math.round(active*crewPer);
+ const notoriety=Math.floor(state.notoriety/20);
+ const total=stat+gear+crew+notoriety+defenseSupport;
+
+ return {total,stat,gear,crew,notoriety,defenseSupport,threat,active};
+}
+function fightRollMax(o){
+ return 24+opponentThreat(o)*4;
+}
+function fightWinChance(o){
+ const profile=offensiveFightProfile(o);
+ const maxRoll=fightRollMax(o);
+ let wins=0,total=maxRoll*maxRoll;
+ for(let pr=1;pr<=maxRoll;pr++){
+   for(let er=1;er<=maxRoll;er++){
+     if(profile.total+pr>=o.power+er)wins++;
+   }
+ }
+ return Math.max(0,Math.min(100,Math.round(wins/total*100)));
+}
+function chanceClass(p){
+ return p>=70?"high":p>=45?"mid":p>=20?"low":"very-low";
+}
+
 function bossDef(t){return 35+t*32}
 function bossReady(t){const relevant=jobDefs.filter(j=>j.tier===t);return relevant.length&&relevant.every(j=>jobState(j.id).mastery>=1)}
 
 
-function genOpponent(i,hit=false){
+function genOpponent(i,hit=false,context="fight"){
  const names=["Ricky Vale","Mara Knox","Joey C.","Vince North","Dani Graves","Frankie Six","Sal Moreno","Nina Black"];
- const level=Math.max(1,state.level-2+i);
- const crew=Math.max(1,Math.min(40,level+rnd(-2,5)));
+
+ if(context==="incoming"){
+   const tier=Math.max(1,Math.min(5,Number(i)||1));
+   const level=Math.max(1,state.level-2+tier);
+   const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round(level+tier*.8)));
+   return {
+     name:names[(tier+state.level)%names.length],
+     level,crew,threat:Math.min(5,tier+1),
+     power:Math.round(8+level*3+crew*2+tier*2),
+     cash:220+level*140,
+     bounty:0
+   };
+ }
+
+ const baseIndex=Math.max(0,Math.floor(Number(i)||0));
+ const threat=Math.max(1,Math.min(8,baseIndex+1+(hit?2:0)));
+ const offsets=[-1,0,1,3,5,7,9,12];
+ const level=Math.max(1,state.level+offsets[threat-1]);
+
+ // Enemy organizations grow both in headcount and equipment quality.
+ const crewFactor=.45+threat*.10;
+ const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round((level+1)*crewFactor+threat*1.2)));
+ const enemyGearQuality=Math.min(8,.5+level*.15+threat*.25);
+ const modeledGear=crew*enemyGearQuality*.45;
+
+ const power=Math.round(
+   5+
+   level*2.6+
+   crew*(1.45+threat*.18)+
+   threat*2.2+
+   threat*threat+
+   modeledGear
+ );
+
  return {
-   name:names[(i+state.level)%names.length],
-   level,
-   crew,
-   power:8+level*3+crew*2+rnd(-5,8),
-   cash:220+level*140,
-   bounty:hit?1000+level*450:0
+   name:names[(baseIndex+state.level+(hit?3:0))%names.length],
+   level,crew,threat,power,
+   cash:Math.round(180+level*120+threat*85),
+   bounty:hit?Math.round(1200+level*500+threat*250):0
  };
 }
 
@@ -2743,9 +2836,14 @@ function fight(i,hit=false,revengeId=null){
  }
 
  state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
- const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);if(!o)return;
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);
+ if(!o)return;
 
- const attackPower=combatPower("attack"),p=attackPower+rnd(1,20),e=o.power+rnd(1,20);
+ const profile=offensiveFightProfile(o);
+ const rollMax=fightRollMax(o);
+ const p=profile.total+rnd(1,rollMax);
+ const e=o.power+rnd(1,rollMax);
+
  if(p>=e){
    const c=rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0);
    const heatDrop=Math.min(state.heat,hit?rnd(6,9):revengeId?rnd(4,7):rnd(3,6));
@@ -2754,15 +2852,19 @@ function fight(i,hit=false,revengeId=null){
    state.heat=Math.max(0,state.heat-heatDrop);
    addXp(10+o.level*2);
 
-   log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
-   showActionFlash("FIGHT WON",`${o.name} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
+   log(`Defeated ${o.name}. Effective Fight Power ${profile.total} beat ${o.power}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
+   showActionFlash("FIGHT WON",`${o.name} · ${profile.total} vs ${o.power} power · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
  }else{
-   const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,180)+o.level*20);
-   const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7,17)*(1-mitigation)));
+   const mitigation=defenseMitigation();
+   const threat=opponentThreat(o);
+   const baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
+   const loss=Math.floor(baseLoss*(1-mitigation));
+   const hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
    state.cash-=loss;state.losses++;state.hp=Math.max(1,state.hp-hpLoss);
-   log(`Lost to ${o.name}. Defense reduced losses by ${Math.round(mitigation*100)}%. Lost ${money(loss)}.`);
-   showActionFlash("FIGHT LOST",`Defense saved ${Math.round(mitigation*100)}% · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
+
+   log(`Lost to ${o.name}. Effective Fight Power ${profile.total} fell short of ${o.power}. Defense reduced losses by ${Math.round(mitigation*100)}%.`);
+   showActionFlash("FIGHT LOST",`${profile.total} vs ${o.power} power · Defense saved ${Math.round(mitigation*100)}% · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
  save();render();
 }
@@ -3259,9 +3361,9 @@ function maybeIncomingAttack(){
  if(now()-state.lastAttack<minGap||Math.random()>chance)return;
 
  state.lastAttack=now();
- const o=genOpponent(rnd(1,4));
+ const o=genOpponent(rnd(1,4),false,"incoming");
  const attack={
-   id:"a"+now(),name:o.name,level:o.level,crew:o.crew,power:o.power,cash:o.cash,
+   id:"a"+now(),name:o.name,level:o.level,crew:o.crew,power:o.power,cash:o.cash,threat:o.threat,
    created:now(),expires:now()+300000,resolved:false,requirement:randomDefenseRequirement()
  };
  state.pendingAttacks.unshift(attack);
@@ -3637,32 +3739,53 @@ function renderFight(){
  const revengeEl=document.getElementById("revenge");
  const hitEl=document.getElementById("hitlist");
  if(!fightEl||!revengeEl||!hitEl)return;
+
  const combatInfo=document.getElementById("combatInfo");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<div class="combat-info"><div class="combat-info-grid"><div class="combat-stat"><div class="label">⚔ ATTACK POWER</div><b>${atk}</b><div class="desc">Used when YOU initiate Fight List, Revenge, and Hitlist attacks. Your roll is Attack Power + 1–20 versus the enemy roll.</div></div><div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Used when you respond to incoming attack messages. Defense also reduces failed-job and lost-fight damage by ${mit}%.</div></div></div><div class="combat-note">Power includes your base stat, relevant gear, active crew, and Notoriety. Skill points invested in Attack or Defense directly change these outcomes. Winning offensive fights also reduces Heat by shifting attention onto rival crews.</div></div>`;
+   combatInfo.innerHTML=`<div class="combat-info">
+     <div class="combat-info-grid">
+       <div class="combat-stat"><div class="label">⚔ BASE ATTACK POWER</div><b>${atk}</b><div class="desc">Your normal Attack Power before opponent difficulty scaling.</div></div>
+       <div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Reduces fight losses by ${mit}% and begins contributing directly to the hardest offensive fights.</div></div>
+     </div>
+     <div class="combat-note">Harder foes now scale aggressively. Your effective offensive power is built from Attack, your best Attack/Vehicle equipment, active crew, and Notoriety. As threat rises, Attack investment, equipment quality, and active crew contribute more heavily; Defense also begins providing tactical support against high-tier enemies. The listed Win Chance uses the same roll model as the actual fight.</div>
+   </div>`;
  }
 
  fightEl.innerHTML=[0,1,2,3,4].map(i=>{
-   const o=genOpponent(i);
+   const o=genOpponent(i),profile=offensiveFightProfile(o),chance=fightWinChance(o);
    return `<div class="row">
-     <div><div class="title">${o.name}</div><div class="sub">LVL ${o.level} · Crew ${o.crew} · Estimated power ${o.power}</div></div>
+     <div>
+       <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+       <div class="sub">LVL ${o.level} · Crew ${o.crew} · Enemy Power ${o.power} · Your Effective Power ${profile.total}</div>
+       <div class="fight-breakdown">Your power: Attack ${profile.stat} · Gear ${profile.gear} · Crew ${profile.crew}${profile.defenseSupport?` · Defense Support ${profile.defenseSupport}`:""} · Notoriety ${profile.notoriety}</div>
+     </div>
      <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
    </div>`;
  }).join("");
 
  revengeEl.innerHTML=state.revenge.length
-   ? state.revenge.map(o=>`<div class="row hit">
-       <div><div class="title">${o.name}</div><div class="sub">Attacked your operation · Estimated power ${o.power}</div></div>
-       <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
-     </div>`).join("")
+   ? state.revenge.map(o=>{
+       const profile=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
+       return `<div class="row hit">
+         <div>
+           <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+           <div class="sub">Attacked your operation · Enemy Power ${o.power} · Your Effective Power ${profile.total}</div>
+         </div>
+         <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
+       </div>`;
+     }).join("")
    : "<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
 
  hitEl.innerHTML=[0,1,2].map(i=>{
-   const o=genOpponent(i+2,true);
+   const idx=i+2,o=genOpponent(idx,true),profile=offensiveFightProfile(o),chance=fightWinChance(o);
    return `<div class="row hit">
-     <div><div class="title">${o.name}</div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div></div>
-     <button class="btn red small" onclick="fight(${i+2},true)">CLAIM</button>
+     <div>
+       <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+       <div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew} · Enemy Power ${o.power}</div>
+       <div class="fight-breakdown">Your Effective Power ${profile.total} · Hitlist targets are substantially stronger than ordinary rivals.</div>
+     </div>
+     <button class="btn red small" onclick="fight(${idx},true)">CLAIM</button>
    </div>`;
  }).join("");
 }
