@@ -2123,8 +2123,53 @@ body:after{
   font-size:7px;color:#91ad7c
 }
 .fight-stamina-badge{
-  display:inline-block;margin-left:4px;padding:2px 4px;border:1px solid #55482f;
-  background:#151109;color:#d1b764;font-size:7px;font-weight:900
+  display:inline-flex;align-items:center;gap:2px;padding:2px 4px;border:1px solid #55482f;
+  background:#151109;color:#d1b764;font-size:7px;font-weight:900;white-space:nowrap
+}
+
+/* FIGHT PAGE STREAMLINE — BUILD 0.22.9 */
+.fight-refresh-bar{
+  display:grid!important;grid-template-columns:minmax(0,1fr) auto;gap:7px!important;align-items:center!important;
+  margin:5px 0 6px!important;padding:6px 7px!important;border:1px solid #3a3b3d!important;
+  border-left:3px solid #776039!important;background:linear-gradient(#121416,#090a0b)!important
+}
+.fight-refresh-copy{font-size:8px!important;color:#9b9489!important;line-height:1.35}
+.fight-refresh-copy b{display:block;font-size:9px;color:#d6c7aa;margin-bottom:1px}
+.fight-set-list{display:grid;gap:4px}
+.fight-card{
+  border:1px solid #36383b;border-left:3px solid #685332;background:linear-gradient(#111315,#08090a);padding:7px;min-width:0
+}
+.fight-card.hit{border-left-color:#7f3d35}.fight-card.user-bounty{border-left-color:#967535}
+.fight-card-head{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:7px;align-items:center}
+.fight-card-icon{
+  width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #3d3d3a;background:#0a0b0c
+}
+.fight-card-icon .ue-sprite{width:27px;height:27px;box-shadow:none}
+.fight-card-copy{min-width:0}
+.fight-card-name{font-size:11px;font-weight:900;color:#ddd4c3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fight-card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-top:3px}
+.fight-card-tags .threat-badge,.fight-card-tags .fight-stamina-badge{margin-left:0}
+.fight-card-odds{min-width:52px;text-align:right}
+.fight-card-odds .fight-chance{margin-left:0;font-size:8px}
+.fight-card-stats{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;margin-top:6px
+}
+.fight-card-stat{padding:4px 5px;border:1px solid #2f3133;background:#0a0b0c;min-width:0}
+.fight-card-stat span{display:block;font-size:6px;color:#77736c;font-weight:900;letter-spacing:.05em}
+.fight-card-stat b{display:block;margin-top:1px;font-size:9px;color:#cfc4b1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fight-card-record{margin-top:5px;font-size:7px;color:#7f7971;line-height:1.35}
+.fight-card-actions{display:grid;grid-template-columns:30px minmax(96px,.8fr) minmax(110px,1.2fr);gap:3px;margin-top:6px;padding-top:6px;border-top:1px solid #282a2b}
+.fight-card-actions.two{grid-template-columns:30px minmax(110px,1fr)}
+.fight-card-actions.one{grid-template-columns:1fr}
+.fight-card-actions .btn{width:100%!important;min-width:0!important}
+.fight-card-empty{padding:10px;border:1px dashed #3a3b3c;background:#090a0b;color:#8e887e;font-size:9px;line-height:1.4;text-align:center}
+@media(min-width:760px){#fightlist.fight-set-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){
+  .fight-refresh-bar{grid-template-columns:1fr!important}.fight-refresh-bar .btn{width:100%!important}
+  .fight-card-head{grid-template-columns:30px minmax(0,1fr) auto}.fight-card-icon{width:30px;height:30px}
+  .fight-card-icon .ue-sprite{width:24px;height:24px}
+  .fight-card-actions{grid-template-columns:28px 1fr 1fr}
+  .fight-card-actions.two{grid-template-columns:28px 1fr}
 }
 
 
@@ -2439,7 +2484,7 @@ body:after{
 <section id="view-fight" class="view">
  <div class="tab-banner" data-banner="FIGHT"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
  <details class="fold-card tab-section-fold" open>
-   <summary>FIGHT LIST <span>1 stamina per attack</span></summary>
+   <summary>FIGHT LIST <span>set rivals · threat-based stamina</span></summary>
    <div class="fold-body">
      <div id="combatInfo"></div>
      <div id="fightRefreshBar" class="fight-refresh-bar"></div>
@@ -2451,7 +2496,7 @@ body:after{
    <div class="fold-body"><div id="revenge"></div></div>
  </details>
  <details class="fold-card tab-section-fold">
-   <summary>HITLIST <span>dynamic bounties</span></summary>
+   <summary>HITLIST <span>set bounties · refresh with fight list</span></summary>
    <div class="fold-body"><div id="hitlist"></div></div>
  </details>
 </section>
@@ -2874,7 +2919,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.8";
+const BUILD_NUMBER="0.22.9";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4111,7 +4156,7 @@ function fresh(){
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",playerAvatarSpec:{},customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
@@ -4153,6 +4198,8 @@ function migrate(){
  if(!Number.isInteger(state.prestige)||state.prestige<0)state.prestige=0;
  if(!state.collectionClaimed||typeof state.collectionClaimed!=="object")state.collectionClaimed={};
  if(!Array.isArray(state.fightList))state.fightList=[];
+ if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
+ if(typeof state.fightListsInitialized!=="boolean")state.fightListsInitialized=false;
  if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
  if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
@@ -4729,7 +4776,7 @@ function addXp(n){
  while(state.xp>=xpNeed()){
    state.xp-=xpNeed();state.level++;state.skill+=5;
    state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;
-   state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;
+   state.hp=state.maxHp;state.en=state.maxEn;state.st=Math.min(state.st,state.maxSt);
    state.notoriety+=10;gained.push(state.level);
    log(`Level ${state.level}. Five skill points awarded.`);S.lvl();
  }
@@ -5272,10 +5319,22 @@ function makeFightRival(i){
    ...rivalRecordBase(base.level)
  };
 }
+function makeHitlistRival(i){
+ const base=genOpponent(i+2,true);
+ return {
+   ...base,
+   id:`hit_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,
+   name:generatedContactName(),
+   ...rivalRecordBase(base.level)
+ };
+}
 function ensureFightList(){
  if(!Array.isArray(state.fightList))state.fightList=[];
- if(state.fightList.length<5){
-   while(state.fightList.length<5)state.fightList.push(makeFightRival(state.fightList.length));
+ if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
+ if(!state.fightListsInitialized){
+   if(!state.fightList.length)state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
+   if(!state.dynamicHitlist.length)state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
+   state.fightListsInitialized=true;
    if(!state.lastFightRefresh)state.lastFightRefresh=now();
  }
  return state.fightList;
@@ -5287,8 +5346,10 @@ function refreshFightList(force=false){
  const wait=fightRefreshWait();
  if(!force&&wait>0)return showRequirementPopup(`New rivals available in ${fmt(wait)}.`);
  state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
+ state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
+ state.fightListsInitialized=true;
  state.lastFightRefresh=now();save();render();
- if(!force)showActionFlash("FIGHT LIST REFRESHED","New rival organizations located.","info");
+ if(!force)showActionFlash("FIGHT LIST REFRESHED","Five rivals and three street bounties located.","info");
 }
 function updateRivalHistory(o,playerWon){
  if(!o?.id)return {fled:false,streak:0};
@@ -5340,13 +5401,7 @@ function updateRivalHistory(o,playerWon){
 
 function removeFleeingRivalFromFightList(id){
  if(!id||!Array.isArray(state.fightList))return;
- const removed=state.fightList.find(x=>x.id===id);
- if(!removed)return;
- const replacementIndex=Math.max(0,Math.min(4,opponentThreat(removed)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- while(state.fightList.length<5){
-   state.fightList.push(makeFightRival(replacementIndex));
- }
 }
 
 function bountyPlacementCost(o){
@@ -5361,9 +5416,7 @@ function placeBountyOnRival(id){
  state.cash-=cost;state.lifetimeCashSpent+=cost;
  state.playerBounties.unshift({...o,bounty:Math.round(cost*.35),placedCost:cost,placedAt:now()});
  state.playerBounties=state.playerBounties.slice(0,10);
- const replacementIndex=Math.max(0,Math.min(4,opponentThreat(o)-1));
  state.fightList=state.fightList.filter(x=>x.id!==id);
- state.fightList.push(makeFightRival(replacementIndex));
  showActionFlash("BOUNTY POSTED",`${o.name} · Cost ${money(cost)} · Hitlist reward ${money(Math.round(cost*.35))}`,"cash");
  save();render();
 }
@@ -5444,7 +5497,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    :revengeId
      ?state.revenge.find(x=>x.id===revengeId)
      :hit
-       ?genOpponent(i,true)
+       ?(state.dynamicHitlist||[])[i]
        :ensureFightList()[i];
  if(!o)return;
 
@@ -5484,6 +5537,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    );
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
    if(bountyId)state.playerBounties=state.playerBounties.filter(x=>x.id!==bountyId);
+   if(hit&&!bountyId&&o?.id)state.dynamicHitlist=(state.dynamicHitlist||[]).filter(x=>x.id!==o.id);
  }else{
    const mitigation=defenseMitigation(),threat=opponentThreat(o),baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
    const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
@@ -6674,7 +6728,7 @@ function prestigeGame(){
  state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
  state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
  state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
- state.fightList=[];state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
+ state.fightList=[];state.dynamicHitlist=[];state.fightListsInitialized=false;state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
  resetGoldUnlockStats();
  log(`Kingpin Prestige ${state.prestige} began. Permanent bonuses increased.`);
  showActionFlash("KINGPIN PRESTIGE",`Prestige ${state.prestige} · +${state.prestige*5}% Job Cash/XP · +${state.prestige*2} Attack/Defense`,"cash");
@@ -6787,7 +6841,7 @@ function openGoldVaultFromStat(){
 }
 function showFightBreakdown(i,hit=false,revengeId=null,e){
  if(e?.stopPropagation)e.stopPropagation();
- const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):(hit?(state.dynamicHitlist||[])[i]:ensureFightList()[i]);
  if(!o)return;
  const p=offensiveFightProfile(o),chance=fightWinChance(o);
  document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
@@ -7029,41 +7083,75 @@ function renderFight(){
  const fightEl=document.getElementById("fightlist"),revengeEl=document.getElementById("revenge"),hitEl=document.getElementById("hitlist");
  if(!fightEl||!revengeEl||!hitEl)return;
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
+ const list=ensureFightList();
+ const streetBounties=state.dynamicHitlist||[];
+ fightEl.className="fight-set-list";
+ revengeEl.className="fight-set-list";
+ hitEl.className="fight-set-list";
+
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Stamina scales more gradually: Street through Dangerous cost 1, Hard/Brutal cost 2, Elite/Kingpin cost 3, and Nightmare costs 4.</div><div class="fight-access-note">Fight List replacements now stay in the same Threat band. Beating or placing a bounty on an easy rival no longer replaces them with a high-Threat rival.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat means a stronger enemy organization. Beat the same Fight List rival ${RIVAL_FLEE_STREAK} times in a row and they flee for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Defense reduces losses by ${mit}%. Stamina costs scale by Threat.</div><div class="fight-access-note">Fight List and street-bounty targets are finite. Fleeing rivals and posted bounties leave an empty slot. New targets only appear when you manually refresh the list.</div></details>`;
  }
  const wait=fightRefreshWait();
- if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
+ if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy"><b>${list.length}/5 RIVALS REMAIN · ${streetBounties.length}/3 STREET BOUNTIES</b>Targets do not auto-repopulate after they leave the list.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH LISTS"}</button>`;
 
- const list=ensureFightList();
- fightEl.innerHTML=list.map((o,i)=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o);
-   return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
-    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span><span class="fight-stamina-badge">${staminaCostMarkup(fightStaminaCost(o))}</span></div>
-    <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
-    <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} intimidation`:``}`:""}</div>
-   </div><div class="fight-row-actions">
-    <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
-    <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
-    <button class="btn red small" onclick="fight(${i},false)" ${state.st<fightStaminaCost(o)?"disabled":""}>ATTACK · ${staminaCostMarkup(fightStaminaCost(o))}</button>
-   </div></div></div>`;
- }).join("");
+ fightEl.innerHTML=list.length?list.map((o,i)=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card">
+     <div class="fight-card-head">
+       <div class="fight-card-icon">${spriteIconHtml("target","card")}</div>
+       <div class="fight-card-copy">
+         <div class="fight-card-name">${o.name}</div>
+         <div class="fight-card-tags">${o.rivalReturn?'<span class="threat-badge">RETURNING</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div>
+       </div>
+       <div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+     </div>
+     <div class="fight-card-stats">
+       <div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div>
+       <div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div>
+       <div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div>
+     </div>
+     <div class="fight-card-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} toward fleeing`:``}`:""}</div>
+     <div class="fight-card-actions">
+       <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
+       <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
+       <button class="btn red small" onclick="fight(${i},false)" ${state.st<stCost?"disabled":""}>ATTACK · ${staminaCostMarkup(stCost)}</button>
+     </div>
+   </div>`;
+ }).join(""):`<div class="fight-card-empty">No Fight List rivals remain. Refresh the list when the refresh timer is ready.</div>`;
 
  revengeEl.innerHTML=state.revenge.length?state.revenge.map(o=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${spriteIconHtml("2:revenge","sm")} ${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>REVENGE · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
- }).join(""):"<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit">
+     <div class="fight-card-head">
+       <div class="fight-card-icon">${spriteIconHtml("2:revenge","card")}</div>
+       <div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">REVENGE</span><span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div>
+       <div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+     </div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div><div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div></div>
+     <div class="fight-card-actions two"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')" ${state.st<stCost?"disabled":""}>REVENGE · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
+ }).join(""):`<div class="fight-card-empty">No outstanding revenge targets.</div>`;
 
  const placed=state.playerBounties.map(o=>{
-   const p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit user-bounty">
+     <div class="fight-card-head"><div class="fight-card-icon">${spriteIconHtml("2:bounty","card")}</div><div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">YOUR BOUNTY</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div><div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div></div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>REWARD</span><b>${compactMoney(o.bounty)}</b></div><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>CREW</span><b>${o.crew}</b></div></div>
+     <div class="fight-card-record">You paid ${money(o.placedCost)} to put this rival on the street.</div>
+     <div class="fight-card-actions one"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')" ${state.st<stCost?"disabled":""}>CLAIM · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
  }).join("");
- const dynamic=[0,1,2].map(i=>{
-   const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)" ${state.st<fightStaminaCost(o)?"disabled":""}>CLAIM · ${staminaCostMarkup(fightStaminaCost(o))}</button></div></div></div>`;
+ const dynamic=streetBounties.map((o,i)=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),stCost=fightStaminaCost(o);
+   return `<div class="fight-card hit">
+     <div class="fight-card-head"><div class="fight-card-icon">${spriteIconHtml("2:bounty","card")}</div><div class="fight-card-copy"><div class="fight-card-name">${o.name}</div><div class="fight-card-tags"><span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div></div><div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div></div>
+     <div class="fight-card-stats"><div class="fight-card-stat"><span>BOUNTY</span><b>${compactMoney(o.bounty)}</b></div><div class="fight-card-stat"><span>LEVEL</span><b>${o.level}</b></div><div class="fight-card-stat"><span>POWER</span><b>${p.total} vs ${o.power}</b></div></div>
+     <div class="fight-card-actions two"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},true,null,event)">?</button><button class="btn red small" onclick="fight(${i},true)" ${state.st<stCost?"disabled":""}>CLAIM · ${staminaCostMarkup(stCost)}</button></div>
+   </div>`;
  }).join("");
- hitEl.innerHTML=placed+dynamic;
+ hitEl.innerHTML=placed+dynamic||`<div class="fight-card-empty">No bounties remain. Refresh the lists when the timer is ready.</div>`;
 }
 
 function gearEffectLabel(g){
