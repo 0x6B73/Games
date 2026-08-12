@@ -906,6 +906,28 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   .fight-row-actions{margin-top:5px}
 }
 
+
+/* UNIFIED ASK-FOR-HELP REEL */
+.gold-reel-item.cash{border-color:#547044;color:#a7cf88;background:linear-gradient(#14200f,#080d06)}
+.gold-reel-item.energy{border-color:#46627a;color:#9fc6e5;background:linear-gradient(#0e1820,#060b0f)}
+.gold-reel-item.stamina{border-color:#78534c;color:#dda095;background:linear-gradient(#1d100e,#0d0706)}
+.gold-reel-item.gold.locked{
+  border-color:#4a4433;color:#777066;background:linear-gradient(#14120d,#090806);
+  filter:saturate(.35)
+}
+.help-gold-status{
+  margin-top:6px;padding:5px 6px;border:1px solid #816a2a;background:#1c1607;
+  color:#efd36a;font-size:8px;font-weight:900;text-align:center
+}
+.help-gold-status.locked{
+  border-color:#514d45;background:#10100f;color:#8d877d
+}
+.help-reel-legend{
+  margin-top:5px;font-size:7px;color:#8f887d;line-height:1.4;text-align:center
+}
+.help-gold-status .req{font-weight:600;color:#756f66}
+.gold-contact.unlocked{color:#d9bf63}
+
 </style>
 </head>
 <body>
@@ -985,9 +1007,9 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
     <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
     <div class="ms-body">
       <div class="custom-friend-box">
-        <b>ADD A CUSTOM FRIEND</b>
-        <div class="sub">Create your own contact and add them directly to your network.</div>
-        <button class="btn small" onclick="openCustomFriendModal()">ADD FRIEND</button>
+        <b>CUSTOMIZE A CREW MEMBER</b>
+        <div class="sub">Replace the identity of an existing recruited crew member. Their stats, relationships, cooldowns, activity, and reward odds stay exactly the same.</div>
+        <button class="btn small" onclick="openCustomFriendModal()">REPLACE CREW MEMBER</button>
       </div>
       <div class="crew-tools">
         <input id="crewSearch" class="compact-search" placeholder="Search name, role, or note..." oninput="setCrewSearch(this.value)">
@@ -1171,21 +1193,6 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   <button class="btn secondary" style="margin-top:6px" onclick="closeModal('staminaReserveModal')">CLOSE</button>
 </div></div>
 
-<div class="modal" id="helpRequestModal"><div class="mbox">
-  <h2>Request Help</h2>
-  <div id="helpRequestContact" class="sub">Choose what you need.</div>
-  <div class="help-choice-grid">
-    <button class="help-choice" onclick="requestHelpItem('energy')">
-      <b>🥤 ENERGY DRINK</b>
-      <span>Save it for later. Restores a random 3–7 Energy when used.</span>
-    </button>
-    <button class="help-choice" onclick="requestHelpItem('stamina')">
-      <b>💉 ADRENALINE SHOT</b>
-      <span>Save it for later. Restores a random 1–3 Stamina when used.</span>
-    </button>
-  </div>
-  <button class="btn secondary" onclick="closeModal('helpRequestModal')">CANCEL</button>
-</div></div>
 
 <div class="modal" id="energyModal"><div class="mbox">
 <h2>You do not have enough energy.</h2>
@@ -1206,11 +1213,15 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 
 
 <div class="modal" id="customFriendModal"><div class="mbox">
-  <h2>Add Custom Friend</h2>
-  <div class="sub">Name is required. Profile picture is optional.</div>
+  <h2>Replace Crew Member</h2>
+  <div class="sub">Choose one recruited crew member and replace only their identity. No new contact, crew slot, cooldown, or Gold Bar opportunity is created.</div>
 
-  <label class="sub">Name</label>
-  <input id="customFriendName" class="name-input" maxlength="28" placeholder="Friend name">
+  <label class="sub">Crew Member to Replace</label>
+  <select id="customFriendReplaceId" class="name-input" onchange="selectCustomReplacement()"></select>
+  <div id="customFriendBalanceNote" class="file-note">Underlying role and progression are preserved.</div>
+
+  <label class="sub">Custom Name</label>
+  <input id="customFriendName" class="name-input" maxlength="28" placeholder="Friend name" oninput="updateCustomReplacementPreview()">
 
   <label class="sub">Profile Picture (optional)</label>
   <input id="customFriendPhoto" type="file" accept="image/*" class="name-input" onchange="previewCustomFriendPhoto(event)">
@@ -1220,16 +1231,16 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
     <img id="customFriendPreview" src="" alt="">
     <div>
       <div class="sub">Preview</div>
-      <b id="customFriendPreviewName">Random profile if none selected</b>
+      <b id="customFriendPreviewName">Select a crew member</b>
     </div>
   </div>
 
   <div class="actions">
-    <button class="btn" onclick="saveCustomFriend()">ADD TO CONTACTS</button>
+    <button class="btn" onclick="saveCustomFriend()">REPLACE IDENTITY</button>
+    <button class="btn secondary" id="restoreCustomFriendBtn" onclick="restoreCustomFriendIdentity()">RESTORE ORIGINAL</button>
     <button class="btn secondary" onclick="closeModal('customFriendModal')">CANCEL</button>
   </div>
 </div></div>
-
 
 <div class="modal" id="editProfileModal"><div class="mbox">
   <h2>Edit Profile</h2>
@@ -1260,8 +1271,10 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 
 
 <div class="modal gold-reel-modal" id="goldReelModal"><div class="mbox">
-  <h2>Gold Bar Request</h2>
+  <h2>Ask for Help</h2>
   <div class="sub" id="goldReelContact">Contacting associate...</div>
+  <div id="helpGoldStatus" class="help-gold-status locked">🔒 GOLD BAR</div>
+  <div class="help-reel-legend">Possible: 💵 Cash · 💉 Adrenaline Shot · 🥤 Energy Drink · Nothing · 🪙 Gold Bar when unlocked</div>
   <div class="gold-reel-wrap">
     <div class="gold-reel-marker"></div>
     <div id="goldReel" class="gold-reel"></div>
@@ -1283,7 +1296,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.15.0";
+const BUILD_NUMBER="0.16.1";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -1563,26 +1576,77 @@ function savePlayerName(){
 }
 
 
-function getPersonDef(id){
+function getBasePersonDef(id){
   return friendDefs.find(x=>x.id===id)
     || potentialDefs.find(x=>x.id===id)
     || state.generatedContacts?.[id]
-    || state.customFriends?.[id]
     || {id,name:"Unknown Contact",role:"Associate",tag:"Unknown contact",help:.45,join:.5,temper:.25};
+}
+function getPersonDef(id){
+  const base=getBasePersonDef(id);
+  const custom=state.customFriends?.[id];
+  if(!custom)return base;
+  return {
+    ...base,
+    name:custom.name||base.name,
+    customPhoto:custom.customPhoto||"",
+    customized:true,
+    originalName:base.name
+  };
 }
 
 function openCustomFriendModal(){
   const modal=document.getElementById("customFriendModal");
-  const name=document.getElementById("customFriendName");
+  const select=document.getElementById("customFriendReplaceId");
   const photo=document.getElementById("customFriendPhoto");
+  const ids=crewIds().filter(id=>state.friends[id]?.crew);
+
+  if(!ids.length){
+    return showRequirementPopup("Recruit at least one crew member before creating a custom identity.");
+  }
+
+  if(select){
+    select.innerHTML=ids.map(id=>{
+      const d=getPersonDef(id),base=getBasePersonDef(id);
+      return `<option value="${id}">${d.name}${d.customized?` (replaces ${base.name})`:""} · ${base.role}</option>`;
+    }).join("");
+  }
+  if(photo)photo.value="";
+  pendingCustomPhoto="";
+  modal?.classList.add("show");
+  selectCustomReplacement();
+}
+
+
+function selectCustomReplacement(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id)return;
+  const d=getPersonDef(id),base=getBasePersonDef(id),custom=state.customFriends?.[id];
+  const name=document.getElementById("customFriendName");
   const preview=document.getElementById("customFriendPreview");
   const previewName=document.getElementById("customFriendPreviewName");
-  if(name)name.value="";
+  const note=document.getElementById("customFriendBalanceNote");
+  const restore=document.getElementById("restoreCustomFriendBtn");
+
+  pendingCustomPhoto="";
+  const photo=document.getElementById("customFriendPhoto");
   if(photo)photo.value="";
-  if(preview)preview.src=avatarUrl("custom-preview-"+Date.now(),"New Contact");
-  if(previewName)previewName.textContent="Random profile if none selected";
-  modal?.classList.add("show");
-  setTimeout(()=>name?.focus(),100);
+  if(name)name.value=custom?.name||base.name;
+  if(preview)preview.src=personAvatarUrl(id,d.name);
+  if(previewName)previewName.textContent=custom?.name||base.name;
+  if(note)note.textContent=`Preserved: ${base.role} role, Reputation, Trust, Respect, crew status, activity, cooldowns, and Gold Bar odds.`;
+  if(restore)restore.disabled=!custom;
+}
+function updateCustomReplacementPreview(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id)return;
+  const name=(document.getElementById("customFriendName")?.value||"").trim();
+  const preview=document.getElementById("customFriendPreview");
+  const previewName=document.getElementById("customFriendPreviewName");
+  if(previewName)previewName.textContent=name||getBasePersonDef(id).name;
+  if(preview&&!pendingCustomPhoto&&!state.customFriends?.[id]?.customPhoto){
+    preview.src=avatarUrl(`custom-${id}`,name||getBasePersonDef(id).name);
+  }
 }
 
 let pendingCustomPhoto="";
@@ -1597,7 +1661,6 @@ function previewCustomFriendPhoto(event){
     event.target.value="";
     return;
   }
-
   if(file.size>8*1024*1024){
     toast("Image is too large. Use an image under 8 MB.");
     event.target.value="";
@@ -1608,10 +1671,8 @@ function previewCustomFriendPhoto(event){
   reader.onload=()=>{
     const img=new Image();
     img.onload=()=>{
-      const size=192;
-      const canvas=document.createElement("canvas");
-      canvas.width=size;
-      canvas.height=size;
+      const size=192,canvas=document.createElement("canvas");
+      canvas.width=size;canvas.height=size;
       const ctx=canvas.getContext("2d");
       const scale=Math.max(size/img.width,size/img.height);
       const w=img.width*scale,h=img.height*scale;
@@ -1619,8 +1680,7 @@ function previewCustomFriendPhoto(event){
       pendingCustomPhoto=canvas.toDataURL("image/jpeg",0.78);
       const preview=document.getElementById("customFriendPreview");
       if(preview)preview.src=pendingCustomPhoto;
-      const n=document.getElementById("customFriendName")?.value.trim();
-      document.getElementById("customFriendPreviewName").textContent=n||file.name;
+      updateCustomReplacementPreview();
     };
     img.src=reader.result;
   };
@@ -1628,57 +1688,45 @@ function previewCustomFriendPhoto(event){
 }
 
 function saveCustomFriend(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  const f=state.friends[id];
+  if(!id||!f||!f.crew)return showRequirementPopup("Select a currently recruited crew member.");
+
   const input=document.getElementById("customFriendName");
   const name=(input?.value||"").trim().replace(/\s+/g," ");
   if(name.length<2)return toast("Enter a name with at least 2 characters.");
 
-  const id="custom_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7);
-  const roles=["Driver","Fixer","Enforcer","Scout","Smuggler","Collector","Accountant","Strategist"];
-  const role=roles[rnd(0,roles.length-1)];
-  const photo=pendingCustomPhoto||avatarUrl(id,name);
+  const base=getBasePersonDef(id);
+  const prior=state.customFriends[id]||{};
+  const photo=pendingCustomPhoto||prior.customPhoto||avatarUrl(`custom-${id}`,name);
 
+  // Cosmetic overlay only. The existing friend state and ID are untouched.
   state.customFriends[id]={
-    id,
     name:name.slice(0,28),
-    role,
-    tag:"Personal contact",
-    help:.55+rnd(-8,12)/100,
-    join:.62+rnd(-8,12)/100,
-    temper:.15+rnd(0,25)/100,
-    customPhoto:photo
-  };
-
-  state.friends[id]={
-    rel:rnd(55,75),
-    trust:rnd(50,72),
-    respect:rnd(42,62),
-    fear:rnd(5,20),
-    resentment:0,
-    crew:false,
-    lastAsk:0,
-    lastRecruit:0,
-    lastFavor:0,
-    lastGift:0,
-    lastGoldBarAsk:0,
-    response:"",
-    chat:[],
-    injuredUntil:0,
-    arrestedUntil:0,
-    gifts:0,
-    lastOnline:now(),
-    activityScore:.95,
-    inactive:false,
-    dropOffAt:0,
-    joinedAt:now()
+    customPhoto:photo,
+    replacedName:base.name,
+    customizedAt:now()
   };
 
   pendingCustomPhoto="";
   closeModal("customFriendModal");
-  log(`${name} was added to your contacts.`);
-  save();
-  render();
+  log(`${base.name} is now represented by custom crew identity ${name}. Underlying progression was preserved.`);
+  save();render();S.ok();
+  showActionFlash("CREW IDENTITY REPLACED",`${base.name} → ${name} · No new crew slot created`,"good");
+}
+
+
+function restoreCustomFriendIdentity(){
+  const id=document.getElementById("customFriendReplaceId")?.value;
+  if(!id||!state.customFriends?.[id])return;
+  const customName=state.customFriends[id].name;
+  const base=getBasePersonDef(id);
+  delete state.customFriends[id];
+  pendingCustomPhoto="";
+  save();render();
+  selectCustomReplacement();
   S.ok();
-  toast(`${name} added.`);
+  toast(`${customName} restored to ${base.name}.`);
 }
 
 function personAvatarUrl(id,name){
@@ -1845,16 +1893,14 @@ function processContactPresence(t=now()){
  for(const [id,f] of Object.entries(state.friends||{})){
    if(!f||f.inactive)continue;
    const d=getPersonDef(id);
-   const isUserCustom=!!state.customFriends?.[id]&&!d.generated;
 
    // Simulate normal logins. Low-activity contacts naturally spend longer offline.
    if(Math.random()<Math.max(.10,Math.min(.82,(f.activityScore||.60)*.72))){
      f.lastOnline=t-rnd(0,8)*60000;
    }
 
-   // Generated contacts have real churn. A few built-in contacts can also disappear,
-   // but user-created custom contacts are never auto-retired.
-   if(!isUserCustom&&f.dropOffAt>0&&t>=f.dropOffAt){
+   // A custom identity does not change the underlying contact lifecycle.
+   if(f.dropOffAt>0&&t>=f.dropOffAt){
      f.inactive=true;
      f.lastOnline=Math.min(f.lastOnline||t,t-rnd(35,240)*60000);
      f.response="No response. This account appears inactive.";
@@ -2157,73 +2203,100 @@ function goldBarPersonCooldown(f){
  const elapsed=Math.max(0,now()-(Number(f?.lastGoldBarAsk)||0));
  return Math.max(0,GOLD_BAR_COOLDOWN_MS-elapsed);
 }
-function buildGoldReel(win){
+
+function goldHelpStatus(id){
+ const f=fstate(id);
+ if(!f)return {unlocked:false,text:"🔒 GOLD BAR · Contact unavailable"};
+ const rep=contactReputation(f);
+ if(rep<95)return {unlocked:false,text:`🔒 GOLD BAR · Reputation ${rep}/95`};
+ const wait=goldBarPersonCooldown(f);
+ if(wait>0)return {unlocked:false,text:`🔒 GOLD BAR · Gold chance available in ${fmt(wait)}`};
+ return {unlocked:true,text:"🪙 GOLD BAR UNLOCKED · Rare result available"};
+}
+function helpRewardTile(kind,goldUnlocked=true){
+ if(kind==="gold")return `<div class="gold-reel-item gold ${goldUnlocked?"":"locked"}">${goldUnlocked?"🪙<br>GOLD BAR":"🔒<br>GOLD BAR"}</div>`;
+ if(kind==="cash")return `<div class="gold-reel-item cash">💵<br>CASH</div>`;
+ if(kind==="energy")return `<div class="gold-reel-item energy">🥤<br>ENERGY DRINK</div>`;
+ if(kind==="stamina")return `<div class="gold-reel-item stamina">💉<br>ADRENALINE</div>`;
+ return `<div class="gold-reel-item empty">NOTHING</div>`;
+}
+
+function buildGoldReel(outcome,goldUnlocked){
  const reel=document.getElementById("goldReel");
  if(!reel)return;
+
+ const ordinary=["cash","energy","stamina","nothing"];
  const items=[];
  for(let i=0;i<19;i++){
-   const gold=(i===16)?win:(i%7===3);
-   items.push(`<div class="gold-reel-item ${gold?"gold":"empty"}">${gold?"🪙<br>GOLD BAR":"NO BAR"}</div>`);
+   let kind;
+   if(i===16){
+     kind=outcome.kind;
+   }else if(i%6===3){
+     kind="gold";
+   }else{
+     kind=ordinary[(i*3+rnd(0,ordinary.length-1))%ordinary.length];
+   }
+   items.push(helpRewardTile(kind,goldUnlocked));
  }
  reel.innerHTML=items.join("");
  reel.classList.remove("spinning");
  reel.style.transform="translateX(0px)";
  void reel.offsetWidth;
 }
-function spinGoldReel(id,win){
+function spinGoldReel(id,outcome,goldStatus){
  const d=getPersonDef(id);
  const modal=document.getElementById("goldReelModal");
  const reel=document.getElementById("goldReel");
  const result=document.getElementById("goldReelResult");
  const close=document.getElementById("goldReelClose");
  const label=document.getElementById("goldReelContact");
+ const goldLabel=document.getElementById("helpGoldStatus");
  if(!modal||!reel||!result||!close)return;
- if(label)label.textContent=`${d.name} is checking their reserve...`;
+
+ if(label)label.textContent=`${d.name} is seeing what they can spare...`;
+ if(goldLabel){
+   goldLabel.textContent=goldStatus.text;
+   goldLabel.classList.toggle("locked",!goldStatus.unlocked);
+ }
  result.textContent="";
  result.className="gold-reel-result";
  close.disabled=true;
- buildGoldReel(win);
+ buildGoldReel(outcome,goldStatus.unlocked);
  modal.classList.add("show");
+
  setTimeout(()=>{
-   // Center item 16 under marker. 94 = item width + gap.
    const target=(16*94)-((Math.min(window.innerWidth*.86,360)-22)/2-44);
    reel.classList.add("spinning");
    reel.style.transform=`translateX(-${Math.max(0,target)}px)`;
  },80);
+
  setTimeout(()=>{
-   result.textContent=win?"GOLD BAR SECURED":"Nothing available this time.";
-   result.className="gold-reel-result "+(win?"win":"lose");
+   result.textContent=outcome.resultText;
+   result.className="gold-reel-result "+(outcome.kind==="nothing"?"lose":"win");
    close.disabled=false;
-   if(win)S.ok();else S.bad();
+   render();
+
+   if(outcome.kind==="gold"){
+     showActionFlash("GOLD BAR RECEIVED",`${d.name} · ${state.goldBars} available`,"cash");
+     S.ok();
+   }else if(outcome.kind==="cash"){
+     showActionFlash("CASH RECEIVED",`${d.name} came through · +${money(outcome.amount)}`,"cash");
+     S.cash();
+   }else if(outcome.kind==="energy"){
+     showActionFlash("ENERGY DRINK RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Energy Drink"]||0}/999`,"good");
+     S.ok();
+   }else if(outcome.kind==="stamina"){
+     showActionFlash("ADRENALINE SHOT RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Adrenaline Shot"]||0}/999`,"good");
+     S.ok();
+   }else{
+     recordIntel("HELP REQUEST CAME UP EMPTY",`${d.name} had nothing available this time.`,"info");
+     S.bad();
+   }
  },2450);
 }
 
 function claimGoldBar(id){
- const f=fstate(id),d=getPersonDef(id);
- if(!f||!d)return;
- if(!requireResponsiveContact(id,"Gold Bar request"))return;
-
- const rep=contactReputation(f);
- if(rep<95)return showRequirementPopup(`${d.name} needs 95 Reputation to trust you with a Gold Bar. Current Reputation: ${rep}.`);
-
- const wait=goldBarPersonCooldown(f);
- if(wait>0)return showRequirementPopup(`${d.name} can only check for a Gold Bar once per hour. Try again in ${fmt(wait)}.`);
-
- f.lastGoldBarAsk=now();
- const win=(Math.random()*100)<goldBarChance(id);
- spinGoldReel(id,win);
-
- if(win){
-   state.goldBars=(state.goldBars||0)+1;
-   state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
-   f.response="I found one Gold Bar for you. Check back later.";
-   log(`${d.name} provided a Gold Bar.`);
-   setTimeout(()=>showActionFlash("GOLD BAR RECEIVED",`${d.name} · ${state.goldBars} available`,"cash"),2500);
- }else{
-   f.response="Nothing available right now. Ask me again later.";
-   log(`${d.name} checked for a Gold Bar but came up empty.`);
- }
- save();render();
+ openHelpRequest(id);
 }
 function tradeCashForGold(){
  const cost=100000;
@@ -2259,7 +2332,7 @@ function renderGoldVault(){
  const eligible=Object.entries(state.friends||{}).filter(([id,f])=>contactReputation(f)>=95);
  el.innerHTML=`<div class="gold-balance">
    <div><div class="sub">AVAILABLE GOLD BARS</div><strong>🪙 ${state.goldBars||0}</strong></div>
-   <div class="right sub">${eligible.length?`${eligible.length} contact${eligible.length===1?"":"s"} at 95+ Reputation`:"Raise a contact to 95 Reputation"}</div>
+   <div class="right sub">${eligible.length?`${eligible.length} contact${eligible.length===1?"":"s"} with Gold eligibility`:"Raise a contact to 95 Reputation"}</div>
  </div>
  <div class="gold-trade">
    <div><b>CASH EXCHANGE</b><span>Trade $100,000 Cash for 1 Gold Bar. No hourly limit.</span></div>
@@ -2310,6 +2383,37 @@ function migrate(){
  if(typeof state.playerAvatarSeed!=="string")state.playerAvatarSeed="";
  if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
  if(!state.generatedContacts||typeof state.generatedContacts!=="object")state.generatedContacts={};
+ const validCustomTargets=new Set([
+   ...friendDefs.map(x=>x.id),
+   ...potentialDefs.map(x=>x.id),
+   ...Object.keys(state.generatedContacts||{})
+ ]);
+ const legacyCustomIds=Object.keys(state.customFriends).filter(id=>!validCustomTargets.has(id));
+ if(legacyCustomIds.length){
+   const availableTargets=Object.entries(state.friends||{})
+     .filter(([id,f])=>validCustomTargets.has(id)&&f?.crew&&!state.customFriends[id])
+     .map(([id])=>id);
+   let migratedLegacy=0,removedLegacy=0;
+   for(const legacyId of legacyCustomIds){
+     const oldDef=state.customFriends[legacyId]||{};
+     const oldState=state.friends?.[legacyId];
+     const target=(oldState?.crew&&availableTargets.length)?availableTargets.shift():null;
+     if(target){
+       state.customFriends[target]={
+         name:oldDef.name||getBasePersonDef(target).name,
+         customPhoto:oldDef.customPhoto||"",
+         replacedName:getBasePersonDef(target).name,
+         customizedAt:now()
+       };
+       migratedLegacy++;
+     }else removedLegacy++;
+     if(state.friends)delete state.friends[legacyId];
+     if(state.potentials)delete state.potentials[legacyId];
+     delete state.customFriends[legacyId];
+     if(Array.isArray(state.inbox))state.inbox=state.inbox.filter(x=>x.personId!==legacyId);
+   }
+   state.legacyCustomMigrationNotice={migrated:migratedLegacy,removed:removedLegacy};
+ }
  if(!Number.isFinite(state.lastGeneratedContact))state.lastGeneratedContact=now();
  if(!Number.isFinite(state.lastPresenceUpdate))state.lastPresenceUpdate=now();
  if(!Number.isFinite(state.lastGiftEvent))state.lastGiftEvent=now();
@@ -2358,8 +2462,19 @@ function migrate(){
  if(!Array.isArray(state.intel))state.intel=[];
  state.intel=state.intel.filter(x=>x&&typeof x==="object"&&typeof x.title==="string").slice(0,20);
  if(!state.intel.length)state.intel=[{t:now(),title:"INTELLIGENCE FEED READY",detail:"Action notifications will appear here.",type:"info"}];
+ if(state.legacyCustomMigrationNotice){
+   const n=state.legacyCustomMigrationNotice;
+   state.intel.unshift({
+     t:now(),
+     title:"CUSTOM CREW SYSTEM UPDATED",
+     detail:`Legacy standalone custom contacts were removed as extra contact slots.${n.migrated?` ${n.migrated} custom identit${n.migrated===1?"y was":"ies were"} preserved on existing recruited crew.`:""}`,
+     type:"info"
+   });
+   state.intel=state.intel.slice(0,20);
+   delete state.legacyCustomMigrationNotice;
+ }
 
- // Normalize built-in contacts while retaining custom contacts.
+ // Normalize contacts. Custom identities are cosmetic overlays on valid contact IDs.
  if(!state.friends||typeof state.friends!=="object")state.friends={};
  const baseFriends=defaults.friends;
  for(const [id,base] of Object.entries(baseFriends)){
@@ -3052,56 +3167,88 @@ function doFavor(id){
  showActionFlash("FAVOR COMPLETED",`${d.name} · Relationship improved`,"good");
  save();render();
 }
-let activeHelpContactId=null;
-
 function openHelpRequest(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d)return;
  if(!requireResponsiveContact(id,"help"))return;
+
  const wait=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
  if(wait>0)return showRequirementPopup(`${d.name} can help again in ${fmt(wait)}.`);
- activeHelpContactId=id;
- const label=document.getElementById("helpRequestContact");
- if(label)label.textContent=`Ask ${d.name} for one consumable. This contact can receive one help request every ${HELP_REQUEST_COOLDOWN_MIN} minutes.`;
- document.getElementById("helpRequestModal").classList.add("show");
-}
 
-function requestHelpItem(kind){
- const id=activeHelpContactId;
- const f=fstate(id),d=getPersonDef(id);
- if(!f||!d)return closeModal("helpRequestModal");
- if(!requireResponsiveContact(id,"help")){closeModal("helpRequestModal");return}
- if(cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN)>0){
-   closeModal("helpRequestModal");
-   return showRequirementPopup(`${d.name} is not ready to help again yet.`);
- }
-
- const item=kind==="stamina"?"Adrenaline Shot":"Energy Drink";
+ const goldStatus=goldHelpStatus(id);
  f.lastAsk=now();
- const chance=Math.max(.08,Math.min(.88,(d.help||.5)+(f.trust-50)/170-(f.resentment/160)));
- changeRelationship(id,{trust:-2,resentment:3,rel:-2});
- closeModal("helpRequestModal");
 
- if(Math.random()<chance){
-   const current=Math.max(0,Number(state.loot[item])||0);
-   if(current>=999){
-     f.response=`I tried to send you a ${item}, but your stash is full.`;
-     log(`${d.name} tried to send a ${item}, but you already have 999.`);
-     showActionFlash(`${item.toUpperCase()} STASH FULL`,"Maximum stack: 999","bad");
+ // If Gold is unlocked for this spin, this consumes the contact's existing
+ // once-per-hour Gold Bar attempt whether Gold wins or not.
+ if(goldStatus.unlocked)f.lastGoldBarAsk=now();
+
+ const helpChance=Math.max(.08,Math.min(.88,(d.help||.5)+(f.trust-50)/170-(f.resentment/160)));
+ changeRelationship(id,{trust:-2,resentment:3,rel:-2});
+
+ let outcome=null;
+
+ // Preserve the old stable hidden 1%–20% per-contact Gold Bar odds.
+ if(goldStatus.unlocked&&(Math.random()*100)<goldBarChance(id)){
+   state.goldBars=(state.goldBars||0)+1;
+   state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
+   f.response="I found something rare for you. One Gold Bar.";
+   log(`${d.name} provided a Gold Bar through an Ask for Help request.`);
+   outcome={kind:"gold",amount:1,resultText:"🪙 GOLD BAR SECURED"};
+ }else if(Math.random()<helpChance){
+   const rewardRoll=Math.random();
+
+   if(rewardRoll<.40){
+     const amount=rnd(100,300)+Math.floor(state.level*20);
+     state.cash+=amount;
+     state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     f.response=`I scraped together ${money(amount)} for you.`;
+     log(`${d.name} sent ${money(amount)} in response to your help request.`);
+     outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
+   }else if(rewardRoll<.70){
+     const item="Energy Drink";
+     const current=Math.max(0,Number(state.loot[item])||0);
+     if(current>=999){
+       const amount=rnd(100,250)+Math.floor(state.level*15);
+       state.cash+=amount;
+       state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+       f.response=`Your Energy Drink stash was full, so I sent ${money(amount)} instead.`;
+       log(`${d.name} converted a full-stash Energy Drink reward into ${money(amount)}.`);
+       outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
+     }else{
+       state.loot[item]=current+1;
+       f.response="Sent you an Energy Drink.";
+       log(`${d.name} sent an Energy Drink through Ask for Help.`);
+       outcome={kind:"energy",amount:1,resultText:"🥤 ENERGY DRINK"};
+     }
    }else{
-     state.loot[item]=Math.min(999,current+1);
-     f.response=`Sent you a ${item}. Save it until you need it.`;
-     log(`${d.name} sent you a ${item}.`);
-     showActionFlash(`${item.toUpperCase()} RECEIVED`,`${d.name} sent you 1 · Stash: ${state.loot[item]}/999`,"good");
-     S.ok();
+     const item="Adrenaline Shot";
+     const current=Math.max(0,Number(state.loot[item])||0);
+     if(current>=999){
+       const amount=rnd(100,250)+Math.floor(state.level*15);
+       state.cash+=amount;
+       state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+       f.response=`Your Adrenaline Shot stash was full, so I sent ${money(amount)} instead.`;
+       log(`${d.name} converted a full-stash Adrenaline Shot reward into ${money(amount)}.`);
+       outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
+     }else{
+       state.loot[item]=current+1;
+       f.response="Sent you an Adrenaline Shot.";
+       log(`${d.name} sent an Adrenaline Shot through Ask for Help.`);
+       outcome={kind:"stamina",amount:1,resultText:"💉 ADRENALINE SHOT"};
+     }
    }
  }else{
    f.response=meanReplies[rnd(0,meanReplies.length-1)];
    changeRelationship(id,{resentment:3,rel:-2});
-   S.bad();
+   log(`${d.name} had nothing available when you asked for help.`);
+   outcome={kind:"nothing",amount:0,resultText:"NOTHING THIS TIME"};
  }
- save();render();
+
+ save();
+ spinGoldReel(id,outcome,goldStatus);
 }
+
+
 
 function askEnergy(id){openHelpRequest(id)}
 
@@ -3240,7 +3387,7 @@ function chatAction(type){
  if(type==="energy"){
    if(!contactCanRespond(f)){f.chat.push({me:false,text:"No response."});}
    else{
-     f.chat.push({me:true,text:"I need help keeping an operation moving. Can you assist?"});
+     f.chat.push({me:true,text:"I need a favor. See what you can spare."});
      askEnergy(id);f.chat.push({me:false,text:fstate(id)?.response||"No response."});
    }
  }
@@ -3858,14 +4005,14 @@ function renderCrew(){
    const d=getPersonDef(id),f=state.friends[id];
    const a=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
    const r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);
-   const rep=contactReputation(f),gb=goldBarPersonCooldown(f);
+   const rep=contactReputation(f),gb=goldBarPersonCooldown(f),goldHelp=goldHelpStatus(id);
    const presence=contactPresence(f),responsive=contactCanRespond(f);
    const inactive=f.inactive;
 
    return `<div class="friend ${inactive?"contact-inactive":responsive?"":"contact-offline"}">
      <img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}">
      <div>
-       <div class="fname">${d.name} ${f.crew?"★":""}${d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
+       <div class="fname">${d.name} ${f.crew?"★":""}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
        <div class="ftag">${d.tag||"Trusted contact"}</div>
        <div class="fmeta">${d.role} · ${crewStatus(f)}</div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
@@ -3874,17 +4021,17 @@ function renderCrew(){
          <summary>RELATIONSHIP</summary>
          <div class="compact-details-body">
            Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
-           ${inactive?"Cannot provide Gold Bars.":!responsive?"Offline — requests unavailable.":rep>=95?(gb>0?`Gold Bar available in ${fmt(gb)}.`:"Eligible to provide a Gold Bar."):`Gold Bars require 95 Reputation.`}
+           ${inactive?"Help unavailable while this contact is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Cash, Energy Drinks, Adrenaline Shots, Nothing, or a Gold Bar when unlocked."}
            ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
          </div>
        </details>
      </div>
+     <div class="gold-contact ${goldHelp.unlocked?"unlocked":""}">${inactive?"🔒 GOLD BAR · Contact inactive":!responsive?"🔒 GOLD BAR · Contact offline":goldHelp.text}</div>
      <div class="fbtns">
-       <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"REQUEST HELP"}</button>
+       <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"ASK FOR HELP"}</button>
        <button onclick="recruit('${id}')" ${f.crew||!responsive||r?"disabled":""}>${f.crew?"RECRUITED":inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
        <button onclick="doFavor('${id}')" ${!responsive||fv||state.cash<100?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":fv?fmt(fv):"RETURN FAVOR -$100"}</button>
        <button onclick="sendGift('${id}')" ${!responsive||(f.lastGift&&cooldown(f.lastGift,30)>0)?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:"SEND GIFT -$250"}</button>
-       <button onclick="claimGoldBar('${id}')" ${!responsive||rep<95||gb>0?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":rep<95?"GOLD: REP 95":gb>0?`GOLD ${fmt(gb)}`:"ASK FOR GOLD BAR"}</button>
      </div>
    </div>`;
  }).join(""):`<div class="crew-filter-empty">No contacts match this filter${crewSearchText?" or search":""}.</div>`;
@@ -4380,7 +4527,7 @@ document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style
 document.addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;
  const action=b.getAttribute("onclick")||"";
- const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|openHelpRequest|requestHelpItem|useAdrenalineShot|openStaminaReserve|testAudioPack|toggleTheme|toggleSound/.test(action);
+ const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|openHelpRequest|useAdrenalineShot|openStaminaReserve|testAudioPack|toggleTheme|toggleSound/.test(action);
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
