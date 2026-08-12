@@ -1235,6 +1235,33 @@ body.compact-stats .mini-hud{
   .mini-hud-item b{font-size:8px!important}
 }
 
+
+/* UNDERWORLD OFFICE BACKGROUND ASSET */
+body{
+  background-color:#040404!important;
+  background-image:
+    linear-gradient(to bottom,rgba(4,4,4,.48),rgba(4,4,4,.72) 42%,rgba(4,4,4,.88)),
+    url("./assets/underworld-background.png")!important;
+  background-position:center top,center top!important;
+  background-size:cover,cover!important;
+  background-repeat:no-repeat,no-repeat!important;
+  background-attachment:fixed,fixed!important;
+}
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  background:radial-gradient(circle at 50% 25%,transparent 0,rgba(0,0,0,.08) 38%,rgba(0,0,0,.42) 100%);
+}
+@media(max-width:700px){
+  body{
+    background-position:center top,52% top!important;
+    background-attachment:scroll,scroll!important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -1669,7 +1696,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.10";
+const BUILD_NUMBER="0.18.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2747,7 +2774,7 @@ function fresh(){
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:2,
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
@@ -2792,6 +2819,11 @@ function migrate(){
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
  if(!state.bossLastFight||typeof state.bossLastFight!=="object")state.bossLastFight={};
  if(!state.bossRematches||typeof state.bossRematches!=="object")state.bossRematches={};
+ if(!Number.isInteger(state.combatBalanceVersion)||state.combatBalanceVersion<2){
+   state.fightList=[];
+   state.lastFightRefresh=0;
+   state.combatBalanceVersion=2;
+ }
  const validCustomTargets=new Set([
    ...friendDefs.map(x=>x.id),
    ...potentialDefs.map(x=>x.id),
@@ -3461,25 +3493,21 @@ function fightThreatLabel(threat){
 function offensiveFightProfile(o){
  const threat=opponentThreat(o);
  const active=combatCrewCount();
-
- // High-threat rivals increasingly reward deliberate investment.
- const statMult=1+(threat-1)*.06;
- const gearMult=1+(threat-1)*.04;
- const crewMult=1+(threat-1)*.09;
- const defenseSupport=threat>=4?Math.floor(state.defense*(threat-3)*.05):0;
+ const stat=Math.max(0,Math.round(state.attack));
+ const gear=Math.max(0,Math.round(gearPower("attack")));
+ const crew=Math.max(0,Math.round(crewCombatValue(active)));
+ const notoriety=Math.floor(state.notoriety/20);
  const setBonus=equipmentSetBonus("attack");
  const prestigeBonus=prestigeStatBonus();
+ const total=stat+gear+crew+notoriety+setBonus+prestigeBonus;
 
- const stat=Math.round(state.attack*statMult);
- const gear=Math.round(gearPower("attack")*gearMult);
- const crew=Math.round(crewCombatValue(active)*crewMult);
- const notoriety=Math.floor(state.notoriety/20);
- const total=stat+gear+crew+notoriety+defenseSupport+setBonus+prestigeBonus;
-
- return {total,stat,gear,crew,notoriety,defenseSupport,setBonus,prestigeBonus,threat,active};
+ return {
+   total,stat,gear,crew,notoriety,setBonus,prestigeBonus,
+   defenseSupport:0,threat,active
+ };
 }
 function fightRollMax(o){
- return 24+opponentThreat(o)*4;
+ return 22+opponentThreat(o)*2;
 }
 function fightWinChance(o){
  const profile=offensiveFightProfile(o);
@@ -3567,11 +3595,14 @@ function genOpponent(i,hit=false,context="fight"){
  if(context==="incoming"){
    const tier=Math.max(1,Math.min(5,Number(i)||1));
    const level=Math.max(1,state.level-2+tier);
-   const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round(level+tier*.8)));
+   const crewBase=Math.max(3,Math.round(combatCrewCount()*.55+combatCrewLimit()*.15));
+   const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round(crewBase*(.75+tier*.15))));
+   const modeled=8+level*2.8+crew*(1.4+tier*.12)+crew*Math.min(10,1+level*.20+tier*.35)*.72+tier*4;
+   const anchor=combatPower("defense")*(.62+tier*.08);
    return {
      name:names[(tier+state.level)%names.length],
      level,crew,threat:Math.min(5,tier+1),
-     power:Math.round(8+level*3+crew*2+tier*2),
+     power:Math.max(8,Math.round(modeled*.68+anchor*.32)),
      cash:220+level*140,
      bounty:0
    };
@@ -3582,26 +3613,39 @@ function genOpponent(i,hit=false,context="fight"){
  const offsets=[-1,0,1,3,5,7,9,12];
  const level=Math.max(1,state.level+offsets[threat-1]);
 
- // Enemy organizations grow both in headcount and equipment quality.
- const crewFactor=.45+threat*.10;
- const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round((level+1)*crewFactor+threat*1.2)));
- const enemyGearQuality=Math.min(8,.5+level*.15+threat*.25);
- const modeledGear=crew*enemyGearQuality*.45;
+ // Opponent crew size is based mostly on the organization's current combat
+ // scale, but only partially follows the player's actual crew so recruiting
+ // and gearing up still create a real advantage.
+ const crewBase=Math.max(3,Math.round(combatCrewCount()*.65+combatCrewLimit()*.20));
+ const crewScale=[.70,.85,1.00,1.18,1.38,1.58,1.82,2.08][threat-1];
+ const crew=Math.max(1,Math.min(MAX_CREW_MEMBERS,Math.round(crewBase*crewScale+threat*.8)));
 
- const power=Math.round(
-   5+
-   level*2.6+
-   crew*(1.45+threat*.18)+
-   threat*2.2+
-   threat*threat+
-   modeledGear
- );
+ // Model both equipment quality and organization size. Threat increases
+ // enemy quality; it never increases the player's contribution.
+ const enemyGearPerCrew=Math.min(20,1.1+level*.22+threat*.45);
+ const modeledGear=crew*enemyGearPerCrew*.82;
+ const modeledCrew=crew*(1.25+threat*.12);
+ let modeledPower=
+   6+
+   level*2.8+
+   modeledCrew+
+   modeledGear+
+   threat*4+
+   threat*threat*1.2;
+
+ // Early levels get a gentler ramp. A light player-power anchor prevents
+ // absurd mismatches while still allowing upgrades to move the odds.
+ const earlyScale=.55+Math.min(1,state.level/10)*.45;
+ modeledPower*=earlyScale;
+ const playerAnchor=combatPower("attack");
+ const relative=[.72,.86,1.00,1.16,1.34,1.52,1.72,1.95][threat-1];
+ const power=Math.max(8,Math.round(modeledPower*.65+playerAnchor*relative*.35));
 
  return {
    name:names[(baseIndex+state.level+(hit?3:0))%names.length],
    level,crew,threat,power,
-   cash:Math.round(180+level*120+threat*85),
-   bounty:hit?Math.round(1200+level*500+threat*250):0
+   cash:Math.round(180+level*120+threat*100),
+   bounty:hit?Math.round(1200+level*500+threat*300):0
  };
 }
 
@@ -3623,7 +3667,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
 
  if(won){
    const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult());
-   const heatDrop=Math.min(state.heat,hit?rnd(6,9):revengeId?rnd(4,7):rnd(3,6));
+   const heatDrop=Math.min(state.heat,hit?rnd(3,5):revengeId?rnd(2,4):rnd(1,3));
    state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));state.heat=Math.max(0,state.heat-heatDrop);
    addXp(Math.floor((10+o.level*2)*prestigeXpMult()));
    log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
@@ -4561,7 +4605,7 @@ function showFightBreakdown(i,hit=false,revengeId=null,e){
  document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
  document.getElementById("statHelpText").textContent=`${fightThreatLabel(opponentThreat(o))} threat. Enemy Power ${o.power}; your Effective Power ${p.total}. The percentage uses the same random-roll model as the actual fight.`;
  const a=document.getElementById("statHelpActions");
- if(a)a.innerHTML=`<div class="sub">Attack contribution: ${p.stat}<br>Gear contribution: ${p.gear}<br>Fielded Crew contribution: ${p.crew} (${p.active}/${combatCrewLimit()} slots)<br>Equipment Sets: ${p.setBonus||0}<br>Prestige: ${p.prestigeBonus||0}${p.defenseSupport?`<br>Defense support: ${p.defenseSupport}`:""}<br>Notoriety: ${p.notoriety}<br><br>Each fielded crew member can use one weapon, one armor item, and one vehicle. Excess crew still counts for Jobs but has diminishing combat impact.</div>`;
+ if(a)a.innerHTML=`<div class="sub">Attack contribution: ${p.stat}<br>Gear contribution: ${p.gear}<br>Fielded Crew contribution: ${p.crew} (${p.active}/${combatCrewLimit()} slots)<br>Equipment Sets: ${p.setBonus||0}<br>Prestige: ${p.prestigeBonus||0}<br>Notoriety: ${p.notoriety}<br><br>Your offensive power is fixed for the fight. Higher-threat opponents bring stronger crews and equipment instead of increasing your stats.</div>`;
  document.getElementById("statHelpModal").classList.add("show");
 }
 
@@ -4764,7 +4808,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
