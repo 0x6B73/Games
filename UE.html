@@ -191,6 +191,154 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   display:block;
 }
 
+
+/* CAMPAIGNS */
+.campaign-panel{
+  border:1px solid #5e5038;
+  border-top:3px solid #c9a64a;
+  background:linear-gradient(180deg,#171611,#090a0b);
+  margin:5px 0 8px;
+}
+.campaign-head{
+  display:flex;
+  justify-content:space-between;
+  gap:8px;
+  align-items:flex-start;
+  padding:7px 8px;
+  background:linear-gradient(#292821,#101113);
+  border-bottom:1px solid #4a4436;
+}
+.campaign-kicker{
+  font-size:8px;
+  letter-spacing:.12em;
+  color:#b8a16b;
+  font-weight:900;
+}
+.campaign-title{
+  margin-top:2px;
+  color:#f0d369;
+  font-size:14px;
+  font-weight:900;
+}
+.campaign-chapter{
+  flex:0 0 auto;
+  border:1px solid #5b543f;
+  background:#0d0e0f;
+  padding:4px 6px;
+  font-size:9px;
+  color:#c8baa0;
+}
+.campaign-story{
+  padding:7px 8px 3px;
+  font-size:10px;
+  color:#b6aea0;
+  line-height:1.4;
+}
+.campaign-objectives{
+  padding:4px 8px 7px;
+}
+.campaign-objective{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  gap:5px;
+  align-items:center;
+  padding:5px 0;
+  border-bottom:1px solid #252624;
+}
+.campaign-objective:last-child{border-bottom:0}
+.campaign-objective.done .campaign-objective-name{color:#a9ca80}
+.campaign-objective-name{
+  font-size:10px;
+  font-weight:800;
+  color:#ddd5c7;
+}
+.campaign-objective-value{
+  font-size:9px;
+  color:#aaa18f;
+  white-space:nowrap;
+}
+.campaign-progress{
+  grid-column:1/-1;
+  height:6px;
+  border:1px solid #3e3b32;
+  background:#050606;
+  overflow:hidden;
+}
+.campaign-progress>div{
+  height:100%;
+  background:linear-gradient(#e0be4e,#8b6918);
+}
+.campaign-objective.done .campaign-progress>div{
+  background:linear-gradient(#88b257,#4f7431);
+}
+.campaign-reward{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+  padding:6px 8px;
+  background:#0c0d0e;
+  border-top:1px solid #34342f;
+}
+.campaign-reward-text{
+  font-size:9px;
+  color:#a99f8e;
+}
+.campaign-complete{
+  color:#9fc776;
+  font-weight:900;
+}
+.campaign-list{
+  display:grid;
+  gap:3px;
+  margin-top:5px;
+}
+.campaign-list-row{
+  border:1px solid #303234;
+  background:#0b0c0e;
+  padding:5px 7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:6px;
+}
+.campaign-list-row.locked{opacity:.48}
+.campaign-list-row .ct{
+  font-size:10px;
+  font-weight:900;
+  color:#cfc7ba;
+}
+.campaign-list-row .cs{
+  font-size:8px;
+  color:#8f887d;
+  margin-top:2px;
+}
+.campaign-badge{
+  font-size:8px;
+  border:1px solid #4c493d;
+  padding:3px 5px;
+  white-space:nowrap;
+}
+.campaign-badge.current{color:#efd369;border-color:#8a7438}
+.campaign-badge.done{color:#a9ca80;border-color:#57753b}
+
+
+.regen-time{
+  display:block;
+  margin-top:3px;
+  font-size:8px;
+  line-height:1;
+  color:#c5b689;
+  white-space:nowrap;
+}
+.regen-time.full{color:#7f9970}
+.regen-time.soon{color:#f0d36d}
+.regen-detail{
+  font-size:9px;
+  color:#b8aa91;
+  margin-top:4px;
+}
+
 </style>
 </head>
 <body>
@@ -199,8 +347,8 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  <div class="brandrow"><div class="brand">UNDERWORLD EMPIRE</div><div class="lvl" id="lvl"></div></div>
  <div class="stats">
   <div class="stat">❤️ HEALTH<b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
-  <div class="stat" id="energyStat">⚡ ENERGY<b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div></div>
-  <div class="stat">🥊 STAMINA<b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div></div>
+  <div class="stat" id="energyStat">⚡ ENERGY<b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
+  <div class="stat">🥊 STAMINA<b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
   <div class="stat">💵 CASH<b id="cashT"></b></div>
   <div class="stat">👥 CREW<b id="crewT"></b></div>
   <div class="stat">🔥 HEAT<b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
@@ -223,6 +371,8 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
  </div>
  <div id="dailyBox"></div>
  <div id="eventBox"></div>
+ <div class="crime-header"><strong>Campaign</strong><span>your path through the underworld</span></div>
+ <div id="campaignBox"></div>
  <div id="energyHome"></div>
  <div class="crime-header"><strong id="cityTitle">East Harbor Operations</strong><span id="citySub">Your organization is small. That can change.</span></div>
  <div class="progress-strip">
@@ -294,7 +444,11 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   </div>
 </div>
 <div class="profile-grid" id="profile"></div>
- <div class="card" style="margin-top:8px"><h3>Collections & Rare Loot</h3><div id="collections"></div></div>
+ <div class="card" style="margin-top:8px">
+  <h3>Campaign Progress</h3>
+  <div id="campaignList" class="campaign-list"></div>
+</div>
+<div class="card" style="margin-top:8px"><h3>Collections & Rare Loot</h3><div id="collections"></div></div>
  <div class="card" style="margin-top:8px"><h3>Achievements</h3><div id="ach"></div></div>
  
  
@@ -887,19 +1041,302 @@ function personAvatarUrl(id,name){
   return d.customPhoto||avatarUrl(id,name);
 }
 
+
+const campaignDefs=[
+ {
+   id:"arrival",
+   title:"A Name on the Street",
+   story:"Nobody owns East Harbor without first being noticed. Put together a small crew, prove you can make money, and show the neighborhood you are not temporary.",
+   objectives:[
+     {type:"jobs",target:3,label:"Complete 3 jobs"},
+     {type:"crew",target:3,label:"Build a crew of 3"},
+     {type:"cash",target:1200,label:"Hold $1,200 cash"}
+   ],
+   reward:{cash:750,xp:60,energy:6,notoriety:8},
+   rewardText:"$750 · 60 XP · +6 Energy · +8 Notoriety"
+ },
+ {
+   id:"armed",
+   title:"Arm the Crew",
+   story:"A crew without equipment is a liability. Put weapons in reliable hands and establish a legitimate-looking front for the money coming in.",
+   objectives:[
+     {type:"gear",target:5,label:"Own 5 pieces of equipment"},
+     {type:"properties",target:1,label:"Own 1 property"},
+     {type:"wins",target:3,label:"Win 3 fights"}
+   ],
+   reward:{cash:1400,xp:100,skill:2,loot:"Weapon Shipment"},
+   rewardText:"$1,400 · 100 XP · +2 Skill Points · Weapon Shipment"
+ },
+ {
+   id:"harbor",
+   title:"The Harbor Belongs to Someone",
+   story:"The Harbor Kings collect from everyone who moves cargo through the docks. Start taking pieces of their operation until they understand there is a second organization in town.",
+   objectives:[
+     {type:"notoriety",target:40,label:"Reach 40 Notoriety"},
+     {type:"jobMasteries",target:2,label:"Master 2 jobs to Rank I"},
+     {type:"territoryProgress",target:35,label:"Make a move on a territory"}
+   ],
+   reward:{cash:2500,xp:160,stamina:3,notoriety:15},
+   rewardText:"$2,500 · 160 XP · +3 Stamina · +15 Notoriety"
+ },
+ {
+   id:"organization",
+   title:"Make It an Organization",
+   story:"Street muscle only gets you so far. You need specialists, dependable income, and enough victories that rivals think before testing you.",
+   objectives:[
+     {type:"crew",target:7,label:"Build a crew of 7"},
+     {type:"roles",target:3,label:"Have 3 different crew specialties"},
+     {type:"netIncome",target:250,label:"Reach $250/hr net income"},
+     {type:"wins",target:8,label:"Win 8 fights"}
+   ],
+   reward:{cash:4000,xp:220,skill:3,loot:"Black Book"},
+   rewardText:"$4,000 · 220 XP · +3 Skill Points · Black Book"
+ },
+ {
+   id:"firstboss",
+   title:"Remove the Man Above You",
+   story:"Your growth has attracted attention from the people who believed you worked beneath them. Master your work and remove the first obstacle to your rise.",
+   objectives:[
+     {type:"masteryTotal",target:3,label:"Earn 3 total job mastery ranks"},
+     {type:"bosses",target:1,label:"Defeat 1 rank boss"},
+     {type:"notoriety",target:80,label:"Reach 80 Notoriety"}
+   ],
+   reward:{cash:6500,xp:350,maxEnergy:5,notoriety:25,loot:"Boss's Ledger"},
+   rewardText:"$6,500 · 350 XP · +5 Max Energy · +25 Notoriety · Boss's Ledger"
+ },
+ {
+   id:"territory",
+   title:"Take Ground",
+   story:"Money is useful. Ground is power. Take and hold territory, expand your fronts, and force a rival crew to watch your flag go up in their neighborhood.",
+   objectives:[
+     {type:"territories",target:2,label:"Control 2 territories"},
+     {type:"properties",target:4,label:"Own 4 properties"},
+     {type:"cash",target:10000,label:"Hold $10,000 cash"},
+     {type:"crew",target:10,label:"Build a crew of 10"}
+   ],
+   reward:{cash:10000,xp:500,skill:4,notoriety:35,loot:"Territory Map"},
+   rewardText:"$10,000 · 500 XP · +4 Skill Points · +35 Notoriety · Territory Map"
+ },
+ {
+   id:"downtown",
+   title:"Move Downtown",
+   story:"East Harbor was the beginning. Downtown is where politicians, clubs, judges, and serious money live. Prove you can operate at that level.",
+   objectives:[
+     {type:"level",target:12,label:"Reach Level 12"},
+     {type:"cityJobs",city:"downtown",target:3,label:"Complete 3 Downtown jobs"},
+     {type:"notoriety",target:150,label:"Reach 150 Notoriety"},
+     {type:"wins",target:15,label:"Win 15 fights"}
+   ],
+   reward:{cash:15000,xp:700,maxStamina:3,loot:"Downtown Connections"},
+   rewardText:"$15,000 · 700 XP · +3 Max Stamina · Downtown Connections"
+ },
+ {
+   id:"familywar",
+   title:"A Seat at the Table",
+   story:"The established families no longer consider you a street problem. They consider you competition. Build enough power that they have to deal with you as an equal.",
+   objectives:[
+     {type:"crew",target:18,label:"Build a crew of 18"},
+     {type:"territories",target:4,label:"Control 4 territories"},
+     {type:"bosses",target:3,label:"Defeat 3 rank bosses"},
+     {type:"notoriety",target:250,label:"Reach 250 Notoriety"}
+   ],
+   reward:{cash:30000,xp:1200,skill:6,maxEnergy:8,notoriety:50,loot:"Family Seal"},
+   rewardText:"$30,000 · 1,200 XP · +6 Skill Points · +8 Max Energy · Family Seal"
+ },
+ {
+   id:"empire",
+   title:"Underworld Empire",
+   story:"There is no one left to convince. Control the ground, command a large organization, and become the name every crew in the city knows.",
+   objectives:[
+     {type:"territories",target:6,label:"Control all 6 territories"},
+     {type:"crew",target:25,label:"Build a crew of 25"},
+     {type:"wins",target:30,label:"Win 30 fights"},
+     {type:"notoriety",target:400,label:"Reach 400 Notoriety"},
+     {type:"bosses",target:5,label:"Defeat 5 rank bosses"}
+   ],
+   reward:{cash:75000,xp:2500,skill:10,maxEnergy:12,maxStamina:5,loot:"Empire Ring"},
+   rewardText:"$75,000 · 2,500 XP · +10 Skill Points · +12 Max Energy · +5 Max Stamina · Empire Ring"
+ }
+];
+
+function totalJobsCompleted(){
+ return Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0)*5+(j.runs||0),0);
+}
+function totalGearOwned(){
+ return Object.values(state.gear||{}).reduce((a,b)=>a+(b||0),0);
+}
+function totalPropertiesOwned(){
+ return Object.values(state.props||{}).reduce((a,b)=>a+(b||0),0);
+}
+function totalTerritoriesOwned(){
+ return Object.values(state.territory||{}).filter(x=>x?.owned).length;
+}
+function totalTerritoryProgress(){
+ return Object.values(state.territory||{}).reduce((n,x)=>n+(x?.progress||0),0);
+}
+function totalMasteryRanks(){
+ return Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0),0);
+}
+function jobsAtMasteryOne(){
+ return Object.values(state.jobs||{}).filter(j=>(j.mastery||0)>=1).length;
+}
+function defeatedBosses(){
+ return Object.values(state.bosses||{}).filter(Boolean).length;
+}
+function crewRoleVariety(){
+ const roles=new Set();
+ crewIds().forEach(id=>{
+   const d=getPersonDef(id);
+   if(d?.role)roles.add(d.role);
+ });
+ return roles.size;
+}
+function completedCityJobs(city){
+ let n=0;
+ jobDefs.filter(j=>j.city===city).forEach(j=>{
+   const js=state.jobs?.[j.id];
+   if(js)n+=(js.mastery||0)*5+(js.runs||0);
+ });
+ return n;
+}
+function campaignObjectiveValue(o){
+ switch(o.type){
+   case "jobs":return totalJobsCompleted();
+   case "crew":return crewSize();
+   case "cash":return Math.floor(state.cash);
+   case "gear":return totalGearOwned();
+   case "properties":return totalPropertiesOwned();
+   case "wins":return state.wins||0;
+   case "notoriety":return Math.floor(state.notoriety||0);
+   case "jobMasteries":return jobsAtMasteryOne();
+   case "masteryTotal":return totalMasteryRanks();
+   case "territoryProgress":return totalTerritoryProgress();
+   case "territories":return totalTerritoriesOwned();
+   case "roles":return crewRoleVariety();
+   case "netIncome":return Math.max(0,Math.floor(netIncome()));
+   case "bosses":return defeatedBosses();
+   case "level":return state.level||1;
+   case "cityJobs":return completedCityJobs(o.city);
+   default:return 0;
+ }
+}
+function campaignObjectiveDone(o){
+ return campaignObjectiveValue(o)>=o.target;
+}
+function currentCampaign(){
+ return campaignDefs[Math.min(state.campaignIndex||0,campaignDefs.length-1)];
+}
+function campaignComplete(c){
+ return c.objectives.every(campaignObjectiveDone);
+}
+function claimCampaign(){
+ const idx=state.campaignIndex||0;
+ const c=campaignDefs[idx];
+ if(!c||state.campaignClaimed[c.id])return;
+ if(!campaignComplete(c))return toast("Complete every campaign objective first.");
+
+ const r=c.reward||{};
+ if(r.cash)state.cash+=r.cash;
+ if(r.xp)addXp(r.xp);
+ if(r.energy)state.en=Math.min(state.maxEn,state.en+r.energy);
+ if(r.stamina)state.st=Math.min(state.maxSt,state.st+r.stamina);
+ if(r.skill)state.skill+=r.skill;
+ if(r.notoriety)state.notoriety+=r.notoriety;
+ if(r.maxEnergy){state.maxEn+=r.maxEnergy;state.en+=r.maxEnergy}
+ if(r.maxStamina){state.maxSt+=r.maxStamina;state.st+=r.maxStamina}
+ if(r.loot)state.loot[r.loot]=(state.loot[r.loot]||0)+1;
+
+ state.campaignClaimed[c.id]=true;
+ log(`Campaign completed: ${c.title}.`);
+ S.ok();
+
+ if(idx<campaignDefs.length-1){
+   state.campaignIndex=idx+1;
+   const next=campaignDefs[state.campaignIndex];
+   log(`New campaign unlocked: ${next.title}.`);
+   toast(`Campaign complete. ${next.title} unlocked.`);
+ }else{
+   toast("Underworld Empire campaign complete.");
+ }
+
+ save();
+ render();
+}
+function renderCampaign(){
+ const box=document.getElementById("campaignBox");
+ const list=document.getElementById("campaignList");
+ if(!box)return;
+
+ const idx=Math.min(state.campaignIndex||0,campaignDefs.length-1);
+ const c=campaignDefs[idx];
+ const done=campaignComplete(c);
+ const claimed=!!state.campaignClaimed[c.id];
+
+ box.innerHTML=`<div class="campaign-panel">
+   <div class="campaign-head">
+     <div>
+       <div class="campaign-kicker">CURRENT CAMPAIGN</div>
+       <div class="campaign-title">${c.title}</div>
+     </div>
+     <div class="campaign-chapter">CHAPTER ${idx+1}/${campaignDefs.length}</div>
+   </div>
+   <div class="campaign-story">${c.story}</div>
+   <div class="campaign-objectives">
+     ${c.objectives.map(o=>{
+       const val=campaignObjectiveValue(o);
+       const complete=val>=o.target;
+       const pct=Math.min(100,Math.floor(val/o.target*100));
+       return `<div class="campaign-objective ${complete?"done":""}">
+         <div class="campaign-objective-name">${complete?"✓ ":""}${o.label}</div>
+         <div class="campaign-objective-value">${Math.min(val,o.target).toLocaleString()} / ${o.target.toLocaleString()}</div>
+         <div class="campaign-progress"><div style="width:${pct}%"></div></div>
+       </div>`;
+     }).join("")}
+   </div>
+   <div class="campaign-reward">
+     <div>
+       <div class="campaign-kicker">REWARD</div>
+       <div class="campaign-reward-text">${c.rewardText}</div>
+     </div>
+     ${claimed
+       ? `<span class="campaign-complete">COMPLETED</span>`
+       : `<button class="btn ${done?"green":"secondary"}" onclick="claimCampaign()" ${done?"":"disabled"}>${done?"CLAIM REWARD":"IN PROGRESS"}</button>`}
+   </div>
+ </div>`;
+
+ if(list){
+   list.innerHTML=campaignDefs.map((x,i)=>{
+     const isDone=!!state.campaignClaimed[x.id];
+     const current=i===state.campaignIndex;
+     const unlocked=i<=state.campaignIndex;
+     return `<div class="campaign-list-row ${unlocked?"":"locked"}">
+       <div>
+         <div class="ct">${i+1}. ${x.title}</div>
+         <div class="cs">${isDone?"Campaign completed":current?"Current campaign":unlocked?"Unlocked":"Locked"}</div>
+       </div>
+       <span class="campaign-badge ${isDone?"done":current?"current":""}">${isDone?"DONE":current?"ACTIVE":unlocked?"OPEN":"LOCKED"}</span>
+     </div>`;
+   }).join("");
+ }
+}
+
 function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",customFriends:{},level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
- currentCity:"east",lastTick:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
 let state=load();migrate();
 function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
-function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!("playerPhoto" in state))state.playerPhoto="";if(!state.customFriends)state.customFriends={};if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
+function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!("playerPhoto" in state))state.playerPhoto="";if(!state.customFriends)state.customFriends={};if(!Number.isInteger(state.campaignIndex))state.campaignIndex=0;if(!state.campaignClaimed)state.campaignClaimed={};if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];
+ const regenBase=state.lastTick||now();
+ if(!state.lastEnergyRegen)state.lastEnergyRegen=regenBase;
+ if(!state.lastStaminaRegen)state.lastStaminaRegen=regenBase;
+ if(!state.lastHealthRegen)state.lastHealthRegen=regenBase;if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function xpNeed(){return 100+(state.level-1)*65}
 function activeTier(){let t=0;tiers.forEach((x,i)=>{if(state.level>=x.level)t=i});return t}
@@ -1247,6 +1684,7 @@ function completeCheckout(){const num=moneyNumber.value.trim(),hrs=parseFloat(wo
 function closeModal(id){document.getElementById(id).classList.remove("show")}
 
 const tutorialSteps=[
+ ["Follow the campaign.","Your current campaign is the clearest path forward. Each chapter gives you specific objectives across jobs, crew, combat, gear, property, and territory, with major rewards when completed."],
  ["Every operation has a cost.","Jobs consume energy and generate cash, experience, heat, mastery, and rare loot. High heat increases risk."],
  ["Build your organization.","Recruit contacts into your crew. Roles such as Driver, Fixer, Smuggler, and Enforcer improve specific jobs."],
  ["Trust determines loyalty.","Calling in favors strains relationships. Returning favors builds trust. Resentment can make contacts refuse you."],
@@ -1261,7 +1699,7 @@ function showTutorial(){tutorialStep.textContent=`STEP ${tut+1} OF ${tutorialSte
 function nextTutorial(){tut++;if(tut>=tutorialSteps.length){state.tutorialDone=true;tutorial.classList.remove("show");save();toast("You are ready to begin.");return}showTutorial()}
 function skipTutorial(){state.tutorialDone=true;tutorial.classList.remove("show");save()}
 
-function renderEnergy(id){const el=document.getElementById(id);if(!el)return;if(state.en<=0)el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Contact your associates, wait for recovery, or acquire more energy.</p><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="energyModal.classList.add('show')">ACQUIRE ENERGY</button></div></div>`;else if(state.en<=Math.max(3,state.maxEn*.2))el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors now or wait for recovery.</p><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button></div>`;else el.innerHTML=""}
+function renderEnergy(id){const el=document.getElementById(id);if(!el)return;if(state.en<=0){const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Contact your associates, wait for recovery, or acquire more energy.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="energyModal.classList.add('show')">ACQUIRE ENERGY</button></div></div>`;}else if(state.en<=Math.max(3,state.maxEn*.2)){const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors now or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button></div>`;}else el.innerHTML=""}
 function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
@@ -1271,12 +1709,12 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  const pAvatar=document.getElementById("playerAvatar");
  if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
  lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
- hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);
+ hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  document.getElementById("log").innerHTML=state.log.map(x=>`<div class="sub" style="padding:6px 0;border-bottom:1px solid #28221b">${x}</div>`).join("");
- renderDaily();renderEvent();renderEnergy("energyHome");renderEnergy("energyJobs");
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
@@ -1409,9 +1847,91 @@ function renderProfile(){
  const a=[["Reach Level 5",state.level>=5],["Recruit 10 Crew Members",crewSize()>=10],["Win 25 Fights",state.wins>=25],["Fully Master a Job",Object.values(state.jobs).some(j=>j.mastery>=3)],["Control 3 Territories",Object.values(state.territory).filter(x=>x.owned).length>=3],["Reach 200 Notoriety",state.notoriety>=200],["Keep 5 Contacts Above 80 Trust",Object.values(state.friends).filter(f=>f.trust>=80).length>=5]];
  ach.innerHTML=a.map(x=>`<div class="row"><div>${x[1]?"✅":"⬜"} ${x[0]}</div></div>`).join("")
 }
+
+const ENERGY_REGEN_MS=60000;
+const STAMINA_REGEN_MS=180000;
+const HEALTH_REGEN_MS=90000;
+
+function regenCountdown(last,period,current,max){
+  if(current>=max)return {text:"FULL",ms:0,full:true};
+  const elapsed=Math.max(0,now()-last);
+  const remainder=elapsed%period;
+  const ms=Math.max(0,period-remainder);
+  return {text:`+1 IN ${formatRegenTime(ms)}`,ms,full:false};
+}
+function formatRegenTime(ms){
+  const total=Math.max(0,Math.ceil(ms/1000));
+  const m=Math.floor(total/60);
+  const s=total%60;
+  return `${m}:${String(s).padStart(2,"0")}`;
+}
+function updateRegenTimers(){
+  const e=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
+  const st=regenCountdown(state.lastStaminaRegen,STAMINA_REGEN_MS,state.st,state.maxSt);
+
+  const ee=document.getElementById("enRegenT");
+  const se=document.getElementById("stRegenT");
+
+  if(ee){
+    ee.textContent=e.text;
+    ee.classList.toggle("full",e.full);
+    ee.classList.toggle("soon",!e.full&&e.ms<=15000);
+  }
+  if(se){
+    se.textContent=st.text;
+    se.classList.toggle("full",st.full);
+    se.classList.toggle("soon",!st.full&&st.ms<=30000);
+  }
+}
+function applyRegeneration(t=now()){
+  // Energy
+  if(state.en>=state.maxEn){
+    state.en=state.maxEn;
+    state.lastEnergyRegen=t;
+  }else{
+    const elapsed=Math.max(0,t-state.lastEnergyRegen);
+    const gain=Math.floor(elapsed/ENERGY_REGEN_MS);
+    if(gain>0){
+      state.en=Math.min(state.maxEn,state.en+gain);
+      state.lastEnergyRegen+=gain*ENERGY_REGEN_MS;
+      if(state.en>=state.maxEn)state.lastEnergyRegen=t;
+    }
+  }
+
+  // Stamina
+  if(state.st>=state.maxSt){
+    state.st=state.maxSt;
+    state.lastStaminaRegen=t;
+  }else{
+    const elapsed=Math.max(0,t-state.lastStaminaRegen);
+    const gain=Math.floor(elapsed/STAMINA_REGEN_MS);
+    if(gain>0){
+      state.st=Math.min(state.maxSt,state.st+gain);
+      state.lastStaminaRegen+=gain*STAMINA_REGEN_MS;
+      if(state.st>=state.maxSt)state.lastStaminaRegen=t;
+    }
+  }
+
+  // Health
+  if(state.hp>=state.maxHp){
+    state.hp=state.maxHp;
+    state.lastHealthRegen=t;
+  }else{
+    const elapsed=Math.max(0,t-state.lastHealthRegen);
+    const gain=Math.floor(elapsed/HEALTH_REGEN_MS);
+    if(gain>0){
+      state.hp=Math.min(state.maxHp,state.hp+gain);
+      state.lastHealthRegen+=gain*HEALTH_REGEN_MS;
+      if(state.hp>=state.maxHp)state.lastHealthRegen=t;
+    }
+  }
+
+  state.lastTick=t; // retained for compatibility / general timing
+}
+
 function tick(){
- const t=now(),d=t-state.lastTick,eg=Math.floor(d/60000),sg=Math.floor(d/180000),hg=Math.floor(d/90000);
- if(eg)state.en=Math.min(state.maxEn,state.en+eg);if(sg)state.st=Math.min(state.maxSt,state.st+sg);if(hg)state.hp=Math.min(state.maxHp,state.hp+hg);if(eg||sg||hg)state.lastTick=t;
+ const t=now();
+ applyRegeneration(t);
  if(state.heat>0){const cool=Math.floor(d/300000);if(cool)state.heat=Math.max(0,state.heat-cool)}
  const hrs=(t-state.lastIncome)/3600000;if(hrs>=1/60){state.cash+=Math.max(0,netIncome())*hrs;state.lastIncome=t}
  if(t-state.lastUpkeep>3600000&&netIncome()<0){state.cash=Math.max(0,state.cash+netIncome());state.lastUpkeep=t;log("Upkeep exceeded income. Cash reserves were used.")}
@@ -1430,7 +1950,7 @@ document.addEventListener("click",e=>{
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
-setInterval(tick,15000);setInterval(processPendingAttacks,1000);tick();setTimeout(()=>{if(state.playerName)startTutorial();else promptForPlayerName()},350);setTimeout(tryAutoTheme,500);
+setInterval(tick,15000);setInterval(updateRegenTimers,1000);setInterval(processPendingAttacks,1000);tick();setTimeout(()=>{if(state.playerName)startTutorial();else promptForPlayerName()},350);setTimeout(tryAutoTheme,500);
 
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden && themeOn){externalTheme.pause();}
