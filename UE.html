@@ -1283,6 +1283,24 @@ body:after{
   isolation:isolate;
 }
 
+
+/* TAB BANNERS */
+.tab-banner{
+  margin:0 0 8px;
+  border:1px solid #24272a;
+  background:#060708;
+  box-shadow:0 7px 16px rgba(0,0,0,.35);
+  overflow:hidden;
+}
+.tab-banner img{
+  display:block;
+  width:100%;
+  height:auto;
+}
+@media(max-width:640px){
+  .tab-banner{margin:0 0 6px;}
+}
+
 </style>
 </head>
 <body>
@@ -1332,6 +1350,7 @@ body:after{
 
 <main class="main">
 <section id="view-home" class="view active">
+ <div class="tab-banner"><img src="./assets/banner-home.png" alt="Criminal Empire banner"></div>
  <div class="hero">
   <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
   <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
@@ -1358,6 +1377,7 @@ body:after{
 </section>
 
 <section id="view-jobs" class="view">
+ <div class="tab-banner"><img src="./assets/banner-jobs.png" alt="Jobs banner"></div>
  <div id="energyJobs"></div>
  <div id="jobResult" class="job-result"></div><div class="section-title"><h2>Jobs</h2><span id="tierName"></span></div>
  <div class="grid cards" id="jobs"></div>
@@ -1366,6 +1386,7 @@ body:after{
 </section>
 
 <section id="view-crew" class="view">
+ <div class="tab-banner"><img src="./assets/banner-crew.png" alt="Crew banner"></div>
  <details class="crew-fold" open>
   <summary>
     <span>YOUR CREW</span>
@@ -1410,6 +1431,7 @@ body:after{
 </section>
 
 <section id="view-fight" class="view">
+ <div class="tab-banner"><img src="./assets/banner-fight.png" alt="Fight banner"></div>
  <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
  <div id="combatInfo"></div>
  <div id="fightRefreshBar" class="fight-refresh-bar"></div>
@@ -1421,6 +1443,7 @@ body:after{
 </section>
 
 <section id="view-gear" class="view">
+ <div class="tab-banner"><img src="./assets/banner-gear.png" alt="Gear banner"></div>
  <details class="fold-card gear-section-fold" open>
    <summary>MAIN INVENTORY <span>cash / gold / supplies</span></summary>
    <div class="fold-body">
@@ -1463,6 +1486,7 @@ body:after{
 </section>
 
 <section id="view-territory" class="view">
+ <div class="tab-banner"><img src="./assets/banner-territory.png" alt="Territory banner"></div>
  <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
  <details class="compact-details explainer-details">
    <summary>HOW PROPERTIES WORK <span>?</span></summary>
@@ -1473,6 +1497,7 @@ body:after{
 </section>
 
 <section id="view-more" class="view">
+ <div class="tab-banner"><img src="./assets/banner-more.png" alt="More banner"></div>
  <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
  <div class="card" style="margin-bottom:8px">
   <div class="edit-profile-row">
@@ -1718,7 +1743,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.18.2";
+const BUILD_NUMBER="0.18.3";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
