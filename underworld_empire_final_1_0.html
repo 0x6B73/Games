@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080706">
+<title>Underworld Empire — Final Build 1.0</title>
+<style>
+:root{
+ --bg:#060606;--panel:#11100e;--panel2:#191713;--text:#e6ddd0;--muted:#94897c;
+ --gold:#b58a43;--gold2:#d0a55d;--green:#657a50;--red:#8e2929;--red2:#b13a3a;--line:#342d24;
+ --navh:64px;--safe:env(safe-area-inset-bottom);
+}
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;min-height:100%;background:radial-gradient(circle at top,#1a1510,#090807 34%,#040404 78%);color:var(--text);font-family:Arial,Helvetica,sans-serif;overflow-x:hidden}
+body{padding-bottom:calc(var(--navh) + var(--safe))}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.13;background:repeating-linear-gradient(0deg,rgba(255,255,255,.017) 0,rgba(255,255,255,.017) 1px,transparent 1px,transparent 3px)}
+.app{position:relative;z-index:3;width:100%;min-height:100dvh;padding-bottom:calc(var(--navh) + 14px + var(--safe))}
+.top{position:sticky;top:0;z-index:800;background:rgba(8,7,6,.98);border-bottom:1px solid var(--line);padding:7px 8px 6px}
+.brandrow{display:flex;justify-content:space-between;align-items:center;gap:8px}.brand{font-family:Georgia,serif;font-weight:900;letter-spacing:.06em;font-size:14px}.lvl{font-size:11px;color:var(--gold2);font-weight:900}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:6px}.stat{min-width:0;background:#100f0d;border:1px solid var(--line);padding:5px;font-size:9px;line-height:1.15}.stat b{display:block;font-size:11px;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.bar{height:4px;background:#050505;margin-top:4px;overflow:hidden}.fill{height:100%;background:var(--gold)}.fill.red{background:var(--red)}.fill.green{background:var(--green)}.fill.blue{background:#51677b}
+.energy-empty{border-color:#8c2727!important;animation:pulse 1.1s infinite}@keyframes pulse{50%{filter:brightness(1.35)}}
+.main{padding:8px}.view{display:none;width:100%}.view.active{display:block}
+.hero{overflow:hidden;background:#11100e;border:1px solid var(--line);border-left:4px solid #74582d;margin-bottom:9px}.hero img{width:100%;height:120px;display:block;object-fit:cover;filter:saturate(.55) contrast(1.1) brightness(.7)}.hero .copy{padding:14px}.hero h1{font-family:Georgia,serif;margin:0 0 5px;font-size:20px}.hero p{font-size:12px;color:var(--muted);line-height:1.45;margin:0}
+.crime-header{background:linear-gradient(#281f16,#15100b);border:1px solid #4b3a29;border-bottom:3px solid #73552d;padding:8px;margin-bottom:8px}.crime-header strong{font-family:Georgia,serif;font-size:16px}.crime-header span{display:block;color:#a09382;font-size:11px;margin-top:2px}
+.progress-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;margin-bottom:9px}.pbox{background:#0d0c0a;border:1px solid var(--line);padding:7px;text-align:center;font-size:9px;color:#9c9184}.pbox b{display:block;color:#e6dccd;font-size:13px;margin-top:2px}
+.section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:5px 0 8px}.section-title h2{font-family:Georgia,serif;font-size:18px;margin:0}.section-title span{font-size:10px;color:var(--muted);text-align:right;max-width:48%}
+.grid{display:grid;gap:8px}.cards{grid-template-columns:1fr}.card{background:var(--panel);border:1px solid var(--line);padding:10px;overflow:hidden;box-shadow:0 8px 20px #0005}.card h3{margin:0 0 5px;font-size:15px}.card p{font-size:11px;color:var(--muted);line-height:1.45}.art{width:calc(100% + 20px);height:105px;object-fit:cover;margin:-10px -10px 8px;display:block;border-bottom:1px solid #2f281f;filter:saturate(.55) contrast(1.07) brightness(.72)}
+.meta{display:flex;flex-wrap:wrap;gap:5px;margin:6px 0}.badge{font-size:10px;padding:4px 6px;border:1px solid #40382c;background:#0b0a08}.badge.red{border-color:#6a2c2c;color:#d6aaa0}.badge.gold{color:#d2aa65}
+.btn{border:1px solid #6d542b;background:var(--gold);color:#100c07;font-weight:900;padding:9px 10px;width:100%;border-radius:2px}.btn:disabled{opacity:.38;cursor:not-allowed}.btn.secondary{background:#26221b;color:var(--text);border-color:#4b4032}.btn.red{background:var(--red);color:#fff;border-color:#a83b3b}.btn.green{background:var(--green);color:#fff}.btn.small{width:auto;padding:6px 8px;font-size:10px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;background:var(--panel);border:1px solid var(--line);padding:9px}.row+.row{margin-top:5px}.title{font-weight:900}.sub{font-size:10px;color:var(--muted);margin-top:3px;line-height:1.35}.right{text-align:right}
+.notice{background:#1b0d0c;border:1px solid #602424;border-left:5px solid #9a3030;padding:9px;margin-bottom:8px}.notice h3{margin:0 0 3px;font-size:14px}.notice p{font-size:11px;color:#c0aa99;margin:0 0 7px;line-height:1.4}.actions{display:grid;grid-template-columns:1fr;gap:5px}
+.skillgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.skill{background:#0e0d0b;border:1px solid var(--line);padding:7px;text-align:center;font-size:10px}.skill strong{display:block;font-size:18px;margin:2px 0}
+.mastery{height:7px;background:#080706;border:1px solid var(--line);margin:6px 0}.mastery>div{height:100%;background:#806128}
+.lock{font-size:10px;color:#c88879;background:#1a0b0a;border:1px solid #512421;padding:6px;margin:6px 0}
+.role{font-size:9px;color:#ccb58e;text-transform:uppercase;letter-spacing:.05em}
+.myspace{background:#c8c1b5;color:#111;border:3px solid #191919}.ms-head{background:linear-gradient(#242424,#101010);color:#eee;padding:7px 8px;font-weight:bold;font-size:12px;text-transform:uppercase}.ms-sub{background:#4b3d2f;color:#fff;padding:5px 7px;font-size:10px;font-weight:bold;text-transform:uppercase}.ms-body{padding:7px}.friend{display:grid;grid-template-columns:52px minmax(0,1fr);gap:7px;padding:8px 0;border-bottom:1px solid #918a7e}.avatar{width:52px;height:52px;background:radial-gradient(circle at 50% 35%,#82745f,#4c4337 55%,#211d18);border:2px solid #665640;display:flex;align-items:center;justify-content:center;font-size:24px;color:#fff}.fname{font-weight:900;color:#34251b}.ftag{font-size:10px;color:#544d45;margin:2px 0;font-style:italic}.fmeta{font-size:9px;color:#595248}.fresponse{font-size:10px;background:#efe5b6;border:1px solid #a0915c;padding:5px;margin-top:4px}.relbar{height:6px;background:#7b756c;margin-top:4px;overflow:hidden}.relbar>div{height:100%;background:#625744}.fbtns{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.fbtns button{min-height:35px;font-size:9px;padding:5px;border:1px solid #514334;background:#d4c7ad;font-weight:bold}
+.relationship-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:5px}.relstat{background:#bdb3a4;padding:3px;text-align:center;font-size:8px}.relstat b{display:block;font-size:9px}
+.territory{border-left:4px solid #6e552c}.territory.enemy{border-left-color:#7e2929}.territory.owned{border-left-color:#607848}
+.factionbar{height:7px;background:#090807;border:1px solid var(--line);overflow:hidden;margin-top:5px}.factionbar>div{height:100%;background:#795d31}
+.hit{border-left:4px solid #7e2929}.heat-high{color:#d36f60}
+.profile-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.profile-grid .card{text-align:center}.profile-grid strong{display:block;font-size:18px;margin-top:3px}
+.daily{background:linear-gradient(#1c1710,#0f0d0a);border:1px solid #5d482e;padding:9px;margin-bottom:8px}
+.event{background:#16110c;border:1px solid #6b4d27;padding:9px;margin-bottom:8px}
+.modal,.tutorial,.chatbox{display:none;position:fixed;inset:0;background:#000c;z-index:2147483200;align-items:center;justify-content:center;padding:10px}.modal.show,.tutorial.show,.chatbox.show{display:flex}.mbox,.tutorial-box{width:100%;max-height:calc(100dvh - 20px);overflow:auto;background:#11100e;border:1px solid #514334;padding:14px}.mbox h2,.tutorial-box h2{font-family:Georgia,serif;margin:0 0 7px}.tutorial-kicker{font-size:9px;letter-spacing:.12em;color:var(--gold2);font-weight:900}.tutorial-step{font-size:10px;color:#8e8376;margin-bottom:7px}
+.chatwin{width:100%;height:calc(100dvh - 20px);background:#d7cfc0;color:#111;border:2px solid #25211c;display:flex;flex-direction:column}.chathead{background:#1f1b17;color:#fff;padding:8px;font-weight:bold;text-transform:uppercase}.chatlog{flex:1;overflow:auto;padding:8px;background:#eee7db}.bubble{max-width:84%;margin:6px 0;padding:6px 8px;border:1px solid #999;font-size:11px;background:#fff}.bubble.me{margin-left:auto;background:#d9e5ef}.chatopts{padding:7px;background:#c7bdad;border-top:1px solid #8b8174;display:grid;gap:5px}.chatopts button{font-size:10px;padding:7px;border:1px solid #5d5245;background:#eee3d0;font-weight:bold}
+.inbox-fab{position:fixed;right:10px;bottom:calc(var(--navh) + 10px + var(--safe));z-index:2147483050;background:#6d542b;color:#fff;border:1px solid #9e7a40;width:44px;height:44px;border-radius:50%;font-size:18px;font-weight:bold;box-shadow:0 10px 24px #0009}.count{position:absolute;right:-4px;top:-5px;background:#a52a2a;border:2px solid #090806;color:#fff;width:20px;height:20px;border-radius:50%;font-size:9px;display:flex;align-items:center;justify-content:center}
+.inbox-panel{display:none;position:fixed;left:8px;right:8px;bottom:calc(var(--navh) + 60px + var(--safe));z-index:2147483060;max-height:58dvh;background:#12100d;border:1px solid #594a36;box-shadow:0 18px 60px #000c;overflow:auto}.inbox-panel.show{display:block}.inbox-head{position:sticky;top:0;background:#201a13;padding:8px;border-bottom:1px solid #4a3e2f;font-weight:bold;text-transform:uppercase}.inbox-item{padding:8px;border-bottom:1px solid #322a20}.inbox-item b{display:block;font-size:11px}.inbox-item p{margin:4px 0 6px;color:#a99c8d;font-size:10px;line-height:1.35}.inbox-actions{display:flex;gap:4px}.inbox-actions button{flex:1}
+.friend-request-pop{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483210;width:calc(100vw - 24px);max-height:calc(100dvh - 100px);overflow:auto;background:#d5cbb9;color:#111;border:3px solid #26221c;box-shadow:0 18px 60px #000c}.friend-request-pop.show{display:block}.fr-head{background:#151515;color:#fff;padding:7px;font-weight:bold;text-transform:uppercase}.fr-body{padding:10px;font-size:11px}
+.toast{position:fixed;left:50%;bottom:calc(var(--navh) + 10px + var(--safe));transform:translateX(-50%) translateY(15px);opacity:0;background:#080706;border:1px solid #4a4033;padding:9px 12px;z-index:2147483300;transition:.2s;width:calc(100vw - 24px);text-align:center;font-size:11px}.toast.show{opacity:1;transform:translateX(-50%)}
+.checkout-grid{display:grid;gap:7px;margin:9px 0}.checkout-grid label{font-size:10px;color:#b5a898}.checkout-grid input{width:100%;margin-top:3px;padding:8px;background:#070706;color:#ddd;border:1px solid #4a4034}
+.nav{position:fixed;inset:auto 0 0 0;z-index:2147483000;height:calc(var(--navh) + var(--safe));background:#080706;border-top:1px solid #4a4033;box-shadow:0 -8px 24px #000b;padding-bottom:var(--safe)}.navin{height:var(--navh);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;padding:2px 3px}.nav button{min-width:0;border:0;background:transparent;color:#8d8376;padding:3px 1px;font-size:8px;display:flex;flex-direction:column;align-items:center;justify-content:center}.nav button.active{background:#1d1913;color:#fff}.ico{display:block;font-size:15px;margin-bottom:2px}
+@media(min-width:700px){
+ .app{max-width:1080px;margin:auto}.main{padding:12px}.brand{font-size:17px}.stats{grid-template-columns:repeat(6,minmax(0,1fr))}.stat{font-size:10px}.stat b{font-size:12px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.skillgrid{grid-template-columns:repeat(5,minmax(0,1fr))}.progress-strip{grid-template-columns:repeat(4,minmax(0,1fr))}.profile-grid{grid-template-columns:repeat(4,1fr)}.friend{grid-template-columns:62px minmax(0,1fr) auto}.avatar{width:62px;height:62px}.fbtns{grid-column:auto;grid-template-columns:1fr}.actions{display:flex}.actions button{width:auto}.hero img{height:160px}.mbox,.tutorial-box{max-width:520px}.chatwin{max-width:520px;height:min(78vh,640px)}.inbox-panel{left:50%;right:auto;transform:translateX(-50%);width:430px}.navin{max-width:1080px;margin:auto}
+}
+@media(min-width:1000px){.cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+/* V5 — compact social-game / crime dashboard */
+:root{--navh:50px;--gold:#d1ad43;--gold2:#f0d36d;--green:#6ea33d;--line:#4a4a49}
+body{background:#050607;color:#e7e7e7;font-family:Arial,Helvetica,sans-serif}
+.app{background:linear-gradient(90deg,#050607,#0c1014 50%,#050607)}
+.top{
+ position:relative!important;background:linear-gradient(#171a1e,#08090a)!important;
+ border-top:3px solid #555;border-bottom:2px solid #606060!important;padding:4px 5px!important
+}
+.brandrow{min-height:38px;background:linear-gradient(90deg,#0c0d0e,#15181c,#08090a);border:1px solid #3d3e40;padding:4px 7px}
+.brand{font-family:Georgia,serif!important;font-size:20px!important;text-shadow:0 2px #000;color:#ddd}
+.lvl{font-size:12px!important;background:#17191c;border:1px solid #5a5a58;padding:6px 9px;color:#f1d46b!important}
+.stats{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:2px!important;margin-top:3px!important}
+.stat{background:linear-gradient(#151719,#0b0c0d)!important;border:1px solid #343638!important;padding:4px 6px!important;font-size:9px!important}
+.stat b{font-size:12px!important;color:#eee}.stat:nth-child(4) b{color:#66a83b}
+.bar{height:5px!important;border:1px solid #333;background:#020202}.fill{background:linear-gradient(#f0c442,#9d7919)}
+.main{padding:5px!important}
+.hero{border:1px solid #424448!important;border-left:0!important;background:#080a0d!important;margin-bottom:5px!important}
+.hero img{height:90px!important;opacity:.52}.hero .copy{padding:7px 9px!important;background:linear-gradient(90deg,#0a0d11ee,#0a0d11aa)}
+.hero h1{font-size:17px!important}.hero p{font-size:10px!important}
+.crime-header,.section-title{background:linear-gradient(#24272b,#0e1012)!important;border:1px solid #4b4e52!important;border-bottom:2px solid #777!important;padding:5px 7px!important;margin:4px 0!important}
+.crime-header strong,.section-title h2{font-family:Arial,Helvetica,sans-serif!important;font-size:14px!important;color:#f0d565!important;text-transform:none}
+.crime-header span,.section-title span{font-size:9px!important}
+.progress-strip{gap:2px!important;margin:4px 0!important}.pbox{padding:4px!important;background:#0b0d0f!important;border-color:#343638!important}.pbox b{font-size:11px!important}
+.skillgrid{gap:2px!important}.skill{padding:4px!important;background:#0b0d0f!important;border-color:#343638!important}.skill strong{font-size:14px!important}
+.grid{gap:3px!important}.cards{grid-template-columns:1fr!important}
+.card{
+ position:relative;background:rgba(8,10,12,.94)!important;border:1px solid #35383c!important;border-radius:0!important;
+ box-shadow:none!important;padding:6px!important
+}
+.card h3{font-size:13px!important;margin:0 0 2px!important}.card p{font-size:9px!important;margin:4px 0!important;line-height:1.25!important}
+.art{width:72px!important;height:58px!important;float:left!important;margin:0 8px 4px 0!important;border:1px solid #555!important;object-fit:cover!important}
+.meta{gap:3px!important;margin:3px 0!important}.badge{font-size:9px!important;padding:2px 4px!important;background:#101214!important;border-color:#444!important}
+.role,.sub{font-size:9px!important}.mastery{height:8px!important;margin:3px 0!important;clear:both}.mastery>div{background:linear-gradient(#ffd34e,#a66e00)!important}
+.lock{font-size:9px!important;padding:3px!important;margin:3px 0!important}
+.btn{
+ width:auto!important;min-height:26px!important;padding:4px 9px!important;border-radius:0!important;
+ border:1px solid #7e7040!important;outline:1px solid #171717;background:
+ repeating-linear-gradient(135deg,#353535 0,#353535 2px,#292929 2px,#292929 4px)!important;
+ color:#f4d85f!important;text-shadow:0 1px #000;font-size:10px!important;font-weight:900!important
+}
+.btn:hover{filter:brightness(1.18)}.btn.red{border-color:#75403b!important;color:#f2b5a8!important}.btn.green{border-color:#557544!important;color:#b8dd8e!important}
+.btn.secondary{border-color:#555!important;color:#ddd!important}.btn:disabled{color:#777!important}
+.row{padding:5px!important;background:#090b0d!important;border-color:#333!important}.row+.row{margin-top:2px!important}.title{font-size:11px}.actions{gap:3px!important}
+.daily,.event,.notice{padding:5px!important;margin-bottom:4px!important;border-width:1px!important;background:#101214!important}.daily b,.event b,.notice h3{font-size:11px!important}.daily .sub,.event .sub,.notice p{font-size:9px!important}
+.myspace{border-width:2px!important}.friend{padding:5px 0!important}.avatar{width:44px!important;height:44px!important;font-size:17px!important}.relationship-grid{gap:1px!important}.relstat{padding:2px!important}
+.nav{height:calc(var(--navh) + var(--safe))!important;background:linear-gradient(#202226,#08090a)!important;border-top:2px solid #666!important}
+.navin{height:var(--navh)!important}.nav button{height:46px!important;min-height:46px!important;border-right:1px solid #333!important;font-size:7px!important}.nav button.active{background:linear-gradient(#403c35,#151515)!important;color:#f2d66b!important}.ico{font-size:13px!important}
+.inbox-fab{bottom:calc(var(--navh) + 6px + var(--safe))!important;width:38px!important;height:38px!important;background:#222!important;border-radius:0!important}
+.toast{bottom:calc(var(--navh) + 7px + var(--safe))!important}
+.soundbar{display:flex;gap:3px;align-items:center;padding:3px 5px;background:#08090a;border:1px solid #3a3c3f;margin-top:3px}
+.soundbar button{font-size:9px}.soundbar .track{flex:1;font-size:8px;color:#8f9296;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+@media(min-width:700px){
+ .app{max-width:1080px!important}.stats{grid-template-columns:repeat(6,minmax(0,1fr))!important}
+ .cards{grid-template-columns:1fr!important}.card{min-height:76px}.art{width:92px!important;height:66px!important}
+ .brand{font-size:27px!important}
+}
+
+
+.attack-alert{border-left:4px solid #9b2d2d!important;background:#140a0a!important}
+.attack-timer{font-size:10px;color:#e7b0a6;margin-top:3px}
+.attack-danger{color:#ff8f7e;font-weight:900}
+
+
+/* FINAL BUILD POLISH */
+:root{--accent:#d3af45;--steel:#4a4d50}
+button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.btn{transition:filter .08s ease,transform .08s ease}.btn:active:not(:disabled){transform:translateY(1px);filter:brightness(.82)}
+.card{transition:border-color .15s ease}.card:hover{border-color:#55585b!important}
+.job-result{display:none;margin:4px 0 6px;border:1px solid #555;background:linear-gradient(#17191c,#0a0b0d);padding:6px 8px;font-size:10px}
+.job-result.show{display:block;animation:resultIn .18s ease}.job-result.good{border-left:4px solid #719c45}.job-result.bad{border-left:4px solid #a54035}
+.job-result b{color:#efd56b}.job-result .detail{color:#b1b1ae;margin-top:2px}
+@keyframes resultIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+.job-card.busy{opacity:.72;pointer-events:none}.job-card.busy:after{content:'OPERATION IN PROGRESS';position:absolute;inset:0;background:#050607cc;display:flex;align-items:center;justify-content:center;color:#f0d36d;font-size:11px;font-weight:900;letter-spacing:.06em;z-index:8}
+.nav button.active{box-shadow:inset 0 2px #d0ad45}.audio-good{color:#8fc060}.audio-bad{color:#cf7062}
+
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="brandrow"><div class="brand">UNDERWORLD EMPIRE</div><div class="lvl" id="lvl"></div></div>
+ <div class="stats">
+  <div class="stat">❤️ HEALTH<b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
+  <div class="stat" id="energyStat">⚡ ENERGY<b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div></div>
+  <div class="stat">🥊 STAMINA<b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div></div>
+  <div class="stat">💵 CASH<b id="cashT"></b></div>
+  <div class="stat">👥 CREW<b id="crewT"></b></div>
+  <div class="stat">🔥 HEAT<b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
+ </div>
+ <div class="soundbar">
+   <button class="btn secondary" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
+   <button class="btn secondary" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
+   <div class="track">EAST HARBOR RADIO // TRAPPIST — AXTON CROLLEY</div>
+ </div>
+</header>
+
+<main class="main">
+<section id="view-home" class="view active">
+ <div class="hero">
+  <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
+  <div class="copy"><h1>Build Your Criminal Empire.</h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
+ </div>
+ <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;background:linear-gradient(#d8d8d8,#8d8d8d);border:1px solid #111;color:#111;padding:4px 7px;margin-bottom:4px;font-weight:900;font-size:11px">
+ <span>CREW GIFTS! SEND SUPPLIES TO YOUR ASSOCIATES</span><button class="btn" onclick="go('crew')">SEND GIFTS</button>
+ </div>
+ <div id="dailyBox"></div>
+ <div id="eventBox"></div>
+ <div id="energyHome"></div>
+ <div class="crime-header"><strong id="cityTitle">East Harbor Operations</strong><span id="citySub">Your organization is small. That can change.</span></div>
+ <div class="progress-strip">
+  <div class="pbox">RANK<b id="rankBox"></b></div><div class="pbox">NOTORIETY<b id="notorietyBox"></b></div>
+  <div class="pbox">ATTACK<b id="atkBox"></b></div><div class="pbox">DEFENSE<b id="defBox"></b></div>
+ </div>
+ <div class="section-title"><h2>Character</h2><span id="spLabel"></span></div>
+ <div class="skillgrid" id="skills"></div>
+ <div class="section-title" style="margin-top:10px"><h2>Recent Intelligence</h2><span>latest activity</span></div>
+ <div class="card" id="log"></div>
+</section>
+
+<section id="view-jobs" class="view">
+ <div id="energyJobs"></div>
+ <div id="jobResult" class="job-result"></div><div class="section-title"><h2>Jobs</h2><span id="tierName"></span></div>
+ <div class="grid cards" id="jobs"></div>
+ <div class="section-title" style="margin-top:11px"><h2>Boss Operation</h2><span>complete the rank</span></div>
+ <div id="boss"></div>
+</section>
+
+<section id="view-crew" class="view">
+ <div class="section-title"><h2>Your Crew</h2><span id="crewSummary"></span></div>
+ <div class="myspace">
+  <div class="ms-head">UNDERWORLDSPACE — CONTACT NETWORK</div>
+  <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
+  <div class="ms-body"><div id="friends"></div><div class="ms-sub" style="margin:10px -7px 0">Potential Associates</div><div id="potentials"></div></div>
+ </div>
+</section>
+
+<section id="view-fight" class="view">
+ <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
+ <div id="fightlist"></div>
+ <div class="section-title" style="margin-top:10px"><h2>Revenge</h2><span>settle outstanding business</span></div>
+ <div id="revenge"></div>
+ <div class="section-title" style="margin-top:10px"><h2>Hitlist</h2><span>dynamic bounties</span></div>
+ <div id="hitlist"></div>
+</section>
+
+<section id="view-gear" class="view">
+ <div class="section-title"><h2>Equipment</h2><span id="upkeepLabel"></span></div>
+ <div class="grid cards" id="gear"></div>
+</section>
+
+<section id="view-territory" class="view">
+ <div class="section-title"><h2>Territory</h2><span id="income"></span></div>
+ <div id="factions"></div>
+ <div class="section-title" style="margin-top:10px"><h2>Properties</h2><span>income and upkeep</span></div>
+ <div class="grid cards" id="props"></div>
+</section>
+
+<section id="view-more" class="view">
+ <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
+ <div class="profile-grid" id="profile"></div>
+ <div class="card" style="margin-top:8px"><h3>Collections & Rare Loot</h3><div id="collections"></div></div>
+ <div class="card" style="margin-top:8px"><h3>Achievements</h3><div id="ach"></div></div>
+ 
+ 
+ <div class="card" style="margin-top:8px">
+   <h3>Audio System</h3>
+   <p id="audioStatusText">Checking external audio…</p>
+   <div id="audioStatusList" class="sub"></div>
+   <button class="btn secondary" onclick="testAudioPack()">TEST AUDIO PACK</button>
+ </div>
+
+<div class="card" style="margin-top:8px">
+   <h3>Audio Credits</h3>
+   <p>Theme music: “Trappist” by Axton Crolley, CC BY 3.0.</p>
+   <p>Additional SFX are linked from OpenGameArt, including a CC0 engine loop used for vehicle-related jobs. CC0 assets include Click Sounds by pauliuw, Coin Drop by Vinrax, Gunshots by kurt, Gun Reload Sound Effects by BMacZero, Sirens and Alarm Noise by aquinn, and Win Sound Effect by Listener.</p>
+ </div>
+
+<div class="card" style="margin-top:8px"><h3>Save</h3><p>Progress is stored locally in this browser.</p><button class="btn secondary" onclick="exportSave()">Export Save</button><button class="btn secondary" style="margin-top:5px" onclick="importSave()">Import Save</button><button class="btn red" style="margin-top:5px" onclick="resetGame()">Reset</button></div>
+</section>
+</main>
+</div>
+
+<nav class="nav"><div class="navin">
+<button class="active" data-v="home"><span class="ico">🏠</span>HOME</button>
+<button data-v="jobs"><span class="ico">💼</span>JOBS</button>
+<button data-v="crew"><span class="ico">👥</span>CREW</button>
+<button data-v="fight"><span class="ico">🥊</span>FIGHT</button>
+<button data-v="gear"><span class="ico">🔫</span>GEAR</button>
+<button data-v="territory"><span class="ico">🏢</span>TERRITORY</button>
+<button data-v="more"><span class="ico">☰</span>MORE</button>
+</div></nav>
+
+<button class="inbox-fab" onclick="toggleInbox()">✉<span class="count" id="inboxCount">0</span></button>
+<div class="inbox-panel" id="inboxPanel"><div class="inbox-head">Messages</div><div id="inboxItems"></div></div>
+<div class="friend-request-pop" id="socialPop"><div class="fr-head">Incoming Message</div><div class="fr-body" id="socialPopBody"></div></div>
+<div class="chatbox" id="chatbox"><div class="chatwin"><div class="chathead" id="chatTitle"></div><div class="chatlog" id="chatLog"></div><div class="chatopts" id="chatOptions"></div><button class="btn secondary" style="border-radius:0" onclick="closeChat()">Close</button></div></div>
+
+<div class="tutorial" id="tutorial"><div class="tutorial-box"><div class="tutorial-kicker">WELCOME TO EAST HARBOR</div><div class="tutorial-step" id="tutorialStep"></div><h2 id="tutorialTitle"></h2><p id="tutorialText"></p><div class="actions"><button class="btn secondary" onclick="skipTutorial()">Skip</button><button class="btn" onclick="nextTutorial()">Next</button></div></div></div>
+
+<div class="modal" id="energyModal"><div class="mbox"><h2>You do not have enough energy.</h2><p class="sub">Wait for recovery, request help from your contacts, or acquire additional energy.</p><div class="actions"><button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="openCheckout()">ACQUIRE ENERGY</button></div><button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">Wait for recovery</button></div></div>
+
+<div class="modal" id="checkoutModal"><div class="mbox"><h2>Acquire Energy</h2><p class="sub">Demonstration only. Do not enter real financial information.</p><div class="checkout-grid"><label>Fictional Account Number<input id="moneyNumber" placeholder="FAKE-0000-ENERGY"></label><label>Hours of work required to cover this purchase<input id="workHours" type="number" min="0" max="999" step=".5" placeholder="3.5"></label><label>Authorization Note<input id="authorization" placeholder="Approved for immediate use"></label></div><button class="btn" onclick="completeCheckout()">PURCHASE ENERGY</button><button class="btn secondary" style="margin-top:6px" onclick="closeModal('checkoutModal')">Cancel</button></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
+const IMG={
+ city:"https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80",
+ gun:"https://images.unsplash.com/photo-1595590424283-b8f17842773f?auto=format&fit=crop&w=900&q=80",
+ car:"https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80",
+ warehouse:"https://images.unsplash.com/photo-1565793298595-6a879b1d9492?auto=format&fit=crop&w=900&q=80",
+ club:"https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=900&q=80",
+ skyline:"https://images.unsplash.com/photo-1485871981521-5b1fd3805eee?auto=format&fit=crop&w=900&q=80",
+ hotel:"https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=900&q=80",
+ docks:"https://images.unsplash.com/photo-1494412685616-a5d310fbb07d?auto=format&fit=crop&w=900&q=80",
+ suit:"https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=900&q=80"
+};
+let audioCtx=null,themeTimer=null,themeOn=false,themeStep=0;
+function ctx(){
+ const C=window.AudioContext||window.webkitAudioContext;
+ if(!C)return null;
+ if(!audioCtx)audioCtx=new C();
+ if(audioCtx.state==="suspended")audioCtx.resume();
+ return audioCtx;
+}
+function tone(f,d=.07,type="triangle",v=.03,delay=0,slide=null){
+ if(!state.sound)return;const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();
+ o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);
+ g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+ o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)
+}
+function noise(d=.08,v=.025,delay=0,low=7000){
+ if(!state.sound)return;const c=ctx();if(!c)return;const len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);
+ for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.7);
+ const s=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain(),t=c.currentTime+delay;s.buffer=buf;f.type="lowpass";f.frequency.value=low;g.gain.value=v;s.connect(f);f.connect(g);g.connect(c.destination);s.start(t)
+}
+
+/* Externally hosted audio. Every SFX has a synthesized fallback. */
+const AUDIO_URLS={
+ theme:"https://opengameart.org/sites/default/files/trappist.wav",
+ click:"https://opengameart.org/sites/default/files/click_sound_1.mp3",
+ message:"https://opengameart.org/sites/default/files/click_sound_4.mp3",
+ cash:"https://opengameart.org/sites/default/files/coin_drop_0.mp3",
+ gun:"https://opengameart.org/sites/default/files/22%20Pistol.wav",
+ reload:"https://opengameart.org/sites/default/files/clipload2.wav",
+ siren:"https://opengameart.org/sites/default/files/siren_0.mp3",
+ win:"https://opengameart.org/sites/default/files/Win%20sound.wav",
+ engine:"https://opengameart.org/sites/default/files/loop_0.wav"
+};
+const audioState={};
+const samples={};
+
+function makeSample(name,url,volume=.45){
+ const a=new Audio();
+ a.preload="auto";a.src=url;a.volume=volume;
+ audioState[name]="loading";
+ a.addEventListener("canplaythrough",()=>{audioState[name]="ready";renderAudioStatus()},{once:true});
+ a.addEventListener("loadeddata",()=>{if(audioState[name]!=="ready")audioState[name]="ready";renderAudioStatus()},{once:true});
+ a.addEventListener("error",()=>{audioState[name]="failed";renderAudioStatus()});
+ try{a.load()}catch(e){audioState[name]="failed"}
+ samples[name]=a;return a
+}
+const externalTheme=makeSample("theme",AUDIO_URLS.theme,.36);
+externalTheme.loop=true;
+makeSample("click",AUDIO_URLS.click,.30);
+makeSample("message",AUDIO_URLS.message,.35);
+makeSample("cash",AUDIO_URLS.cash,.42);
+makeSample("gun",AUDIO_URLS.gun,.34);
+makeSample("reload",AUDIO_URLS.reload,.40);
+makeSample("siren",AUDIO_URLS.siren,.24);
+makeSample("win",AUDIO_URLS.win,.42);
+makeSample("engine",AUDIO_URLS.engine,.28);
+
+let activeSfxAudio=null;
+let activeSynthNodes=[],sceneTimers=[],sceneToken=0;
+function stopCurrentSfx(){if(activeSfxAudio){try{activeSfxAudio.pause();activeSfxAudio.currentTime=0}catch(e){}activeSfxAudio=null}activeSynthNodes.forEach(n=>{try{n.stop()}catch(e){}});activeSynthNodes=[]}
+function cancelSfxScene(){sceneToken++;sceneTimers.forEach(clearTimeout);sceneTimers=[];stopCurrentSfx()}
+function channelTone(f,d=.07,type="triangle",v=.03,slide=null){if(!state.sound)return;const c=ctx();if(!c)return;const t=c.currentTime,o=c.createOscillator(),g=c.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v,t+.006);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);activeSynthNodes.push(o);o.start(t);o.stop(t+d+.02)}
+function channelNoise(d=.08,v=.025,low=7000){if(!state.sound)return;const c=ctx();if(!c)return;const len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*Math.pow(1-i/len,1.7);const src=c.createBufferSource(),f=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;f.type="lowpass";f.frequency.value=low;g.gain.value=v;src.connect(f);f.connect(g);g.connect(c.destination);activeSynthNodes.push(src);src.start()}
+function playSampleRaw(name,{volume=null,rate=1,loop=false}={}){if(!state.sound)return false;const base=samples[name];if(!base||audioState[name]==="failed")return false;try{const a=base.cloneNode(true);if(volume!==null)a.volume=volume;a.playbackRate=rate;a.loop=loop;activeSfxAudio=a;const p=a.play();if(p&&p.catch)p.catch(()=>{audioState[name]="failed";renderAudioStatus()});return true}catch(e){audioState[name]="failed";renderAudioStatus();return false}}
+function later(ms,token,fn){const id=setTimeout(()=>{sceneTimers=sceneTimers.filter(x=>x!==id);if(token===sceneToken)fn()},ms);sceneTimers.push(id)}
+function fallbackClick(){channelTone(360,.025,"square",.012);channelNoise(.018,.006)}
+function fallbackCash(){channelTone(880,.04,"square",.018);const t=sceneToken;later(55,t,()=>channelTone(1320,.04,"square",.014))}
+function fallbackGun(){channelNoise(.12,.075,1800);channelTone(95,.09,"sawtooth",.035,45)}
+function fallbackMsg(){channelTone(740,.045,"square",.018);const t=sceneToken;later(60,t,()=>channelTone(990,.05,"square",.015))}
+function fallbackWin(){channelTone(440,.10,"triangle",.026);const t=sceneToken;later(105,t,()=>channelTone(660,.12,"triangle",.026))}
+function fallbackEngine(){channelTone(72,.45,"sawtooth",.025,95)}
+function metalHit(){channelNoise(.08,.04,2400);channelTone(210,.10,"triangle",.02,120)}
+function knock(){channelTone(115,.055,"sine",.03);const t=sceneToken;later(100,t,()=>channelTone(115,.055,"sine",.03))}
+function glassBreak(){channelNoise(.18,.055,6500);channelTone(1800,.05,"square",.012)}
+function safeDial(){channelTone(720,.025,"square",.014);const t=sceneToken;later(85,t,()=>channelTone(890,.025,"square",.014));later(170,t,()=>channelTone(650,.025,"square",.014))}
+function phoneRing(){channelTone(680,.10,"square",.015);const t=sceneToken;later(130,t,()=>channelTone(890,.10,"square",.015))}
+function oneShot(name,opts,fallback){stopCurrentSfx();if(!playSampleRaw(name,opts))fallback?.()}
+function engineBurst(ms=650){oneShot("engine",{volume:.27,rate:.92,loop:true},fallbackEngine);const t=sceneToken;later(ms,t,stopCurrentSfx)}
+function runScene(steps){cancelSfxScene();if(!state.sound)return;const token=sceneToken;steps.forEach(([ms,fn])=>later(ms,token,()=>{stopCurrentSfx();fn()}))}
+const S={tap:()=>{cancelSfxScene();oneShot("click",{volume:.22,rate:1.06},fallbackClick)},ok:()=>{cancelSfxScene();oneShot("win",{volume:.28,rate:1.08},fallbackWin)},bad:()=>{cancelSfxScene();channelTone(150,.15,"sawtooth",.025,75);channelNoise(.09,.018,1200)},lvl:()=>{cancelSfxScene();oneShot("win",{volume:.38,rate:.92},fallbackWin)},cash:()=>{cancelSfxScene();oneShot("cash",{volume:.38},fallbackCash)},gun:()=>{cancelSfxScene();oneShot("gun",{volume:.32},fallbackGun)},reload:()=>{cancelSfxScene();oneShot("reload",{volume:.38},fallbackClick)},msg:()=>{cancelSfxScene();oneShot("message",{volume:.30},fallbackMsg)},siren:()=>{cancelSfxScene();oneShot("siren",{volume:.22},()=>channelTone(740,.3,"sine",.02,520))}};
+function playJobSound(job,success){
+ if(!state.sound)return;
+ if(!success){runScene(job.heat>=12?[[0,()=>oneShot("siren",{volume:.18},()=>channelTone(740,.3,"sine",.02,520))],[850,()=>{channelTone(145,.16,"sawtooth",.025,70);metalHit()}]]:[[0,()=>{channelTone(145,.16,"sawtooth",.025,70);metalHit()}]]);return}
+ const cash=()=>oneShot("cash",{volume:.36},fallbackCash),gun=()=>oneShot("gun",{volume:.30},fallbackGun),reload=()=>oneShot("reload",{volume:.32},fallbackClick),win=()=>oneShot("win",{volume:.23},fallbackWin),siren=()=>oneShot("siren",{volume:.17},()=>channelTone(740,.25,"sine",.02,520));
+ const scenes={boost:[[0,()=>oneShot("click",{volume:.22,rate:.82},fallbackClick)],[190,()=>engineBurst(650)],[930,cash]],shake:[[0,knock],[240,metalHit],[510,cash]],truck:[[0,()=>engineBurst(520)],[610,gun],[900,()=>engineBurst(500)]],bookie:[[0,phoneRing],[310,knock],[620,cash]],warehouse:[[0,metalHit],[290,gun],[620,metalHit]],union:[[0,phoneRing],[320,knock],[650,win]],casino:[[0,cash],[290,glassBreak],[620,cash]],vault:[[0,safeDial],[380,metalHit],[720,cash]],bank:[[0,safeDial],[380,metalHit],[710,cash],[1030,siren]],shipment:[[0,()=>engineBurst(470)],[560,gun],[850,metalHit]],judge:[[0,phoneRing],[340,cash],[650,()=>oneShot("message",{volume:.27},fallbackMsg)]],convoy:[[0,()=>engineBurst(450)],[540,reload],[790,gun],[1100,siren]],family:[[0,reload],[300,gun],[590,gun],[900,win]]};
+ runScene(scenes[job.id]||[[0,win]])
+}
+
+function kick(delay=0){const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(145,t);o.frequency.exponentialRampToValueAtTime(43,t+.12);g.gain.setValueAtTime(.13,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.2)}
+function hat(delay=0,open=false){noise(open?.11:.025,open?.017:.012,delay,9000)}
+function snare(delay=0){noise(.09,.04,delay,4200);tone(185,.055,"triangle",.015,delay)}
+function bass(note,delay=0,d=.18){const c=ctx();if(!c)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.value=note;g.gain.setValueAtTime(.055,t);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+d+.02)}
+function themeBeat(){
+ if(!themeOn)return;
+ const bpm=138,beat=60/bpm,step=beat/4,base=[43.65,43.65,51.91,38.89],root=base[Math.floor(themeStep/16)%base.length];
+ for(let i=0;i<16;i++){const d=i*step;hat(d,i===7||i===15);if(i===0||i===7||i===10)kick(d);if(i===4||i===12)snare(d);if([0,3,7,10,14].includes(i))bass(root,d,step*2.7)}
+ themeStep+=16;themeTimer=setTimeout(themeBeat,beat*4*1000-35)
+}
+function toggleTheme(){
+ themeOn=!themeOn;ctx();
+ if(themeOn){
+   if(audioState.theme!=="failed"){
+     const p=externalTheme.play();
+     if(p&&p.catch)p.catch(()=>{audioState.theme="failed";renderAudioStatus();themeStep=0;themeBeat()});
+   }else{themeStep=0;themeBeat()}
+ }else{
+   externalTheme.pause();clearTimeout(themeTimer);themeTimer=null
+ }
+ const b=document.getElementById("musicBtn");if(b)b.textContent=themeOn?"■ THEME":"▶ THEME"
+}
+async function tryAutoTheme(){
+  if(themeOn)return;
+  themeOn=true;
+  ctx();
+  try{
+    if(audioState.theme!=="failed"){
+      await externalTheme.play();
+    }else{
+      themeStep=0;
+      themeBeat();
+    }
+  }catch(e){
+    // Most mobile browsers block autoplay with sound. Keep the intent armed
+    // and start it on the first user gesture.
+    themeOn=false;
+    const startOnGesture=async()=>{
+      document.removeEventListener("pointerdown",startOnGesture,true);
+      document.removeEventListener("touchstart",startOnGesture,true);
+      if(themeOn)return;
+      themeOn=true;
+      try{
+        if(audioState.theme!=="failed")await externalTheme.play();
+        else{themeStep=0;themeBeat()}
+      }catch(err){
+        if(!themeTimer){themeStep=0;themeBeat()}
+      }
+      const b=document.getElementById("musicBtn");
+      if(b)b.textContent="■ THEME";
+    };
+    document.addEventListener("pointerdown",startOnGesture,true);
+    document.addEventListener("touchstart",startOnGesture,true);
+  }
+  const b=document.getElementById("musicBtn");
+  if(b)b.textContent=themeOn?"■ THEME":"▶ THEME";
+}
+
+function toggleSound(){state.sound=!state.sound;save();const e=document.getElementById("sfxState");if(e)e.textContent=state.sound?"ON":"OFF"}
+
+function renderAudioStatus(){
+ const list=document.getElementById("audioStatusList"),text=document.getElementById("audioStatusText");
+ if(!list||!text)return;
+ const names=["theme","click","message","cash","gun","reload","siren","win","engine"];
+ const ready=names.filter(n=>audioState[n]==="ready").length;
+ const failed=names.filter(n=>audioState[n]==="failed").length;
+ text.textContent=`External audio: ${ready}/${names.length} ready${failed?` · ${failed} using fallback`:""}`;
+ list.innerHTML=names.map(n=>`${audioState[n]==="ready"?"✓":audioState[n]==="failed"?"×":"…"} ${n.toUpperCase()}`).join(" · ");
+}
+async function testAudioPack(){
+ state.sound=true;save();
+ const seq=[["click",350],["cash",550],["message",500],["reload",650],["gun",850],["engine",850],["win",700],["siren",900]];
+ for(const [n,wait] of seq){cancelSfxScene();if(n==="engine")runScene([[0,()=>engineBurst(600)]]);else oneShot(n,{volume:n==="siren"?.18:.28},fallbackClick);await new Promise(r=>setTimeout(r,wait))}
+ cancelSfxScene();renderAudioStatus()
+}
+setTimeout(renderAudioStatus,500);
+
+
+const cities=[
+ {id:"east",name:"East Harbor",level:1,sub:"Docks, back rooms, warehouses, and people who can be bought."},
+ {id:"downtown",name:"Downtown",level:12,sub:"Nightclubs, judges, money, and rivals with deeper pockets."},
+ {id:"north",name:"Northside",level:24,sub:"Old families, armored routes, and territory worth killing over."}
+];
+const tiers=[
+ {name:"Street Thug",level:1,boss:"Marlon Pike"},{name:"Associate",level:5,boss:"Victor Marrow"},
+ {name:"Soldier",level:10,boss:"Rosa Bellini"},{name:"Enforcer",level:16,boss:"The Dockmaster"},
+ {name:"Hitman",level:23,boss:"Anton Varga"},{name:"Capo",level:31,boss:"Dominic Vale"}
+];
+const jobDefs=[
+ {id:"boost",tier:0,city:"east",name:"Boost a Parked Car",energy:3,cash:[110,180],xp:8,crew:1,heat:2,risk:8,role:"Driver",img:"car",req:{},loot:["Burner Phone","Stolen Plate"]},
+ {id:"shake",tier:0,city:"east",name:"Shake Down a Corner Store",energy:4,cash:[160,240],xp:10,crew:2,heat:3,risk:10,role:"Enforcer",img:"suit",req:{pistol:1},loot:["Old Ledger"]},
+ {id:"truck",tier:0,city:"east",name:"Hijack a Delivery Truck",energy:6,cash:[280,420],xp:16,crew:3,heat:5,risk:14,role:"Driver",img:"warehouse",req:{pistol:2,sedan:1},loot:["Dock Manifest"]},
+ {id:"bookie",tier:1,city:"east",name:"Collect from a Bookmaker",energy:7,cash:[450,650],xp:20,crew:4,heat:5,risk:15,role:"Collector",img:"suit",req:{pistol:3,vest:2},loot:["Marked Dice"]},
+ {id:"warehouse",tier:1,city:"east",name:"Raid a Harbor Warehouse",energy:9,cash:[650,930],xp:28,crew:6,heat:8,risk:20,role:"Smuggler",img:"warehouse",req:{smg:1,sedan:2},loot:["Customs Seal","Crate Key"]},
+ {id:"union",tier:1,city:"east",name:"Pressure a Union Foreman",energy:10,cash:[780,1150],xp:32,crew:8,heat:7,risk:18,role:"Fixer",img:"docks",req:{smg:2,vest:4},loot:["Union Card"]},
+ {id:"casino",tier:2,city:"downtown",name:"Rig a Private Casino",energy:12,cash:[1200,1650],xp:40,crew:10,heat:10,risk:23,role:"Fixer",img:"club",req:{smg:4,sedan:4},loot:["Loaded Deck","VIP Ledger"]},
+ {id:"vault",tier:2,city:"downtown",name:"Crack a Counting Room",energy:15,cash:[1750,2500],xp:52,crew:12,heat:12,risk:27,role:"Safecracker",img:"club",req:{rifle:2,vest:8},loot:["Brass Key"]},
+ {id:"shipment",tier:2,city:"downtown",name:"Take a Contraband Shipment",energy:17,cash:[2200,3200],xp:60,crew:15,heat:14,risk:30,role:"Smuggler",img:"warehouse",req:{rifle:4,armored:2},loot:["Black Seal"]},
+ {id:"judge",tier:3,city:"downtown",name:"Compromise a City Judge",energy:20,cash:[3400,4700],xp:75,crew:18,heat:13,risk:26,role:"Fixer",img:"skyline",req:{rifle:7,armored:4},loot:["Court Docket"]},
+ {id:"convoy",tier:3,city:"north",name:"Hit an Armored Convoy",energy:23,cash:[4600,6400],xp:88,crew:22,heat:18,risk:38,role:"Driver",img:"car",req:{rifle:10,armored:6},loot:["Security Badge","Route Schedule"]},
+ {id:"family",tier:4,city:"north",name:"Break a Rival Family's Supply Line",energy:26,cash:[6200,8500],xp:110,crew:28,heat:20,risk:42,role:"Strategist",img:"docks",req:{rifle:14,armored:10,plates:12},loot:["Family Ledger"]},
+ {id:"bank",tier:4,city:"north",name:"Take the Reserve Vault",energy:30,cash:[8500,12000],xp:135,crew:34,heat:24,risk:48,role:"Safecracker",img:"skyline",req:{rifle:20,armored:14,plates:18},loot:["Reserve Bond"]}
+];
+const gearDefs=[
+ {id:"pistol",name:"Cheap Pistol",type:"attack",power:2,cost:220,upkeep:1,level:1,img:"gun"},
+ {id:"vest",name:"Kevlar Vest",type:"defense",power:2,cost:300,upkeep:1,level:2,img:"suit"},
+ {id:"sedan",name:"Getaway Sedan",type:"vehicle",power:2,cost:480,upkeep:2,level:3,img:"car"},
+ {id:"smg",name:"Submachine Gun",type:"attack",power:5,cost:900,upkeep:3,level:5,img:"gun"},
+ {id:"rifle",name:"Custom Rifle",type:"attack",power:9,cost:1800,upkeep:6,level:10,img:"gun"},
+ {id:"armored",name:"Armored Car",type:"vehicle",power:8,cost:2600,upkeep:10,level:12,img:"car"},
+ {id:"plates",name:"Ballistic Plates",type:"defense",power:8,cost:2100,upkeep:5,level:12,img:"suit"}
+];
+const propDefs=[
+ {id:"garage",name:"Back-Alley Garage",city:"east",cost:700,income:55,upkeep:8,level:1,img:"warehouse"},
+ {id:"bar",name:"Neighborhood Bar",city:"east",cost:1600,income:130,upkeep:20,level:3,img:"club"},
+ {id:"laundry",name:"Laundry Front",city:"east",cost:3900,income:320,upkeep:55,level:6,img:"warehouse"},
+ {id:"club",name:"Nightclub",city:"downtown",cost:9000,income:760,upkeep:120,level:10,img:"club"},
+ {id:"hotel",name:"Boutique Hotel",city:"downtown",cost:22000,income:1850,upkeep:300,level:16,img:"hotel"},
+ {id:"terminal",name:"Freight Terminal",city:"north",cost:48000,income:3900,upkeep:700,level:24,img:"docks"}
+];
+const territoryDefs=[
+ {id:"dock9",name:"Dock 9",city:"east",reqNot:0,income:120,enemy:"Harbor Kings"},
+ {id:"market",name:"Old Market",city:"east",reqNot:40,income:240,enemy:"Rossi Crew"},
+ {id:"river",name:"River Ward",city:"east",reqNot:80,income:420,enemy:"Harbor Kings"},
+ {id:"clubrow",name:"Club Row",city:"downtown",reqNot:130,income:700,enemy:"Bellini Family"},
+ {id:"civic",name:"Civic Center",city:"downtown",reqNot:190,income:1100,enemy:"Bellini Family"},
+ {id:"northyard",name:"North Freight Yard",city:"north",reqNot:260,income:1600,enemy:"Varga Syndicate"}
+];
+const factions=[
+ {id:"harbor",name:"Harbor Kings",city:"east",strength:55},{id:"rossi",name:"Rossi Crew",city:"east",strength:75},
+ {id:"bellini",name:"Bellini Family",city:"downtown",strength:120},{id:"varga",name:"Varga Syndicate",city:"north",strength:190}
+];
+const friendDefs=[
+ {id:"jenny",name:"Jenny Sparks",av:"JS",tag:"Reliable. Knows everyone.",role:"Fixer",base:82,join:.9,help:.85,temper:.15,agenda:"Protect Lisa",rival:"chad"},
+ {id:"mike",name:"Mike D.",av:"MD",tag:"Driver. Never early.",role:"Driver",base:68,join:.72,help:.68,temper:.25,agenda:"Needs cash",rival:"ash"},
+ {id:"ash",name:"Ashley Cross",av:"AC",tag:"Social access. Complicated loyalties.",role:"Socialite",base:54,join:.45,help:.5,temper:.55,agenda:"Wants status",rival:"mike"},
+ {id:"trev",name:"Trevor Hale",av:"TH",tag:"Always knows a guy.",role:"Smuggler",base:61,join:.62,help:.55,temper:.42,agenda:"Avoids debt",rival:"chad"},
+ {id:"lisa",name:"Lisa Marie",av:"LM",tag:"Quiet, loyal, remembers everything.",role:"Accountant",base:76,join:.8,help:.74,temper:.18,agenda:"Protect Jenny",rival:"ash"},
+ {id:"chad",name:"Chad Rourke",av:"CR",tag:"Violent. Useful. Difficult.",role:"Enforcer",base:35,join:.3,help:.3,temper:.72,agenda:"Wants respect",rival:"jenny"},
+ {id:"tom",name:"Tom Mercer",av:"TM",tag:"Connected. Nobody knows how.",role:"Fixer",base:90,join:.95,help:.94,temper:.05,agenda:"Expands network",rival:""},
+ {id:"kev",name:"Kevin Ward",av:"KW",tag:"Always online. Always informed.",role:"Scout",base:58,join:.6,help:.62,temper:.35,agenda:"Collects secrets",rival:"trev"}
+];
+const potentialDefs=[
+ {id:"maya",name:"Maya Vale",av:"MV",tag:"Mutual contacts: Jenny, Lisa",role:"Strategist",base:48,join:.6,help:.52,temper:.22},
+ {id:"rico",name:"Rico Santos",av:"RS",tag:"Three mutual contacts",role:"Collector",base:44,join:.66,help:.47,temper:.34},
+ {id:"amber",name:"Amber Rosewood",av:"AR",tag:"Connected to Ashley",role:"Socialite",base:51,join:.44,help:.61,temper:.18},
+ {id:"derek",name:"Derek Voss",av:"DV",tag:"Recommended by Mike",role:"Driver",base:39,join:.72,help:.39,temper:.29},
+ {id:"nia",name:"Nia Black",av:"NB",tag:"Two mutual contacts",role:"Safecracker",base:46,join:.52,help:.55,temper:.31},
+ {id:"bobby",name:"Bobby Bags",av:"BB",tag:"Trevor knows him",role:"Smuggler",base:33,join:.78,help:.35,temper:.48}
+];
+const genericReplies=["Understood.","Maybe.","What do you need?","That depends.","I hear you.","Fair enough."];
+const helpReplies=["Sent. Use it well.","I can help this time.","Done. You owe me one.","I sent what I could."];
+const meanReplies=["You are asking too much of me.","Handle this one yourself.","You only call when you need something.","Do not make a habit of this."];
+const joinReplies=["I am in.","You have my support.","Count me in.","I will stand with you."];
+const refuseReplies=["Not yet.","I am not ready to commit.","I will stay independent for now.","No."];
+
+function fresh(){
+ const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
+ const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
+ const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
+ return {level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
+ factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
+ currentCity:"east",lastTick:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ log:["You came to East Harbor with $700, eight contacts, and no territory."]};
+}
+let state=load();migrate();
+function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
+function migrate(){if(!state.friends)state=fresh();if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state))}
+function xpNeed(){return 100+(state.level-1)*65}
+function activeTier(){let t=0;tiers.forEach((x,i)=>{if(state.level>=x.level)t=i});return t}
+function cityDef(){return cities.find(c=>c.id===state.currentCity)||cities[0]}
+function crewIds(){return Object.keys(state.friends).filter(id=>state.friends[id].crew)}
+function crewSize(){return crewIds().length+1}
+function availableCrew(){return crewIds().filter(id=>state.friends[id].injuredUntil<now()&&state.friends[id].arrestedUntil<now())}
+function roleCount(role){return availableCrew().filter(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);return d?.role===role}).length}
+function gearQty(id){return state.gear[id]||0}
+function gearUpkeep(){return gearDefs.reduce((n,g)=>n+gearQty(g.id)*g.upkeep,0)}
+function propertyIncome(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.income,0)}
+function propertyUpkeep(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.upkeep,0)}
+function territoryIncome(){return territoryDefs.reduce((n,t)=>n+(state.territory[t.id]?.owned?t.income:0),0)}
+function netIncome(){return propertyIncome()+territoryIncome()-propertyUpkeep()-gearUpkeep()}
+function jobState(id){if(!state.jobs[id])state.jobs[id]={runs:0,mastery:0};return state.jobs[id]}
+function log(x){state.log.unshift(new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})+" — "+x);state.log=state.log.slice(0,50)}
+function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)}
+function addXp(n){state.xp+=n;while(state.xp>=xpNeed()){state.xp-=xpNeed();state.level++;state.skill+=5;state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;state.notoriety+=10;log(`Level ${state.level}. Five skill points awarded.`);S.lvl()}}
+function crewRoleBonus(role){return roleCount(role)>0?8:0}
+function gearPower(kind){const slots=availableCrew().length+1,list=[];gearDefs.forEach(g=>{if(g.type===kind||(kind==="attack"&&g.type==="vehicle"))for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});list.sort((a,b)=>b-a);return list.slice(0,slots).reduce((a,b)=>a+b,0)}
+function combatPower(kind){return (kind==="attack"?state.attack:state.defense)+gearPower(kind)+(availableCrew().length+1)*2+Math.floor(state.notoriety/20)}
+function heatLabel(){return state.heat<20?"Low":state.heat<45?"Watched":state.heat<70?"High":"Critical"}
+function spendSkill(k){if(state.skill<1)return toast("No skill points.");state.skill--;if(k==="attack")state.attack++;if(k==="defense")state.defense++;if(k==="energy"){state.maxEn+=2;state.en+=2}if(k==="health"){state.maxHp+=5;state.hp+=5}if(k==="stamina"){state.maxSt++;state.st++}S.tap();save();render()}
+function reqMissing(j){const m=[];if(crewSize()<j.crew)m.push(`${j.crew} crew`);Object.entries(j.req).forEach(([id,q])=>{if(gearQty(id)<q)m.push(`${q} ${gearDefs.find(g=>g.id===id).name}`)});if(cities.find(c=>c.id===j.city).level>state.level)m.push(`LVL ${cities.find(c=>c.id===j.city).level}`);return m}
+function jobChance(j){let chance=92-j.risk-state.heat*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30);return Math.max(30,Math.min(97,Math.round(chance)))}
+let jobBusy=false;
+function showJobResult(success,title,detail){const el=document.getElementById("jobResult");if(!el)return;el.className="job-result show "+(success?"good":"bad");el.innerHTML=`<b>${title}</b><div class="detail">${detail}</div>`;clearTimeout(window._jr);window._jr=setTimeout(()=>el.classList.remove("show"),4200)}
+function setJobBusy(id,on){jobBusy=on;const c=document.getElementById("job-"+id);if(c)c.classList.toggle("busy",on)}
+function doJob(id){
+ if(jobBusy)return;
+ const j=jobDefs.find(x=>x.id===id),miss=reqMissing(j);if(miss.length)return toast("Missing: "+miss.join(", "));
+ if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
+ setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);const chance=jobChance(j),success=rnd(1,100)<=chance,js=jobState(id);
+ if(success){
+   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);state.cash+=c;js.runs++;state.notoriety+=2;
+   if(js.runs>=5){js.runs=0;if(js.mastery<3){js.mastery++;state.skill++;state.notoriety+=5;log(`${j.name} mastery advanced to ${js.mastery}/3. +1 skill point.`)}}
+   if(Math.random()<.20){const item=j.loot[rnd(0,j.loot.length-1)];state.loot[item]=(state.loot[item]||0)+1;log(`Recovered rare item: ${item}.`)}
+   addXp(j.xp);log(`${j.name} completed. Earned ${money(c)} and ${j.xp} XP.`);showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${j.xp} XP`);playJobSound(j,true)
+ }else{
+   const loss=Math.min(state.cash,rnd(80,220)+state.level*15);state.cash-=loss;state.hp=Math.max(1,state.hp-rnd(5,14));log(`${j.name} failed. Lost ${money(loss)} and drew attention.`);showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · Heat increased`);playJobSound(j,false);
+   if(Math.random()<.35)injureRandomCrew();
+   if(state.heat>65&&Math.random()<.25)arrestRandomCrew();
+ }
+ save();render();maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),950)
+}
+function injureRandomCrew(){const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);state.friends[id].injuredUntil=now()+rnd(5,12)*60000;log(`${d.name} was injured and is temporarily unavailable.`)}
+function arrestRandomCrew(){S.siren();const ids=availableCrew();if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);state.friends[id].arrestedUntil=now()+rnd(8,16)*60000;state.cash=Math.max(0,state.cash-300);log(`${d.name} was arrested. Legal costs: $300.`)}
+function bossDef(t){return 35+t*32}
+function bossReady(t){const relevant=jobDefs.filter(j=>j.tier===t);return relevant.length&&relevant.every(j=>jobState(j.id).mastery>=1)}
+
+
+function genOpponent(i,hit=false){
+ const names=["Ricky Vale","Mara Knox","Joey C.","Vince North","Dani Graves","Frankie Six","Sal Moreno","Nina Black"];
+ const level=Math.max(1,state.level-2+i);
+ const crew=Math.max(1,Math.min(40,level+rnd(-2,5)));
+ return {
+   name:names[(i+state.level)%names.length],
+   level,
+   crew,
+   power:8+level*3+crew*2+rnd(-5,8),
+   cash:220+level*140,
+   bounty:hit?1000+level*450:0
+ };
+}
+
+function fight(i,hit=false,revengeId=null){
+ if(state.st<1)return toast("Not enough stamina.");
+ if(state.hp<10)return toast("Health too low.");
+ state.st--;
+ runScene([[0,()=>oneShot("reload",{volume:.32},fallbackClick)],[260,()=>oneShot("gun",{volume:.33},fallbackGun)]]);
+ const o=revengeId
+   ? state.revenge.find(x=>x.id===revengeId)
+   : genOpponent(i,hit);
+
+ if(!o)return;
+
+ const p=combatPower("attack")+rnd(1,20);
+ const e=o.power+rnd(1,20);
+
+ if(p>=e){
+   const c=rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0);
+   state.cash+=c;
+   state.wins++;
+   state.notoriety+=2;
+   state.hp=Math.max(1,state.hp-rnd(2,9));
+   addXp(10+o.level*2);
+   log(`Defeated ${o.name}. Took ${money(c)}.`);
+   if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
+ }else{
+   const loss=Math.min(state.cash,rnd(80,180)+o.level*20);
+   state.cash-=loss;
+   state.losses++;
+   state.hp=Math.max(1,state.hp-rnd(7,17));
+   log(`Lost to ${o.name}. Lost ${money(loss)}.`);
+ }
+ save();
+ render();
+}
+
+function fightBoss(t){
+ if(!bossReady(t))return toast("Master every job in this rank at least once.");
+ if(state.st<3)return toast("Boss operations cost 3 stamina.");
+ state.st-=3;const power=combatPower("attack")+combatPower("defense")+rnd(1,30),enemy=bossDef(t)+rnd(1,30),name=tiers[t].boss;
+ if(power>=enemy){state.bosses[t]=true;state.cash+=1800*(t+1);state.notoriety+=25;addXp(120+50*t);state.heat=Math.min(100,state.heat+12);log(`${name} was defeated. Your organization controls the rank.`);S.ok()}
+ else{state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900));log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew()}
+ save();render()
+}
+function buyGear(id){const g=gearDefs.find(x=>x.id===id);if(!g)return toast("Equipment unavailable.");if(state.level<g.level)return toast(`Unlocks at level ${g.level}.`);if(state.cash<g.cost)return toast("Not enough cash.");state.cash-=g.cost;state.gear[id]=gearQty(id)+1;S.cash();save();render()}
+function buyProp(id){const p=propDefs.find(x=>x.id===id);if(!p)return toast("Property unavailable.");const q=state.props[id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));if(state.level<p.level)return toast(`Unlocks at level ${p.level}.`);if(state.cash<c)return toast("Not enough cash.");state.cash-=c;state.props[id]=q+1;state.notoriety+=2;S.cash();save();render()}
+function takeTerritory(id){
+ const t=territoryDefs.find(x=>x.id===id);
+ if(!t)return toast("Territory unavailable.");
+ if(!state.territory[id])state.territory[id]={owned:false,progress:0};
+ const ts=state.territory[id];
+ if(state.notoriety<t.reqNot)return toast("Not enough notoriety.");
+ if(state.st<2)return toast("Territory moves cost 2 stamina.");
+ const enemy=factions.find(f=>f.name===t.enemy);
+ if(!enemy)return toast("Rival faction unavailable.");
+ state.st-=2;
+ const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
+ if(p>=e){ts.progress+=35;state.heat=Math.min(100,state.heat+8);if(ts.progress>=100){ts.owned=true;ts.progress=100;state.notoriety+=18;log(`You took control of ${t.name}.`)}else log(`You weakened ${t.enemy}'s hold on ${t.name}.`);S.ok()}
+ else{state.hp=Math.max(1,state.hp-rnd(8,18));state.heat=Math.min(100,state.heat+5);log(`Your move on ${t.name} failed.`);S.bad()}
+ save();render()
+}
+function fstate(id){return state.friends[id]}
+function cooldown(last,min){return Math.max(0,min*60000-(now()-last))}
+function fmt(ms){if(ms<=0)return "";const s=Math.ceil(ms/1000);return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`}
+function changeRelationship(id,{trust=0,respect=0,fear=0,resentment=0,rel=0}={}){
+ const f=fstate(id);if(!f)return;f.trust=Math.max(0,Math.min(100,f.trust+trust));f.respect=Math.max(0,Math.min(100,f.respect+respect));f.fear=Math.max(0,Math.min(100,f.fear+fear));f.resentment=Math.max(0,Math.min(100,f.resentment+resentment));f.rel=Math.max(0,Math.min(100,f.rel+rel));
+}
+function doFavor(id){
+ const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(cooldown(f.lastFavor,10)>0)return;if(state.cash<100)return toast("Not enough cash.");
+ state.cash-=100;S.cash();f.lastFavor=now();changeRelationship(id,{trust:7,respect:3,resentment:-5,rel:6});f.response="I will remember that you came through.";log(`You did a favor for ${d.name}.`);S.ok();save();render()
+}
+function askEnergy(id){
+ const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(cooldown(f.lastAsk,8)>0)return;
+ f.lastAsk=now();const chance=Math.max(.08,Math.min(.96,(d.help||.5)+(f.trust-50)/160-(f.resentment/180)));
+ changeRelationship(id,{trust:-2,resentment:3,rel:-2});
+ if(Math.random()<chance){const g=rnd(3,7),actual=Math.min(g,state.maxEn-state.en);state.en+=actual;f.response=helpReplies[rnd(0,helpReplies.length-1)]+` (+${actual} energy)`;log(`${d.name} sent energy.`);S.ok()}
+ else{f.response=meanReplies[rnd(0,meanReplies.length-1)];changeRelationship(id,{resentment:3,rel:-2});S.bad()}
+ save();render()
+}
+function recruit(id){
+ const f=fstate(id),d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id);if(f.crew)return;if(cooldown(f.lastRecruit,12)>0)return;f.lastRecruit=now();
+ const chance=Math.max(.05,Math.min(.97,(d.join||.5)+(f.trust-50)/120+(f.respect-50)/180-(f.resentment/150)));
+ if(Math.random()<chance){f.crew=true;changeRelationship(id,{respect:4,rel:3});f.response=joinReplies[rnd(0,joinReplies.length-1)];state.notoriety+=3;log(`${d.name} joined your crew.`);S.ok()}
+ else{changeRelationship(id,{resentment:4,rel:-3});f.response=refuseReplies[rnd(0,refuseReplies.length-1)];S.bad()}
+ save();render()
+}
+function sendGift(id){
+ if(state.cash<250)return toast("Not enough cash for a gift.");state.cash-=250;S.cash();changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});fstate(id).gifts++;fstate(id).response="I received the package. Thank you.";log(`You sent a gift to ${nameOf(id)}.`);save();render();S.ok()
+}
+function nameOf(id){return (friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id))?.name||id}
+function addPotential(id){
+ const p=state.potentials[id],d=potentialDefs.find(x=>x.id===id);if(p.added)return;
+ const chance=.35+p.rel/160;if(Math.random()<chance){p.added=true;state.friends[id]={rel:p.rel,trust:p.rel,respect:45,fear:10,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"Good to have a direct line.",chat:p.chat||[],injuredUntil:0,arrestedUntil:0,gifts:0};log(`${d.name} accepted your contact request.`);S.ok()}
+ else{p.rel=Math.max(0,p.rel-2);toast("They have not accepted yet.");S.bad()}save();render()
+}
+function openChat(id,potential=false){activeChat={id,potential};const d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];if(!f.chat)f.chat=[];chatTitle.textContent=`Chat with ${d.name}`;renderChat();chatbox.classList.add("show")}
+function closeChat(){chatbox.classList.remove("show");activeChat=null}
+let activeChat=null;
+function renderChat(){
+ if(!activeChat)return;const {id,potential}=activeChat,d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];
+ chatLog.innerHTML=(f.chat||[]).length?f.chat.map(m=>`<div class="bubble ${m.me?"me":""}">${m.text}</div>`).join(""):`<div class="bubble">I heard your name through a mutual contact.</div>`;
+ const opts=[`<button onclick="chatAction('smalltalk')">Check in</button>`];
+ if(potential&&!f.added)opts.push(`<button onclick="chatAction('add')">Send contact request</button>`);
+ if(!potential||f.added){opts.push(`<button onclick="chatAction('recruit')">Ask them to join your crew</button>`);opts.push(`<button onclick="chatAction('energy')">Request help</button>`)}
+ chatOptions.innerHTML=opts.join("");setTimeout(()=>chatLog.scrollTop=chatLog.scrollHeight,0)
+}
+function chatAction(type){
+ const {id,potential}=activeChat,d=(potential?potentialDefs:friendDefs).find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=potential?state.potentials[id]:state.friends[id];f.chat=f.chat||[];
+ if(type==="smalltalk"){f.chat.push({me:true,text:"I wanted to check in."});f.chat.push({me:false,text:genericReplies[rnd(0,genericReplies.length-1)]});if(potential)f.rel=Math.min(100,f.rel+2);else changeRelationship(id,{trust:2,rel:2})}
+ if(type==="add"){f.chat.push({me:true,text:"We should stay in contact."});addPotential(id);f.chat.push({me:false,text:f.added?"Agreed. Keep this line open.":"Not yet."})}
+ if(type==="recruit"){f.chat.push({me:true,text:"I am building a crew. I want you in."});recruit(id);f.chat.push({me:false,text:fstate(id)?.crew?"I am in.":"Not yet."})}
+ if(type==="energy"){f.chat.push({me:true,text:"I need help keeping an operation moving. Can you assist?"});askEnergy(id);f.chat.push({me:false,text:fstate(id)?.response||"No response."})}
+ save();render();renderChat()
+}
+function socialConflict(id){
+ const d=friendDefs.find(x=>x.id===id);if(!d?.rival||!state.friends[d.rival])return;
+ if(Math.random()<.35){changeRelationship(d.rival,{resentment:3,trust:-2,rel:-2});log(`${nameOf(d.rival)} noticed your support for ${d.name}.`)}
+}
+function addInbox(x){if(x.type!=="attack")S.msg();x.id="i"+now()+Math.random().toString(16).slice(2);x.read=false;state.inbox.unshift(x);state.inbox=state.inbox.slice(0,25);save();renderInbox()}
+function unread(){return state.inbox.filter(x=>!x.read).length}
+function toggleInbox(){inboxPanel.classList.toggle("show");if(inboxPanel.classList.contains("show")){state.inbox.forEach(x=>x.read=true);save();renderInbox()}}
+function dismissInbox(id){state.inbox=state.inbox.filter(x=>x.id!==id);save();renderInbox()}
+function answerInbox(id,choice){
+ const x=state.inbox.find(y=>y.id===id);if(!x)return;
+ if(x.type==="favor"){
+   if(choice==="help"){const cost=x.amount||150;if(state.cash<cost)return toast("Not enough cash.");state.cash-=cost;changeRelationship(x.personId,{trust:8,respect:4,resentment:-4,rel:6});socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);S.ok()}
+   else{changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);S.bad()}
+ }
+ if(x.type==="backup"){
+   if(choice==="help"){if(state.st<1)return toast("Not enough stamina.");state.st--;changeRelationship(x.personId,{trust:7,respect:5,rel:5});state.notoriety+=2;socialConflict(x.personId);log(`You backed ${x.from} on a job.`);S.ok()}
+   else{changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`)}
+ }
+ if(x.type==="gift"){
+   if(choice==="accept"){state.en=Math.min(state.maxEn,state.en+5);state.loot[x.item]=(state.loot[x.item]||0)+1;log(`${x.from} sent you ${x.item}.`);S.ok()}
+ }
+ dismissInbox(id);render()
+}
+function acceptRequest(id){const x=state.inbox.find(y=>y.id===id);if(x?.personId)addPotential(x.personId);dismissInbox(id);render()}
+function maybeSocialEvent(){
+ if(now()-state.lastSocial<75000)return;state.lastSocial=now();const ids=Object.keys(state.friends),roll=Math.random();
+ if(roll<.55&&ids.length){
+   const id=ids[rnd(0,ids.length-1)],d=nameOf(id);
+   if(Math.random()<.55)addInbox({type:"favor",from:d,personId:id,amount:rnd(100,320),text:"I need money for something that cannot wait. Can you cover it?"});
+   else addInbox({type:"backup",from:d,personId:id,text:"I need backup on a situation. I would remember the favor."});
+   showSocial(`${d} needs something`,`Open your messages to respond.`);
+ }else{
+   const av=potentialDefs.filter(p=>!state.potentials[p.id].added);if(av.length){const p=av[rnd(0,av.length-1)];addInbox({type:"request",from:p.name,personId:p.id,text:"Sent you a contact request through mutual associates."});showSocial("New contact request",`${p.name} wants to connect.`)}
+ }
+ save()
+}
+function maybeGift(){
+ if(Math.random()>.15)return;const ids=Object.keys(state.friends).filter(id=>state.friends[id].trust>65);if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],item=["Energy Pack","Burner Phone","Cash Envelope"][rnd(0,2)];addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`})
+}
+function showSocial(title,text){socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;socialPop.classList.add("show")}
+function renderInbox(){
+ inboxCount.textContent=unread();
+ inboxCount.style.display=unread()?"flex":"none";
+ inboxItems.innerHTML=state.inbox.length?state.inbox.map(x=>{
+   let attackHtml="";
+   if(x.type==="attack"){
+     const a=state.pendingAttacks.find(y=>y.id===x.attackId&&!y.resolved);
+     if(a){
+       const left=Math.max(0,a.expires-now());
+       attackHtml=`<div class="attack-timer ${left<10000?"attack-danger":""}">RESPOND IN ${fmt(left)}</div>
+       <button class="btn red small" onclick="defendAttack('${a.id}')">DEFEND NOW</button>`;
+     }else{
+       attackHtml=`<div class="sub">Attack resolved.</div>`;
+     }
+   }
+   return `<div class="inbox-item ${x.type==="attack"?"attack-alert":""}"><b>${x.from}</b><p>${x.text}</p><div class="inbox-actions">
+   ${x.type==="favor"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">HELP</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">REFUSE</button>`:""}
+   ${x.type==="backup"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">BACK THEM</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">IGNORE</button>`:""}
+   ${x.type==="request"?`<button class="btn small" onclick="acceptRequest('${x.id}')">ACCEPT</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
+   ${x.type==="gift"?`<button class="btn small" onclick="answerInbox('${x.id}','accept')">ACCEPT GIFT</button>`:""}
+   ${attackHtml}</div></div>`;
+ }).join(""):"<div class='inbox-item'><p>No new messages.</p></div>"
+}
+function maybeIncomingAttack(){
+ if(now()-state.lastAttack<120000||Math.random()>.32)return;
+ state.lastAttack=now();
+ const o=genOpponent(rnd(1,4));
+ const attack={
+   id:"a"+now(),
+   name:o.name,
+   level:o.level,
+   crew:o.crew,
+   power:o.power,
+   cash:o.cash,
+   created:now(),
+   expires:now()+45000,
+   resolved:false
+ };
+ state.pendingAttacks.unshift(attack);
+ state.pendingAttacks=state.pendingAttacks.slice(0,6);
+ addInbox({
+   type:"attack",
+   from:"SECURITY ALERT",
+   attackId:attack.id,
+   text:`${o.name} is moving against your operation. You have 45 seconds to respond.`
+ });
+ S.siren();
+ showSocial("Your operation is under attack",`${o.name} is moving now. Respond before the window closes.`);
+ save();render()
+}
+
+function defendAttack(id){
+ const a=state.pendingAttacks.find(x=>x.id===id&&!x.resolved);
+ if(!a)return toast("This attack is no longer active.");
+ if(now()>a.expires){resolveExpiredAttack(a);return}
+ if(state.st<1)return toast("You need 1 stamina to defend.");
+ state.st--;
+ a.resolved=true;
+ stopSfxChannel();
+ if(!playSampleRaw("reload",{volume:.32}))fallbackClick();
+ scheduleSfx(260,()=>{stopSfxChannel();if(!playSampleRaw("gun",{volume:.33}))fallbackGun()});
+ const p=combatPower("defense")+rnd(1,20),e=a.power+rnd(1,20);
+ if(p>=e){
+   state.notoriety+=2;
+   log(`You defended against ${a.name}. They left empty-handed.`);
+   toast("Attack repelled.");
+ }else{
+   const loss=Math.min(state.cash,rnd(80,220)+a.level*20);
+   state.cash-=loss;
+   state.hp=Math.max(1,state.hp-rnd(5,14));
+   state.revenge.unshift({...a,id:"r"+now(),bounty:0});
+   state.revenge=state.revenge.slice(0,8);
+   log(`${a.name} broke through your defense and took ${money(loss)}.`);
+   toast("Defense failed.");
+ }
+ removeAttackMessage(id);
+ save();render()
+}
+
+function resolveExpiredAttack(a){
+ if(!a||a.resolved)return;
+ a.resolved=true;
+ const cashLoss=Math.min(state.cash,rnd(120,300)+a.level*25);
+ state.cash-=cashLoss;
+ let itemLoss="";
+ const ownedGear=gearDefs.filter(g=>gearQty(g.id)>0);
+ if(ownedGear.length&&Math.random()<.45){
+   const g=ownedGear[rnd(0,ownedGear.length-1)];
+   state.gear[g.id]=Math.max(0,gearQty(g.id)-1);
+   itemLoss=` and stole 1 ${g.name}`;
+ }
+ if(Math.random()<.35){
+   const ownedProps=propDefs.filter(p=>(state.props[p.id]||0)>0);
+   if(ownedProps.length){
+     const p=ownedProps[rnd(0,ownedProps.length-1)];
+     state.props[p.id]=Math.max(0,(state.props[p.id]||0)-1);
+     itemLoss+=`${itemLoss?", ":" and "}damaged your ${p.name}`;
+   }
+ }
+ state.revenge.unshift({...a,id:"r"+now(),bounty:0});
+ state.revenge=state.revenge.slice(0,8);
+ log(`${a.name} hit your operation while you did not respond. Lost ${money(cashLoss)}${itemLoss}.`);
+ S.bad();
+ removeAttackMessage(a.id);
+ save();render()
+}
+
+function removeAttackMessage(attackId){
+ state.inbox=state.inbox.filter(x=>x.attackId!==attackId);
+}
+
+function processPendingAttacks(){
+ const t=now();
+ state.pendingAttacks.forEach(a=>{if(!a.resolved&&t>a.expires)resolveExpiredAttack(a)});
+ state.pendingAttacks=state.pendingAttacks.filter(a=>!a.resolved||t-a.created<300000);
+ renderInbox();
+}
+
+function maybeHeatEvent(){
+ if(state.heat<60||Math.random()>.25)return;if(state.cash>=250){state.cash-=250;state.heat=Math.max(0,state.heat-12);log("You paid $250 in legal and cleanup costs to reduce pressure.")}else arrestRandomCrew()
+}
+function layLow(){if(state.cash<300)return toast("You need $300 to disappear for a while.");state.cash-=300;S.cash();state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);log("You laid low and reduced heat.");save();render()}
+function claimDaily(){
+ const today=new Date().toISOString().slice(0,10);if(state.daily.last===today)return;const y=new Date(Date.now()-86400000).toISOString().slice(0,10);state.daily.streak=state.daily.last===y?state.daily.streak+1:1;state.daily.last=today;const c=400+state.daily.streak*120;state.cash+=c;state.en=Math.min(state.maxEn,state.en+5);if(state.daily.streak%3===0)state.loot["Mystery Crate"]=(state.loot["Mystery Crate"]||0)+1;log(`Daily collection: ${money(c)} and +5 energy.`);save();render();S.ok()}
+function switchCity(id){const c=cities.find(x=>x.id===id);if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;save();render()}
+function openCheckout(){closeModal("energyModal");checkoutModal.classList.add("show")}
+function completeCheckout(){const num=moneyNumber.value.trim(),hrs=parseFloat(workHours.value);if(!num||Number.isNaN(hrs))return toast("Complete the fictional purchase form.");if(/[0-9]{12,}/.test(num.replace(/\D/g,"")))return toast("Use a fictional account number. Do not enter real financial information.");state.en=state.maxEn;log(`Energy acquired. Estimated labor cost: ${hrs} hours.`);moneyNumber.value="";workHours.value="";authorization.value="";closeModal("checkoutModal");save();render();S.ok();toast("Energy acquired.")}
+function closeModal(id){document.getElementById(id).classList.remove("show")}
+
+const tutorialSteps=[
+ ["Every operation has a cost.","Jobs consume energy and generate cash, experience, heat, mastery, and rare loot. High heat increases risk."],
+ ["Build your organization.","Recruit contacts into your crew. Roles such as Driver, Fixer, Smuggler, and Enforcer improve specific jobs."],
+ ["Trust determines loyalty.","Calling in favors strains relationships. Returning favors builds trust. Resentment can make contacts refuse you."],
+ ["Power attracts pressure.","Rivals attack, territory changes hands, and high heat can injure or arrest members of your crew."],
+ ["Expand your network.","Message potential associates, build rapport, recruit them, send gifts, and manage conflicts between people who dislike each other."],
+ ["Take territory.","Properties provide income. Territory provides influence and additional revenue, but rival factions resist you."],
+ ["Grow beyond East Harbor.","Higher levels unlock new cities, stronger factions, harder bosses, and larger operations."]
+];
+let tut=0;
+function startTutorial(){if(state.tutorialDone)return;tut=0;showTutorial()}
+function showTutorial(){tutorialStep.textContent=`STEP ${tut+1} OF ${tutorialSteps.length}`;tutorialTitle.textContent=tutorialSteps[tut][0];tutorialText.textContent=tutorialSteps[tut][1];tutorial.classList.add("show")}
+function nextTutorial(){tut++;if(tut>=tutorialSteps.length){state.tutorialDone=true;tutorial.classList.remove("show");save();toast("You are ready to begin.");return}showTutorial()}
+function skipTutorial(){state.tutorialDone=true;tutorial.classList.remove("show");save()}
+
+function renderEnergy(id){const el=document.getElementById(id);if(!el)return;if(state.en<=0)el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Contact your associates, wait for recovery, or acquire more energy.</p><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="energyModal.classList.add('show')">ACQUIRE ENERGY</button></div></div>`;else if(state.en<=Math.max(3,state.maxEn*.2))el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors now or wait for recovery.</p><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button></div>`;else el.innerHTML=""}
+function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";
+ lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
+ hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);
+ rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
+ const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
+ skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
+ document.getElementById("log").innerHTML=state.log.map(x=>`<div class="sub" style="padding:6px 0;border-bottom:1px solid #28221b">${x}</div>`).join("");
+ renderDaily();renderEvent();renderEnergy("energyHome");renderEnergy("energyJobs");
+ const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
+ renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
+}
+function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and periodic mystery crates.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
+function renderEvent(){const active=state.event.ends>now();eventBox.innerHTML=active?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmt(state.event.ends-now())}</div></div>`:""}
+function renderJobs(){
+ const t=activeTier();tierName.innerHTML=`${tiers[t].name} · <select onchange="switchCity(this.value)" style="background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
+ jobs.innerHTML=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity).map(j=>{const js=jobState(j.id),miss=reqMissing(j),pct=js.runs*20,ch=jobChance(j);return `<div class="card job-card" id="job-${j.id}"><img class="art" src="${IMG[j.img]}" alt=""><h3>${j.name}</h3><div class="meta"><span class="badge">⚡ ${j.energy}</span><span class="badge">⭐ ${j.xp}</span><span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span><span class="badge gold">${ch}% success</span></div><div class="role">Preferred role: ${j.role}</div><div class="sub">Mastery ${js.mastery}/3</div><div class="mastery"><div style="width:${pct}%"></div></div>${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}<p>Possible rare items: ${j.loot.join(", ")}</p><button class="btn" onclick="doJob('${j.id}')" ${miss.length?"disabled":""}>DO JOB</button></div>`}).join("")||`<div class="card"><p>No operations are available in this city at your current rank.</p></div>`;
+ const done=!!state.bosses[t];boss.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3>${tiers[t].boss}</h3><p>Control this rank by defeating the organization standing above you.</p><div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div><button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"CHALLENGE BOSS":"MASTER EACH JOB ONCE"}</button></div>`
+}
+function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
+function renderCrew(){
+ crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active`;
+ friends.innerHTML=Object.keys(state.friends).map(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><div class="avatar">${d.av}</div><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
+ potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><div class="avatar">${p.av}</div><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
+}
+function renderFight(){
+ const fightEl=document.getElementById("fightlist");
+ const revengeEl=document.getElementById("revenge");
+ const hitEl=document.getElementById("hitlist");
+ if(!fightEl||!revengeEl||!hitEl)return;
+
+ fightEl.innerHTML=[0,1,2,3,4].map(i=>{
+   const o=genOpponent(i);
+   return `<div class="row">
+     <div><div class="title">${o.name}</div><div class="sub">LVL ${o.level} · Crew ${o.crew} · Estimated power ${o.power}</div></div>
+     <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
+   </div>`;
+ }).join("");
+
+ revengeEl.innerHTML=state.revenge.length
+   ? state.revenge.map(o=>`<div class="row hit">
+       <div><div class="title">${o.name}</div><div class="sub">Attacked your operation · Estimated power ${o.power}</div></div>
+       <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
+     </div>`).join("")
+   : "<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
+
+ hitEl.innerHTML=[0,1,2].map(i=>{
+   const o=genOpponent(i+2,true);
+   return `<div class="row hit">
+     <div><div class="title">${o.name}</div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div></div>
+     <button class="btn red small" onclick="fight(${i+2},true)">CLAIM</button>
+   </div>`;
+ }).join("");
+}
+function renderGear(){
+ const upkeepEl=document.getElementById("upkeepLabel");
+ const gearEl=document.getElementById("gear");
+ if(!upkeepEl||!gearEl)return;
+
+ upkeepEl.textContent=`Gear upkeep ${money(gearUpkeep())}/hr`;
+ gearEl.innerHTML=gearDefs.map(g=>`
+   <div class="card">
+     <img class="art" src="${IMG[g.img]}" alt="">
+     <h3>${g.name}</h3>
+     <div class="meta">
+       <span class="badge">${g.type.toUpperCase()} +${g.power}</span>
+       <span class="badge">Owned ${gearQty(g.id)}</span>
+       <span class="badge">${money(g.cost)}</span>
+       <span class="badge red">Upkeep ${money(g.upkeep)}/hr</span>
+     </div>
+     <button class="btn" onclick="buyGear('${g.id}')" ${state.level<g.level||state.cash<g.cost?"disabled":""}>
+       ${state.level<g.level?"UNLOCK LVL "+g.level:"BUY ONE"}
+     </button>
+   </div>
+ `).join("");
+}
+function renderTerritory(){
+ const incomeEl=document.getElementById("income");
+ const factionsEl=document.getElementById("factions");
+ const propsEl=document.getElementById("props");
+ if(!incomeEl||!factionsEl||!propsEl)return;
+
+ incomeEl.textContent=`Net ${money(Math.max(0,netIncome()))}/hr`;
+
+ const factionRows=factions.map(f=>`
+   <div class="row">
+     <div>
+       <div class="title">${f.name}</div>
+       <div class="sub">${cities.find(c=>c.id===f.city).name} · Strength ${f.strength}</div>
+       <div class="factionbar"><div style="width:${Math.min(100,state.factions[f.id]||0)}%"></div></div>
+     </div>
+   </div>
+ `).join("");
+
+ const territoryRows=territoryDefs.map(t=>{
+   if(!state.territory[t.id])state.territory[t.id]={owned:false,progress:0};
+   const s=state.territory[t.id];
+   return `<div class="row territory ${s.owned?"owned":"enemy"}">
+     <div>
+       <div class="title">${t.name}</div>
+       <div class="sub">${cities.find(c=>c.id===t.city).name} · Rival: ${t.enemy} · Income ${money(t.income)}/hr · Requires ${t.reqNot} notoriety</div>
+       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div>`:""}
+     </div>
+     <button class="btn ${s.owned?"green":"red"} small"
+       onclick="takeTerritory('${t.id}')"
+       ${s.owned||state.notoriety<t.reqNot?"disabled":""}>
+       ${s.owned?"CONTROLLED":"TAKE TERRITORY"}
+     </button>
+   </div>`;
+ }).join("");
+
+ factionsEl.innerHTML=`
+   <div class="section-title"><h2>Rival Factions</h2><span>pressure and control</span></div>
+   ${factionRows}
+   <div class="section-title" style="margin-top:10px"><h2>Territory</h2><span>notoriety unlocks expansion</span></div>
+   ${territoryRows}
+ `;
+
+ propsEl.innerHTML=propDefs.map(p=>{
+   const q=state.props[p.id]||0;
+   const c=Math.floor(p.cost*Math.pow(1.22,q));
+   return `<div class="card">
+     <img class="art" src="${IMG[p.img]}" alt="">
+     <h3>${p.name}</h3>
+     <div class="meta">
+       <span class="badge">Owned ${q}</span>
+       <span class="badge">${money(p.income)}/hr</span>
+       <span class="badge red">Upkeep ${money(p.upkeep)}/hr</span>
+     </div>
+     <button class="btn green" onclick="buyProp('${p.id}')" ${state.level<p.level||state.cash<c?"disabled":""}>
+       BUY ${money(c)}
+     </button>
+   </div>`;
+ }).join("");
+}
+function renderProfile(){
+ profile.innerHTML=[["Rank",tiers[activeTier()].name],["Notoriety",Math.floor(state.notoriety)],["Crew",crewSize()],["Active Crew",availableCrew().length+1],["Fight Record",`${state.wins}W / ${state.losses}L`],["Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["Net Income",money(netIncome())+"/hr"],["Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]].map(x=>`<div class="card">${x[0]}<strong>${x[1]}</strong></div>`).join("");
+ collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>`<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`).join(""):"<p class='sub'>No rare items recovered yet.</p>";
+ const a=[["Reach Level 5",state.level>=5],["Recruit 10 Crew Members",crewSize()>=10],["Win 25 Fights",state.wins>=25],["Fully Master a Job",Object.values(state.jobs).some(j=>j.mastery>=3)],["Control 3 Territories",Object.values(state.territory).filter(x=>x.owned).length>=3],["Reach 200 Notoriety",state.notoriety>=200],["Keep 5 Contacts Above 80 Trust",Object.values(state.friends).filter(f=>f.trust>=80).length>=5]];
+ ach.innerHTML=a.map(x=>`<div class="row"><div>${x[1]?"✅":"⬜"} ${x[0]}</div></div>`).join("")
+}
+function tick(){
+ const t=now(),d=t-state.lastTick,eg=Math.floor(d/60000),sg=Math.floor(d/180000),hg=Math.floor(d/90000);
+ if(eg)state.en=Math.min(state.maxEn,state.en+eg);if(sg)state.st=Math.min(state.maxSt,state.st+sg);if(hg)state.hp=Math.min(state.maxHp,state.hp+hg);if(eg||sg||hg)state.lastTick=t;
+ if(state.heat>0){const cool=Math.floor(d/300000);if(cool)state.heat=Math.max(0,state.heat-cool)}
+ const hrs=(t-state.lastIncome)/3600000;if(hrs>=1/60){state.cash+=Math.max(0,netIncome())*hrs;state.lastIncome=t}
+ if(t-state.lastUpkeep>3600000&&netIncome()<0){state.cash=Math.max(0,state.cash+netIncome());state.lastUpkeep=t;log("Upkeep exceeded income. Cash reserves were used.")}
+ save();render();maybeSocialEvent();maybeGift();maybeIncomingAttack()
+}
+function go(v){const target=document.getElementById("view-"+v);if(!target)return;document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.v===v));window.scrollTo({top:0,behavior:"auto"});S.tap()}
+function exportSave(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(state))));navigator.clipboard?.writeText(d).then(()=>toast("Save copied")).catch(()=>prompt("Copy save:",d))}
+function importSave(){const d=prompt("Paste save code:");if(!d)return;try{state=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(d)))));migrate();save();render();toast("Imported")}catch(e){toast("Invalid save")}}
+function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem(KEY);state=fresh();save();render();setTimeout(startTutorial,250)}}
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
+document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style.display="none"},true);
+document.addEventListener("click",e=>{
+ const b=e.target.closest("button");if(!b)return;
+ const action=b.getAttribute("onclick")||"";
+ const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|completeCheckout|testAudioPack|toggleTheme|toggleSound/.test(action);
+ if(!hasOwnSound)S.tap();
+});
+setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
+setInterval(tick,15000);setInterval(processPendingAttacks,1000);tick();setTimeout(startTutorial,350);setTimeout(tryAutoTheme,500);
+
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden && themeOn){externalTheme.pause();}
+  else if(!document.hidden && themeOn && audioState.theme!=="failed"){
+    externalTheme.play().catch(()=>{audioState.theme="failed";renderAudioStatus()});
+  }
+});
+
+</script>
+</body>
+</html>
