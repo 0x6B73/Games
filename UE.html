@@ -1331,6 +1331,13 @@ body:after{
 .boss-requirements{clear:both;margin:6px 0;display:grid;gap:2px}
 .boss-requirement{padding:4px 5px;border:1px solid #3e3029;background:#100b09;color:#bd8173;font-size:8px}
 .boss-requirement.met{border-color:#354b2b;background:#0b1009;color:#8fb474}
+
+/* HOME BANNER CLEANUP */
+.home-intro{margin-top:0!important}
+.home-intro .copy{padding:8px 10px!important}
+.home-intro h1{margin:0 0 3px!important;font-size:14px!important}
+.home-intro p{margin:0!important;font-size:9px!important;line-height:1.35!important}
+
 </style>
 </head>
 <body>
@@ -1381,8 +1388,7 @@ body:after{
 <main class="main">
 <section id="view-home" class="view active">
  <div class="tab-banner" data-banner="CRIMINAL EMPIRE"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-home.png" alt="Criminal Empire banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div class="hero">
-  <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
+ <div class="hero home-intro">
   <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
  </div>
  <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;background:linear-gradient(#d8d8d8,#8d8d8d);border:1px solid #111;color:#111;padding:4px 7px;margin-bottom:4px;font-weight:900;font-size:11px">
@@ -1773,7 +1779,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.19.2";
+const BUILD_NUMBER="0.19.3";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
