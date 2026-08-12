@@ -29,7 +29,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:5px 0 8px}.section-title h2{font-family:Georgia,serif;font-size:18px;margin:0}.section-title span{font-size:10px;color:var(--muted);text-align:right;max-width:48%}
 .grid{display:grid;gap:8px}.cards{grid-template-columns:1fr}.card{background:var(--panel);border:1px solid var(--line);padding:10px;overflow:hidden;box-shadow:0 8px 20px #0005}.card h3{margin:0 0 5px;font-size:15px}.card p{font-size:11px;color:var(--muted);line-height:1.45}.art{width:calc(100% + 20px);height:105px;object-fit:cover;margin:-10px -10px 8px;display:block;border-bottom:1px solid #2f281f;filter:saturate(.55) contrast(1.07) brightness(.72)}
 
-:root{--ue-sprite-sheet:url("./Assets/ue-icon-sprite.png");--ue-sprite-sheet-2:url("./Assets/ue-icon-sprite-2.png");}
+:root{--ue-sprite-sheet:url("./Assets/ue-icon-sprite.png");--ue-sprite-sheet-2:url("./Assets/ue-icon-sprite-2.png");--ue-nav-sprite:url("./Assets/ue-nav-sprite.png");}
 .ue-sprite{display:inline-block;flex:0 0 auto;vertical-align:middle;background-image:var(--ue-sprite-sheet);background-repeat:no-repeat;background-size:500% 400%;width:18px;height:18px;border-radius:3px;box-shadow:0 0 0 1px #0007 inset}
 .ue-sprite.sheet-2{background-image:var(--ue-sprite-sheet-2)}
 .ue-sprite.sheet-2.sprite-xs{width:13px;height:13px}
@@ -123,7 +123,21 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .friend-request-pop{display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2147483210;width:calc(100vw - 24px);max-height:calc(100dvh - 100px);overflow:auto;background:#d5cbb9;color:#111;border:3px solid #26221c;box-shadow:0 18px 60px #000c}.friend-request-pop.show{display:block}.fr-head{background:#151515;color:#fff;padding:7px;font-weight:bold;text-transform:uppercase}.fr-body{padding:10px;font-size:11px}
 .toast{position:fixed;left:50%;bottom:calc(var(--navh) + 10px + var(--safe));transform:translateX(-50%) translateY(15px);opacity:0;background:#080706;border:1px solid #4a4033;padding:9px 12px;z-index:2147483300;transition:.2s;width:calc(100vw - 24px);text-align:center;font-size:11px}.toast.show{opacity:1;transform:translateX(-50%)}
 .checkout-grid{display:grid;gap:7px;margin:9px 0}.checkout-grid label{font-size:10px;color:#b5a898}.checkout-grid input{width:100%;margin-top:3px;padding:8px;background:#070706;color:#ddd;border:1px solid #4a4034}
-.nav{position:fixed;inset:auto 0 0 0;z-index:2147483000;height:calc(var(--navh) + var(--safe));background:#080706;border-top:1px solid #4a4033;box-shadow:0 -8px 24px #000b;padding-bottom:var(--safe)}.navin{height:var(--navh);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;padding:2px 3px}.nav button{min-width:0;border:0;background:transparent;color:#8d8376;padding:3px 1px;font-size:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.nav button.active{background:#1d1913;color:#fff}.nav button .ico{display:flex;align-items:center;justify-content:center;width:22px;height:22px;margin:0;border:1px solid #3f3a33;border-radius:4px;background:linear-gradient(#16181a,#090a0b);box-shadow:inset 0 1px 0 #ffffff08}.nav button .ico .ue-sprite{width:14px;height:14px;box-shadow:none;border-radius:2px}.nav button.active .ico{border-color:#8f6f34;background:linear-gradient(#262015,#100d08);box-shadow:0 0 0 1px #000 inset,0 0 10px #0006}.nav button.active .ico .ue-sprite{transform:scale(1.05)}.nav button .nav-label{line-height:1;letter-spacing:.04em}.nav button.active .nav-label{color:#f1dfb0}
+.nav{position:fixed;inset:auto 0 0 0;z-index:2147483000;height:calc(var(--navh) + var(--safe));background:#080706;border-top:1px solid #4a4033;box-shadow:0 -8px 24px #000b;padding-bottom:var(--safe)}.navin{height:var(--navh);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;padding:2px 3px}.nav button{min-width:0;border:0;background:transparent;color:#91897e;padding:2px 1px 3px;font-size:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;position:relative;overflow:visible}
+.nav button.active{background:linear-gradient(180deg,rgba(209,173,67,.08),rgba(209,173,67,.025));color:#fff}
+.nav button .ico{display:flex;align-items:center;justify-content:center;width:29px;height:29px;margin:0;overflow:visible}
+.nav-icon{display:block;width:27px;height:27px;background-image:var(--ue-nav-sprite);background-repeat:no-repeat;background-size:700% 100%;filter:brightness(1.10) saturate(1.10);transform:translateZ(0)}
+.nav-icon-home{background-position:0% 0}
+.nav-icon-jobs{background-position:16.6667% 0}
+.nav-icon-crew{background-position:33.3333% 0}
+.nav-icon-fight{background-position:50% 0}
+.nav-icon-gear{background-position:66.6667% 0}
+.nav-icon-territory{background-position:83.3333% 0}
+.nav-icon-more{background-position:100% 0}
+.nav button .nav-label{line-height:1;letter-spacing:.035em;font-size:7px;font-weight:900}
+.nav button.active .nav-label{color:#f1dfb0}
+.nav button.active .nav-icon{filter:brightness(1.32) saturate(1.18) drop-shadow(0 0 5px rgba(221,177,65,.6))}
+.nav button.active:after{content:"";position:absolute;left:17%;right:17%;bottom:0;height:2px;background:linear-gradient(90deg,transparent,#d8b54e,transparent);box-shadow:0 0 5px rgba(216,181,78,.55)}
 @media(min-width:700px){
  .app{max-width:1080px;margin:auto}.main{padding:12px}.brand{font-size:17px}.stats{grid-template-columns:repeat(6,minmax(0,1fr))}.stat{font-size:10px}.stat b{font-size:12px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.skillgrid{grid-template-columns:repeat(5,minmax(0,1fr))}.progress-strip{grid-template-columns:repeat(4,minmax(0,1fr))}.profile-grid{grid-template-columns:repeat(4,1fr)}.friend{grid-template-columns:62px minmax(0,1fr) auto}.avatar{width:62px;height:62px}.fbtns{grid-column:auto;grid-template-columns:1fr}.actions{display:flex}.actions button{width:auto}.hero img{height:160px}.mbox,.tutorial-box{max-width:520px}.chatwin{max-width:520px;height:min(78vh,640px)}.inbox-panel{left:50%;right:auto;transform:translateX(-50%);width:430px}.navin{max-width:1080px;margin:auto}
 }
@@ -2230,13 +2244,13 @@ body:after{
 </div>
 
 <nav class="nav"><div class="navin">
-<button class="active" data-v="home"><span class="ico"><span class="ue-sprite sprite-territory sprite-sm"></span></span><span class="nav-label">HOME</span></button>
-<button data-v="jobs"><span class="ico"><span class="ue-sprite sheet-2 sprite-boss sprite-sm"></span></span><span class="nav-label">JOBS</span></button>
-<button data-v="crew"><span class="ico"><span class="ue-sprite sprite-crew sprite-sm"></span></span><span class="nav-label">CREW</span></button>
-<button data-v="fight"><span class="ico"><span class="ue-sprite sheet-2 sprite-revenge sprite-sm"></span></span><span class="nav-label">FIGHT</span></button>
-<button data-v="gear"><span class="ico"><span class="ue-sprite sprite-pistol sprite-sm"></span></span><span class="nav-label">GEAR</span></button>
-<button data-v="territory"><span class="ico"><span class="ue-sprite sheet-2 sprite-nightclub sprite-sm"></span></span><span class="nav-label">TERRITORY</span></button>
-<button data-v="more"><span class="ico"><span class="ue-sprite sheet-2 sprite-collection sprite-sm"></span></span><span class="nav-label">MORE</span></button>
+<button class="active" data-v="home"><span class="ico"><span class="nav-icon nav-icon-home"></span></span><span class="nav-label">HOME</span></button>
+<button data-v="jobs"><span class="ico"><span class="nav-icon nav-icon-jobs"></span></span><span class="nav-label">JOBS</span></button>
+<button data-v="crew"><span class="ico"><span class="nav-icon nav-icon-crew"></span></span><span class="nav-label">CREW</span></button>
+<button data-v="fight"><span class="ico"><span class="nav-icon nav-icon-fight"></span></span><span class="nav-label">FIGHT</span></button>
+<button data-v="gear"><span class="ico"><span class="nav-icon nav-icon-gear"></span></span><span class="nav-label">GEAR</span></button>
+<button data-v="territory"><span class="ico"><span class="nav-icon nav-icon-territory"></span></span><span class="nav-label">TERRITORY</span></button>
+<button data-v="more"><span class="ico"><span class="nav-icon nav-icon-more"></span></span><span class="nav-label">MORE</span></button>
 </div></nav>
 
 <button class="inbox-fab" onclick="toggleInbox()"><span class="ue-sprite sprite-operations sprite-sm"></span><span class="count" id="inboxCount">0</span></button>
@@ -2398,7 +2412,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.21.5";
+const BUILD_NUMBER="0.21.6";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
