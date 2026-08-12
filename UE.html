@@ -180,8 +180,14 @@ body{background:#050607;color:#e7e7e7;font-family:Arial,Helvetica,sans-serif}
 .lock{font-size:9px!important;padding:3px!important;margin:3px 0!important}
 .btn{
  width:auto!important;min-height:26px!important;padding:4px 9px!important;border-radius:0!important;
- border:1px solid #7e7040!important;outline:1px solid #171717;background:
- repeating-linear-gradient(135deg,#353535 0,#353535 2px,#292929 2px,#292929 4px)!important;
+ border:1px solid #7e7040!important;outline:1px solid #171717!important;
+ background:
+   radial-gradient(circle at 18% 24%,rgba(255,255,255,.055) 0 1px,transparent 2px),
+   radial-gradient(circle at 72% 68%,rgba(0,0,0,.18) 0 1px,transparent 2px),
+   radial-gradient(circle at 48% 38%,rgba(255,255,255,.025) 0 2px,transparent 3px),
+   linear-gradient(180deg,#383734 0%,#302f2c 48%,#262521 100%)!important;
+ background-size:13px 11px,17px 15px,23px 19px,100% 100%!important;
+ box-shadow:inset 0 1px rgba(255,255,255,.05),inset 0 -1px rgba(0,0,0,.45)!important;
  color:#f4d85f!important;text-shadow:0 1px #000;font-size:10px!important;font-weight:900!important
 }
 .btn:hover{filter:brightness(1.18)}.btn.red{border-color:#75403b!important;color:#f2b5a8!important}.btn.green{border-color:#557544!important;color:#b8dd8e!important}
@@ -2212,8 +2218,14 @@ body:after{
 .crew-pill.good{border-color:#48613a;color:#9fc47f}.crew-pill.warn{border-color:#7a6132;color:#dfc06c}.crew-pill.bad{border-color:#6d3d36;color:#d59a90}.crew-pill.info{border-color:#3d4b58;color:#9ab0c5}
 .presence-line{margin-top:5px;padding:4px 5px;border:1px solid #34363a;background:#0b0c0e}.presence-line.online{border-color:#415639;background:#090d08}.presence-line.offline{border-color:#5b533f;background:#0f0d0a}.presence-line.inactive{border-color:#6d3d37;background:#120908}
 .fbtns{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-top:4px}
-.fbtns button{min-height:31px;font-size:8px;padding:5px 4px;border:1px solid #4c4133;background:linear-gradient(#d8ccb3,#baa98a);font-weight:900;color:#201812}
-.fbtns button:disabled{background:linear-gradient(#4a4741,#32302b);color:#8e877b;border-color:#5a554e}
+.fbtns button{min-height:31px;font-size:8px;padding:5px 4px;border:1px solid #4c4133;background:
+ radial-gradient(circle at 20% 25%,rgba(255,255,255,.11) 0 1px,transparent 2px),
+ radial-gradient(circle at 72% 70%,rgba(78,52,20,.11) 0 1px,transparent 2px),
+ linear-gradient(180deg,#d8ccb3 0%,#c8b998 48%,#baa98a 100%);
+ background-size:13px 11px,17px 15px,100% 100%;font-weight:900;color:#201812;box-shadow:inset 0 1px rgba(255,255,255,.18),inset 0 -1px rgba(72,50,22,.22)}
+.fbtns button:disabled{background:
+ radial-gradient(circle at 20% 25%,rgba(255,255,255,.025) 0 1px,transparent 2px),
+ linear-gradient(180deg,#4a4741,#32302b);background-size:15px 13px,100% 100%;color:#8e877b;border-color:#5a554e}
 .fight-stamina-badge{display:inline-flex;align-items:center;gap:3px}.fight-stamina-badge .ue-sprite{box-shadow:none}
 @media(max-width:420px){.territory-summary-bar{grid-template-columns:1fr}.fbtns{grid-template-columns:1fr}}
 
@@ -2945,7 +2957,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.17";
+const BUILD_NUMBER="0.22.18";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
