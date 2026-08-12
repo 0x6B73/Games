@@ -1770,6 +1770,58 @@ body:after{
   color:#d6b563;
 }
 
+
+/* FULL ICON CONSISTENCY PASS */
+.sprite-hero{width:64px;height:64px;border-radius:7px}
+.ue-sprite.sheet-2.sprite-hero{width:70px;height:70px}
+.sprite-art{
+  width:calc(100% + 20px);
+  min-height:92px;
+  margin:-10px -10px 8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid #2f281f;
+  background:
+    radial-gradient(circle at 50% 45%,rgba(184,144,58,.12),transparent 47%),
+    linear-gradient(#111315,#070809);
+  overflow:hidden;
+}
+.sprite-art .ue-sprite{
+  filter:saturate(.9) contrast(1.06);
+  box-shadow:0 8px 22px #000a,0 0 0 1px #ffffff0b inset;
+}
+.sprite-art.sheet2-art{background:radial-gradient(circle at 50% 45%,rgba(159,124,45,.16),transparent 48%),linear-gradient(#111315,#070809)}
+.status-mark{
+  display:inline-block;
+  width:8px;height:8px;
+  margin-right:4px;
+  border-radius:50%;
+  border:1px solid #57524a;
+  background:#111214;
+  vertical-align:middle;
+  box-shadow:0 0 0 1px #0007 inset;
+}
+.status-mark.done{border-color:#668f47;background:#79ad51;box-shadow:0 0 6px #5b8b3b55}
+.status-mark.pending{border-color:#665c45;background:#1a1710}
+.inline-sprite{display:inline-flex;align-items:center;gap:4px}
+.inline-sprite .ue-sprite{box-shadow:none}
+.badge .ue-sprite{width:11px;height:11px;box-shadow:none;margin-right:3px}
+.inbox-fab{display:flex!important;align-items:center!important;justify-content:center!important}
+.inbox-fab>.ue-sprite{width:17px;height:17px;box-shadow:none}
+.help-reel-legend .ue-sprite{width:12px;height:12px;box-shadow:none;margin:0 2px;vertical-align:-2px}
+.fold-card summary:before{
+  content:""!important;
+  width:6px;height:6px;
+  margin-right:7px;
+  border-right:2px solid #d2b44f;
+  border-bottom:2px solid #d2b44f;
+  transform:rotate(-45deg);
+  transition:transform .12s ease;
+  flex:0 0 auto;
+}
+.fold-card[open] summary:before{content:""!important;transform:rotate(45deg) translateY(-1px)}
+
 </style>
 </head>
 <body>
@@ -1848,32 +1900,32 @@ body:after{
    </div>
    <div class="home-overview-grid">
      <button class="home-overview-item gold" onclick="openGoldVaultFromStat()">
-       <span class="home-overview-icon">${spriteIconHtml("gold","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sprite-gold sprite-sm"></span></span>
        <span class="home-overview-label">GOLD BARS</span>
        <b id="homeGoldBars">0</b>
      </button>
      <button class="home-overview-item" onclick="go('crew')">
-       <span class="home-overview-icon">${spriteIconHtml("crew","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sprite-crew sprite-sm"></span></span>
        <span class="home-overview-label">CREW</span>
        <b id="homeCrewSize">1</b>
      </button>
      <button class="home-overview-item" onclick="go('fight')">
-       <span class="home-overview-icon">${spriteIconHtml("2:revenge","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sheet-2 sprite-revenge sprite-sm"></span></span>
        <span class="home-overview-label">COMBAT CREW</span>
        <b id="homeCombatCrew">1 / 25</b>
      </button>
      <button class="home-overview-item cash" onclick="go('more')">
-       <span class="home-overview-icon">${spriteIconHtml("2:bank","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sheet-2 sprite-bank sprite-sm"></span></span>
        <span class="home-overview-label">OFFSHORE BANK</span>
        <b id="homeBankCash">$0</b>
      </button>
      <button class="home-overview-item income" onclick="go('territory')">
-       <span class="home-overview-icon">${spriteIconHtml("2:nightclub","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sheet-2 sprite-nightclub sprite-sm"></span></span>
        <span class="home-overview-label">NET INCOME</span>
        <b id="homeNetIncome">+$0/hr</b>
      </button>
      <button class="home-overview-item" onclick="go('fight')">
-       <span class="home-overview-icon">${spriteIconHtml("2:bounty","sm")}</span>
+       <span class="home-overview-icon"><span class="ue-sprite sheet-2 sprite-bounty sprite-sm"></span></span>
        <span class="home-overview-label">FIGHT RECORD</span>
        <b id="homeFightRecord">0W · 0L</b>
      </button>
@@ -2187,7 +2239,7 @@ body:after{
 <button data-v="more"><span class="ico"><span class="ue-sprite sheet-2 sprite-collection sprite-sm"></span></span><span class="nav-label">MORE</span></button>
 </div></nav>
 
-<button class="inbox-fab" onclick="toggleInbox()">✉<span class="count" id="inboxCount">0</span></button>
+<button class="inbox-fab" onclick="toggleInbox()"><span class="ue-sprite sprite-operations sprite-sm"></span><span class="count" id="inboxCount">0</span></button>
 <div class="inbox-focus-overlay" id="inboxFocusOverlay" onclick="toggleInbox()" aria-hidden="true"></div>
 <div class="inbox-panel" id="inboxPanel"><div class="inbox-head">Messages</div><div id="inboxItems"></div></div>
 <div class="friend-request-pop" id="socialPop"><div class="fr-head">Incoming Message</div><div class="fr-body" id="socialPopBody"></div></div>
@@ -2293,7 +2345,7 @@ body:after{
 
   <div class="actions">
     <button class="btn" onclick="saveEditedProfile()">SAVE PROFILE</button>
-    <button class="btn secondary" onclick="removePlayerPhoto()">🎲 RANDOM GENERATED AVATAR</button>
+    <button class="btn secondary" onclick="removePlayerPhoto()"><span class="inline-sprite"><span class="ue-sprite sprite-crew sprite-sm"></span>RANDOM GENERATED AVATAR</span></button>
     <button class="btn secondary" onclick="closeModal('editProfileModal')">CANCEL</button>
   </div>
 </div></div>
@@ -2304,7 +2356,7 @@ body:after{
 <div class="modal gold-reel-modal" id="goldReelModal"><div class="mbox">
   <h2>Ask for Help</h2>
   <div class="sub" id="goldReelContact">Contacting associate...</div>
-  <div class="help-reel-legend">Possible: 💉 Adrenaline · 🥤 Energy · 📦 Energy/Stamina Packs · Nothing · rare rewards</div>
+  <div class="help-reel-legend">Possible: <span class="ue-sprite sprite-adrenaline sprite-xs"></span> Adrenaline · <span class="ue-sprite sprite-drink sprite-xs"></span> Energy · <span class="ue-sprite sheet-2 sprite-energy-pack sprite-xs"></span> Packs · Nothing · rare rewards</div>
   <div class="gold-reel-wrap">
     <div class="gold-reel-marker"></div>
     <div id="goldReel" class="gold-reel"></div>
@@ -2346,7 +2398,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.21.4";
+const BUILD_NUMBER="0.21.5";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2386,6 +2438,7 @@ function spriteIconHtml(name,size="md",extra=""){
  const cls=["ue-sprite",sheetCls,`sprite-${icon}`,size?`sprite-${size}`:"",extra||""].filter(Boolean).join(" ");
  return `<span class="${cls}"></span>`;
 }
+function statusMarkHtml(done){return `<span class="status-mark ${done?"done":"pending"}"></span>`;}
 function spriteForGear(g){
  const name=(g?.name||"").toLowerCase();
  if(g?.type==="defense")return "armor";
@@ -2471,7 +2524,7 @@ function themeBeat(){if(!themeOn||!audioUnlocked){themeTimer=null;return}const b
 function toggleTheme(){themeOn=!themeOn;unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}else if(!themeOn){clearTimeout(themeTimer);themeTimer=null}const b=document.getElementById("musicBtn");if(b)b.textContent=themeOn?"■ THEME":"▶ THEME"}
 function toggleSound(){state.sound=!state.sound;save();const e=document.getElementById("sfxState");if(e)e.textContent=state.sound?"ON":"OFF"}
 function tryAutoTheme(){themeOn=true;const arm=()=>{unlockAudio();if(themeOn&&!themeTimer){themeStep=0;themeBeat()}document.removeEventListener("pointerdown",arm,true);document.removeEventListener("touchstart",arm,true)};document.addEventListener("pointerdown",arm,true);document.addEventListener("touchstart",arm,true);const b=document.getElementById("musicBtn");if(b)b.textContent="■ THEME"}
-function renderAudioStatus(){const text=document.getElementById("audioStatusText"),list=document.getElementById("audioStatusList");if(text)text.textContent="Audio engine: READY · self-contained Web Audio";if(list)list.innerHTML='<span class="audio-good">✓ THEME</span> · <span class="audio-good">✓ JOB SFX</span> · <span class="audio-good">✓ COMBAT</span> · <span class="audio-good">✓ CASH</span> · <span class="audio-good">✓ ALERTS</span>'}
+function renderAudioStatus(){const text=document.getElementById("audioStatusText"),list=document.getElementById("audioStatusList");if(text)text.textContent="Audio engine: READY · self-contained Web Audio";if(list)list.innerHTML=`<span class="audio-good">${statusMarkHtml(true)}THEME</span> · <span class="audio-good">${statusMarkHtml(true)}JOB SFX</span> · <span class="audio-good">${statusMarkHtml(true)}COMBAT</span> · <span class="audio-good">${statusMarkHtml(true)}CASH</span> · <span class="audio-good">${statusMarkHtml(true)}ALERTS</span>`}
 async function testAudioPack(){state.sound=true;save();unlockAudio();for(const fn of [fxClick,fxCash,fxMessage,fxReload,fxGun,fxEngine,fxWin,fxSiren]){runScene([[0,fn]]);await new Promise(r=>setTimeout(r,650))}cancelSfxScene();renderAudioStatus()}
 setTimeout(renderAudioStatus,250);
 
@@ -3313,7 +3366,7 @@ function renderCampaign(){
        const complete=val>=o.target;
        const pct=Math.min(100,Math.floor(val/o.target*100));
        return `<div class="campaign-objective ${complete?"done":"remaining"}">
-         <div class="campaign-objective-name">${complete?"✓ ":""}${o.label}</div>
+         <div class="campaign-objective-name">${complete?statusMarkHtml(true):statusMarkHtml(false)}${o.label}</div>
          <div class="campaign-objective-value">${Math.min(val,o.target).toLocaleString()} / ${o.target.toLocaleString()}</div>
          <div class="campaign-progress"><div style="width:${pct}%"></div></div>
        </div>`;
@@ -3447,11 +3500,11 @@ function goldHelpStatus(id){
  return {unlocked:true};
 }
 function helpRewardTile(kind,goldUnlocked=true){
- if(kind==="gold"&&goldUnlocked)return `<div class="gold-reel-item gold">🪙<br>GOLD BAR</div>`;
- if(kind==="energy")return `<div class="gold-reel-item energy">🥤<br>ENERGY DRINK</div>`;
- if(kind==="stamina")return `<div class="gold-reel-item stamina">💉<br>ADRENALINE</div>`;
- if(kind==="energyPack")return `<div class="gold-reel-item pack">📦<br>ENERGY PACK</div>`;
- if(kind==="staminaPack")return `<div class="gold-reel-item pack">📦<br>STAMINA PACK</div>`;
+ if(kind==="gold"&&goldUnlocked)return `<div class="gold-reel-item gold">${spriteIconHtml("gold","lg")}<br>GOLD BAR</div>`;
+ if(kind==="energy")return `<div class="gold-reel-item energy">${spriteIconHtml("drink","lg")}<br>ENERGY DRINK</div>`;
+ if(kind==="stamina")return `<div class="gold-reel-item stamina">${spriteIconHtml("adrenaline","lg")}<br>ADRENALINE</div>`;
+ if(kind==="energyPack")return `<div class="gold-reel-item pack">${spriteIconHtml("2:energy-pack","lg")}<br>ENERGY PACK</div>`;
+ if(kind==="staminaPack")return `<div class="gold-reel-item pack">${spriteIconHtml("2:stamina-pack","lg")}<br>STAMINA PACK</div>`;
  return `<div class="gold-reel-item empty">NOTHING</div>`;
 }
 
@@ -3561,11 +3614,11 @@ function renderGoldVault(){
  </div>
  <div class="gold-trade">
    <div><b>CASH EXCHANGE</b><span>Trade $100,000 Cash for 1 Gold Bar. No hourly limit.</span></div>
-   <button class="btn small" onclick="tradeCashForGold()" ${state.cash<100000?"disabled":""}>$100K → 🪙 1</button>
+   <button class="btn small" onclick="tradeCashForGold()" ${state.cash<100000?"disabled":""}>$100K → ${spriteIconHtml("gold","xs")} 1</button>
  </div>`+
  goldUnlockDefs.map(u=>`<div class="gold-unlock ${state.goldUnlocks[u.id]?"owned":""}">
-   <div><div class="gu-name">${state.goldUnlocks[u.id]?"✓ ":""}${u.name}</div><div class="gu-desc">${u.desc}</div></div>
-   <div class="right"><div class="gu-cost">🪙 ${u.cost}</div><button class="btn small" onclick="buyGoldUnlock('${u.id}')" ${state.goldUnlocks[u.id]?"disabled":""}>${state.goldUnlocks[u.id]?"UNLOCKED":"UNLOCK"}</button></div>
+   <div><div class="gu-name">${state.goldUnlocks[u.id]?statusMarkHtml(true):""}${u.name}</div><div class="gu-desc">${u.desc}</div></div>
+   <div class="right"><div class="gu-cost">${spriteIconHtml("gold","xs")} ${u.cost}</div><button class="btn small" onclick="buyGoldUnlock('${u.id}')" ${state.goldUnlocks[u.id]?"disabled":""}>${state.goldUnlocks[u.id]?"UNLOCKED":"UNLOCK"}</button></div>
  </div>`).join("");
 }
 
@@ -3900,7 +3953,7 @@ function buyEndgameAutomation(kind){
  state.endgameInfra[`${kind}Enabled`]=true;
  log(`${def.name} installed for ${def.cost} Gold Bars.`);
  recordIntel("GOLD INFRASTRUCTURE",`${def.name} installed · automation enabled`,"cash");
- showActionFlash("AUTOMATION INSTALLED",`${def.name} · 🪙 ${def.cost}`,"cash");
+ showActionFlash("AUTOMATION INSTALLED",`${def.name} · ${def.cost} Gold Bars`,"cash");
  S.cash();save();render();
 }
 function toggleEndgameAutomation(kind){
@@ -3928,7 +3981,7 @@ function upgradeEndgameTier(kind){
 
  log(`${def.name} upgraded to Tier ${tier+1} for ${cost} Gold Bars.`);
  recordIntel("INFRASTRUCTURE UPGRADED",`${def.name} · Tier ${tier+1}`,"cash");
- showActionFlash("TIER UPGRADE",`${def.name} · Tier ${tier+1} · 🪙 ${cost}`,"cash");
+ showActionFlash("TIER UPGRADE",`${def.name} · Tier ${tier+1} · ${cost} Gold Bars`,"cash");
  S.cash();save();render();
 }
 function processProduction(t=now()){
@@ -4007,8 +4060,8 @@ function renderEndgameFacilities(){
    const missing=endgameRequirement(def);
    return `<div class="gold-infra-card ${owned?"owned":missing.length?"locked":""}">
      <div class="gold-infra-head">
-       <div class="gold-infra-name">${spriteIconHtml(spriteForEndgame(kind),"md")}<span>${owned?"✓ ":""}${def.name}</span></div>
-       <div class="gold-infra-cost">${owned?"INSTALLED":`🪙 ${def.cost}`}</div>
+       <div class="gold-infra-name">${spriteIconHtml(spriteForEndgame(kind),"md")}<span>${owned?statusMarkHtml(true):""}${def.name}</span></div>
+       <div class="gold-infra-cost">${owned?"INSTALLED":`${spriteIconHtml("gold","xs")} ${def.cost}`}</div>
      </div>
      <div class="gold-infra-desc">${def.desc}</div>
      <div class="gold-infra-meta">
@@ -4021,7 +4074,7 @@ function renderEndgameFacilities(){
      <div class="gold-infra-actions">
        ${owned
          ?`<button class="btn ${enabled?"green":"secondary"} small" onclick="toggleEndgameAutomation('${kind}')">${enabled?"ENABLED · TAP TO DISABLE":"DISABLED · TAP TO ENABLE"}</button>`
-         :`<button class="btn gold small" onclick="buyEndgameAutomation('${kind}')" ${missing.length||gold<def.cost?"disabled":""}>INSTALL · 🪙 ${def.cost}</button>`}
+         :`<button class="btn gold small" onclick="buyEndgameAutomation('${kind}')" ${missing.length||gold<def.cost?"disabled":""}>INSTALL · ${spriteIconHtml("gold","xs")} ${def.cost}</button>`}
      </div>
    </div>`;
  };
@@ -4037,8 +4090,8 @@ function renderEndgameFacilities(){
    }
    return `<div class="gold-infra-card ${tier>0?"owned":missing.length?"locked":""}">
      <div class="gold-infra-head">
-       <div class="gold-infra-name">${spriteIconHtml(spriteForEndgame(kind),"md")}<span>${tier>0?"✓ ":""}${def.name}</span></div>
-       <div class="gold-infra-cost">${tier>=5?"MAX TIER":`🪙 ${next}`}</div>
+       <div class="gold-infra-name">${spriteIconHtml(spriteForEndgame(kind),"md")}<span>${tier>0?statusMarkHtml(true):""}${def.name}</span></div>
+       <div class="gold-infra-cost">${tier>=5?"MAX TIER":`${spriteIconHtml("gold","xs")} ${next}`}</div>
      </div>
      <div class="gold-infra-desc">${def.desc}</div>
      <div class="gold-tier-track">${[1,2,3,4,5].map(n=>`<div class="gold-tier-seg ${n<=tier?"on":""}"></div>`).join("")}</div>
@@ -4051,7 +4104,7 @@ function renderEndgameFacilities(){
      </div>
      ${missing.length?`<div class="gold-infra-status bad">LOCKED · ${missing.join(" · ")}</div>`:""}
      <div class="gold-infra-actions">
-       <button class="btn gold small" onclick="upgradeEndgameTier('${kind}')" ${tier>=5||missing.length||gold<next?"disabled":""}>${tier>=5?"TIER 5 COMPLETE":`UPGRADE TO TIER ${tier+1} · 🪙 ${next}`}</button>
+       <button class="btn gold small" onclick="upgradeEndgameTier('${kind}')" ${tier>=5||missing.length||gold<next?"disabled":""}>${tier>=5?"TIER 5 COMPLETE":`UPGRADE TO TIER ${tier+1} · ${spriteIconHtml("gold","xs")} ${next}`}</button>
      </div>
    </div>`;
  };
@@ -4233,7 +4286,7 @@ function bribeLawEnforcement(){
  state.lastHeatDecay=now();
 
  log(`Paid 10 Gold Bars in bribes to reset Heat from ${oldHeat} to 0.`);
- showActionFlash("LAW ENFORCEMENT BRIBED",`🪙 10 Gold Bars · Heat ${oldHeat} → 0`,"good");
+ showActionFlash("LAW ENFORCEMENT BRIBED",`10 Gold Bars · Heat ${oldHeat} → 0`,"good");
  closeModal("statHelpModal");
  S.cash();save();render();
 }
@@ -4291,7 +4344,7 @@ function showStatHelp(key,e){
  const actions=document.getElementById("statHelpActions");
  if(actions){
    if(key==="heat"){
-     actions.innerHTML=`<div class="bribe-box"><b>BRIBE LAW ENFORCEMENT</b><span>Pay 10 Gold Bars to wipe Heat to 0.</span><button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button></div>`;
+     actions.innerHTML=`<div class="bribe-box"><b>BRIBE LAW ENFORCEMENT</b><span>Pay 10 Gold Bars to wipe Heat to 0.</span><button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
      const gross=propertyIncome()+facilityIncome()+territoryIncome(),upkeep=propertyUpkeep()+facilityUpkeep()+gearUpkeep(),net=netIncome();
      actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Facilities + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
@@ -4316,7 +4369,7 @@ function renderStaminaReserve(){
 
  body.innerHTML=`<div class="energy-reserve">
    <div class="er"><span>CURRENT STAMINA</span><b>${Math.floor(state.st)}/${state.maxSt}</b></div>
-   <div class="er"><span>ADRENALINE SHOTS</span><b>💉 ${qty}</b></div>
+   <div class="er"><span>ADRENALINE SHOTS</span><b>${spriteIconHtml("adrenaline","sm")} ${qty}</b></div>
  </div>
  <div class="energy-rate"><b>Natural recovery:</b> ${state.st>=state.maxSt?"FULL":`1 Stamina every ${formatRegenTime(STAMINA_REGEN_MS)} · Next in ${regen.text.replace("+1 IN ","")}`}</div>
  <p class="sub">Stamina powers fights, incoming-attack defenses, and territory moves. Adrenaline Shots restore 1–3 Stamina.</p>
@@ -4337,7 +4390,7 @@ function renderEnergyReserve(){
  const regen=energyRegenCountdown();
  body.innerHTML=`<div class="energy-reserve">
    <div class="er"><span>CURRENT ENERGY</span><b>${Math.floor(state.en)}/${state.maxEn}</b></div>
-   <div class="er"><span>ENERGY DRINKS</span><b>🥤 ${qty}</b></div>
+   <div class="er"><span>ENERGY DRINKS</span><b>${spriteIconHtml("drink","sm")} ${qty}</b></div>
  </div>
  <div class="energy-rate"><b>Current natural recovery:</b> ${state.en>=state.maxEn?"FULL":energyRateLabel()}${state.en>=state.maxEn?"":` · Next Energy in ${regen.text.replace("+1 IN ","")}`}</div>
  <p class="sub">Natural recovery slows as Energy is banked. Energy Drinks restore 3–7 Energy.</p>
@@ -4433,7 +4486,7 @@ function dashJobPanel(j,dash,dashMarkup){
  if(!automationUnlocked("dash")){
    const f=facilityForFeature("dash");
    return `<div class="job-dash locked-facility">
-     <div class="job-dash-head"><span class="job-dash-brand">🔒 DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
+     <div class="job-dash-head"><span class="job-dash-brand">${spriteIconHtml("2:help-cache","xs")} DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
      <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
      <div class="sub">Requires ${f?.name||"Logistics Warehouse"} · Territory → Facilities</div>
    </div>`;
@@ -5111,8 +5164,8 @@ function openHelpCache(id=null){
 
  state.helpCaches.splice(idx,1);
  const parts=[];
- if(rewards.energy)parts.push(`🥤 ${rewards.energy}`);
- if(rewards.stamina)parts.push(`💉 ${rewards.stamina}`);
+ if(rewards.energy)parts.push(`${rewards.energy} Energy Drink${rewards.energy===1?"":"s"}`);
+ if(rewards.stamina)parts.push(`${rewards.stamina} Adrenaline Shot${rewards.stamina===1?"":"s"}`);
  if(rewards.energyPack)parts.push(`Energy Pack ×${rewards.energyPack}`);
  if(rewards.staminaPack)parts.push(`Stamina Pack ×${rewards.staminaPack}`);
  if(rewards.cash)parts.push(money(rewards.cash));
@@ -5138,7 +5191,7 @@ function renderCrewOperations(){
      <h4>${title}</h4>
      <div class="crew-op-meta">${desc}<br>${q.count} eligible · ${money(q.unit)} per crew member</div>
      <div class="crew-op-cost">${unlocked?money(q.total):"LOCKED"}</div>
-     ${!unlocked?`<div class="crew-op-lock">🔒 Requires ${facility?.name||"Facility"} · Territory → Facilities</div>`:""}
+     ${!unlocked?`<div class="crew-op-lock">${spriteIconHtml("2:help-cache","xs")} Requires ${facility?.name||"Facility"} · Territory → Facilities</div>`:""}
      <button class="btn small ${kind==="money"?"":"secondary"}" onclick="massCrewOperation('${kind}')" ${!unlocked||q.count<1||state.cash<q.total?"disabled":""}>${unlocked?label:"FACILITY REQUIRED"}</button>
    </div>`;
  };
@@ -5149,7 +5202,7 @@ function renderCrewOperations(){
    ${opCard("MASS ASK FOR HELP","Coordinate one request across eligible recruited crew. Replies are sealed into a Help Cache for later.",qh,"help","ASK FOR HELP")}
  </div>
  <div class="help-cache-head"><b>SEALED HELP CACHES</b><span>${caches.length}/${MAX_HELP_CACHES}</span></div>
- <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>🎁 ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
+ <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>${spriteIconHtml("2:help-cache","sm")} ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
 }
 
 function doFavor(id){
@@ -5188,25 +5241,25 @@ function openHelpRequest(id){
    state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
    f.response="I found something rare for you.";
    log(`${d.name} provided a Gold Bar through an Ask for Help request.`);
-   outcome={kind:"gold",amount:1,resultText:"🪙 GOLD BAR SECURED"};
+   outcome={kind:"gold",amount:1,resultText:"GOLD BAR SECURED"};
  }else if(Math.random()<helpChance){
    const r=Math.random();
    if(r<.38){
      addLootItem("Energy Drink",1,999);
      f.response="Sent you an Energy Drink.";
-     outcome={kind:"energy",amount:1,resultText:"🥤 ENERGY DRINK"};
+     outcome={kind:"energy",amount:1,resultText:"ENERGY DRINK"};
    }else if(r<.70){
      addLootItem("Adrenaline Shot",1,999);
      f.response="Sent you an Adrenaline Shot.";
-     outcome={kind:"stamina",amount:1,resultText:"💉 ADRENALINE SHOT"};
+     outcome={kind:"stamina",amount:1,resultText:"ADRENALINE SHOT"};
    }else if(r<.85){
      addLootItem("Energy Pack",1,99);
      f.response="I had an Energy Pack tucked away. It is yours.";
-     outcome={kind:"energyPack",amount:1,resultText:"📦 ENERGY PACK"};
+     outcome={kind:"energyPack",amount:1,resultText:"ENERGY PACK"};
    }else{
      addLootItem("Stamina Pack",1,99);
      f.response="I found a Stamina Pack. Save it for a bad night.";
-     outcome={kind:"staminaPack",amount:1,resultText:"📦 STAMINA PACK"};
+     outcome={kind:"staminaPack",amount:1,resultText:"STAMINA PACK"};
    }
  }else{
    f.response=meanReplies[rnd(0,meanReplies.length-1)];
@@ -5771,7 +5824,7 @@ function renderEnergyDrinkQuick(){
  }
  const qty=Math.max(0,Number(state.loot["Energy Drink"])||0);
  if(qty<=0){el.innerHTML="";return}
- el.innerHTML=`<div class="row"><div><div class="title">🥤 Energy Drinks <span class="badge gold">x${qty}</span></div><div class="sub">Restore 3–7 Energy per drink · Stack limit 999</div></div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div>`;
+ el.innerHTML=`<div class="row"><div><div class="title inline-sprite">${spriteIconHtml("drink","sm")}<span>Energy Drinks <span class="badge gold">x${qty}</span></span></div><div class="sub">Restore 3–7 Energy per drink · Stack limit 999</div></div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div>`;
 }
 
 
@@ -6112,7 +6165,7 @@ function renderJobs(){
    const lo=Math.floor(j.cash[0]*jobMasteryCashMult(j)*prestigeCashMult()),hi=Math.floor(j.cash[1]*jobMasteryCashMult(j)*prestigeCashMult());
    const xp=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
    return `<div class="card job-card compact-job" id="job-${j.id}">
-    <div class="job-head"><img class="art" src="${art}" alt=""><div><h3>${j.name}</h3><div class="meta"><span class="badge">⚡ ${j.energy}</span><span class="badge green">💵 ${money(lo)}–${money(hi)}</span><span class="badge">⭐ ${xp}</span><span class="badge gold">${ch}% SUCCESS</span></div></div></div>
+    <div class="job-head"><img class="art" src="${art}" alt=""><div><h3>${j.name}</h3><div class="meta"><span class="badge">${spriteIconHtml("energy","xs")} ${j.energy}</span><span class="badge green">${spriteIconHtml("cash","xs")} ${money(lo)}–${money(hi)}</span><span class="badge">${spriteIconHtml("2:prestige-crown","xs")} ${xp} XP</span><span class="badge gold">${ch}% SUCCESS</span></div></div></div>
     <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
     <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>
     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
@@ -6124,10 +6177,10 @@ function renderJobs(){
 
  const done=!!state.bosses[bossT],last=Number(state.bossLastFight[bossT]||0),wait=done?Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last)):0,rematches=Number(state.bossRematches[bossT]||0);
  const power=bossDef(bossT)+rematches*22,pool=bossLootDefs[bossT]||[],bossProgress=bossJobProgress(bossT),ready=bossReady(bossT);
- const bossReqHtml=bossProgress.length?bossProgress.map(x=>`<div class="boss-requirement ${x.mastered&&!x.cityLocked?"met":""}">${x.mastered&&!x.cityLocked?"✓":"○"} ${x.job.name} · Mastery ${jobState(x.job.id).mastery}/3${x.cityLocked?` · Unlocks LVL ${x.cityLevel}`:""}</div>`).join(""):`<div class="boss-requirement">No rank operations are available.</div>`;
- bossEl.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3 class="icon-title">${spriteIconHtml("2:boss","card")}<span>${tiers[bossT].boss}</span></h3>
+ const bossReqHtml=bossProgress.length?bossProgress.map(x=>`<div class="boss-requirement ${x.mastered&&!x.cityLocked?"met":""}">${statusMarkHtml(x.mastered&&!x.cityLocked)}${x.job.name} · Mastery ${jobState(x.job.id).mastery}/3${x.cityLocked?` · Unlocks LVL ${x.cityLevel}`:""}</div>`).join(""):`<div class="boss-requirement">No rank operations are available.</div>`;
+ bossEl.innerHTML=`<div class="card"><div class="sprite-art sheet2-art">${spriteIconHtml("2:boss","hero")}</div><h3 class="icon-title"><span>${tiers[bossT].boss}</span></h3>
   ${bossT<t?`<div class="lock">UNFINISHED BOSS FROM ${tiers[bossT].name.toUpperCase()} RANK</div>`:""}
-  <div class="meta"><span class="badge">🥊 ${done?4:3}</span><span class="badge">Power ${power}</span><span class="badge">Rematches ${rematches}</span></div>
+  <div class="meta"><span class="badge">${spriteIconHtml("fist","xs")} ${done?4:3} ST</span><span class="badge">Power ${power}</span><span class="badge">Rematches ${rematches}</span></div>
   <div class="boss-loot">Exclusive loot: ${pool.join(" · ")} · first victory guarantees a drop, rematches have a 35% chance.</div>
   <div class="boss-requirements">${bossReqHtml}</div>
   <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once. Unfinished bosses remain available even if you level into a higher rank. After the first victory, this boss becomes repeatable every 30 minutes and grows stronger each win.</div></details>
@@ -6206,7 +6259,7 @@ function renderCrew(){
    return `<div class="friend ${inactive?"contact-inactive":responsive?"":"contact-offline"}">
      <img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}">
      <div>
-       <div class="fname">${d.name} ${f.crew?"★":""}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
+       <div class="fname">${d.name} ${f.crew?spriteIconHtml("crew","xs"):""}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
        <div class="ftag">${d.tag||"Trusted contact"}</div>
        <div class="fmeta">${d.role} · ${crewStatus(f)}</div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
@@ -6255,7 +6308,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Fight Stamina now scales with Threat: Street/Tough 1, Dangerous/Hard 2, Brutal/Elite 3, Kingpin 4, Nightmare 5.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%. Fight Stamina now scales with Threat: Street/Tough 1, Dangerous/Hard 2, Brutal/Elite 3, Kingpin 4, Nightmare 5.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
@@ -6327,10 +6380,10 @@ function supplyExchangeHtml(){
  return `<div class="supply-exchange">
    <div class="supply-exchange-head"><b>SUPPLY EXCHANGE</b><span>2:1 trade · $1,000 sale value</span></div>
    <div class="supply-exchange-actions">
-     <button class="btn secondary small" onclick="tradeConsumables('Energy Drink','Adrenaline Shot')" ${drinks<2?"disabled":""}>🥤 2 → 💉 1</button>
-     <button class="btn secondary small" onclick="tradeConsumables('Adrenaline Shot','Energy Drink')" ${shots<2?"disabled":""}>💉 2 → 🥤 1</button>
-     <button class="btn small" onclick="sellConsumable('Energy Drink')" ${drinks<1?"disabled":""}>SELL 🥤 · $1,000</button>
-     <button class="btn small" onclick="sellConsumable('Adrenaline Shot')" ${shots<1?"disabled":""}>SELL 💉 · $1,000</button>
+     <button class="btn secondary small" onclick="tradeConsumables('Energy Drink','Adrenaline Shot')" ${drinks<2?"disabled":""}>${spriteIconHtml("drink","xs")} 2 → ${spriteIconHtml("adrenaline","xs")} 1</button>
+     <button class="btn secondary small" onclick="tradeConsumables('Adrenaline Shot','Energy Drink')" ${shots<2?"disabled":""}>${spriteIconHtml("adrenaline","xs")} 2 → ${spriteIconHtml("drink","xs")} 1</button>
+     <button class="btn small" onclick="sellConsumable('Energy Drink')" ${drinks<1?"disabled":""}>SELL ${spriteIconHtml("drink","xs")} · $1,000</button>
+     <button class="btn small" onclick="sellConsumable('Adrenaline Shot')" ${shots<1?"disabled":""}>SELL ${spriteIconHtml("adrenaline","xs")} · $1,000</button>
    </div>
  </div>`;
 }
@@ -6385,8 +6438,8 @@ function renderEquipmentSets(){
  const el=document.getElementById("equipmentSets");if(!el)return;
  el.innerHTML=equipmentSetDefs.map(s=>{
    const done=equipmentSetComplete(s);
-   const items=Object.entries(s.items).map(([id,q])=>{const g=gearDefs.find(x=>x.id===id);return `${gearQty(id)>=q?"✓":"○"} ${g?.name||id} ${gearQty(id)}/${q}`}).join(" · ");
-   return `<div class="set-row ${done?"complete":""}"><div class="set-head"><div class="set-name">${done?"✓ ":""}${s.name}</div><span class="badge">${done?"ACTIVE":"INCOMPLETE"}</span></div><div class="set-bonus">Bonus: +${s.attack} Attack · +${s.defense} Defense</div><div class="set-items">${items}</div></div>`;
+   const items=Object.entries(s.items).map(([id,q])=>{const g=gearDefs.find(x=>x.id===id);return `${statusMarkHtml(gearQty(id)>=q)}${g?.name||id} ${gearQty(id)}/${q}`}).join(" · ");
+   return `<div class="set-row ${done?"complete":""}"><div class="set-head"><div class="set-name">${done?statusMarkHtml(true):statusMarkHtml(false)}${s.name}</div><span class="badge">${done?"ACTIVE":"INCOMPLETE"}</span></div><div class="set-bonus">Bonus: +${s.attack} Attack · +${s.defense} Defense</div><div class="set-items">${items}</div></div>`;
  }).join("");
 }
 
@@ -6425,8 +6478,8 @@ function renderGear(){
    const grade=gearGrade(g),elite=grade.id==="high";
 
    return `<div class="card ${elite?"elite-catalog-item":""}">
-     <img class="art" src="${IMG[g.img]||IMG.suit}" alt="">
-     <h3 class="icon-title">${spriteIconHtml(spriteForGear(g),"card")}<span>${g.name}</span></h3>
+     <div class="sprite-art ${String(spriteForGear(g)).startsWith("2:")?"sheet2-art":""}">${spriteIconHtml(spriteForGear(g),"hero")}</div>
+     <h3>${g.name}</h3>
      <div class="meta">
        <span class="badge ${grade.cls}">${grade.label}</span>
        <span class="badge">${gearEffectLabel(g)}</span>
@@ -6482,8 +6535,8 @@ function renderTerritory(){
    const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
    const access=catalogAccess(p),elite=p.cost>=75000;
    return `<div class="card ${elite?"elite-catalog-item":""}">
-     <img class="art" src="${IMG[p.img]}" alt="">
-     <h3 class="icon-title">${spriteIconHtml(spriteForProperty(p),"card")}<span>${p.name}</span></h3>
+     <div class="sprite-art ${String(spriteForProperty(p)).startsWith("2:")?"sheet2-art":""}">${spriteIconHtml(spriteForProperty(p),"hero")}</div>
+     <h3>${p.name}</h3>
      <div class="meta">
        <span class="badge">Owned ${q}</span>
        <span class="badge green">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
@@ -6513,7 +6566,7 @@ function renderTerritory(){
      const net=f.income-f.upkeep;
      return `<div class="facility-card ${owned?"owned":access.locked?"locked":""}">
        <div class="facility-head">
-         <div class="facility-name">${spriteIconHtml(spriteForFacility(f),"md")}<span>${owned?"✓ ":""}${f.name}</span></div>
+         <div class="facility-name">${spriteIconHtml(spriteForFacility(f),"md")}<span>${owned?statusMarkHtml(true):""}${f.name}</span></div>
          <div class="facility-price">${owned?"OPERATING":money(f.cost)}</div>
        </div>
        <div class="facility-unlock">${owned?"UNLOCKED":"UNLOCKS"} · ${f.unlockLabel}</div>
@@ -6634,7 +6687,7 @@ function renderProfile(){
 
  const collectionHtml=collectionDefs.map(c=>{
    const done=!!state.collectionClaimed[c.id],ready=collectionReady(c),have=c.items.filter(x=>(state.loot[x]||0)>=1).length;
-   return `<div class="collection-row ${done?"complete":""}"><div class="collection-head"><div class="collection-name">${spriteIconHtml("2:collection","sm")}${done?"✓ ":""}${c.name}</div><div class="collection-progress">${have}/${c.items.length}</div></div><div class="collection-items">${c.items.map(x=>`${(state.loot[x]||0)>=1?"✓":"○"} ${x}`).join(" · ")}</div><div class="collection-reward">Reward: ${c.reward}</div><button class="btn small" style="margin-top:5px" onclick="claimCollection('${c.id}')" ${!ready||done?"disabled":""}>${done?"CLAIMED":"CLAIM REWARD"}</button></div>`;
+   return `<div class="collection-row ${done?"complete":""}"><div class="collection-head"><div class="collection-name">${spriteIconHtml("2:collection","sm")}${done?statusMarkHtml(true):statusMarkHtml(false)}${c.name}</div><div class="collection-progress">${have}/${c.items.length}</div></div><div class="collection-items">${c.items.map(x=>`${statusMarkHtml((state.loot[x]||0)>=1)}${x}`).join(" · ")}</div><div class="collection-reward">Reward: ${c.reward}</div><button class="btn small" style="margin-top:5px" onclick="claimCollection('${c.id}')" ${!ready||done?"disabled":""}>${done?"CLAIMED":"CLAIM REWARD"}</button></div>`;
  }).join("");
 
  const specialLoot=Object.entries(state.loot).filter(([k,v])=>v>0&&!consumables.includes(k));
@@ -6648,7 +6701,7 @@ function renderProfile(){
  }
  const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
  ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+
- defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?"✓ ":""}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
+ defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?statusMarkHtml(true):statusMarkHtml(false)}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
 }
 
 
