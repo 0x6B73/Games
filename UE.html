@@ -1338,6 +1338,85 @@ body:after{
 .home-intro h1{margin:0 0 3px!important;font-size:14px!important}
 .home-intro p{margin:0!important;font-size:9px!important;line-height:1.35!important}
 
+
+/* HOME DASHBOARD POLISH */
+#view-home .tab-banner{margin-bottom:6px}
+.home-command-panel{
+  margin-bottom:7px;
+  padding:8px;
+  border:1px solid #4b4133;
+  border-left:3px solid #9c7638;
+  background:linear-gradient(135deg,rgba(27,24,19,.96),rgba(8,9,10,.97));
+  box-shadow:0 7px 18px rgba(0,0,0,.32);
+}
+.home-command-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}
+.home-command-copy{min-width:0}
+.home-kicker{font-size:7px;font-weight:900;letter-spacing:.12em;color:#aa956f}
+.home-command-panel h1{font-family:Georgia,serif;font-size:16px;line-height:1.05;margin:2px 0 4px;color:#eee4d3}
+.home-location{font-size:10px;font-weight:900;color:#c9ac6b}
+.home-location-sub{font-size:8px;color:#8f887d;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.home-command-actions{display:grid;grid-template-columns:1fr;gap:3px;min-width:76px}
+.home-command-actions .btn{width:100%!important;padding:5px 7px!important;font-size:8px!important}
+.home-progress-strip{grid-template-columns:repeat(4,minmax(0,1fr))!important;margin:7px 0 0!important;gap:3px!important}
+.home-progress-strip .pbox{padding:5px 3px!important;font-size:7px!important;background:#090a0b!important}
+.home-progress-strip .pbox b{font-size:11px!important;margin-top:1px!important}
+.home-section-head{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  margin:6px 0 4px;padding:5px 7px;
+  border:1px solid #3d352a;border-left:3px solid #795a2d;
+  background:linear-gradient(#1c1813,#0d0d0c)
+}
+.home-section-head b{display:block;font:900 11px Georgia,serif;color:#e1d4be}
+.home-section-head span{display:block;font-size:7px;color:#8f887d;margin-top:1px}
+.home-link-btn{border:0;background:transparent;color:#ba9a58;font-size:8px;font-weight:900;padding:4px;white-space:nowrap}
+.home-fold{margin-top:6px!important}
+.home-fold>summary{font-size:9px!important;letter-spacing:.025em}
+.home-fold>summary span{font-size:7px!important;font-weight:normal;color:#847e75}
+.home-fold-body{padding:6px!important}
+.home-gift-action{display:flex;align-items:center;justify-content:space-between;gap:7px;padding:6px;border:1px solid #35312a;background:#0c0c0b;margin-bottom:5px}
+.home-gift-action b{display:block;font-size:9px;color:#d2c6b3}
+.home-gift-action span{display:block;font-size:7px;color:#817b72;margin-top:1px}
+.home-gift-action .btn{flex:0 0 auto}
+.home-log-card{margin:0!important;box-shadow:none!important}
+#view-home .daily,#view-home .event,#view-home .limited-loot{margin-bottom:5px!important}
+@media(max-width:430px){
+  .home-command-head{grid-template-columns:minmax(0,1fr) 72px}
+  .home-command-panel h1{font-size:14px}
+  .home-location-sub{max-width:250px}
+}
+
+/* EQUIPMENT GRADE FILTERS */
+.gear-filter-panel{padding:5px;border:1px solid #353431;background:#0b0c0d;margin-bottom:6px}
+.gear-filter-group+.gear-filter-group{border-top:1px solid #272824;margin-top:4px;padding-top:4px}
+.gear-filter-label{font-size:7px;font-weight:900;letter-spacing:.09em;color:#827b70;margin-bottom:2px}
+.gear-filter-panel .gear-filter-strip{padding:0!important;border:0!important;background:transparent!important;margin:0!important}
+.gear-filter-summary{font-size:7px;color:#8d867c;margin-top:4px;padding-top:4px;border-top:1px solid #272824}
+.badge.grade-low{border-color:#45484b;color:#a9adb0;background:#101112}
+.badge.grade-mid{border-color:#665237;color:#c8a36b;background:#15110c}
+.badge.grade-high{border-color:#7b6027;color:#e0bf63;background:#1a1509;box-shadow:inset 0 0 0 1px rgba(224,191,99,.06)}
+.gear-grade-key{font-weight:900}
+
+
+/* COLLAPSIBLE TAB SECTIONS / CREW OPERATIONS */
+.tab-section-fold{margin:0 0 6px}
+.tab-section-fold>summary{font-size:10px!important;letter-spacing:.035em}
+.tab-section-fold>summary span{font-size:8px!important;color:#8f887d;font-weight:700}
+.fold-inline-action{display:flex;justify-content:flex-end;margin:0 0 5px}
+.crew-operations-fold{border-left:3px solid #796238}
+.crew-op-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+.crew-op-card{background:#0a0b0c;border:1px solid #343638;padding:6px;min-width:0}
+.crew-op-card h4{margin:0 0 3px;font-size:9px;color:#ddd}
+.crew-op-cost{font-size:10px;font-weight:900;color:#c8ae5b;margin:3px 0}
+.crew-op-meta{font-size:8px;color:#8f887d;line-height:1.35;min-height:22px}
+.crew-op-card .btn{width:100%;margin-top:5px}
+.help-cache-head{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-top:7px;padding-top:6px;border-top:1px solid #343638}
+.help-cache-head b{font-size:9px}.help-cache-head span{font-size:8px;color:#9c9489}
+.help-cache-list{display:grid;gap:3px;margin-top:4px}
+.help-cache-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px;align-items:center;padding:5px 6px;background:#090a0b;border:1px solid #303235}
+.help-cache-row b{display:block;font-size:9px}.help-cache-row span{display:block;font-size:8px;color:#8f887d;margin-top:1px}
+.inventory-resource.cache b{color:#d8ba66}
+@media(max-width:600px){.crew-op-grid{grid-template-columns:1fr}.crew-op-meta{min-height:0}}
+
 </style>
 </head>
 <body>
@@ -1388,41 +1467,82 @@ body:after{
 <main class="main">
 <section id="view-home" class="view active">
  <div class="tab-banner" data-banner="CRIMINAL EMPIRE"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-home.png" alt="Criminal Empire banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div class="hero home-intro">
-  <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
+
+ <div class="home-command-panel">
+   <div class="home-command-head">
+     <div class="home-command-copy">
+       <div class="home-kicker">YOUR ORGANIZATION</div>
+       <h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1>
+       <div class="home-location" id="cityTitle">East Harbor Operations</div>
+       <div class="home-location-sub" id="citySub">Your organization is small. That can change.</div>
+     </div>
+     <div class="home-command-actions">
+       <button class="btn small" onclick="go('jobs')">RUN JOBS</button>
+       <button class="btn secondary small" onclick="go('crew')">CREW</button>
+       <button class="btn red small" onclick="go('fight')">FIGHT</button>
+     </div>
+   </div>
+   <div class="progress-strip home-progress-strip">
+     <div class="pbox">RANK<b id="rankBox"></b></div>
+     <div class="pbox">NOTORIETY<b id="notorietyBox"></b></div>
+     <div class="pbox">ATTACK<b id="atkBox"></b></div>
+     <div class="pbox">DEFENSE<b id="defBox"></b></div>
+   </div>
  </div>
- <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;background:linear-gradient(#d8d8d8,#8d8d8d);border:1px solid #111;color:#111;padding:4px 7px;margin-bottom:4px;font-weight:900;font-size:11px">
- <span>CREW GIFTS! SEND SUPPLIES TO YOUR ASSOCIATES</span><button class="btn" onclick="go('crew')">SEND GIFTS</button>
- </div>
- <div id="dailyBox"></div>
- <div id="eventBox"></div>
- <div class="crime-header"><strong>Campaign</strong><span>your path through the underworld</span></div>
- <div id="campaignBox"></div>
- <div id="energyHome"></div>
- <div class="crime-header"><strong id="cityTitle">East Harbor Operations</strong><span id="citySub">Your organization is small. That can change.</span></div>
- <div class="progress-strip">
-  <div class="pbox">RANK<b id="rankBox"></b></div><div class="pbox">NOTORIETY<b id="notorietyBox"></b></div>
-  <div class="pbox">ATTACK<b id="atkBox"></b></div><div class="pbox">DEFENSE<b id="defBox"></b></div>
- </div>
- <div class="section-title"><h2>Character</h2><span id="spLabel"></span></div>
- <div class="skillgrid" id="skills"></div>
- <div class="section-title" style="margin-top:10px"><h2>Recent Intelligence</h2><span>latest activity</span></div>
- <div class="card" id="log"></div>
+
+ <details class="fold-card home-fold tab-section-fold" open>
+   <summary>CAMPAIGN <span>your path through the underworld</span></summary>
+   <div class="fold-body home-fold-body">
+     <div class="fold-inline-action"><button class="home-link-btn" onclick="go('jobs')">OPEN JOBS ›</button></div>
+     <div id="campaignBox"></div>
+     <div id="energyHome"></div>
+   </div>
+ </details>
+
+ <details class="fold-card home-fold">
+   <summary>OPPORTUNITIES <span>daily collection / events / weekly drops</span></summary>
+   <div class="fold-body home-fold-body">
+     <div class="home-gift-action"><div><b>CREW GIFTS</b><span>Send supplies to trusted associates.</span></div><button class="btn secondary small" onclick="go('crew')">SEND GIFTS</button></div>
+     <div id="dailyBox"></div>
+     <div id="eventBox"></div>
+   </div>
+ </details>
+
+ <details class="fold-card home-fold">
+   <summary>CHARACTER <span id="spLabel">skill points</span></summary>
+   <div class="fold-body home-fold-body"><div class="skillgrid" id="skills"></div></div>
+ </details>
+
+ <details class="fold-card home-fold">
+   <summary>RECENT INTELLIGENCE <span>latest activity</span></summary>
+   <div class="fold-body home-fold-body"><div class="card home-log-card" id="log"></div></div>
+ </details>
 
  <div class="build-number" id="homeBuildNumber">BUILD</div>
 </section>
 
 <section id="view-jobs" class="view">
  <div class="tab-banner" data-banner="JOBS"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-jobs.png" alt="Jobs banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div id="energyJobs"></div>
- <div id="jobResult" class="job-result"></div><div class="section-title"><h2>Jobs</h2><span id="tierName"></span></div>
- <div class="grid cards" id="jobs"></div>
- <div class="section-title" style="margin-top:11px"><h2>Boss Operation</h2><span>complete the rank</span></div>
- <div id="boss"></div>
+ <details class="fold-card tab-section-fold" open>
+   <summary>JOBS <span id="tierName"></span></summary>
+   <div class="fold-body">
+     <div id="energyJobs"></div>
+     <div id="jobResult" class="job-result"></div>
+     <div class="grid cards" id="jobs"></div>
+   </div>
+ </details>
+ <details class="fold-card tab-section-fold">
+   <summary>BOSS OPERATION <span>complete the rank</span></summary>
+   <div class="fold-body"><div id="boss"></div></div>
+ </details>
 </section>
 
 <section id="view-crew" class="view">
  <div class="tab-banner" data-banner="CREW"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-crew.png" alt="Crew banner" loading="eager" onerror="bannerAssetError(this)"></div>
+ <details class="fold-card crew-operations-fold tab-section-fold" open>
+   <summary>CREW OPERATIONS <span id="crewOpsSummary">bulk actions / help caches</span></summary>
+   <div class="fold-body"><div id="crewOperations"></div></div>
+ </details>
  <details class="crew-fold" open>
   <summary>
     <span>YOUR CREW</span>
@@ -1451,31 +1571,41 @@ body:after{
   </div>
  </details>
 
- <div class="section-title" style="margin-top:8px"><h2>Potential Associates</h2><span>new people in your network</span></div>
- <div id="networkArrival" class="network-arrival">
-   <div>
-     <span class="network-arrival-label">NEXT POTENTIAL ASSOCIATE</span>
-     <b id="networkArrivalTime">≤ 30:00</b>
+ <details class="fold-card tab-section-fold">
+   <summary>POTENTIAL ASSOCIATES <span>new people in your network</span></summary>
+   <div class="fold-body">
+     <div id="networkArrival" class="network-arrival">
+       <div>
+         <span class="network-arrival-label">NEXT POTENTIAL ASSOCIATE</span>
+         <b id="networkArrivalTime">≤ 30:00</b>
+       </div>
+       <div id="networkArrivalStatus" class="network-arrival-status">Network search active.</div>
+     </div>
+     <div class="myspace">
+       <div class="ms-body"><div id="potentials"></div></div>
+     </div>
    </div>
-   <div id="networkArrivalStatus" class="network-arrival-status">Network search active.</div>
- </div>
- <div class="myspace">
-  <div class="ms-body">
-    <div id="potentials"></div>
-  </div>
- </div>
+ </details>
 </section>
 
 <section id="view-fight" class="view">
  <div class="tab-banner" data-banner="FIGHT"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-fight.png" alt="Fight banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
- <div id="combatInfo"></div>
- <div id="fightRefreshBar" class="fight-refresh-bar"></div>
- <div id="fightlist"></div>
- <div class="section-title" style="margin-top:10px"><h2>Revenge</h2><span>settle outstanding business</span></div>
- <div id="revenge"></div>
- <div class="section-title" style="margin-top:10px"><h2>Hitlist</h2><span>dynamic bounties</span></div>
- <div id="hitlist"></div>
+ <details class="fold-card tab-section-fold" open>
+   <summary>FIGHT LIST <span>1 stamina per attack</span></summary>
+   <div class="fold-body">
+     <div id="combatInfo"></div>
+     <div id="fightRefreshBar" class="fight-refresh-bar"></div>
+     <div id="fightlist"></div>
+   </div>
+ </details>
+ <details class="fold-card tab-section-fold">
+   <summary>REVENGE <span>settle outstanding business</span></summary>
+   <div class="fold-body"><div id="revenge"></div></div>
+ </details>
+ <details class="fold-card tab-section-fold">
+   <summary>HITLIST <span>dynamic bounties</span></summary>
+   <div class="fold-body"><div id="hitlist"></div></div>
+ </details>
 </section>
 
 <section id="view-gear" class="view">
@@ -1484,10 +1614,9 @@ body:after{
    <summary>MAIN INVENTORY <span>cash / gold / supplies</span></summary>
    <div class="fold-body">
      <div id="inventory"></div>
+     <div id="gearSupplyExchange"></div>
    </div>
  </details>
-
- <div id="gearSupplyExchange"></div>
 
  <details class="fold-card gear-section-fold">
    <summary>OWNED EQUIPMENT <span id="ownedEquipmentCount">0 items</span></summary>
@@ -1503,47 +1632,81 @@ body:after{
    </div>
  </details>
 
- <div class="section-title" style="margin-top:10px"><h2>Equipment Shop</h2><span id="upkeepLabel"></span></div>
- <div class="filter-strip gear-filter-strip" id="gearFilters">
-   <button class="btn small" data-filter="all" onclick="setGearFilter('all')">ALL</button>
-   <button class="btn small secondary" data-filter="attack" onclick="setGearFilter('attack')">ATTACK</button>
-   <button class="btn small secondary" data-filter="defense" onclick="setGearFilter('defense')">DEFENSE</button>
-   <button class="btn small secondary" data-filter="vehicle" onclick="setGearFilter('vehicle')">VEHICLES</button>
-   <button class="btn small secondary" data-filter="utility" onclick="setGearFilter('utility')">JOB TOOLS</button>
-   <button class="btn small secondary" data-filter="affordable" onclick="setGearFilter('affordable')">AFFORDABLE</button>
- </div>
- <div class="grid cards" id="gear"></div>
+ <details class="fold-card gear-section-fold tab-section-fold" open>
+   <summary>EQUIPMENT SHOP <span id="upkeepLabel"></span></summary>
+   <div class="fold-body">
+     <div class="gear-filter-panel" id="gearFilters">
+       <div class="gear-filter-group">
+         <div class="gear-filter-label">TYPE</div>
+         <div class="filter-strip gear-filter-strip">
+           <button class="btn small" data-filter="all" onclick="setGearFilter('all')">ALL</button>
+           <button class="btn small secondary" data-filter="attack" onclick="setGearFilter('attack')">ATTACK</button>
+           <button class="btn small secondary" data-filter="defense" onclick="setGearFilter('defense')">DEFENSE</button>
+           <button class="btn small secondary" data-filter="vehicle" onclick="setGearFilter('vehicle')">VEHICLES</button>
+           <button class="btn small secondary" data-filter="utility" onclick="setGearFilter('utility')">JOB TOOLS</button>
+           <button class="btn small secondary" data-filter="affordable" onclick="setGearFilter('affordable')">AFFORDABLE</button>
+         </div>
+       </div>
+       <div class="gear-filter-group">
+         <div class="gear-filter-label">GRADE</div>
+         <div class="filter-strip gear-filter-strip grade-filter-strip">
+           <button class="btn small" data-grade="all" onclick="setGearGradeFilter('all')">ALL GRADES</button>
+           <button class="btn small secondary" data-grade="low" onclick="setGearGradeFilter('low')">LOW END</button>
+           <button class="btn small secondary" data-grade="mid" onclick="setGearGradeFilter('mid')">MID GRADE</button>
+           <button class="btn small secondary" data-grade="high" onclick="setGearGradeFilter('high')">HIGH END</button>
+         </div>
+       </div>
+       <div class="gear-filter-summary" id="gearFilterSummary"></div>
+     </div>
+     <div class="grid cards" id="gear"></div>
+   </div>
+ </details>
 
- <div class="section-title" id="goldVaultSection" style="margin-top:10px"><h2>Gold Bar Vault</h2><span>rare permanent unlocks</span></div>
- <div class="card gold-vault-card">
-   <p>Gold Bars unlock equipment and favors that ordinary cash cannot buy. They can appear as an exceptionally rare Ask for Help reward, or you can exchange cash at an intentionally brutal rate.</p>
-   <div id="goldVault"></div>
- </div>
+ <details class="fold-card gear-section-fold tab-section-fold" id="goldVaultSection">
+   <summary>GOLD BAR VAULT <span>rare permanent unlocks</span></summary>
+   <div class="fold-body">
+     <div class="card gold-vault-card">
+       <p>Gold Bars unlock equipment and favors that ordinary cash cannot buy. They can appear as an exceptionally rare Ask for Help reward, or you can exchange cash at an intentionally brutal rate.</p>
+       <div id="goldVault"></div>
+     </div>
+   </div>
+ </details>
 </section>
 
 <section id="view-territory" class="view">
  <div class="tab-banner" data-banner="TERRITORY"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-territory.png" alt="Territory banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
- <details class="compact-details explainer-details">
-   <summary>HOW PROPERTIES WORK <span>?</span></summary>
-   <div class="compact-details-body">Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</div>
+ <details class="fold-card tab-section-fold" open>
+   <summary>PROPERTIES <span id="income"></span></summary>
+   <div class="fold-body">
+     <details class="compact-details explainer-details">
+       <summary>HOW PROPERTIES WORK <span>?</span></summary>
+       <div class="compact-details-body">Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</div>
+     </details>
+     <div class="grid cards" id="props"></div>
+   </div>
  </details>
- <div class="grid cards" id="props"></div>
- <div id="factions" style="margin-top:10px"></div>
+ <details class="fold-card tab-section-fold">
+   <summary>FACTIONS & CONTROL <span>territory pressure</span></summary>
+   <div class="fold-body"><div id="factions"></div></div>
+ </details>
 </section>
 
 <section id="view-more" class="view">
  <div class="tab-banner" data-banner="MORE"><img src="https://raw.githubusercontent.com/0x6B73/Games/refs/heads/main/Assets/banner-more.png" alt="More banner" loading="eager" onerror="bannerAssetError(this)"></div>
- <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
- <div class="card" style="margin-bottom:8px">
-  <div class="edit-profile-row">
-    <div class="edit-profile-main">
-      <img id="playerAvatar" class="profile-avatar" src="" alt="">
-      <div><div class="sub">PLAYER</div><div id="playerProfileName" class="player-name">Unknown</div></div>
-    </div>
-    <button class="btn secondary small" onclick="openEditProfile()">EDIT PROFILE</button>
-  </div>
-</div>
+ <details class="fold-card tab-section-fold" open>
+   <summary>ORGANIZATION PROFILE <span>identity / overview</span></summary>
+   <div class="fold-body">
+     <div class="card">
+       <div class="edit-profile-row">
+         <div class="edit-profile-main">
+           <img id="playerAvatar" class="profile-avatar" src="" alt="">
+           <div><div class="sub">PLAYER</div><div id="playerProfileName" class="player-name">Unknown</div></div>
+         </div>
+         <button class="btn secondary small" onclick="openEditProfile()">EDIT PROFILE</button>
+       </div>
+     </div>
+   </div>
+ </details>
 <details class="fold-card">
   <summary>Profile Stats <span>tap to expand</span></summary>
   <div class="fold-body"><div class="profile-grid" id="profile"></div></div>
@@ -1569,42 +1732,39 @@ body:after{
   <div class="fold-body"><div id="prestigePanel"></div></div>
 </details>
 
-<div class="card" style="margin-top:8px">
-  <h3>Preferences</h3>
-  <div class="toggle-row">
-    <div>
-      <b>Message Popups</b>
-      <div class="sub">Messages still arrive in the inbox when popups are disabled.</div>
+<details class="fold-card tab-section-fold">
+  <summary>PREFERENCES <span>messages / audio</span></summary>
+  <div class="fold-body">
+    <div class="toggle-row">
+      <div><b>Message Popups</b><div class="sub">Messages still arrive in the inbox when popups are disabled.</div></div>
+      <button class="btn small" id="messagePopupToggle" onclick="toggleMessagePopups()">ON</button>
     </div>
-    <button class="btn small" id="messagePopupToggle" onclick="toggleMessagePopups()">ON</button>
+    <div class="toggle-row" style="margin-top:7px">
+      <div><b>Theme Music</b><div class="sub">Dark trap background theme.</div></div>
+      <button class="btn secondary small" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
+    </div>
+    <div class="toggle-row" style="margin-top:7px">
+      <div><b>Sound Effects</b><div class="sub">Jobs, fights, purchases, alerts, and interface sounds.</div></div>
+      <button class="btn secondary small" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
+    </div>
   </div>
-<div class="toggle-row" style="margin-top:7px">
-  <div>
-    <b>Theme Music</b>
-    <div class="sub">Dark trap background theme.</div>
-  </div>
-  <button class="btn secondary small" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
-</div>
-<div class="toggle-row" style="margin-top:7px">
-  <div>
-    <b>Sound Effects</b>
-    <div class="sub">Jobs, fights, purchases, alerts, and interface sounds.</div>
-  </div>
-  <button class="btn secondary small" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
-</div>
-</div>
+</details>
 
-<div class="card" style="margin-top:8px">
-   <h3>Audio Credits</h3>
-   <p>Theme music and gameplay sound effects are generated locally with Web Audio for reliable playback.</p>
-   
- </div>
+<details class="fold-card tab-section-fold">
+  <summary>AUDIO CREDITS <span>Web Audio</span></summary>
+  <div class="fold-body"><p>Theme music and gameplay sound effects are generated locally with Web Audio for reliable playback.</p></div>
+</details>
 
-<div class="card" style="margin-top:8px"><h3>Save</h3><p>Progress is stored locally in this browser.</p><button class="btn secondary" onclick="exportSave()">Export Save</button><button class="btn secondary" style="margin-top:5px" onclick="importSave()">Import Save</button><button class="btn red" style="margin-top:5px" onclick="resetGame()">Reset</button></div>
-<div class="version-check-box">
-  <button class="btn secondary small" id="manualBuildCheckBtn" onclick="manualBuildCheck()">CHECK FOR NEW VERSION</button>
-  <div class="version-check-status" id="manualBuildCheckStatus">Updates are also checked automatically.</div>
-</div>
+<details class="fold-card tab-section-fold">
+  <summary>SAVE & VERSION <span>backup / update</span></summary>
+  <div class="fold-body">
+    <div class="card"><p>Progress is stored locally in this browser.</p><button class="btn secondary" onclick="exportSave()">Export Save</button><button class="btn secondary" style="margin-top:5px" onclick="importSave()">Import Save</button><button class="btn red" style="margin-top:5px" onclick="resetGame()">Reset</button></div>
+    <div class="version-check-box">
+      <button class="btn secondary small" id="manualBuildCheckBtn" onclick="manualBuildCheck()">CHECK FOR NEW VERSION</button>
+      <div class="version-check-status" id="manualBuildCheckStatus">Updates are also checked automatically.</div>
+    </div>
+  </div>
+</details>
 <div class="build-number" id="buildNumber">BUILD</div>
 </section>
 </main>
@@ -1779,7 +1939,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.19.3";
+const BUILD_NUMBER="0.20.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2249,6 +2409,8 @@ const GENERATED_CONTACT_INTERVAL_MS=30*60000;
 const PRESENCE_UPDATE_MS=10*60000;
 const CONTACT_RESPONSE_WINDOW_MS=90*60000;
 const HELP_REQUEST_COOLDOWN_MIN=30;
+const MASS_MONEY_COOLDOWN_MIN=60;
+const MAX_HELP_CACHES=20;
 const MAX_POTENTIAL_ASSOCIATES=5;
 const MAX_CREW_MEMBERS=1000;
 
@@ -2879,11 +3041,11 @@ function renderGoldVault(){
 }
 
 function fresh(){
- const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
+ const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:2,
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:2,helpCaches:[],
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
@@ -2926,6 +3088,8 @@ function migrate(){
  if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
  if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
+ if(!Array.isArray(state.helpCaches))state.helpCaches=[];
+ state.helpCaches=state.helpCaches.filter(x=>x&&typeof x==="object").slice(0,MAX_HELP_CACHES);
  if(!state.bossLastFight||typeof state.bossLastFight!=="object")state.bossLastFight={};
  if(!state.bossRematches||typeof state.bossRematches!=="object")state.bossRematches={};
  if(!Number.isInteger(state.combatBalanceVersion)||state.combatBalanceVersion<2){
@@ -3035,7 +3199,7 @@ function migrate(){
    const d=getPersonDef(id);
    state.friends[id]=Object.assign({
      rel:50,trust:50,respect:50,fear:10,resentment:0,crew:false,
-     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastGoldBarAsk:0,response:"",chat:[],
+     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],
      injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,45)*60000,
      activityScore:d?.generated?Math.max(.25,Math.min(.96,d.activityScore||.55)):.78,
      inactive:false,dropOffAt:0,joinedAt:now()
@@ -3985,6 +4149,158 @@ function fmt(ms){if(ms<=0)return "";const s=Math.ceil(ms/1000);return `${Math.fl
 function changeRelationship(id,{trust=0,respect=0,fear=0,resentment=0,rel=0}={}){
  const f=fstate(id);if(!f)return;f.trust=Math.max(0,Math.min(100,f.trust+trust));f.respect=Math.max(0,Math.min(100,f.respect+respect));f.fear=Math.max(0,Math.min(100,f.fear+fear));f.resentment=Math.max(0,Math.min(100,f.resentment+resentment));f.rel=Math.max(0,Math.min(100,f.rel+rel));
 }
+
+function crewBulkEligible(kind){
+ return crewIds().filter(id=>{
+   const f=state.friends[id];
+   if(!f||!contactCanRespond(f))return false;
+   if(kind==="money")return cooldown(Number(f.lastMoney)||0,MASS_MONEY_COOLDOWN_MIN)<=0;
+   if(kind==="favor")return cooldown(Number(f.lastFavor)||0,10)<=0;
+   if(kind==="help")return cooldown(Number(f.lastAsk)||0,HELP_REQUEST_COOLDOWN_MIN)<=0;
+   return false;
+ });
+}
+function crewBulkUnitCost(kind){
+ const lvl=Math.max(1,Math.floor(Number(state.level)||1));
+ if(kind==="money")return 150+lvl*20;
+ if(kind==="favor")return 100+lvl*15;
+ if(kind==="help")return 125+lvl*18;
+ return 0;
+}
+function crewBulkQuote(kind){
+ const ids=crewBulkEligible(kind),unit=crewBulkUnitCost(kind);
+ return {ids,count:ids.length,unit,total:ids.length*unit};
+}
+function helpCacheTier(cache){
+ const n=Math.max(0,Number(cache?.responders)||0);
+ if(n>=20)return "HEAVY CACHE";
+ if(n>=10)return "PACKED CACHE";
+ if(n>=4)return "CREW CACHE";
+ if(n>=1)return "SMALL CACHE";
+ return "THIN CACHE";
+}
+function massCrewOperation(kind){
+ const q=crewBulkQuote(kind);
+ if(!q.count)return showRequirementPopup("No recruited crew members are currently eligible for that bulk operation.");
+ if(state.cash<q.total)return showRequirementPopup(`This crew operation costs ${money(q.total)}. You have ${money(state.cash)}.`);
+ const names={money:"send money to",favor:"return favors for",help:"ask for help from"};
+ if(!confirm(`Spend ${money(q.total)} to ${names[kind]||"contact"} ${q.count} eligible crew member${q.count===1?"":"s"}?`))return;
+
+ state.cash-=q.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+q.total;
+ const t=now();
+
+ if(kind==="money"){
+   q.ids.forEach(id=>{
+     const f=state.friends[id],d=getPersonDef(id);
+     f.lastMoney=t;
+     changeRelationship(id,{trust:4,respect:2,resentment:-3,rel:4});
+     f.response=`Received ${money(q.unit)} from the organization.`;
+     if(d)log(`Sent ${money(q.unit)} to ${d.name} through Crew Operations.`);
+   });
+   showActionFlash("MONEY DISTRIBUTED",`${q.count} crew · ${money(q.unit)} each · ${money(q.total)} total`,"cash");
+ }
+
+ if(kind==="favor"){
+   q.ids.forEach(id=>{
+     const f=state.friends[id],d=getPersonDef(id);
+     f.lastFavor=t;
+     changeRelationship(id,{trust:5,respect:3,resentment:-4,rel:5});
+     f.response="The organization settled what it owed me.";
+     if(d)log(`Returned a favor for ${d.name} through Crew Operations.`);
+   });
+   showActionFlash("FAVORS RETURNED",`${q.count} crew · ${money(q.total)} operation cost`,"good");
+ }
+
+ if(kind==="help"){
+   let responders=0;
+   q.ids.forEach(id=>{
+     const f=state.friends[id],d=getPersonDef(id);
+     f.lastAsk=t;
+     const chance=Math.max(.08,Math.min(.88,(d?.help||.5)+(f.trust-50)/170-(f.resentment/160)));
+     changeRelationship(id,{trust:-1,resentment:1,rel:-1});
+     if(Math.random()<chance){
+       responders++;
+       f.response="I put something into the crew cache.";
+     }else{
+       f.response="Nothing to spare this time.";
+     }
+   });
+   const cache={
+     id:`cache_${t.toString(36)}_${Math.random().toString(36).slice(2,7)}`,
+     createdAt:t,
+     contacted:q.count,
+     responders,
+     level:state.level
+   };
+   state.helpCaches.unshift(cache);
+   state.helpCaches=state.helpCaches.slice(0,MAX_HELP_CACHES);
+   log(`Crew Operations sealed a ${helpCacheTier(cache)} after contacting ${q.count} crew members; ${responders} contributed.`);
+   recordIntel("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} crew contributed`,"good");
+   showActionFlash("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} responses · Open it when ready`,"good");
+ }
+ S.cash();save();render();
+}
+function openHelpCache(id=null){
+ if(!Array.isArray(state.helpCaches)||!state.helpCaches.length)return showRequirementPopup("You do not have any sealed Help Caches.");
+ const idx=id?state.helpCaches.findIndex(x=>x.id===id):0;
+ if(idx<0)return showRequirementPopup("That Help Cache is no longer available.");
+ const cache=state.helpCaches[idx];
+ const responders=Math.max(0,Number(cache.responders)||0);
+ const rolls=Math.max(1,Math.min(6,1+Math.floor(responders/4)));
+ const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,cash:0,limited:0,nothing:0};
+
+ for(let i=0;i<rolls;i++){
+   let r=Math.random();
+   if(responders===0)r=Math.min(.999,r+.24);
+   if(r<.31){addLootItem("Energy Drink",1,999);rewards.energy++;}
+   else if(r<.58){addLootItem("Adrenaline Shot",1,999);rewards.stamina++;}
+   else if(r<.72){addLootItem("Energy Pack",1,99);rewards.energyPack++;}
+   else if(r<.84){addLootItem("Stamina Pack",1,99);rewards.staminaPack++;}
+   else if(r<.94){
+     const amount=rnd(250,700)+Math.max(1,Number(cache.level)||1)*25+responders*20;
+     state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;rewards.cash+=amount;
+   }else if(r<.98&&responders>=8){
+     const limited=activeLimitedLoot();addLootItem(limited.name,1,99);rewards.limited++;
+   }else rewards.nothing++;
+ }
+
+ state.helpCaches.splice(idx,1);
+ const parts=[];
+ if(rewards.energy)parts.push(`🥤 ${rewards.energy}`);
+ if(rewards.stamina)parts.push(`💉 ${rewards.stamina}`);
+ if(rewards.energyPack)parts.push(`Energy Pack ×${rewards.energyPack}`);
+ if(rewards.staminaPack)parts.push(`Stamina Pack ×${rewards.staminaPack}`);
+ if(rewards.cash)parts.push(money(rewards.cash));
+ if(rewards.limited)parts.push(`Weekly Loot ×${rewards.limited}`);
+ if(!parts.length)parts.push("Nothing useful");
+ const summary=parts.join(" · ");
+ log(`Opened ${helpCacheTier(cache)}: ${summary}.`);
+ recordIntel("HELP CACHE OPENED",summary,rewards.nothing===rolls?"info":"good");
+ showActionFlash("HELP CACHE OPENED",summary,rewards.nothing===rolls?"info":"good");
+ save();render();
+}
+function renderCrewOperations(){
+ const el=document.getElementById("crewOperations");if(!el)return;
+ const summary=document.getElementById("crewOpsSummary");
+ const qm=crewBulkQuote("money"),qf=crewBulkQuote("favor"),qh=crewBulkQuote("help");
+ const caches=Array.isArray(state.helpCaches)?state.helpCaches:[];
+ if(summary)summary.textContent=`bulk actions · ${caches.length} sealed cache${caches.length===1?"":"s"}`;
+ const opCard=(title,desc,q,kind,label)=>`<div class="crew-op-card">
+   <h4>${title}</h4>
+   <div class="crew-op-meta">${desc}<br>${q.count} eligible · ${money(q.unit)} per crew member</div>
+   <div class="crew-op-cost">${money(q.total)}</div>
+   <button class="btn small ${kind==="money"?"":"secondary"}" onclick="massCrewOperation('${kind}')" ${q.count<1||state.cash<q.total?"disabled":""}>${label}</button>
+ </div>`;
+ el.innerHTML=`<div class="crew-op-grid">
+   ${opCard("MASS SEND MONEY","Distribute level-scaled Cash to every eligible recruited crew member. 60m per-person cooldown.",qm,"money","SEND MONEY")}
+   ${opCard("MASS RETURN FAVORS","Settle obligations across eligible recruited crew. Uses each contact's normal favor cooldown.",qf,"favor","RETURN FAVORS")}
+   ${opCard("MASS ASK FOR HELP","Coordinate one request across eligible recruited crew. Replies are sealed into a Help Cache for later.",qh,"help","ASK FOR HELP")}
+ </div>
+ <div class="help-cache-head"><b>SEALED HELP CACHES</b><span>${caches.length}/${MAX_HELP_CACHES}</span></div>
+ <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>🎁 ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
+}
+
 function doFavor(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d)return;
@@ -4124,7 +4440,7 @@ function addPotential(id,force=false){
 
    state.friends[id]={
      rel:p.rel,trust:p.rel,respect:45,fear:10,resentment:0,crew:false,
-     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastGoldBarAsk:0,
+     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,
      response:"Good to have a direct line.",chat:p.chat||[],
      injuredUntil:0,arrestedUntil:0,gifts:0,
      lastOnline:p.lastOnline||now(),activityScore:p.activityScore||d.activityScore||.60,
@@ -4770,6 +5086,7 @@ function showLevelUpModal(level){
 }
 
 let gearShopFilter="all";
+let gearGradeFilter="all";
 const gearBuySelections={};
 let crewListFilter="all";
 let crewSearchText="";
@@ -4783,6 +5100,16 @@ function setRelationshipOpen(id,isOpen){
 function setGearFilter(filter){
  gearShopFilter=filter||"all";
  renderGear();
+}
+function setGearGradeFilter(filter){
+ gearGradeFilter=filter||"all";
+ renderGear();
+}
+function gearGrade(g){
+ const cost=Math.max(0,Number(g?.cost)||0);
+ if(cost>=50000)return {id:"high",label:"HIGH END",cls:"grade-high",range:"$50K+"};
+ if(cost>=5000)return {id:"mid",label:"MID GRADE",cls:"grade-mid",range:"$5K–$49,999"};
+ return {id:"low",label:"LOW END",cls:"grade-low",range:"Under $5K"};
 }
 function gearSelectedQty(id){
  const q=Number(gearBuySelections[id]||1);
@@ -4809,9 +5136,11 @@ function catalogLockText(item){
  return missing.length?`NEED ${missing.join(" · ")}`:"";
 }
 function gearMatchesFilter(g){
- if(gearShopFilter==="all")return true;
- if(gearShopFilter==="affordable")return !catalogAccess(g).locked&&state.cash>=bulkGearPrice(g,gearSelectedQty(g.id)).total;
- return g.type===gearShopFilter;
+ let typeMatch=true;
+ if(gearShopFilter==="affordable")typeMatch=!catalogAccess(g).locked&&state.cash>=bulkGearPrice(g,gearSelectedQty(g.id)).total;
+ else if(gearShopFilter!=="all")typeMatch=g.type===gearShopFilter;
+ const gradeMatch=gearGradeFilter==="all"||gearGrade(g).id===gearGradeFilter;
+ return typeMatch&&gradeMatch;
 }
 function setCrewFilter(filter){
  crewListFilter=filter||"all";
@@ -4983,6 +5312,7 @@ function renderCrew(){
    else openRelationshipDetails.delete(id);
  });
 
+ renderCrewOperations();
  const inactiveCrew=crewIds().filter(id=>state.friends[id]?.inactive).length;
  crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
 
@@ -5144,6 +5474,7 @@ function renderInventory(){
  const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
  const ep=Math.max(0,Number(state.loot["Energy Pack"])||0);
  const sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
+ const caches=Array.isArray(state.helpCaches)?state.helpCaches.length:0;
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
  const ownedQty=owned.reduce((n,g)=>n+gearQty(g.id),0);
 
@@ -5164,6 +5495,10 @@ function renderInventory(){
    <div class="inventory-resource pack">
      <div class="ir-label">STAMINA PACKS</div><b>📦 ${sp}</b>
      <button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button>
+   </div>
+   <div class="inventory-resource cache">
+     <div class="ir-label">HELP CACHES</div><b>🎁 ${caches}</b>
+     <button class="btn small" style="margin-top:4px" onclick="openHelpCache()" ${caches<=0?"disabled":""}>OPEN</button>
    </div>
  </div>`;
 
@@ -5207,29 +5542,41 @@ function renderGear(){
    b.classList.toggle("active",active);
    b.classList.toggle("secondary",!active);
  });
+ document.querySelectorAll("#gearFilters [data-grade]").forEach(b=>{
+   const active=b.dataset.grade===gearGradeFilter;
+   b.classList.toggle("active",active);
+   b.classList.toggle("secondary",!active);
+ });
 
  const visible=gearDefs.filter(gearMatchesFilter);
+ const summary=document.getElementById("gearFilterSummary");
+ if(summary){
+   const typeLabel=gearShopFilter==="all"?"All types":gearShopFilter==="affordable"?"Affordable":gearShopFilter==="vehicle"?"Vehicles":gearShopFilter==="utility"?"Job Tools":gearShopFilter.charAt(0).toUpperCase()+gearShopFilter.slice(1);
+   const gradeLabel=gearGradeFilter==="all"?"All grades":gearGradeFilter==="low"?"Low End · under $5K":gearGradeFilter==="mid"?"Mid Grade · $5K–$49,999":"High End · $50K+";
+   summary.textContent=`Showing ${visible.length} of ${gearDefs.length} · ${typeLabel} · ${gradeLabel}`;
+ }
+
  gearEl.innerHTML=visible.length?visible.map(g=>{
    const uses=jobsUsingGear(g.id),qty=gearSelectedQty(g.id),price=bulkGearPrice(g,qty);
    const savings=g.cost*qty-price.total;
    const access=catalogAccess(g),lock=access.locked;
    const discount=qty===5?3:qty===10?7:qty===50?10:0;
-   const elite=g.cost>=25000;
+   const grade=gearGrade(g),elite=grade.id==="high";
 
    return `<div class="card ${elite?"elite-catalog-item":""}">
      <img class="art" src="${IMG[g.img]||IMG.suit}" alt="">
      <h3>${g.name}</h3>
      <div class="meta">
+       <span class="badge ${grade.cls}">${grade.label}</span>
        <span class="badge">${gearEffectLabel(g)}</span>
        <span class="badge">Owned ${gearQty(g.id)}</span>
        <span class="badge">${money(g.cost)} each</span>
-       ${elite?`<span class="badge gold">HIGH-END</span>`:""}
        ${g.crewReq?`<span class="badge ${access.crewMet?"green":"red"}">Crew ${crewSize()}/${g.crewReq}</span>`:""}
        ${g.upkeep?`<span class="badge red">${money(g.upkeep)}/hr upkeep</span>`:""}
      </div>
      <details class="compact-details">
        <summary>ITEM DETAILS</summary>
-       <div class="compact-details-body">${g.desc}<br>${g.crewReq?`Organization requirement: Level ${g.level} · Crew ${g.crewReq}.<br>`:""}${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
+       <div class="compact-details-body"><b>${grade.label}</b> · ${grade.range}<br>${g.desc}<br>${g.crewReq?`Organization requirement: Level ${g.level} · Crew ${g.crewReq}.<br>`:""}${uses.length?`Required by: ${uses.slice(0,4).join(" · ")}${uses.length>4?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div>
      </details>
      <div class="gear-buy-controls">
        <select class="gear-qty-select" onchange="setGearBuyQty('${g.id}',this.value)" ${lock?"disabled":""}>
@@ -5244,7 +5591,7 @@ function renderGear(){
      </div>
      <div class="gear-buy-note">${lock?`Locked until ${[!access.levelMet?`Level ${access.levelReq}`:"",!access.crewMet?`Crew ${access.crewReq}`:""].filter(Boolean).join(" and ")}.`:discount?`${discount}% bulk discount · Saved ${money(savings)} vs individual price.`:"Select a larger quantity for a bulk discount."}</div>
    </div>`;
- }).join(""):`<div class="tab-empty">No equipment matches this filter.</div>`;
+ }).join(""):`<div class="tab-empty">No equipment matches this type and grade combination.</div>`;
 }
 function factionPressure(f){
  const linked=territoryDefs.filter(t=>t.enemy===f.name);
