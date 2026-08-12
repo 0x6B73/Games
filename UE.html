@@ -3041,7 +3041,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.27";
+const BUILD_NUMBER="0.22.28";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3203,19 +3203,19 @@ const jobDefs=[
  {id:"boost",tier:0,city:"east",name:"Boost a Parked Car",energy:3,cash:[110,180],xp:8,crew:1,heat:2,risk:8,role:"Driver",img:"car",req:{lockpick:1},loot:["Burner Phone","Stolen Plate"]},
  {id:"shake",tier:0,city:"east",name:"Shake Down a Corner Store",energy:4,cash:[160,240],xp:10,crew:2,heat:3,risk:10,role:"Enforcer",img:"suit",req:{pistol:1,burner:1},loot:["Old Ledger"]},
  {id:"truck",tier:0,city:"east",name:"Hijack a Delivery Truck",energy:6,cash:[280,420],xp:16,crew:3,heat:5,risk:14,role:"Driver",img:"warehouse",req:{pistol:2,sedan:1,lockpick:1},loot:["Dock Manifest"]},
- {id:"bookie",tier:1,city:"east",name:"Collect from a Bookmaker",energy:7,cash:[450,650],xp:20,crew:4,heat:5,risk:15,role:"Collector",img:"suit",req:{pistol:3,vest:2,burner:2},loot:["Marked Dice"]},
- {id:"warehouse",tier:1,city:"east",name:"Raid a Harbor Warehouse",energy:9,cash:[650,930],xp:28,crew:6,heat:8,risk:20,role:"Smuggler",img:"warehouse",req:{smg:1,sedan:2,cargoVan:1},loot:["Customs Seal","Crate Key"]},
- {id:"union",tier:1,city:"east",name:"Pressure a Union Foreman",energy:10,cash:[780,1150],xp:32,crew:8,heat:7,risk:18,role:"Fixer",img:"docks",req:{smg:2,vest:4,suppressor:1},loot:["Union Card"]},
- {id:"casino",tier:2,city:"downtown",name:"Rig a Private Casino",energy:12,cash:[1200,1650],xp:40,crew:10,heat:10,risk:23,role:"Fixer",img:"club",req:{smg:4,sedan:4,encrypted:1},loot:["Loaded Deck","VIP Ledger"]},
- {id:"vault",tier:2,city:"downtown",name:"Crack a Counting Room",energy:15,cash:[1750,2500],xp:52,crew:12,heat:12,risk:27,role:"Safecracker",img:"club",req:{rifle:2,vest:8,safeKit:2},loot:["Brass Key"]},
- {id:"shipment",tier:2,city:"downtown",name:"Take a Contraband Shipment",energy:17,cash:[2200,3200],xp:60,crew:15,heat:14,risk:30,role:"Smuggler",img:"warehouse",req:{rifle:4,armored:2,cargoVan:3,encrypted:1},loot:["Black Seal"]},
- {id:"judge",tier:3,city:"downtown",name:"Compromise a City Judge",energy:20,cash:[3400,4700],xp:75,crew:18,heat:13,risk:26,role:"Fixer",img:"skyline",req:{rifle:7,armored:4,encrypted:2,suppressor:2},loot:["Court Docket"]},
- {id:"convoy",tier:3,city:"north",name:"Hit an Armored Convoy",energy:23,cash:[4600,6400],xp:88,crew:22,heat:18,risk:38,role:"Driver",img:"car",req:{rifle:10,armored:6,nightvision:2,tacticalvan:2},loot:["Security Badge","Route Schedule"]},
- {id:"family",tier:4,city:"north",name:"Break a Rival Family's Supply Line",energy:26,cash:[6200,8500],xp:110,crew:28,heat:20,risk:42,role:"Strategist",img:"docks",req:{rifle:14,armored:10,plates:12,bodyarmor:4,comms:2},loot:["Family Ledger"]},
- {id:"bank",tier:4,city:"north",name:"Take the Reserve Vault",energy:30,cash:[8500,12000],xp:135,crew:34,heat:24,risk:48,role:"Safecracker",img:"skyline",req:{rifle:20,armored:14,plates:18,safeKit:5,breach:4,lmg:2},loot:["Reserve Bond"]},
- {id:"evidence",tier:5,city:"north",name:"Hijack a Federal Evidence Transfer",energy:34,cash:[12000,17500],xp:160,crew:40,heat:25,risk:50,role:"Driver",img:"car",req:{rifle:22,armored:16,bodyarmor:8,tacticalvan:4,dmr:2},loot:["Sealed Evidence Tag","Federal Route Sheet"]},
- {id:"securitycontract",tier:5,city:"downtown",name:"Take Over a Private Security Contract",energy:37,cash:[16500,23500],xp:195,crew:46,heat:27,risk:52,role:"Strategist",img:"suit",req:{dmr:4,ceramicSuit:4,armoredSUV:2,comms:6,encrypted:4},loot:["Executive Access Card","Security Retainer Ledger"]},
- {id:"north treasury",tier:5,city:"north",name:"Seize the Northside Treasury",energy:42,cash:[24000,35000],xp:240,crew:55,heat:30,risk:56,role:"Safecracker",img:"skyline",req:{dmr:8,ceramicSuit:8,armoredSUV:4,lmg:6,breach:6,safeKit:8},loot:["Vale Treasury Key","Capo Black Ledger"]}
+ {id:"bookie",tier:1,city:"east",name:"Collect from a Bookmaker",energy:7,cash:[500,700],xp:20,crew:4,heat:5,risk:15,role:"Collector",img:"suit",req:{pistol:3,vest:2,burner:2},loot:["Marked Dice"]},
+ {id:"warehouse",tier:1,city:"east",name:"Raid a Harbor Warehouse",energy:9,cash:[750,1050],xp:28,crew:6,heat:8,risk:20,role:"Smuggler",img:"warehouse",req:{smg:1,sedan:2,cargoVan:1},loot:["Customs Seal","Crate Key"]},
+ {id:"union",tier:1,city:"east",name:"Pressure a Union Foreman",energy:10,cash:[1000,1400],xp:32,crew:8,heat:7,risk:18,role:"Fixer",img:"docks",req:{smg:2,vest:4,suppressor:1},loot:["Union Card"]},
+ {id:"casino",tier:2,city:"downtown",name:"Rig a Private Casino",energy:12,cash:[1800,2500],xp:40,crew:10,heat:10,risk:23,role:"Fixer",img:"club",req:{smg:4,sedan:4,encrypted:1},loot:["Loaded Deck","VIP Ledger"]},
+ {id:"vault",tier:2,city:"downtown",name:"Crack a Counting Room",energy:15,cash:[2700,3800],xp:52,crew:12,heat:12,risk:27,role:"Safecracker",img:"club",req:{rifle:2,vest:8,safeKit:2},loot:["Brass Key"]},
+ {id:"shipment",tier:2,city:"downtown",name:"Take a Contraband Shipment",energy:17,cash:[3900,5500],xp:60,crew:15,heat:14,risk:30,role:"Smuggler",img:"warehouse",req:{rifle:4,armored:2,cargoVan:3,encrypted:1},loot:["Black Seal"]},
+ {id:"judge",tier:3,city:"downtown",name:"Compromise a City Judge",energy:20,cash:[6500,9000],xp:75,crew:18,heat:13,risk:26,role:"Fixer",img:"skyline",req:{rifle:7,armored:4,encrypted:2,suppressor:2},loot:["Court Docket"]},
+ {id:"convoy",tier:3,city:"north",name:"Hit an Armored Convoy",energy:23,cash:[9000,12500],xp:88,crew:22,heat:18,risk:38,role:"Driver",img:"car",req:{rifle:10,armored:6,nightvision:2,tacticalvan:2},loot:["Security Badge","Route Schedule"]},
+ {id:"family",tier:4,city:"north",name:"Break a Rival Family's Supply Line",energy:26,cash:[14000,19500],xp:110,crew:28,heat:20,risk:42,role:"Strategist",img:"docks",req:{rifle:14,armored:10,plates:12,bodyarmor:4,comms:2},loot:["Family Ledger"]},
+ {id:"bank",tier:4,city:"north",name:"Take the Reserve Vault",energy:30,cash:[21000,30000],xp:135,crew:34,heat:24,risk:48,role:"Safecracker",img:"skyline",req:{rifle:20,armored:14,plates:18,safeKit:5,breach:4,lmg:2},loot:["Reserve Bond"]},
+ {id:"evidence",tier:5,city:"north",name:"Hijack a Federal Evidence Transfer",energy:34,cash:[32000,45000],xp:160,crew:40,heat:25,risk:50,role:"Driver",img:"car",req:{rifle:22,armored:16,bodyarmor:8,tacticalvan:4,dmr:2},loot:["Sealed Evidence Tag","Federal Route Sheet"]},
+ {id:"securitycontract",tier:5,city:"downtown",name:"Take Over a Private Security Contract",energy:37,cash:[45000,65000],xp:195,crew:46,heat:27,risk:52,role:"Strategist",img:"suit",req:{dmr:4,ceramicSuit:4,armoredSUV:2,comms:6,encrypted:4},loot:["Executive Access Card","Security Retainer Ledger"]},
+ {id:"north treasury",tier:5,city:"north",name:"Seize the Northside Treasury",energy:42,cash:[65000,95000],xp:240,crew:55,heat:30,risk:56,role:"Safecracker",img:"skyline",req:{dmr:8,ceramicSuit:8,armoredSUV:4,lmg:6,breach:6,safeKit:8},loot:["Vale Treasury Key","Capo Black Ledger"]}
 ];
 const gearDefs=[
  {id:"lockpick",name:"Professional Lockpick Set",type:"utility",power:0,cost:180,upkeep:0,level:1,img:"gun",desc:"A compact set for getting through cheap locks without announcing yourself. JOB TOOL — required by early theft operations."},
