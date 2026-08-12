@@ -2926,7 +2926,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.14";
+const BUILD_NUMBER="0.22.15";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4359,6 +4359,11 @@ function migrate(){
    if(typeof state.friends[id].inactive!=="boolean")state.friends[id].inactive=false;
    if(!Number.isFinite(state.friends[id].dropOffAt))state.friends[id].dropOffAt=0;
    if(!Number.isFinite(state.friends[id].joinedAt))state.friends[id].joinedAt=now();
+   const gr=state.friends[id].giftRequest;
+   if(gr&&typeof gr==="object"){
+     gr.qty=Math.max(1,Math.min(5,Math.floor(Number(gr.qty)||1)));
+     if(!gr.item)state.friends[id].giftRequest=null;
+   }else state.friends[id].giftRequest=null;
  }
 
  if(!state.potentials||typeof state.potentials!=="object")state.potentials={};
@@ -6004,33 +6009,28 @@ function sendGift(id){
  const wait=cooldown(f.lastGift||0,30);
  if(wait>0)return showRequirementPopup(`You already sent ${d.name} a gift. Try again in ${fmt(wait)}.`);
 
- const gift=rollOutgoingCrewGift();
- if(!gift){
-   return showRequirementPopup("You do not have any standard supplies or equipment available to send as a gift.");
+ const gift=ensureCrewGiftRequest(id);
+ if(!gift)return showRequirementPopup(`${d.name} does not have a gift request right now.`);
+ const owned=crewGiftOwned(gift);
+ if(owned<gift.qty){
+   return showRequirementPopup(`${d.name} is requesting ${gift.item} ×${gift.qty}. You currently have ${owned}.`);
  }
 
  if(gift.kind==="gear"){
-   const owned=Math.max(0,Math.floor(Number(state.gear[gift.itemId])||0));
-   const sent=Math.min(gift.qty,owned);
-   if(sent<=0)return showRequirementPopup("That gift is no longer available in your inventory.");
-   state.gear[gift.itemId]=owned-sent;
+   state.gear[gift.itemId]=owned-gift.qty;
    if(state.gear[gift.itemId]<=0)delete state.gear[gift.itemId];
-   gift.qty=sent;
  }else{
-   const owned=Math.max(0,Math.floor(Number(state.loot[gift.item])||0));
-   const sent=Math.min(gift.qty,owned);
-   if(sent<=0)return showRequirementPopup("That gift is no longer available in your inventory.");
-   state.loot[gift.item]=owned-sent;
+   state.loot[gift.item]=owned-gift.qty;
    if(state.loot[gift.item]<=0)delete state.loot[gift.item];
-   gift.qty=sent;
  }
 
  f.lastGift=now();
+ f.giftRequest=null;
  changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});
  f.gifts=(f.gifts||0)+1;
- f.response=`I received the ${gift.item}${gift.qty>1?` ×${gift.qty}`:""}. Thank you.`;
- log(`You sent ${gift.item} ×${gift.qty} to ${d.name}.`);
- showActionFlash("GIFT SENT",`${d.name} · ${gift.item} ×${gift.qty} · Next gift in 30m`,"good");
+ f.response=`That is exactly what I needed. Thank you for the ${gift.item}${gift.qty>1?` ×${gift.qty}`:""}.`;
+ log(`You sent ${gift.item} ×${gift.qty} to ${d.name} after they requested it.`);
+ showActionFlash("GIFT SENT",`${d.name} · ${gift.item} ×${gift.qty} · Next request after 30m cooldown`,"good");
  S.ok();save();render();
 }
 function nameOf(id){return getPersonDef(id)?.name||id}
@@ -6258,7 +6258,7 @@ function maybeSocialEvent(){
  save();
 }
 function weightedCrewGiftQuantity(){
- // Outgoing gift quantity: 1 is most common, with steadily lower odds through 5.
+ // Crew requests use the same descending 1-5 weighting: smaller asks are more common.
  const roll=Math.random()*100;
  if(roll<45)return 1;
  if(roll<70)return 2;
@@ -6266,27 +6266,49 @@ function weightedCrewGiftQuantity(){
  if(roll<95)return 4;
  return 5;
 }
-function accessibleCrewGiftItems(){
+function crewGiftRequestPool(){
+ // Requests can ask for anything the player has unlocked access to, even if they
+ // do not currently own enough. This lets the request remain visible until filled.
  const supplies=[
    {kind:"loot",item:"Energy Drink"},
    {kind:"loot",item:"Adrenaline Shot"},
    {kind:"loot",item:"Energy Pack"},
    {kind:"loot",item:"Stamina Pack"}
- ].map(x=>({...x,owned:Math.max(0,Math.floor(Number(state.loot[x.item])||0))}))
-  .filter(x=>x.owned>0);
-
+ ];
+ const size=crewSize();
  const availableGear=gearDefs
-   .map(g=>({kind:"gear",item:g.name,itemId:g.id,owned:Math.max(0,Math.floor(Number(state.gear[g.id])||0))}))
-   .filter(x=>x.owned>0);
-
+   .filter(g=>state.level>=g.level&&size>=(g.crewReq||0))
+   .map(g=>({kind:"gear",item:g.name,itemId:g.id}));
  return [...supplies,...availableGear];
 }
-function rollOutgoingCrewGift(){
- const pool=accessibleCrewGiftItems();
+function crewGiftOwned(request){
+ if(!request)return 0;
+ if(request.kind==="gear"&&request.itemId){
+   return Math.max(0,Math.floor(Number(state.gear[request.itemId])||0));
+ }
+ return Math.max(0,Math.floor(Number(state.loot[request.item])||0));
+}
+function ensureCrewGiftRequest(id){
+ const f=fstate(id);
+ if(!f)return null;
+ const wait=cooldown(f.lastGift||0,30);
+ if(wait>0)return f.giftRequest||null;
+ const current=f.giftRequest;
+ if(current&&current.item&&Number(current.qty)>0)return current;
+ const pool=crewGiftRequestPool();
  if(!pool.length)return null;
- const gift={...pool[rnd(0,pool.length-1)]};
- gift.qty=Math.min(weightedCrewGiftQuantity(),gift.owned);
- return gift;
+ const request={...pool[rnd(0,pool.length-1)],qty:weightedCrewGiftQuantity(),createdAt:now()};
+ f.giftRequest=request;
+ save();
+ return request;
+}
+function crewGiftRequestStatus(id){
+ const f=fstate(id);
+ if(!f)return {request:null,owned:0,ready:false,wait:0};
+ const wait=cooldown(f.lastGift||0,30);
+ const request=ensureCrewGiftRequest(id);
+ const owned=crewGiftOwned(request);
+ return {request,owned,ready:!!request&&owned>=request.qty,wait};
 }
 function maybeGift(){
  const t=now();
@@ -7148,6 +7170,7 @@ function renderCrew(){
          <div class="compact-details-body">
            Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
            ${inactive?"Help unavailable while this contact is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Energy Drinks, Adrenaline Shots, supply packs, Nothing, or an exceptionally rare reward."}
+           ${(()=>{const gs=crewGiftRequestStatus(id);return gs.request?`<br><b>Gift request:</b> ${gs.request.item} ×${gs.request.qty} · You have ${gs.owned}${gs.owned<gs.request.qty?" · INSUFFICIENT":" · READY"}`:""})()}
            ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
          </div>
        </details>
@@ -7156,7 +7179,7 @@ function renderCrew(){
        <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"ASK FOR HELP"}</button>
        <button onclick="recruit('${id}')" ${f.crew||!responsive||r?"disabled":""}>${f.crew?"RECRUITED":inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
        <button onclick="doFavor('${id}')" ${!responsive||fv||state.cash<100?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":fv?fmt(fv):"RETURN FAVOR -$100"}</button>
-       <button onclick="sendGift('${id}')" ${!responsive||(f.lastGift&&cooldown(f.lastGift,30)>0)||accessibleCrewGiftItems().length===0?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:accessibleCrewGiftItems().length===0?"NO GIFT ITEMS":"SEND RANDOM GIFT"}</button>
+       ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>`})()}
      </div>
    </div>`;
  }).join(""):`<div class="crew-filter-empty">No contacts match this filter${crewSearchText?" or search":""}.</div>`;
