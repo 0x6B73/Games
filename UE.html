@@ -2280,6 +2280,25 @@ body:after{
   .territory-property-price{grid-column:2;text-align:left;display:flex;align-items:baseline;gap:5px;margin-top:-1px}.territory-property-price b{font-size:10px}.territory-property-price span{margin:0}
   .territory-property-buyrow{grid-template-columns:1fr}.territory-property-buy{width:100%!important}
 }
+
+/* CREW SECTION CHEVRON CONSISTENCY — BUILD 0.22.17 */
+#view-crew>details>summary:before{
+  content:""!important;
+  width:9px!important;
+  height:9px!important;
+  margin-right:7px!important;
+  border-right:2px solid #d2b44f!important;
+  border-bottom:2px solid #d2b44f!important;
+  transform:rotate(-45deg)!important;
+  transform-origin:center!important;
+  transition:transform .12s ease!important;
+  flex:0 0 auto!important;
+  box-sizing:border-box!important;
+}
+#view-crew>details[open]>summary:before{
+  transform:rotate(45deg) translateY(-1px)!important;
+}
+
 </style>
 </head>
 <body>
@@ -2926,7 +2945,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.16";
+const BUILD_NUMBER="0.22.17";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
