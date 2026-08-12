@@ -1087,6 +1087,19 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   width:28px;min-width:28px;padding:0!important
 }
 .compact-job .lock{margin-top:4px}
+.job-requirements{
+  margin-top:5px;padding:5px 6px;border:1px solid #3c3a34;background:#0d0e0e;
+  color:#b9b0a2;font-size:8px;line-height:1.45
+}
+.job-requirements b{color:#d7c9b4}
+.job-missing{
+  margin-top:3px;padding:4px 6px;border:1px solid #63302b;background:#180b0a;
+  color:#d99587;font-size:8px;line-height:1.4
+}
+.job-missing b{color:#efb0a3}
+.job-requirements-met{
+  margin-top:3px;color:#91b57d;font-size:8px;font-weight:900
+}
 
 .fight-row-main{display:flex;align-items:flex-start;gap:5px}
 .fight-row-copy{min-width:0;flex:1}
@@ -3028,7 +3041,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.26";
+const BUILD_NUMBER="0.22.27";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5267,12 +5280,13 @@ function openEnergyReserve(){
 function showJobRequirements(id){
  const j=jobDefs.find(x=>x.id===id);
  if(!j)return;
+ const requirements=jobRequirementList(j);
  const missing=reqMissing(j);
  if(missing.length){
-   return showRequirementPopup(`Missing requirement${missing.length===1?"":"s"}: ${missing.join(" · ")}`);
+   return showRequirementPopup(`Requirements: ${requirements.join(" · ")} | Missing: ${missing.join(" · ")}`);
  }
  if(state.en<j.energy){
-   return showRequirementPopup(`Not enough Energy. This job needs ${j.energy}; you have ${Math.floor(state.en)}.`);
+   return showRequirementPopup(`Requirements: ${requirements.join(" · ")} | Missing: ${j.energy-Math.floor(state.en)} Energy`);
  }
  doJob(id);
 }
@@ -5360,17 +5374,33 @@ function dashJobPanel(j,dash,dashMarkup){
  </div>`;
 }
 
+function jobRequirementList(j){
+ if(!j)return ["Unknown job"];
+ const r=[];
+ const crewReq=Math.max(0,Number(j.crew)||0);
+ if(crewReq>0)r.push(`${crewReq} Crew`);
+ Object.entries(j.req||{}).forEach(([id,q])=>{
+   const g=gearDefs.find(x=>x.id===id);
+   r.push(g?`${q}× ${g.name}`:`${q}× ${id}`);
+ });
+ const city=cities.find(c=>c.id===j.city);
+ if(city&&city.level>1)r.push(`Level ${city.level}`);
+ return r.length?r:["None"];
+}
 function reqMissing(j){
  const m=[];
  if(!j)return ["Unknown job"];
- if(crewSize()<Math.max(0,Number(j.crew)||0))m.push(`${j.crew} crew`);
+ const crewReq=Math.max(0,Number(j.crew)||0);
+ const crewMissing=Math.max(0,crewReq-crewSize());
+ if(crewMissing>0)m.push(`${crewMissing} Crew`);
  Object.entries(j.req||{}).forEach(([id,q])=>{
    const g=gearDefs.find(x=>x.id===id);
-   if(!g){m.push(`Unknown equipment: ${id}`);return}
-   if(gearQty(id)<q)m.push(`${q} ${g.name}`);
+   if(!g){m.push(`${q}× Unknown equipment: ${id}`);return}
+   const missing=Math.max(0,Number(q)-gearQty(id));
+   if(missing>0)m.push(`${missing}× ${g.name}`);
  });
  const city=cities.find(c=>c.id===j.city);
- if(city&&city.level>state.level)m.push(`LVL ${city.level}`);
+ if(city&&city.level>state.level)m.push(`Level ${city.level} (current ${state.level})`);
  return m;
 }
 function jobStatKind(j){
@@ -7358,7 +7388,7 @@ function renderJobs(){
  const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const s=jobState(j.id),miss=reqMissing(j),pct=s.mastery>=3?100:Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
+   const s=jobState(j.id),requirements=jobRequirementList(j),miss=reqMissing(j),pct=s.mastery>=3?100:Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
    const statKind=jobStatKind(j),statBonus=jobStatBonus(j),dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
    const lo=Math.floor(j.cash[0]*jobMasteryCashMult(j)*prestigeCashMult()),hi=Math.floor(j.cash[1]*jobMasteryCashMult(j)*prestigeCashMult());
    const xp=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
@@ -7368,7 +7398,8 @@ function renderJobs(){
       ?`<div class="mastery-reward">FALLBACK JOB · no gear, crew, Heat, or mastery requirements</div>`
       :`<div class="sub">Mastery ${s.mastery}/3</div><div class="mastery ${s.mastery>=3?"mastered":""}"><div style="width:${pct}%"></div></div>
         <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>`}
-    ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
+    <div class="job-requirements"><b>Requirements:</b> ${requirements.join(" · ")}</div>
+    ${miss.length?`<div class="job-missing"><b>Missing:</b> ${miss.join(" · ")}</div>`:`<div class="job-requirements-met">REQUIREMENTS MET</div>`}
     ${dashJobPanel(j,dash,dashMarkup)}
     <div class="job-primary"><button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button></div>
     <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${Array.isArray(j.loot)&&j.loot.length?j.loot.join(", "):"None"}<br><b>Weekly limited drop:</b> ${j.fallback?"Not available on fallback jobs":`${limited.name} (8% on success)`}</div></details>
