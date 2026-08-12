@@ -888,13 +888,13 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   margin:6px 0;padding:8px;border:1px solid #5a4d38;background:#100f0c
 }
 .heat-control-top{
-  display:grid;grid-template-columns:minmax(0,1fr) minmax(120px,180px);gap:7px;align-items:end
+  display:block
 }
 .heat-control-label{
   display:block;margin-bottom:3px;font-size:8px;font-weight:900;letter-spacing:.06em;color:#b9aa8e
 }
-.heat-location-select{
-  width:100%;min-height:34px;padding:6px 28px 6px 8px;border:1px solid #665a45;background:#090909;color:#eee;font-size:10px;font-weight:800
+.heat-location-switch-label{
+  display:block;margin-bottom:4px;font-size:8px;font-weight:900;letter-spacing:.06em;color:#b9aa8e
 }
 .heat-current{
   border:1px solid #453c30;background:#15130f;padding:6px 8px;min-height:34px
@@ -905,11 +905,14 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;margin-top:7px
 }
 .heat-location-chip{
-  border:1px solid #39342d;background:#0b0c0d;padding:5px;text-align:center
+  appearance:none;-webkit-appearance:none;width:100%;margin:0;border:1px solid #39342d;background:#0b0c0d;padding:7px 5px;text-align:center;color:inherit;font:inherit;cursor:pointer
 }
-.heat-location-chip.active{border-color:#8b7446;background:#17140d}
+.heat-location-chip:hover{border-color:#665a45;background:#12110e}
+.heat-location-chip.active{border-color:#b18d45;background:#1b170e;box-shadow:inset 0 2px #b18d45}
 .heat-location-chip span{display:block;color:#91887b;font-size:7px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heat-location-chip.active span{color:#d9c89f}
 .heat-location-chip b{display:block;margin-top:2px;color:#ddd3c1;font-size:11px}
+.heat-location-chip:focus-visible{outline:2px solid #d0ad45;outline-offset:1px}
 .heat-info-row{
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin-top:6px
 }
@@ -927,7 +930,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 .heat-action .btn{width:100%;margin:0!important;min-height:32px}
 .heat-menu-note{margin-top:7px;color:#82796c;font-size:7px;line-height:1.4}
 @media(max-width:540px){
-  .heat-control-top,.heat-action{grid-template-columns:1fr}
+  .heat-action{grid-template-columns:1fr}
   .heat-info-row{grid-template-columns:1fr 1fr}
 }
 
@@ -1002,7 +1005,8 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 }
 .crew-fold:not([open])>summary:before{transform:rotate(-45deg)}
 .crew-fold>summary span:first-child{display:flex;align-items:center}
-.crew-fold>summary #crewSummary{
+.crew-fold>summary #crewSummary,
+.crew-fold>summary #contactSummary{
   margin-left:auto;
   font-size:8px;
   color:#999187;
@@ -2530,7 +2534,7 @@ body:after{
   </summary>
   <div class="myspace crew-fold-body">
     <div class="ms-head">UNDERWORLDSPACE — CONTACT NETWORK</div>
-    <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
+    <div class="ms-sub">Active members / favors / support / loyalty</div>
     <div class="ms-body">
       <div class="custom-friend-box">
         <b>CUSTOMIZE A CREW MEMBER</b>
@@ -2547,6 +2551,21 @@ body:after{
         </div>
       </div>
       <div id="friends"></div>
+    </div>
+  </div>
+ </details>
+
+ <details class="crew-fold" open>
+  <summary>
+    <span>CONTACTS</span>
+    <span id="contactSummary"></span>
+  </summary>
+  <div class="myspace crew-fold-body">
+    <div class="ms-head">UNDERWORLDSPACE — CONTACTS</div>
+    <div class="ms-sub">Recruiting / money / requested items</div>
+    <div class="ms-body">
+      <div class="sub" style="margin-bottom:6px">Contacts are in your network but are not part of your Crew yet. You cannot Ask for Help until they join your Crew.</div>
+      <div id="contacts"></div>
     </div>
   </div>
  </details>
@@ -3006,7 +3025,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.21";
+const BUILD_NUMBER="0.22.24";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3114,6 +3133,22 @@ function fxGun(){synthNoise(.13,.09,2200,80);synthTone(105,.1,"sawtooth",.05,42)
 function fxReload(){fxClick();const t=sceneToken;later(90,t,()=>{synthTone(280,.035,"square",.018);synthNoise(.025,.012,5000,1200)});later(210,t,()=>fxClick())}
 function fxMessage(){synthTone(760,.065,"square",.025);const t=sceneToken;later(85,t,()=>synthTone(1040,.08,"square",.02))}
 function fxWin(){const t=sceneToken;[330,440,554,660].forEach((f,i)=>later(i*70,t,()=>synthTone(f,.11,"triangle",.028)))}
+function fxGoldBar(){
+ const t=sceneToken;
+ synthTone(92,.22,"sine",.045,138);
+ synthNoise(.07,.016,7200,1800);
+ [523,659,784,1047,1319].forEach((f,i)=>later(90+i*82,t,()=>{
+   synthTone(f,.14,"triangle",.034);
+   synthTone(f*2,.075,"sine",.012);
+ }));
+ later(520,t,()=>{
+   synthTone(784,.24,"triangle",.03);
+   synthTone(988,.24,"triangle",.026);
+   synthTone(1175,.24,"triangle",.022);
+   synthNoise(.16,.015,9000,2600);
+ });
+ later(720,t,()=>fxCash());
+}
 function fxBad(){synthTone(155,.18,"sawtooth",.03,70);synthNoise(.1,.025,1300,40)}
 function fxSiren(){const t=sceneToken;for(let i=0;i<6;i++)later(i*130,t,()=>synthTone(i%2?570:760,.14,"sine",.018))}
 function fxEngine(ms=650){const t=sceneToken;for(let i=0;i<Math.max(3,Math.floor(ms/70));i++)later(i*65,t,()=>{synthTone(68+(i%4)*7,.09,"sawtooth",.012,82+(i%3)*5);synthNoise(.045,.006,450,30)})}
@@ -3122,7 +3157,7 @@ function fxMetal(){synthNoise(.09,.045,3000,400);synthTone(230,.11,"triangle",.0
 function fxGlass(){synthNoise(.22,.06,9000,1600);const t=sceneToken;later(40,t,()=>synthTone(1900,.05,"square",.012));later(95,t,()=>synthTone(1420,.06,"square",.009))}
 function fxSafe(){const t=sceneToken;[720,850,630,940,690].forEach((f,i)=>later(i*95,t,()=>{synthTone(f,.025,"square",.014);fxClick()}))}
 function fxPhone(){synthTone(680,.11,"square",.017);const t=sceneToken;later(145,t,()=>synthTone(890,.11,"square",.017));later(330,t,()=>synthTone(680,.11,"square",.014))}
-const S={tap:()=>runScene([[0,fxClick]]),ok:()=>runScene([[0,fxWin]]),bad:()=>runScene([[0,fxBad]]),lvl:()=>runScene([[0,fxWin],[420,fxCash]]),cash:()=>runScene([[0,fxCash]]),gun:()=>runScene([[0,fxGun]]),reload:()=>runScene([[0,fxReload]]),msg:()=>runScene([[0,fxMessage]]),siren:()=>runScene([[0,fxSiren]])};
+const S={tap:()=>runScene([[0,fxClick]]),ok:()=>runScene([[0,fxWin]]),gold:()=>runScene([[0,fxGoldBar]]),bad:()=>runScene([[0,fxBad]]),lvl:()=>runScene([[0,fxWin],[420,fxCash]]),cash:()=>runScene([[0,fxCash]]),gun:()=>runScene([[0,fxGun]]),reload:()=>runScene([[0,fxReload]]),msg:()=>runScene([[0,fxMessage]]),siren:()=>runScene([[0,fxSiren]])};
 function playJobSound(job,success){if(!state.sound)return;if(!success){runScene(job.heat>=12?[[0,fxSiren],[700,fxBad]]:[[0,fxBad]]);return}const scenes={boost:[[0,fxClick],[140,()=>fxEngine(700)],[920,fxCash]],shake:[[0,fxKnock],[260,fxMetal],[530,fxCash]],truck:[[0,()=>fxEngine(500)],[590,fxGun],[900,()=>fxEngine(520)]],bookie:[[0,fxPhone],[380,fxKnock],[700,fxCash]],warehouse:[[0,fxMetal],[330,fxGun],[690,fxMetal]],union:[[0,fxPhone],[400,fxKnock],[730,fxWin]],casino:[[0,fxCash],[300,fxGlass],[690,fxCash]],vault:[[0,fxSafe],[550,fxMetal],[850,fxCash]],bank:[[0,fxSafe],[550,fxMetal],[850,fxCash],[1180,fxSiren]],shipment:[[0,()=>fxEngine(460)],[550,fxGun],[880,fxMetal]],judge:[[0,fxPhone],[410,fxCash],[740,fxMessage]],convoy:[[0,()=>fxEngine(430)],[520,fxReload],[800,fxGun],[1120,fxSiren]],family:[[0,fxReload],[340,fxGun],[650,fxGun],[980,fxWin]]};runScene(scenes[job.id]||[[0,fxWin]])}
 function themeKick(delay=0){const c=ctx();if(!c||!themeOn)return;const t=c.currentTime+delay,o=c.createOscillator(),g=c.createGain();o.type="sine";o.frequency.setValueAtTime(145,t);o.frequency.exponentialRampToValueAtTime(43,t+.12);g.gain.setValueAtTime(.07,t);g.gain.exponentialRampToValueAtTime(.0001,t+.18);o.connect(g);g.connect(c.destination);o.start(t);o.stop(t+.2)}
 function themeHat(delay=0,open=false){if(!themeOn)return;const c=ctx();if(!c)return;const d=open?.11:.025,len=Math.max(1,Math.floor(c.sampleRate*d)),buf=c.createBuffer(1,len,c.sampleRate),a=buf.getChannelData(0);for(let i=0;i<len;i++)a[i]=(Math.random()*2-1)*(1-i/len);const src=c.createBufferSource(),hp=c.createBiquadFilter(),g=c.createGain();src.buffer=buf;hp.type="highpass";hp.frequency.value=6500;g.gain.value=open?.009:.006;src.connect(hp);hp.connect(g);g.connect(c.destination);src.start(c.currentTime+delay)}
@@ -4183,7 +4218,7 @@ function spinGoldReel(id,outcome,goldStatus){
 
    if(outcome.kind==="gold"){
      showActionFlash("GOLD BAR RECEIVED",`${d.name} · ${state.goldBars} available`,"cash");
-     S.ok();
+     S.gold();
    }else if(outcome.kind==="energy"){
      showActionFlash("ENERGY DRINK RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Energy Drink"]||0}/999`,"good");
      S.ok();
@@ -5090,13 +5125,12 @@ function showStatHelp(key,e){
      const city=heatMenuCity(),heat=heatForCity(city),layWait=layLowRemaining(city),cashCost=cashHeatBribeCost(),cashPct=cashHeatBribePercent(now(),city),cashReset=cashHeatBribeResetRemaining(now(),city),quiet=heatQuietRecoveryActive(now(),city),decay=heatDecayMs(now(),city),blackmail=Math.max(0,Math.floor(Number(state.loot["Blackmail"])||0));
      const status=heatActionStatusText(city);
      const bribeResetText=cashReset>0?`Resets in ${fmt(cashReset)}`:"First bribe this hour";
-     const locationOptions=cities.map(c=>`<option value="${c.id}" ${c.id===city?"selected":""}>${c.name}</option>`).join("");
-     const locationChips=cities.map(c=>`<div class="heat-location-chip ${c.id===city?"active":""}"><span>${c.name}</span><b>${Math.floor(heatForCity(c.id))}</b></div>`).join("");
+     const locationChips=cities.map(c=>`<button type="button" class="heat-location-chip ${c.id===city?"active":""}" onclick="selectHeatMenuLocation('${c.id}')" ${c.id===city?'aria-current="true"':''}><span>${c.name}</span><b>${Math.floor(heatForCity(c.id))}</b></button>`).join("");
      actions.innerHTML=`<div class="heat-control">
        <div class="heat-control-top">
-         <label><span class="heat-control-label">LOCATION</span><select id="heatLocationSelect" class="heat-location-select" onchange="selectHeatMenuLocation(this.value)">${locationOptions}</select></label>
-         <div class="heat-current"><b>${Math.floor(heat)} / 100</b><span>${status} HEAT</span></div>
+         <div class="heat-current"><b>${Math.floor(heat)} / 100</b><span>${heatCityName(city)} · ${status} HEAT</span></div>
        </div>
+       <span class="heat-location-switch-label">SELECT LOCATION</span>
        <div class="heat-location-grid">${locationChips}</div>
        <div class="heat-info-row">
          <div class="heat-info"><span>PASSIVE RECOVERY</span><b>-1 every ${formatRegenTime(decay)}</b></div>
@@ -6074,6 +6108,25 @@ function renderCrewOperations(){
  <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>${spriteIconHtml("2:help-cache","sm")} ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
 }
 
+function sendContactMoney(id){
+ const f=fstate(id),d=getPersonDef(id);
+ if(!f||!d)return;
+ if(f.crew)return showRequirementPopup(`${d.name} is already in your Crew. Use Crew Operations for organization-wide money distribution.`);
+ if(!requireResponsiveContact(id,"money"))return;
+ const wait=cooldown(Number(f.lastMoney)||0,MASS_MONEY_COOLDOWN_MIN);
+ if(wait>0)return showRequirementPopup(`You already sent money to ${d.name}. Try again in ${fmt(wait)}.`);
+ const amount=crewBulkUnitCost("money");
+ if(state.cash<amount)return showRequirementPopup(`Sending money to ${d.name} costs ${money(amount)}. You have ${money(state.cash)}.`);
+ state.cash-=amount;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+amount;
+ f.lastMoney=now();
+ changeRelationship(id,{trust:4,respect:2,resentment:-3,rel:4});
+ f.response=`Received ${money(amount)}. I appreciate it.`;
+ log(`You sent ${money(amount)} to ${d.name}.`);
+ showActionFlash("MONEY SENT",`${d.name} · ${money(amount)} · Contact relationship improved`,"cash");
+ S.cash();save();render();
+}
+
 function doFavor(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d)return;
@@ -6093,6 +6146,7 @@ function doFavor(id){
 function openHelpRequest(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d)return;
+ if(!f.crew)return showRequirementPopup(`${d.name} is a Contact, not a Crew member. Recruit them before asking for help.`);
  if(!requireResponsiveContact(id,"help"))return;
  const wait=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
  if(wait>0)return showRequirementPopup(`${d.name} can help again in ${fmt(wait)}.`);
@@ -6279,8 +6333,11 @@ function renderChat(){
  }
  if(!potential||f.added){
    const responsive=contactCanRespond(f);
-   opts.push(`<button onclick="chatAction('recruit')" ${responsive?"":"disabled"}>${responsive?"Ask them to join your crew":"Offline / no response"}</button>`);
-   opts.push(`<button onclick="chatAction('energy')" ${responsive?"":"disabled"}>${responsive?"Request help":"Offline / no response"}</button>`);
+   if(!f.crew){
+     opts.push(`<button onclick="chatAction('recruit')" ${responsive?"":"disabled"}>${responsive?"Ask them to join your crew":"Offline / no response"}</button>`);
+   }else{
+     opts.push(`<button onclick="chatAction('energy')" ${responsive?"":"disabled"}>${responsive?"Request help":"Offline / no response"}</button>`);
+   }
  }
  chatOptions.innerHTML=opts.join("");
  setTimeout(()=>chatLog.scrollTop=chatLog.scrollHeight,0);
@@ -6317,7 +6374,8 @@ function chatAction(type){
    }
  }
  if(type==="energy"){
-   if(!contactCanRespond(f)){f.chat.push({me:false,text:"No response."});}
+   if(!f.crew){f.chat.push({me:false,text:"Join the Crew first. Then we can talk favors."});}
+   else if(!contactCanRespond(f)){f.chat.push({me:false,text:"No response."});}
    else{
      f.chat.push({me:true,text:"I need a favor. See what you can spare."});
      askEnergy(id);f.chat.push({me:false,text:fstate(id)?.response||"No response."});
@@ -7321,7 +7379,7 @@ function updateNetworkArrivalTimer(){
 function renderCrew(){
  // Crew cooldown/presence labels refresh every second. Preserve any Relationship
  // panels the player has expanded before rebuilding the contact rows.
- document.querySelectorAll("#friends details[data-rel-id]").forEach(el=>{
+ document.querySelectorAll("#friends details[data-rel-id], #contacts details[data-rel-id]").forEach(el=>{
    const id=el.dataset.relId;
    if(!id)return;
    if(el.open)openRelationshipDetails.add(id);
@@ -7329,8 +7387,16 @@ function renderCrew(){
  });
 
  renderCrewOperations();
- const inactiveCrew=crewIds().filter(id=>state.friends[id]?.inactive).length;
- crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
+ const recruitedIds=Object.keys(state.friends).filter(id=>state.friends[id]?.crew);
+ const contactIds=Object.keys(state.friends).filter(id=>state.friends[id]&&!state.friends[id].crew);
+ const inactiveCrew=recruitedIds.filter(id=>state.friends[id]?.inactive).length;
+ const activeCrew=recruitedIds.filter(id=>contactCanRespond(state.friends[id])&&!state.friends[id]?.inactive).length;
+ if(typeof crewSummary!=="undefined"&&crewSummary)crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${activeCrew+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
+ const contactSummary=document.getElementById("contactSummary");
+ if(contactSummary){
+   const activeContacts=contactIds.filter(id=>contactCanRespond(state.friends[id])&&!state.friends[id]?.inactive).length;
+   contactSummary.textContent=`${contactIds.length} total · ${activeContacts} available`;
+ }
 
  document.querySelectorAll("#crewFilters [data-filter]").forEach(b=>{
    const active=b.dataset.filter===crewListFilter;
@@ -7338,23 +7404,23 @@ function renderCrew(){
    b.classList.toggle("secondary",!active);
  });
 
- const visibleIds=Object.keys(state.friends).filter(crewListMatches);
+ const visibleIds=recruitedIds.filter(crewListMatches);
  friends.classList.add("crew-directory");
  friends.innerHTML=visibleIds.length?visibleIds.map(id=>{
    const d=getPersonDef(id),f=state.friends[id];
    const a=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
-   const r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);
+   const fv=cooldown(f.lastFavor,10);
    const rep=contactReputation(f);
    const presence=contactPresence(f),responsive=contactCanRespond(f);
    const inactive=f.inactive;
    const repCls=rep>=95?"good":rep>=70?"warn":rep>=45?"info":"bad";
-   const statusCls=f.crew&&!inactive?"good":inactive?"bad":responsive?"info":"warn";
+   const statusCls=!inactive?"good":"bad";
 
    return `<div class="friend ${inactive?"contact-inactive":responsive?"":"contact-offline"}">
      <img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}">
      <div>
-       <div class="fname">${d.name} ${f.crew?spriteIconHtml("crew","xs"):""}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
-       <div class="ftag">${d.tag||"Trusted contact"}</div>
+       <div class="fname">${d.name} ${spriteIconHtml("crew","xs")}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
+       <div class="ftag">${d.tag||"Trusted crew member"}</div>
        <div class="crew-meta-pills">
          <span class="crew-pill info">${d.role}</span>
          <span class="crew-pill ${statusCls}">${crewStatus(f)}</span>
@@ -7366,7 +7432,7 @@ function renderCrew(){
          <summary>RELATIONSHIP</summary>
          <div class="compact-details-body">
            Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
-           ${inactive?"Help unavailable while this contact is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Energy Drinks, Adrenaline Shots, supply packs, semi-rare Blackmail, Nothing, or an exceptionally rare reward."}
+           ${inactive?"Help unavailable while this crew member is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Energy Drinks, Adrenaline Shots, supply packs, semi-rare Blackmail, Nothing, or an exceptionally rare reward."}
            ${(()=>{const gs=crewGiftRequestStatus(id);return gs.request?`<br><b>Gift request:</b> ${gs.request.item} ×${gs.request.qty} · You have ${gs.owned}${gs.owned<gs.request.qty?" · INSUFFICIENT":" · READY"}`:""})()}
            ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
          </div>
@@ -7374,12 +7440,59 @@ function renderCrew(){
      </div>
      <div class="fbtns">
        <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"ASK FOR HELP"}</button>
-       <button onclick="recruit('${id}')" ${f.crew||!responsive||r?"disabled":""}>${f.crew?"RECRUITED":inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
        <button onclick="doFavor('${id}')" ${!responsive||fv||state.cash<100?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":fv?fmt(fv):"RETURN FAVOR -$100"}</button>
        ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>`})()}
      </div>
    </div>`;
- }).join(""):`<div class="crew-filter-empty">No contacts match this filter${crewSearchText?" or search":""}.</div>`;
+ }).join(""):`<div class="crew-filter-empty">No Crew members match this filter${crewSearchText?" or search":""}.</div>`;
+
+ const contacts=document.getElementById("contacts");
+ if(contacts){
+   contacts.classList.add("crew-directory");
+   const sortedContacts=contactIds.sort((a,b)=>{
+     const fa=state.friends[a],fb=state.friends[b];
+     const ar=contactCanRespond(fa)&&!fa.inactive?1:0,br=contactCanRespond(fb)&&!fb.inactive?1:0;
+     if(ar!==br)return br-ar;
+     return String(getPersonDef(a)?.name||a).localeCompare(String(getPersonDef(b)?.name||b));
+   });
+   contacts.innerHTML=sortedContacts.length?sortedContacts.map(id=>{
+     const d=getPersonDef(id),f=state.friends[id];
+     const r=cooldown(f.lastRecruit,12);
+     const moneyWait=cooldown(Number(f.lastMoney)||0,MASS_MONEY_COOLDOWN_MIN);
+     const sendAmount=crewBulkUnitCost("money");
+     const rep=contactReputation(f);
+     const presence=contactPresence(f),responsive=contactCanRespond(f),inactive=f.inactive;
+     const repCls=rep>=95?"good":rep>=70?"warn":rep>=45?"info":"bad";
+     const statusCls=inactive?"bad":responsive?"info":"warn";
+     return `<div class="friend ${inactive?"contact-inactive":responsive?"":"contact-offline"}">
+       <img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}">
+       <div>
+         <div class="fname">${d.name}${d.customized?'<span class="generated-badge">CUSTOM</span>':d.generated?'<span class="generated-badge">NETWORK</span>':""}</div>
+         <div class="ftag">${d.tag||"Contact in your network"}</div>
+         <div class="crew-meta-pills">
+           <span class="crew-pill info">${d.role}</span>
+           <span class="crew-pill ${statusCls}">${inactive?"INACTIVE":"CONTACT"}</span>
+           <span class="crew-pill ${repCls}">REP ${rep}</span>
+         </div>
+         <div class="presence-line ${presence.cls}">${presence.text}</div>
+         <details class="compact-details" data-rel-id="${id}" ${openRelationshipDetails.has(id)?"open":""} ontoggle="setRelationshipOpen('${id}',this.open)">
+           <summary>RELATIONSHIP</summary>
+           <div class="compact-details-body">
+             Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
+             <b>Contact only:</b> You can send money or requested items, but Ask for Help is unavailable until they join your Crew.
+             ${(()=>{const gs=crewGiftRequestStatus(id);return gs.request?`<br><b>Gift request:</b> ${gs.request.item} ×${gs.request.qty} · You have ${gs.owned}${gs.owned<gs.request.qty?" · INSUFFICIENT":" · READY"}`:""})()}
+             ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
+           </div>
+         </details>
+       </div>
+       <div class="fbtns">
+         <button onclick="recruit('${id}')" ${!responsive||r?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
+         <button onclick="sendContactMoney('${id}')" ${!responsive||moneyWait||state.cash<sendAmount?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":moneyWait?`MONEY ${fmt(moneyWait)}`:`SEND ${money(sendAmount)}`}</button>
+         ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>`})()}
+       </div>
+     </div>`;
+   }).join(""):`<div class="crew-filter-empty">No contacts are waiting. Accepted contact requests appear here before recruitment.</div>`;
+ }
 
  const potentialList=allPotentialDefs()
    .filter(p=>state.potentials[p.id]&&!state.potentials[p.id].added&&!state.friends[p.id])
