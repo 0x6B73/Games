@@ -996,6 +996,52 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   }
 }
 
+
+/* FULL PROGRESSION / ECONOMY PASS */
+.fight-refresh-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:6px;
+  margin:5px 0;padding:5px 6px;border:1px solid #383732;background:#0b0c0d
+}
+.fight-refresh-copy{font-size:8px;color:#938c81}
+.rival-record{font-size:7px;color:#777168;margin-top:2px}
+.bounty-btn{border-color:#72522d!important;color:#e5c276!important}
+.user-bounty{border-left:3px solid #9b7832!important}
+
+.set-row,.collection-row,.service-row,.prestige-card{
+  border:1px solid #35342f;background:#0c0d0e;padding:7px;margin-bottom:5px
+}
+.set-row.complete,.collection-row.complete{border-color:#596f3b;background:#0d120a}
+.set-head,.collection-head,.service-head{
+  display:flex;align-items:center;justify-content:space-between;gap:7px
+}
+.set-name,.collection-name,.service-name{font-size:9px;font-weight:900;color:#d9d0c0}
+.set-bonus,.collection-reward{font-size:8px;color:#cbb05c;margin-top:3px}
+.set-items,.collection-items,.service-note{font-size:8px;color:#8f887d;line-height:1.4;margin-top:3px}
+.collection-progress{font-size:8px;color:#a79f92;white-space:nowrap}
+.limited-loot{
+  border:1px solid #755e25;background:#181306;padding:6px;margin-top:5px
+}
+.limited-loot b{color:#efd36a}
+.inventory-resource.pack{border-color:#5b5140}
+.pack-item{border-left:3px solid #8c7334}
+.service-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.service-actions .btn{width:auto}
+.bank-balance{font-size:15px;color:#d7c16a;font-weight:900}
+.hospital-cost{font-size:11px;color:#c9bba3;font-weight:900}
+.prestige-level{font-size:18px;color:#efd36a;font-weight:900}
+.prestige-bonuses{font-size:8px;color:#a89f90;line-height:1.5;margin:5px 0}
+.mastery-reward{font-size:7px;color:#c8ae5b;margin-top:3px}
+.boss-loot{font-size:8px;color:#c8ae5b;margin:4px 0}
+.level-up-summary{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:7px 0
+}
+.level-up-summary>div{
+  border:1px solid #444038;background:#0c0d0e;padding:6px;text-align:center;font-size:8px;color:#968e82
+}
+.level-up-summary b{display:block;color:#ecd069;font-size:13px;margin-top:2px}
+.level-unlocks{font-size:8px;color:#9e9689;line-height:1.45;margin:7px 0}
+.gold-reel-item.pack{border-color:#755f2e;color:#e1c36a;background:linear-gradient(#211a09,#0e0b04)}
+
 </style>
 </head>
 <body>
@@ -1119,6 +1165,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <section id="view-fight" class="view">
  <div class="section-title"><h2>Fight List</h2><span>1 stamina per attack</span></div>
  <div id="combatInfo"></div>
+ <div id="fightRefreshBar" class="fight-refresh-bar"></div>
  <div id="fightlist"></div>
  <div class="section-title" style="margin-top:10px"><h2>Revenge</h2><span>settle outstanding business</span></div>
  <div id="revenge"></div>
@@ -1129,6 +1176,9 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <section id="view-gear" class="view">
  <div class="section-title"><h2>Inventory</h2><span>resources and equipment you own</span></div>
  <div id="inventory"></div>
+
+ <div class="section-title" style="margin-top:10px"><h2>Equipment Sets</h2><span>organization bonuses</span></div>
+ <div id="equipmentSets"></div>
 
  <div class="section-title" style="margin-top:10px"><h2>Equipment Shop</h2><span id="upkeepLabel"></span></div>
  <div class="filter-strip gear-filter-strip" id="gearFilters">
@@ -1184,6 +1234,14 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <details class="fold-card">
   <summary>Achievements <span>tap to expand</span></summary>
   <div class="fold-body"><div id="ach"></div></div>
+</details>
+<details class="fold-card">
+  <summary>Underworld Services <span>bank / hospital</span></summary>
+  <div class="fold-body"><div id="underworldServices"></div></div>
+</details>
+<details class="fold-card">
+  <summary>Kingpin Prestige <span>endgame progression</span></summary>
+  <div class="fold-body"><div id="prestigePanel"></div></div>
 </details>
 
 <div class="card" style="margin-top:8px">
@@ -1350,13 +1408,19 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   <h2>Ask for Help</h2>
   <div class="sub" id="goldReelContact">Contacting associate...</div>
   <div id="helpGoldStatus" class="help-gold-status locked">🔒 GOLD BAR</div>
-  <div class="help-reel-legend">Possible: 💵 Cash · 💉 Adrenaline Shot · 🥤 Energy Drink · Nothing · 🪙 Gold Bar when unlocked</div>
+  <div class="help-reel-legend">Possible: 💵 Cash · 💉 Adrenaline · 🥤 Energy · 📦 Energy/Stamina Packs · Nothing · 🪙 Gold when unlocked</div>
   <div class="gold-reel-wrap">
     <div class="gold-reel-marker"></div>
     <div id="goldReel" class="gold-reel"></div>
   </div>
   <div id="goldReelResult" class="gold-reel-result"></div>
   <button class="btn secondary" id="goldReelClose" onclick="closeModal('goldReelModal')" disabled>CLOSE</button>
+</div></div>
+
+<div class="modal" id="levelUpModal"><div class="mbox">
+  <h2 id="levelUpTitle">Level Up</h2>
+  <div id="levelUpBody"></div>
+  <button class="btn" onclick="closeModal('levelUpModal')">CONTINUE</button>
 </div></div>
 
 <div id="requirementPopup" class="requirement-popup">
@@ -1372,7 +1436,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.16.2";
+const BUILD_NUMBER="0.17.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -2225,6 +2289,36 @@ function renderCampaign(){
 
 
 const GOLD_BAR_COOLDOWN_MS=3600000;
+
+const equipmentSetDefs=[
+ {id:"street",name:"Street Crew",items:{pistol:1,vest:1,sedan:1},attack:3,defense:3},
+ {id:"harbor",name:"Harbor Runner",items:{smg:1,heavyvest:1,cargoVan:1},attack:6,defense:5},
+ {id:"professional",name:"Professional Outfit",items:{rifle:1,plates:1,armored:1},attack:10,defense:10},
+ {id:"war",name:"War Machine",items:{lmg:1,bodyarmor:1,tacticalvan:1},attack:18,defense:15}
+];
+const collectionDefs=[
+ {id:"street_evidence",name:"Street Evidence",items:["Burner Phone","Stolen Plate","Old Ledger"],reward:"+1 Attack",apply:()=>{state.attack+=1}},
+ {id:"harbor_papers",name:"Harbor Papers",items:["Dock Manifest","Marked Dice","Customs Seal","Crate Key","Union Card"],reward:"+1 Defense, +2 Max Energy",apply:()=>{state.defense+=1;state.maxEn+=2;state.en+=2}},
+ {id:"downtown_access",name:"Downtown Access",items:["Loaded Deck","VIP Ledger","Brass Key","Black Seal","Court Docket"],reward:"+2 Attack, +2 Defense",apply:()=>{state.attack+=2;state.defense+=2}},
+ {id:"northside_intel",name:"Northside Intelligence",items:["Security Badge","Route Schedule","Family Ledger","Reserve Bond"],reward:"+3 Attack, +3 Defense, +1 Max Stamina",apply:()=>{state.attack+=3;state.defense+=3;state.maxSt+=1;state.st+=1}}
+];
+const limitedLootDefs=[
+ {name:"Black-Market Wristwatch",desc:"A weekly contraband collectible."},
+ {name:"Corrupt Detective Badge",desc:"A weekly underworld collectible."},
+ {name:"Diamond-Cut Money Clip",desc:"A weekly prestige collectible."},
+ {name:"Ghost Plate",desc:"A weekly vehicle-network collectible."},
+ {name:"Smuggler's Seal",desc:"A weekly harbor collectible."},
+ {name:"Burned Federal File",desc:"A weekly intelligence collectible."}
+];
+const bossLootDefs=[
+ ["Dockmaster's Ring","Harbor King's Switchblade"],
+ ["Rossi Family Ledger","Union Boss Cufflinks"],
+ ["Bellini Signet","Casino Master Key"],
+ ["Judge's Black Book","Armored Convoy Token"],
+ ["Varga War Medal","Reserve Vault Crest"]
+];
+const FIGHT_REFRESH_COOLDOWN_MS=2*60000;
+const BOSS_REMATCH_COOLDOWN_MS=30*60000;
 const goldUnlockDefs=[
  {id:"safehouse_cache",name:"Safehouse Cache",cost:3,desc:"+5 Maximum Energy"},
  {id:"armored_tailoring",name:"Armored Tailoring",cost:8,desc:"+8 Defense"},
@@ -2294,30 +2388,24 @@ function helpRewardTile(kind,goldUnlocked=true){
  if(kind==="cash")return `<div class="gold-reel-item cash">💵<br>CASH</div>`;
  if(kind==="energy")return `<div class="gold-reel-item energy">🥤<br>ENERGY DRINK</div>`;
  if(kind==="stamina")return `<div class="gold-reel-item stamina">💉<br>ADRENALINE</div>`;
+ if(kind==="energyPack")return `<div class="gold-reel-item pack">📦<br>ENERGY PACK</div>`;
+ if(kind==="staminaPack")return `<div class="gold-reel-item pack">📦<br>STAMINA PACK</div>`;
  return `<div class="gold-reel-item empty">NOTHING</div>`;
 }
 
 function buildGoldReel(outcome,goldUnlocked){
- const reel=document.getElementById("goldReel");
- if(!reel)return;
-
- const ordinary=["cash","energy","stamina","nothing"];
+ const reel=document.getElementById("goldReel");if(!reel)return;
+ const ordinary=["cash","energy","stamina","nothing","cash","energy","stamina","energyPack","staminaPack"];
  const items=[];
  for(let i=0;i<19;i++){
    let kind;
-   if(i===16){
-     kind=outcome.kind;
-   }else if(i%6===3){
-     kind="gold";
-   }else{
-     kind=ordinary[(i*3+rnd(0,ordinary.length-1))%ordinary.length];
-   }
+   if(i===16)kind=outcome.kind;
+   else if(i%6===3)kind="gold";
+   else kind=ordinary[rnd(0,ordinary.length-1)];
    items.push(helpRewardTile(kind,goldUnlocked));
  }
  reel.innerHTML=items.join("");
- reel.classList.remove("spinning");
- reel.style.transform="translateX(0px)";
- void reel.offsetWidth;
+ reel.classList.remove("spinning");reel.style.transform="translateX(0px)";void reel.offsetWidth;
 }
 function spinGoldReel(id,outcome,goldStatus){
  const d=getPersonDef(id);
@@ -2363,6 +2451,12 @@ function spinGoldReel(id,outcome,goldStatus){
      S.ok();
    }else if(outcome.kind==="stamina"){
      showActionFlash("ADRENALINE SHOT RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Adrenaline Shot"]||0}/999`,"good");
+     S.ok();
+   }else if(outcome.kind==="energyPack"){
+     showActionFlash("ENERGY PACK RECEIVED",`${d.name} sent a rare Energy Pack · Stash: ${state.loot["Energy Pack"]||0}/99`,"good");
+     S.ok();
+   }else if(outcome.kind==="staminaPack"){
+     showActionFlash("STAMINA PACK RECEIVED",`${d.name} sent a rare Stamina Pack · Stash: ${state.loot["Stamina Pack"]||0}/99`,"good");
      S.ok();
    }else{
      recordIntel("HELP REQUEST CAME UP EMPTY",`${d.name} had nothing available this time.`,"info");
@@ -2424,7 +2518,9 @@ function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
+ bankCash:0,prestige:0,collectionClaimed:{},fightList:[],lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},
+ campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -2459,6 +2555,15 @@ function migrate(){
  if(typeof state.playerAvatarSeed!=="string")state.playerAvatarSeed="";
  if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
  if(!state.generatedContacts||typeof state.generatedContacts!=="object")state.generatedContacts={};
+ if(!Number.isFinite(state.bankCash)||state.bankCash<0)state.bankCash=0;
+ if(!Number.isInteger(state.prestige)||state.prestige<0)state.prestige=0;
+ if(!state.collectionClaimed||typeof state.collectionClaimed!=="object")state.collectionClaimed={};
+ if(!Array.isArray(state.fightList))state.fightList=[];
+ if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
+ if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
+ if(!Array.isArray(state.playerBounties))state.playerBounties=[];
+ if(!state.bossLastFight||typeof state.bossLastFight!=="object")state.bossLastFight={};
+ if(!state.bossRematches||typeof state.bossRematches!=="object")state.bossRematches={};
  const validCustomTargets=new Set([
    ...friendDefs.map(x=>x.id),
    ...potentialDefs.map(x=>x.id),
@@ -2732,19 +2837,74 @@ function showActionFlash(title,detail="",type="good"){
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)}
 function addXp(n){
  state.xp+=n;
- let leveled=false;
+ const gained=[];
  while(state.xp>=xpNeed()){
    state.xp-=xpNeed();state.level++;state.skill+=5;
    state.maxHp+=5;state.maxEn+=2;state.maxSt+=1;
    state.hp=state.maxHp;state.en=state.maxEn;state.st=state.maxSt;
-   state.notoriety+=10;leveled=true;
+   state.notoriety+=10;gained.push(state.level);
    log(`Level ${state.level}. Five skill points awarded.`);S.lvl();
  }
- if(leveled)checkForNewUnlocks();
+ if(gained.length){
+   checkForNewUnlocks();
+   setTimeout(()=>showLevelUpModal(gained[gained.length-1]),1900);
+ }
 }
 function crewRoleBonus(role){return roleCount(role)>0?8:0}
-function gearPower(kind){const slots=availableCrew().length+1,list=[];gearDefs.forEach(g=>{if(g.type===kind||(kind==="attack"&&g.type==="vehicle"))for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});list.sort((a,b)=>b-a);return list.slice(0,slots).reduce((a,b)=>a+b,0)}
-function combatPower(kind){return (kind==="attack"?state.attack:state.defense)+gearPower(kind)+(availableCrew().length+1)*2+Math.floor(state.notoriety/20)}
+function combatCrewLimit(){
+ return Math.min(500,25+state.level*3+(state.prestige||0)*20);
+}
+function combatCrewCount(){
+ return Math.max(1,Math.min(availableCrew().length+1,combatCrewLimit()));
+}
+function crewCombatValue(count=combatCrewCount()){
+ const c=Math.max(1,count);
+ if(c<=25)return c*2;
+ if(c<=100)return 50+(c-25)*1.25;
+ return 143.75+(c-100)*.6;
+}
+function equipmentSetComplete(s){
+ return Object.entries(s.items).every(([id,q])=>gearQty(id)>=q);
+}
+function equipmentSetBonus(kind){
+ return equipmentSetDefs.reduce((n,s)=>n+(equipmentSetComplete(s)?Number(s[kind]||0):0),0);
+}
+function prestigeStatBonus(){
+ return (state.prestige||0)*2;
+}
+function prestigeCashMult(){
+ return 1+(state.prestige||0)*.05;
+}
+function prestigeXpMult(){
+ return 1+(state.prestige||0)*.05;
+}
+function gearPower(kind){
+ const slots=combatCrewCount();
+ const list=[];
+ if(kind==="attack"){
+   const weapons=[],vehicles=[];
+   gearDefs.forEach(g=>{
+     if(g.type==="attack")for(let i=0;i<gearQty(g.id);i++)weapons.push(g.power);
+     if(g.type==="vehicle")for(let i=0;i<gearQty(g.id);i++)vehicles.push(g.power);
+   });
+   weapons.sort((a,b)=>b-a);vehicles.sort((a,b)=>b-a);
+   return weapons.slice(0,slots).reduce((a,b)=>a+b,0)+vehicles.slice(0,slots).reduce((a,b)=>a+b,0);
+ }
+ gearDefs.forEach(g=>{if(g.type==="defense")for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});
+ list.sort((a,b)=>b-a);
+ return list.slice(0,slots).reduce((a,b)=>a+b,0);
+}
+function combatPower(kind){
+ const base=(kind==="attack"?state.attack:state.defense);
+ return Math.round(
+   base+
+   gearPower(kind)+
+   crewCombatValue()+
+   Math.floor(state.notoriety/20)+
+   equipmentSetBonus(kind)+
+   prestigeStatBonus()
+ );
+}
 
 function bribeLawEnforcement(){
  const cost=10;
@@ -2781,7 +2941,7 @@ const PROFILE_HELP={
  rank:{title:"Rank",text:"Rank follows your level and determines which job tiers and bosses are available."},
  notoriety:{title:"Notoriety",text:"Notoriety is your underworld reputation. It unlocks territory, improves Job success, and contributes to Attack and Defense Power."},
  crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
- activeCrew:{title:"Active Crew",text:"Crew members currently able to work. Injured or arrested associates temporarily stop contributing to combat power."},
+ activeCrew:{title:"Combat Crew",text:"The number of currently fielded crew members. Jobs can use your full recruited crew, but combat has a level/prestige-based field limit and diminishing returns. Each fielded member can use one weapon, one armor item, and one vehicle."},
  record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and reduces Heat. Harder opponents require stronger Attack, better equipment, and more active crew; Defense also supports the highest-threat offensive fights."},
  heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Winning offensive fights lowers Heat, or you can spend 10 Gold Bars to bribe law enforcement and reset Heat to 0 immediately."},
  income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
@@ -2811,34 +2971,22 @@ const STAT_HELP={
 function showStatHelp(key,e){
  if(e?.stopPropagation)e.stopPropagation();
  const h=STAT_HELP[key];if(!h)return;
-
- document.getElementById("statHelpTitle").textContent=h.title;
- document.getElementById("statHelpText").textContent=h.text;
-
+ document.getElementById("statHelpTitle").textContent=h.title;document.getElementById("statHelpText").textContent=h.text;
  const actions=document.getElementById("statHelpActions");
  if(actions){
    if(key==="heat"){
-     actions.innerHTML=`<div class="bribe-box">
-       <b>BRIBE LAW ENFORCEMENT</b>
-       <span>Pay 10 Gold Bars to wipe your current Heat to 0 immediately. Expensive, corrupt, and effective.</span>
-       <button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button>
-     </div>`;
+     actions.innerHTML=`<div class="bribe-box"><b>BRIBE LAW ENFORCEMENT</b><span>Pay 10 Gold Bars to wipe Heat to 0.</span><button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
      const gross=propertyIncome()+territoryIncome(),upkeep=propertyUpkeep()+gearUpkeep(),net=netIncome();
-     actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b">
-       <b style="color:#efd36a">HOURLY CASH FLOW</b>
-       <span>Properties + Territory: ${money(gross)}/hr<br>Property + Gear Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr</span>
-       <button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('territory')">OPEN PROPERTIES</button>
-     </div>`;
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
+   }else if(key==="health"){
+     actions.innerHTML=`<div class="bribe-box"><b>UNDERGROUND HOSPITAL</b><span>Heal to full for ${money(hospitalCost())}.</span><button class="btn green" style="margin-top:6px" onclick="hospitalHeal();closeModal('statHelpModal')" ${state.hp>=state.maxHp||state.cash<hospitalCost()?"disabled":""}>HEAL TO FULL</button></div>`;
    }else if(key==="gold"){
      actions.innerHTML=`<button class="btn" onclick="closeModal('statHelpModal');openGoldVaultFromStat()">OPEN GOLD BAR VAULT</button>`;
    }else if(key==="crew"){
      actions.innerHTML=`<button class="btn" onclick="closeModal('statHelpModal');go('crew')">OPEN CREW</button>`;
-   }else{
-     actions.innerHTML="";
-   }
+   }else actions.innerHTML="";
  }
-
  document.getElementById("statHelpModal").classList.add("show");
 }
 
@@ -3025,14 +3173,37 @@ function doJob(id){
  if(miss.length)return showRequirementPopup(`Missing requirement${miss.length===1?"":"s"}: ${miss.join(" · ")}`);
  if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
  setJobBusy(id,true);state.en-=j.energy;state.heat=Math.min(100,state.heat+j.heat);
- const chance=jobChance(j),success=rnd(1,100)<=chance,js=jobState(id);
+ const chance=jobChance(j),success=rnd(1,100)<=chance,jobData=jobState(id);
  if(success){
-   const mult=state.event.ends>now()?1.25:1,c=Math.floor(rnd(j.cash[0],j.cash[1])*mult);
-   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;js.runs++;state.notoriety+=2;
-   if(js.runs>=5){js.runs=0;if(js.mastery<3){js.mastery++;state.skill++;state.notoriety+=5;log(`${j.name} mastery advanced to ${js.mastery}/3. +1 skill point.`)}}
-   if(Math.random()<.20){const item=j.loot[rnd(0,j.loot.length-1)];state.loot[item]=(state.loot[item]||0)+1;log(`Recovered rare item: ${item}.`)}
-   addXp(j.xp);log(`${j.name} completed. Earned ${money(c)} and ${j.xp} XP.`);
-   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${j.xp} XP · ${jobStatKind(j).toUpperCase()} helped success`);
+   const eventMult=state.event.ends>now()?1.25:1;
+   const c=Math.floor(rnd(j.cash[0],j.cash[1])*eventMult*jobMasteryCashMult(j)*prestigeCashMult());
+   const xpEarned=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
+   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;jobData.runs++;state.notoriety+=2;
+
+   if(jobData.runs>=5){
+     jobData.runs=0;
+     if(jobData.mastery<3){
+       jobData.mastery++;
+       state.skill++;state.notoriety+=5;
+       log(`${j.name} mastery advanced to ${jobData.mastery}/3. +1 skill point.`);
+       grantMasteryReward(j,jobData.mastery);
+     }
+   }
+
+   if(Math.random()<.20){
+     const item=j.loot[rnd(0,j.loot.length-1)];
+     addLootItem(item,1,999);log(`Recovered rare item: ${item}.`);
+   }
+   const limited=activeLimitedLoot();
+   if(Math.random()<.08){
+     addLootItem(limited.name,1,99);
+     log(`Limited loot recovered: ${limited.name}.`);
+     showActionFlash("LIMITED LOOT",`${limited.name} · weekly drop`,"cash");
+   }
+
+   addXp(xpEarned);
+   log(`${j.name} completed. Earned ${money(c)} and ${xpEarned} XP.`);
+   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${xpEarned} XP · Mastery ${jobData.mastery}/3`);
    playJobSound(j,true);
  }else{
    const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,220)+state.level*15);
@@ -3059,21 +3230,23 @@ function fightThreatLabel(threat){
 }
 function offensiveFightProfile(o){
  const threat=opponentThreat(o);
- const active=availableCrew().length+1;
+ const active=combatCrewCount();
 
- // Harder fights increasingly reward investment rather than flat early-game power.
+ // High-threat rivals increasingly reward deliberate investment.
  const statMult=1+(threat-1)*.06;
  const gearMult=1+(threat-1)*.04;
- const crewPer=2+(threat-1)*.18;
+ const crewMult=1+(threat-1)*.09;
  const defenseSupport=threat>=4?Math.floor(state.defense*(threat-3)*.05):0;
+ const setBonus=equipmentSetBonus("attack");
+ const prestigeBonus=prestigeStatBonus();
 
  const stat=Math.round(state.attack*statMult);
  const gear=Math.round(gearPower("attack")*gearMult);
- const crew=Math.round(active*crewPer);
+ const crew=Math.round(crewCombatValue(active)*crewMult);
  const notoriety=Math.floor(state.notoriety/20);
- const total=stat+gear+crew+notoriety+defenseSupport;
+ const total=stat+gear+crew+notoriety+defenseSupport+setBonus+prestigeBonus;
 
- return {total,stat,gear,crew,notoriety,defenseSupport,threat,active};
+ return {total,stat,gear,crew,notoriety,defenseSupport,setBonus,prestigeBonus,threat,active};
 }
 function fightRollMax(o){
  return 24+opponentThreat(o)*4;
@@ -3096,6 +3269,67 @@ function chanceClass(p){
 function bossDef(t){return 35+t*32}
 function bossReady(t){const relevant=jobDefs.filter(j=>j.tier===t);return relevant.length&&relevant.every(j=>jobState(j.id).mastery>=1)}
 
+
+
+function rivalRecordBase(level){
+ const games=Math.max(20,level*rnd(7,15));
+ const wins=Math.floor(games*rnd(42,72)/100);
+ return {recordWins:wins,recordLosses:games-wins};
+}
+function makeFightRival(i){
+ const base=genOpponent(i,false);
+ const recent=Object.values(state.rivalHistory||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+ if(i<2&&recent.length&&Math.random()<.45){
+   const h=recent[i%recent.length];
+   const scale=1+Math.min(.18,(h.timesFought||1)*.025);
+   return {...base,id:h.id,name:h.name,recordWins:h.recordWins||base.level*6,recordLosses:h.recordLosses||base.level*4,power:Math.round(base.power*scale),rivalReturn:true};
+ }
+ return {...base,id:`foe_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,name:generatedContactName(),...rivalRecordBase(base.level)};
+}
+function ensureFightList(){
+ if(!Array.isArray(state.fightList))state.fightList=[];
+ if(state.fightList.length<5){
+   while(state.fightList.length<5)state.fightList.push(makeFightRival(state.fightList.length));
+   if(!state.lastFightRefresh)state.lastFightRefresh=now();
+ }
+ return state.fightList;
+}
+function fightRefreshWait(){
+ return Math.max(0,FIGHT_REFRESH_COOLDOWN_MS-(now()-(state.lastFightRefresh||0)));
+}
+function refreshFightList(force=false){
+ const wait=fightRefreshWait();
+ if(!force&&wait>0)return showRequirementPopup(`New rivals available in ${fmt(wait)}.`);
+ state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
+ state.lastFightRefresh=now();save();render();
+ if(!force)showActionFlash("FIGHT LIST REFRESHED","New rival organizations located.","info");
+}
+function updateRivalHistory(o,playerWon){
+ if(!o?.id)return;
+ const h=state.rivalHistory[o.id]||{id:o.id,name:o.name,timesFought:0,playerWins:0,playerLosses:0,recordWins:o.recordWins||0,recordLosses:o.recordLosses||0};
+ h.name=o.name;h.level=o.level;h.crew=o.crew;h.timesFought++;h.lastSeen=now();
+ if(playerWon){h.playerWins++;h.recordLosses=(h.recordLosses||0)+1}else{h.playerLosses++;h.recordWins=(h.recordWins||0)+1}
+ state.rivalHistory[o.id]=h;
+ const entries=Object.values(state.rivalHistory).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0)).slice(0,50);
+ state.rivalHistory=Object.fromEntries(entries.map(x=>[x.id,x]));
+}
+function bountyPlacementCost(o){
+ return Math.max(1500,Math.round(1800+o.level*550+opponentThreat(o)*400));
+}
+function placeBountyOnRival(id){
+ const list=ensureFightList(),o=list.find(x=>x.id===id);
+ if(!o)return toast("That rival is no longer on the Fight List.");
+ if(state.playerBounties.some(x=>x.id===id))return toast("That rival is already on your Hitlist.");
+ const cost=bountyPlacementCost(o);
+ if(state.cash<cost)return showRequirementPopup(`Placing this bounty costs ${money(cost)}. You have ${money(state.cash)}.`);
+ state.cash-=cost;state.lifetimeCashSpent+=cost;
+ state.playerBounties.unshift({...o,bounty:Math.round(cost*.35),placedCost:cost,placedAt:now()});
+ state.playerBounties=state.playerBounties.slice(0,10);
+ state.fightList=state.fightList.filter(x=>x.id!==id);
+ state.fightList.push(makeFightRival(4));
+ showActionFlash("BOUNTY POSTED",`${o.name} · Cost ${money(cost)} · Hitlist reward ${money(Math.round(cost*.35))}`,"cash");
+ save();render();
+}
 
 function genOpponent(i,hit=false,context="fight"){
  const names=["Ricky Vale","Mara Knox","Joey C.","Vince North","Dani Graves","Frankie Six","Sal Moreno","Nina Black"];
@@ -3141,57 +3375,71 @@ function genOpponent(i,hit=false,context="fight"){
  };
 }
 
-function fight(i,hit=false,revengeId=null){
+function fight(i,hit=false,revengeId=null,bountyId=null){
  if(state.st<1){
-   showActionFlash("NOT ENOUGH STAMINA",`You need 1 Stamina to fight. You have ${Math.floor(state.st)}/${state.maxSt}. Tap Stamina to use an Adrenaline Shot.`,"bad");
-   return;
+   showActionFlash("NOT ENOUGH STAMINA",`You need 1 Stamina to fight. You have ${Math.floor(state.st)}/${state.maxSt}. Tap Stamina to use an Adrenaline Shot.`,"bad");return;
  }
  if(state.hp<10){
-   showActionFlash("HEALTH TOO LOW",`You need at least 10 Health to start a fight. Current Health: ${Math.floor(state.hp)}.`,"bad");
-   return;
+   showActionFlash("HEALTH TOO LOW",`You need at least 10 Health to start a fight. Current Health: ${Math.floor(state.hp)}.`,"bad");return;
  }
 
  state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
- const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);
+ const o=bountyId?state.playerBounties.find(x=>x.id===bountyId):revengeId?state.revenge.find(x=>x.id===revengeId):hit?genOpponent(i,true):ensureFightList()[i];
  if(!o)return;
 
- const profile=offensiveFightProfile(o);
- const rollMax=fightRollMax(o);
- const p=profile.total+rnd(1,rollMax);
- const e=o.power+rnd(1,rollMax);
+ const profile=offensiveFightProfile(o),rollMax=fightRollMax(o),p=profile.total+rnd(1,rollMax),e=o.power+rnd(1,rollMax);
+ const won=p>=e;
+ updateRivalHistory(o,won);
 
- if(p>=e){
-   const c=rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0);
+ if(won){
+   const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult());
    const heatDrop=Math.min(state.heat,hit?rnd(6,9):revengeId?rnd(4,7):rnd(3,6));
-   state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;
-   state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));
-   state.heat=Math.max(0,state.heat-heatDrop);
-   addXp(10+o.level*2);
-
-   log(`Defeated ${o.name}. Effective Fight Power ${profile.total} beat ${o.power}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
-   showActionFlash("FIGHT WON",`${o.name} · ${profile.total} vs ${o.power} power · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
+   state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));state.heat=Math.max(0,state.heat-heatDrop);
+   addXp(Math.floor((10+o.level*2)*prestigeXpMult()));
+   log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
+   showActionFlash("FIGHT WON",`${o.name} · ${profile.total} vs ${o.power} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
+   if(bountyId)state.playerBounties=state.playerBounties.filter(x=>x.id!==bountyId);
  }else{
-   const mitigation=defenseMitigation();
-   const threat=opponentThreat(o);
-   const baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
-   const loss=Math.floor(baseLoss*(1-mitigation));
-   const hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
+   const mitigation=defenseMitigation(),threat=opponentThreat(o),baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
+   const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
    state.cash-=loss;state.losses++;state.hp=Math.max(1,state.hp-hpLoss);
-
-   log(`Lost to ${o.name}. Effective Fight Power ${profile.total} fell short of ${o.power}. Defense reduced losses by ${Math.round(mitigation*100)}%.`);
-   showActionFlash("FIGHT LOST",`${profile.total} vs ${o.power} power · Defense saved ${Math.round(mitigation*100)}% · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
+   log(`Lost to ${o.name}. Defense reduced losses by ${Math.round(mitigation*100)}%.`);
+   showActionFlash("FIGHT LOST",`${profile.total} vs ${o.power} · Lost ${money(loss)} · -${hpLoss} Health`,"bad");
  }
  save();render();
 }
 
 function fightBoss(t){
  if(!bossReady(t))return toast("Master every job in this rank at least once.");
- if(state.st<3)return toast("Boss operations cost 3 stamina.");
- state.st-=3;const power=combatPower("attack")+combatPower("defense")+rnd(1,30),enemy=bossDef(t)+rnd(1,30),name=tiers[t].boss;
- if(power>=enemy){state.bosses[t]=true;state.cash+=1800*(t+1);state.notoriety+=25;addXp(120+50*t);state.heat=Math.min(100,state.heat+12);log(`${name} was defeated. Your organization controls the rank.`);S.ok()}
- else{state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900));log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew()}
- save();render()
+ const first=!state.bosses[t],last=Number(state.bossLastFight[t]||0),wait=first?0:Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last));
+ if(wait>0)return showRequirementPopup(`${tiers[t].boss} can be challenged again in ${fmt(wait)}.`);
+ const staminaCost=first?3:4;
+ if(state.st<staminaCost)return toast(`Boss operations cost ${staminaCost} stamina.`);
+ state.st-=staminaCost;state.bossLastFight[t]=now();
+
+ const rematches=Number(state.bossRematches[t]||0);
+ const enemyBase=bossDef(t)+rematches*22;
+ const power=combatPower("attack")+combatPower("defense")+rnd(1,35),enemy=enemyBase+rnd(1,35),name=tiers[t].boss;
+
+ if(power>=enemy){
+   const payout=Math.floor(1800*(t+1)*(1+rematches*.15)*prestigeCashMult());
+   state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.notoriety+=first?25:8;
+   addXp(Math.floor((120+50*t+rematches*10)*prestigeXpMult()));state.heat=Math.min(100,state.heat+12);
+   const pool=bossLootDefs[t]||["Boss Trophy"];
+   if(first||Math.random()<.35){
+     const item=pool[rnd(0,pool.length-1)];addLootItem(item,1,99);
+     log(`${name} dropped exclusive loot: ${item}.`);
+     showActionFlash("BOSS LOOT",`${item} · exclusive drop`,"cash");
+   }
+   if(!first&&Math.random()<.18)addLootItem(Math.random()<.5?"Energy Pack":"Stamina Pack",1,99);
+   state.bossRematches[t]=rematches+1;
+   log(`${name} was defeated${first?". Your organization controls the rank.":" in a rematch."}`);S.ok();
+ }else{
+   state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900)*(t+1));
+   log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew();
+ }
+ save();render();
 }
 function bulkGearPrice(g,qty){
  const discount=qty===5?.03:qty===10?.07:qty===50?.10:0;
@@ -3271,83 +3519,49 @@ function openHelpRequest(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d)return;
  if(!requireResponsiveContact(id,"help"))return;
-
  const wait=cooldown(f.lastAsk,HELP_REQUEST_COOLDOWN_MIN);
  if(wait>0)return showRequirementPopup(`${d.name} can help again in ${fmt(wait)}.`);
 
  const goldStatus=goldHelpStatus(id);
  f.lastAsk=now();
-
- // If Gold is unlocked for this spin, this consumes the contact's existing
- // once-per-hour Gold Bar attempt whether Gold wins or not.
  if(goldStatus.unlocked)f.lastGoldBarAsk=now();
 
  const helpChance=Math.max(.08,Math.min(.88,(d.help||.5)+(f.trust-50)/170-(f.resentment/160)));
  changeRelationship(id,{trust:-2,resentment:3,rel:-2});
-
  let outcome=null;
 
- // Preserve the old stable hidden 1%–20% per-contact Gold Bar odds.
  if(goldStatus.unlocked&&(Math.random()*100)<goldBarChance(id)){
-   state.goldBars=(state.goldBars||0)+1;
-   state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
+   state.goldBars=(state.goldBars||0)+1;state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
    f.response="I found something rare for you. One Gold Bar.";
    log(`${d.name} provided a Gold Bar through an Ask for Help request.`);
    outcome={kind:"gold",amount:1,resultText:"🪙 GOLD BAR SECURED"};
  }else if(Math.random()<helpChance){
-   const rewardRoll=Math.random();
-
-   if(rewardRoll<.40){
+   const r=Math.random();
+   if(r<.32){
      const amount=rnd(100,300)+Math.floor(state.level*20);
-     state.cash+=amount;
-     state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
-     f.response=`I scraped together ${money(amount)} for you.`;
+     state.cash+=amount;state.lifetimeCashEarned+=amount;f.response=`I scraped together ${money(amount)} for you.`;
      log(`${d.name} sent ${money(amount)} in response to your help request.`);
      outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
-   }else if(rewardRoll<.70){
-     const item="Energy Drink";
-     const current=Math.max(0,Number(state.loot[item])||0);
-     if(current>=999){
-       const amount=rnd(100,250)+Math.floor(state.level*15);
-       state.cash+=amount;
-       state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
-       f.response=`Your Energy Drink stash was full, so I sent ${money(amount)} instead.`;
-       log(`${d.name} converted a full-stash Energy Drink reward into ${money(amount)}.`);
-       outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
-     }else{
-       state.loot[item]=current+1;
-       f.response="Sent you an Energy Drink.";
-       log(`${d.name} sent an Energy Drink through Ask for Help.`);
-       outcome={kind:"energy",amount:1,resultText:"🥤 ENERGY DRINK"};
-     }
+   }else if(r<.57){
+     addLootItem("Energy Drink",1,999);f.response="Sent you an Energy Drink.";
+     outcome={kind:"energy",amount:1,resultText:"🥤 ENERGY DRINK"};
+   }else if(r<.77){
+     addLootItem("Adrenaline Shot",1,999);f.response="Sent you an Adrenaline Shot.";
+     outcome={kind:"stamina",amount:1,resultText:"💉 ADRENALINE SHOT"};
+   }else if(r<.89){
+     addLootItem("Energy Pack",1,99);f.response="I had an Energy Pack tucked away. It is yours.";
+     outcome={kind:"energyPack",amount:1,resultText:"📦 ENERGY PACK"};
    }else{
-     const item="Adrenaline Shot";
-     const current=Math.max(0,Number(state.loot[item])||0);
-     if(current>=999){
-       const amount=rnd(100,250)+Math.floor(state.level*15);
-       state.cash+=amount;
-       state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
-       f.response=`Your Adrenaline Shot stash was full, so I sent ${money(amount)} instead.`;
-       log(`${d.name} converted a full-stash Adrenaline Shot reward into ${money(amount)}.`);
-       outcome={kind:"cash",amount,resultText:`💵 ${money(amount)} CASH`};
-     }else{
-       state.loot[item]=current+1;
-       f.response="Sent you an Adrenaline Shot.";
-       log(`${d.name} sent an Adrenaline Shot through Ask for Help.`);
-       outcome={kind:"stamina",amount:1,resultText:"💉 ADRENALINE SHOT"};
-     }
+     addLootItem("Stamina Pack",1,99);f.response="I found a Stamina Pack. Save it for a bad night.";
+     outcome={kind:"staminaPack",amount:1,resultText:"📦 STAMINA PACK"};
    }
  }else{
    f.response=meanReplies[rnd(0,meanReplies.length-1)];
-   changeRelationship(id,{resentment:3,rel:-2});
-   log(`${d.name} had nothing available when you asked for help.`);
+   changeRelationship(id,{resentment:3,rel:-2});log(`${d.name} had nothing available when you asked for help.`);
    outcome={kind:"nothing",amount:0,resultText:"NOTHING THIS TIME"};
  }
-
- save();
- spinGoldReel(id,outcome,goldStatus);
+ save();spinGoldReel(id,outcome,goldStatus);
 }
-
 
 
 function askEnergy(id){openHelpRequest(id)}
@@ -3885,6 +4099,172 @@ function renderEnergyDrinkQuick(){
 }
 
 
+
+function activeLimitedLoot(t=now()){
+ const week=Math.floor(t/(7*86400000));
+ return limitedLootDefs[Math.abs(week)%limitedLootDefs.length];
+}
+function limitedLootEndsAt(t=now()){
+ const weekMs=7*86400000;
+ return (Math.floor(t/weekMs)+1)*weekMs;
+}
+function fmtLong(ms){
+ const total=Math.max(0,Math.ceil(ms/60000)),days=Math.floor(total/1440),hours=Math.floor((total%1440)/60),mins=total%60;
+ return days?`${days}d ${hours}h`:hours?`${hours}h ${mins}m`:`${mins}m`;
+}
+function jobMasteryCashMult(j){return 1+jobState(j.id).mastery*.05}
+function jobMasteryXpMult(j){return 1+jobState(j.id).mastery*.05}
+function masteryRewardText(level){
+ return level===1?"+5% Job cash permanently · one-time cash bonus":level===2?"+5% Job XP permanently · Energy Pack":level===3?"Maximum mastery · Stamina Pack · +2 Skill Points":"";
+}
+function addLootItem(item,qty=1,cap=999){
+ const current=Math.max(0,Number(state.loot[item])||0);
+ state.loot[item]=Math.min(cap,current+qty);
+ return state.loot[item]-current;
+}
+function grantMasteryReward(j,level){
+ if(level===1){
+   const c=500*(j.tier+1);
+   state.cash+=c;state.lifetimeCashEarned+=c;
+   showActionFlash("MASTERY I",`${j.name} · +${money(c)} · Future cash +5%`,"cash");
+ }else if(level===2){
+   addLootItem("Energy Pack",1,99);
+   showActionFlash("MASTERY II",`${j.name} · Energy Pack · Future XP +5%`,"good");
+ }else if(level===3){
+   addLootItem("Stamina Pack",1,99);state.skill+=2;
+   showActionFlash("MASTERY III",`${j.name} · Stamina Pack · +2 Skill Points`,"good");
+ }
+}
+function collectionReady(c){
+ return c.items.every(x=>(state.loot[x]||0)>=1);
+}
+function claimCollection(id){
+ const c=collectionDefs.find(x=>x.id===id);
+ if(!c||state.collectionClaimed[id])return;
+ if(!collectionReady(c))return showRequirementPopup("Complete every item in this collection first.");
+ state.collectionClaimed[id]=now();
+ c.apply();
+ log(`Collection completed: ${c.name}. Reward: ${c.reward}.`);
+ showActionFlash("COLLECTION COMPLETED",`${c.name} · ${c.reward}`,"good");
+ save();render();
+}
+function useEnergyPack(){
+ const q=Number(state.loot["Energy Pack"]||0);
+ if(q<=0)return toast("No Energy Packs available.");
+ if(state.en>=state.maxEn)return toast("Energy is already full.");
+ const roll=rnd(10,15),actual=Math.min(roll,state.maxEn-state.en);
+ state.loot["Energy Pack"]=q-1;if(state.loot["Energy Pack"]<=0)delete state.loot["Energy Pack"];
+ state.en=Math.min(state.maxEn,state.en+roll);
+ showActionFlash("ENERGY PACK USED",`+${actual} Energy · ${Math.max(0,q-1)} remaining`,"good");
+ save();render();
+}
+function useStaminaPack(){
+ const q=Number(state.loot["Stamina Pack"]||0);
+ if(q<=0)return toast("No Stamina Packs available.");
+ if(state.st>=state.maxSt)return toast("Stamina is already full.");
+ const roll=rnd(4,7),actual=Math.min(roll,state.maxSt-state.st);
+ state.loot["Stamina Pack"]=q-1;if(state.loot["Stamina Pack"]<=0)delete state.loot["Stamina Pack"];
+ state.st=Math.min(state.maxSt,state.st+roll);
+ showActionFlash("STAMINA PACK USED",`+${actual} Stamina · ${Math.max(0,q-1)} remaining`,"good");
+ save();render();
+}
+function bankDeposit(pct=1){
+ if(state.cash<=0)return toast("No Cash available to deposit.");
+ const amount=Math.max(1,Math.floor(state.cash*Math.max(.01,Math.min(1,pct))));
+ const fee=Math.ceil(amount*.10),deposited=Math.max(0,amount-fee);
+ state.cash-=amount;state.bankCash+=deposited;state.lifetimeCashSpent+=fee;
+ showActionFlash("BANK DEPOSIT",`${money(deposited)} protected · ${money(fee)} laundering fee`,"cash");
+ save();render();
+}
+function bankWithdraw(amount=Infinity){
+ const take=Math.min(state.bankCash,Number.isFinite(amount)?amount:state.bankCash);
+ if(take<=0)return toast("The bank is empty.");
+ state.bankCash-=take;state.cash+=take;
+ showActionFlash("BANK WITHDRAWAL",`${money(take)} returned to your pocket`,"cash");
+ save();render();
+}
+function hospitalCost(){
+ const missing=Math.max(0,state.maxHp-state.hp);
+ return Math.ceil(missing*(10+state.level*2)*(1+(state.prestige||0)*.08));
+}
+function hospitalHeal(){
+ const cost=hospitalCost();
+ if(state.hp>=state.maxHp)return toast("Health is already full.");
+ if(state.cash<cost)return showRequirementPopup(`Hospital treatment costs ${money(cost)}. You have ${money(state.cash)}.`);
+ state.cash-=cost;state.lifetimeCashSpent+=cost;state.hp=state.maxHp;
+ showActionFlash("HOSPITAL TREATMENT",`Health restored · ${money(cost)} paid`,"good");
+ save();render();
+}
+function renderUnderworldServices(){
+ const el=document.getElementById("underworldServices");if(!el)return;
+ const hc=hospitalCost();
+ el.innerHTML=`<div class="service-row">
+   <div class="service-head"><div class="service-name">Offshore Bank</div><div class="bank-balance">${money(state.bankCash)}</div></div>
+   <div class="service-note">Banked Cash is protected from fight losses. Deposits lose 10% to laundering fees.</div>
+   <div class="service-actions">
+    <button class="btn small" onclick="bankDeposit(.25)" ${state.cash<1?"disabled":""}>DEPOSIT 25%</button>
+    <button class="btn small" onclick="bankDeposit(.5)" ${state.cash<1?"disabled":""}>DEPOSIT 50%</button>
+    <button class="btn small" onclick="bankDeposit(1)" ${state.cash<1?"disabled":""}>DEPOSIT ALL</button>
+    <button class="btn secondary small" onclick="bankWithdraw(10000)" ${state.bankCash<=0?"disabled":""}>WITHDRAW $10K</button>
+    <button class="btn secondary small" onclick="bankWithdraw()" ${state.bankCash<=0?"disabled":""}>WITHDRAW ALL</button>
+   </div>
+ </div>
+ <div class="service-row">
+   <div class="service-head"><div class="service-name">Underground Hospital</div><div class="hospital-cost">${state.hp>=state.maxHp?"FULL HEALTH":money(hc)}</div></div>
+   <div class="service-note">Pay Cash to restore Health immediately. Treatment becomes more expensive as your organization grows.</div>
+   <div class="service-actions"><button class="btn green" onclick="hospitalHeal()" ${state.hp>=state.maxHp||state.cash<hc?"disabled":""}>HEAL TO FULL</button></div>
+ </div>`;
+}
+function canPrestige(){
+ return state.level>=100&&tiers.every((_,i)=>!!state.bosses[i]);
+}
+function resetGoldUnlockStats(){
+ state.attack=5;state.defense=5;state.maxHp=100;state.hp=100;state.maxEn=20;state.en=20;state.maxSt=10;state.st=10;
+ if(state.goldUnlocks.safehouse_cache){state.maxEn+=5;state.en+=5}
+ if(state.goldUnlocks.armored_tailoring)state.defense+=8;
+ if(state.goldUnlocks.private_armory)state.attack+=8;
+ if(state.goldUnlocks.underground_clinic){state.maxHp+=25;state.hp=state.maxHp}
+ if(state.goldUnlocks.ghost_network){state.maxSt+=5;state.st+=5;state.notoriety+=10}
+ if(state.goldUnlocks.kingpin_reserve){state.attack+=15;state.defense+=15;state.maxEn+=10;state.en+=10}
+ // Collection rewards are permanent across Prestige.
+ collectionDefs.filter(c=>state.collectionClaimed?.[c.id]).forEach(c=>c.apply());
+}
+function prestigeGame(){
+ if(!canPrestige())return showRequirementPopup("Prestige requires Level 100 and every rank boss defeated.");
+ if(!confirm("Become a higher-tier Kingpin? This resets level, cash, jobs, bosses, properties, territory, equipment, and run statistics. Crew, custom identities, Gold Bars, Gold Vault unlocks, rare loot, achievements, and completed collections are preserved."))return;
+ state.prestige=(state.prestige||0)+1;
+ state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.notoriety=10*state.prestige;
+ state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
+ state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
+ state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
+ state.fightList=[];state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
+ resetGoldUnlockStats();
+ log(`Kingpin Prestige ${state.prestige} began. Permanent bonuses increased.`);
+ showActionFlash("KINGPIN PRESTIGE",`Prestige ${state.prestige} · +${state.prestige*5}% Job Cash/XP · +${state.prestige*2} Attack/Defense`,"cash");
+ save();render();
+}
+function renderPrestige(){
+ const el=document.getElementById("prestigePanel");if(!el)return;
+ const p=state.prestige||0,ready=canPrestige();
+ el.innerHTML=`<div class="prestige-card">
+  <div class="service-head"><div class="service-name">Kingpin Prestige</div><div class="prestige-level">${p}</div></div>
+  <div class="prestige-bonuses">Permanent bonus: +${p*5}% Job Cash · +${p*5}% Job XP · +${p*2} Attack · +${p*2} Defense · +${p*20} combat crew capacity.</div>
+  <div class="service-note">${ready?"You control every rank and have reached Level 100. A new run is available.":`Requires Level 100 and all ${tiers.length} rank bosses defeated.`}</div>
+  <button class="btn gold" style="margin-top:6px" onclick="prestigeGame()" ${ready?"":"disabled"}>BEGIN PRESTIGE ${p+1}</button>
+ </div>`;
+}
+function showLevelUpModal(level){
+ const title=document.getElementById("levelUpTitle"),body=document.getElementById("levelUpBody");
+ if(!title||!body)return;
+ const unlocks=getUnlockCatalog().filter(x=>x.level===level).slice(0,6);
+ title.textContent=`LEVEL ${level}`;
+ body.innerHTML=`<div class="sub">Your organization has grown.</div>
+  <div class="level-up-summary"><div>SKILL POINTS<b>+5</b></div><div>MAX HEALTH<b>+5</b></div><div>MAX ENERGY<b>+2</b></div></div>
+  <div class="level-up-summary"><div>MAX STAMINA<b>+1</b></div><div>NOTORIETY<b>+10</b></div><div>PRESTIGE<b>${state.prestige||0}</b></div></div>
+  <div class="level-unlocks">${unlocks.length?`New at this level:<br>${unlocks.map(x=>`• ${x.title}`).join("<br>")}`:"No new catalog unlocks at this exact level."}</div>`;
+ document.getElementById("levelUpModal").classList.add("show");
+}
+
 let gearShopFilter="all";
 const gearBuySelections={};
 let crewListFilter="all";
@@ -3943,7 +4323,7 @@ function showFightBreakdown(i,hit=false,revengeId=null,e){
  document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
  document.getElementById("statHelpText").textContent=`${fightThreatLabel(opponentThreat(o))} threat. Enemy Power ${o.power}; your Effective Power ${p.total}. The percentage uses the same random-roll model as the actual fight.`;
  const a=document.getElementById("statHelpActions");
- if(a)a.innerHTML=`<div class="sub">Attack contribution: ${p.stat}<br>Gear contribution: ${p.gear}<br>Active Crew contribution: ${p.crew}${p.defenseSupport?`<br>Defense support: ${p.defenseSupport}`:""}<br>Notoriety contribution: ${p.notoriety}<br><br>Harder foes increase the value of strong stats, better equipment, and a larger active crew.</div>`;
+ if(a)a.innerHTML=`<div class="sub">Attack contribution: ${p.stat}<br>Gear contribution: ${p.gear}<br>Fielded Crew contribution: ${p.crew} (${p.active}/${combatCrewLimit()} slots)<br>Equipment Sets: ${p.setBonus||0}<br>Prestige: ${p.prestigeBonus||0}${p.defenseSupport?`<br>Defense support: ${p.defenseSupport}`:""}<br>Notoriety: ${p.notoriety}<br><br>Each fielded crew member can use one weapon, one armor item, and one vehicle. Excess crew still counts for Jobs but has diminishing combat impact.</div>`;
  document.getElementById("statHelpModal").classList.add("show");
 }
 
@@ -3967,88 +4347,52 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  renderRecentIntel();
  renderLatestNotification();
- renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();updateNetworkArrivalTimer();
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();renderUnderworldServices();renderPrestige();updateNetworkArrivalTimer();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
 function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and periodic mystery crates.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
-function renderEvent(){const active=state.event.ends>now();eventBox.innerHTML=active?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmt(state.event.ends-now())}</div></div>`:""}
+function renderEvent(){
+ const surge=state.event.ends>now(),limited=activeLimitedLoot(),left=limitedLootEndsAt()-now();
+ eventBox.innerHTML=`${surge?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmtLong(state.event.ends-now())}</div></div>`:""}
+ <div class="limited-loot"><b>WEEKLY LIMITED DROP: ${limited.name}</b><div class="sub">${limited.desc} Every successful Job has an 8% chance to recover one.</div><div class="badge gold" style="margin-top:4px">Rotates in ${fmtLong(left)}</div></div>`;
+}
 function renderJobs(){
- const jobsEl=document.getElementById("jobs");
- const tierEl=document.getElementById("tierName");
- const bossEl=document.getElementById("boss");
+ const jobsEl=document.getElementById("jobs"),tierEl=document.getElementById("tierName"),bossEl=document.getElementById("boss");
  if(!jobsEl||!tierEl||!bossEl)return;
-
  const resultEl=document.getElementById("jobResult");
  if(resultEl&&lastJobResult){
    const age=now()-lastJobResult.shownAt;
-   if(age>=1800&&age<11850){
-     resultEl.className="job-result show "+(lastJobResult.success?"good":"bad");
-     resultEl.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`;
-   }else if(age<1800){
-     resultEl.className="job-result";
-     resultEl.innerHTML="";
-   }
+   if(age>=1800&&age<11850){resultEl.className="job-result show "+(lastJobResult.success?"good":"bad");resultEl.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`}
+   else if(age<1800){resultEl.className="job-result";resultEl.innerHTML=""}
  }
-
  const t=activeTier();
- tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">
-   ${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}
- </select>`;
-
+ tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
+ const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const s=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,s.runs*20));
-   const ch=jobChance(j),art=IMG[j.img]||IMG.suit,statKind=jobStatKind(j),statBonus=jobStatBonus(j);
-   const dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
-   const payout=`${money(j.cash[0])}–${money(j.cash[1])}`;
-
+   const s=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
+   const statKind=jobStatKind(j),statBonus=jobStatBonus(j),dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
+   const lo=Math.floor(j.cash[0]*jobMasteryCashMult(j)*prestigeCashMult()),hi=Math.floor(j.cash[1]*jobMasteryCashMult(j)*prestigeCashMult());
+   const xp=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
    return `<div class="card job-card compact-job" id="job-${j.id}">
-     <div class="job-head">
-       <img class="art" src="${art}" alt="">
-       <div>
-         <h3>${j.name}</h3>
-         <div class="meta">
-           <span class="badge">⚡ ${j.energy}</span>
-           <span class="badge green">💵 ${payout}</span>
-           <span class="badge">⭐ ${j.xp}</span>
-           <span class="badge gold">${ch}% SUCCESS</span>
-         </div>
-       </div>
-     </div>
-     <div class="sub">Mastery ${s.mastery}/3</div>
-     <div class="mastery"><div style="width:${pct}%"></div></div>
-     ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
-     ${dash.items.length?`<div class="job-dash">
-       <div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
-       <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
-       <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button>
-       <div class="sub">+50% convenience markup (${money(dashMarkup)}).</div>
-     </div>`:""}
-     <div class="job-primary">
-       <button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button>
-     </div>
-     <details class="compact-details">
-       <summary>JOB DETAILS</summary>
-       <div class="compact-details-body">
-         Preferred role: ${j.role}<br>
-         ${statKind==="attack"?"Attack raises this Job’s success chance.":statKind==="defense"?"Defense raises success chance and reduces failure losses.":"Attack and Defense both contribute."}
-         Current ${statKind==="attack"?"Attack":statKind==="defense"?"Defense":"stat"} bonus: +${statBonus}%.<br>
-         Crew requirement: ${j.crew} · Heat: +${j.heat}<br>
-         Possible rare items: ${j.loot.join(", ")}
-       </div>
-     </details>
+    <div class="job-head"><img class="art" src="${art}" alt=""><div><h3>${j.name}</h3><div class="meta"><span class="badge">⚡ ${j.energy}</span><span class="badge green">💵 ${money(lo)}–${money(hi)}</span><span class="badge">⭐ ${xp}</span><span class="badge gold">${ch}% SUCCESS</span></div></div></div>
+    <div class="sub">Mastery ${s.mastery}/3</div><div class="mastery"><div style="width:${pct}%"></div></div>
+    <div class="mastery-reward">${s.mastery<3?`Next mastery: ${masteryRewardText(s.mastery+1)}`:"MASTERED · +15% cash / +15% XP from mastery"}</div>
+    ${miss.length?`<div class="lock">Missing: ${miss.join(" · ")}</div>`:""}
+    ${dash.items.length?`<div class="job-dash"><div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div><div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div><button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button><div class="sub">+50% convenience markup (${money(dashMarkup)}).</div></div>`:""}
+    <div class="job-primary"><button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button></div>
+    <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${j.loot.join(", ")}<br><b>Weekly limited drop:</b> ${limited.name} (8% on success)</div></details>
    </div>`;
  }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
 
- const done=!!state.bosses[t];
- bossEl.innerHTML=`<div class="card">
-   <img class="art" src="${IMG.suit}" alt="">
-   <h3>${tiers[t].boss}</h3>
-   <div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div>
-   <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once, then defeat the organization above you to control the rank.</div></details>
-   <button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"FIGHT BOSS":"REQUIREMENTS NOT MET"}</button>
- </div>`;
+ const done=!!state.bosses[t],last=Number(state.bossLastFight[t]||0),wait=done?Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last)):0,rematches=Number(state.bossRematches[t]||0);
+ const power=bossDef(t)+rematches*22,pool=bossLootDefs[t]||[];
+ bossEl.innerHTML=`<div class="card"><img class="art" src="${IMG.suit}" alt=""><h3>${tiers[t].boss}</h3>
+  <div class="meta"><span class="badge">🥊 ${done?4:3}</span><span class="badge">Power ${power}</span><span class="badge">Rematches ${rematches}</span></div>
+  <div class="boss-loot">Exclusive loot: ${pool.join(" · ")} · first victory guarantees a drop, rematches have a 35% chance.</div>
+  <details class="compact-details"><summary>OPERATION DETAILS</summary><div class="compact-details-body">Master every Job in this rank at least once. After the first victory, this boss becomes repeatable every 30 minutes, grows stronger each win, and can continue dropping exclusive loot.</div></details>
+  <button class="btn red" onclick="fightBoss(${t})" ${!bossReady(t)||wait>0?"disabled":""}>${!bossReady(t)?"REQUIREMENTS NOT MET":wait>0?`REMATCH ${fmt(wait)}`:done?"REMATCH BOSS":"FIGHT BOSS"}</button></div>`;
 }
 function crewStatus(f){
  if(f.inactive)return "INACTIVE CREW";
@@ -4158,67 +4502,44 @@ function renderCrew(){
  updateNetworkArrivalTimer();
 }
 function renderFight(){
- const fightEl=document.getElementById("fightlist");
- const revengeEl=document.getElementById("revenge");
- const hitEl=document.getElementById("hitlist");
+ const fightEl=document.getElementById("fightlist"),revengeEl=document.getElementById("revenge"),hitEl=document.getElementById("hitlist");
  if(!fightEl||!revengeEl||!hitEl)return;
-
- const combatInfo=document.getElementById("combatInfo");
+ const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details">
-     <summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary>
-     <div class="compact-details-body">Harder foes increasingly reward Attack, strong equipment, and active crew. Defense reduces losses by ${mit}% and supports high-threat offensive fights. Each listed Win Chance uses the same roll model as the actual fight.</div>
-   </details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
  }
+ const wait=fightRefreshWait();
+ if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
 
- fightEl.innerHTML=[0,1,2,3,4].map(i=>{
-   const o=genOpponent(i),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row">
-     <div class="fight-row-main">
-       <div class="fight-row-copy">
-         <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-         <div class="sub">LVL ${o.level} · Crew ${o.crew}</div>
-         <div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
-       </div>
-       <div class="fight-row-actions">
-         <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
-         <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
-       </div>
-     </div>
-   </div>`;
+ const list=ensureFightList();
+ fightEl.innerHTML=list.map((o,i)=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),h=state.rivalHistory[o.id],cost=bountyPlacementCost(o);
+   return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
+    <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
+    <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
+    <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}`:""}</div>
+   </div><div class="fight-row-actions">
+    <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
+    <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
+    <button class="btn red small" onclick="fight(${i},false)">ATTACK</button>
+   </div></div></div>`;
  }).join("");
 
- revengeEl.innerHTML=state.revenge.length
-   ? state.revenge.map(o=>{
-       const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
-       return `<div class="row hit"><div class="fight-row-main">
-         <div class="fight-row-copy">
-           <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-           <div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div>
-         </div>
-         <div class="fight-row-actions">
-           <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button>
-           <button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button>
-         </div>
-       </div></div>`;
-     }).join("")
-   : "<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
+ revengeEl.innerHTML=state.revenge.length?state.revenge.map(o=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o),threat=opponentThreat(o);
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Revenge target · Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(0,false,'${o.id}',event)">?</button><button class="btn red small" onclick="fight(0,false,'${o.id}')">REVENGE</button></div></div></div>`;
+ }).join(""):"<div class='row'><div class='sub'>No outstanding revenge targets.</div></div>";
 
- hitEl.innerHTML=[0,1,2].map(i=>{
+ const placed=state.playerBounties.map(o=>{
+   const p=offensiveFightProfile(o),chance=fightWinChance(o);
+   return `<div class="row hit user-bounty"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">YOUR BOUNTY</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Reward ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="rival-record">You paid ${money(o.placedCost)} to put this rival on the street.</div></div><div class="fight-row-actions"><button class="btn red small" onclick="fight(0,true,null,'${o.id}')">CLAIM</button></div></div></div>`;
+ }).join("");
+ const dynamic=[0,1,2].map(i=>{
    const idx=i+2,o=genOpponent(idx,true),p=offensiveFightProfile(o),chance=fightWinChance(o);
-   return `<div class="row hit"><div class="fight-row-main">
-     <div class="fight-row-copy">
-       <div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
-       <div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div>
-       <div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
-     </div>
-     <div class="fight-row-actions">
-       <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button>
-       <button class="btn red small" onclick="fight(${idx},true)">CLAIM</button>
-     </div>
-   </div></div>`;
+   return `<div class="row hit"><div class="fight-row-main"><div class="fight-row-copy"><div class="title">${o.name}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div><div class="sub">Bounty ${money(o.bounty)} · LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div></div><div class="fight-row-actions"><button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${idx},true,null,event)">?</button><button class="btn red small" onclick="fight(${idx},true)">CLAIM</button></div></div></div>`;
  }).join("");
+ hitEl.innerHTML=placed+dynamic;
 }
 
 function gearEffectLabel(g){
@@ -4230,27 +4551,35 @@ function jobsUsingGear(id){
 }
 function renderInventory(){
  const el=document.getElementById("inventory");if(!el)return;
- const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0);
- const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0),shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ const ep=Math.max(0,Number(state.loot["Energy Pack"])||0),sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
  el.innerHTML=`<div class="inventory-resources">
    <div class="inventory-resource"><div class="ir-label">CASH</div><b>${compactMoney(state.cash)}</b></div>
    <div class="inventory-resource gold"><div class="ir-label">GOLD BARS</div><b>🪙 ${state.goldBars||0}</b></div>
    <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()"><div class="ir-label">ENERGY DRINKS</div><b>🥤 ${drinks}</b></div>
-   <div class="inventory-resource stamina"><div class="ir-label">ADRENALINE SHOTS</div><b>💉 ${shots}</b><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
+   <div class="inventory-resource stamina"><div class="ir-label">ADRENALINE</div><b>💉 ${shots}</b><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
+   <div class="inventory-resource pack"><div class="ir-label">ENERGY PACKS</div><b>📦 ${ep}</b><button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
+   <div class="inventory-resource pack"><div class="ir-label">STAMINA PACKS</div><b>📦 ${sp}</b><button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
  </div>
- <div class="inventory-equipment">
-   ${owned.length?owned.map(g=>`<div class="inventory-item">
-     <div><div class="ii-name">${g.name}</div><div class="ii-desc">${g.desc}</div></div>
-     <div class="ii-qty">x${gearQty(g.id)}</div>
-   </div>`).join(""):`<div class="inventory-empty">You do not own any shop equipment yet.</div>`}
- </div>`;
+ <div class="inventory-equipment">${owned.length?owned.map(g=>`<div class="inventory-item"><div><div class="ii-name">${g.name}</div><div class="ii-desc">${g.desc}</div></div><div class="ii-qty">x${gearQty(g.id)}</div></div>`).join(""):`<div class="inventory-empty">You do not own any shop equipment yet.</div>`}</div>`;
+}
+
+
+function renderEquipmentSets(){
+ const el=document.getElementById("equipmentSets");if(!el)return;
+ el.innerHTML=equipmentSetDefs.map(s=>{
+   const done=equipmentSetComplete(s);
+   const items=Object.entries(s.items).map(([id,q])=>{const g=gearDefs.find(x=>x.id===id);return `${gearQty(id)>=q?"✓":"○"} ${g?.name||id} ${gearQty(id)}/${q}`}).join(" · ");
+   return `<div class="set-row ${done?"complete":""}"><div class="set-head"><div class="set-name">${done?"✓ ":""}${s.name}</div><span class="badge">${done?"ACTIVE":"INCOMPLETE"}</span></div><div class="set-bonus">Bonus: +${s.attack} Attack · +${s.defense} Defense</div><div class="set-items">${items}</div></div>`;
+ }).join("");
 }
 
 function renderGear(){
  const upkeepEl=document.getElementById("upkeepLabel");
  const gearEl=document.getElementById("gear");
  if(!upkeepEl||!gearEl)return;
+ renderEquipmentSets();
 
  upkeepEl.textContent=`Gear upkeep ${money(gearUpkeep())}/hr`;
 
@@ -4418,35 +4747,35 @@ function drinkEnergyDrink(){
 
 function renderProfile(){
  const stats=[
-   ["rank","Rank",tiers[activeTier()].name],
-   ["notoriety","Notoriety",Math.floor(state.notoriety)],
-   ["crew","Crew",crewSize()],
-   ["activeCrew","Active Crew",availableCrew().length+1],
-   ["record","Fight Record",`${state.wins}W / ${state.losses}L`],
-   ["heat","Heat",`${Math.floor(state.heat)} ${heatLabel()}`],
-   ["income","Net Income",money(netIncome())+"/hr"],
-   ["gold","Gold Bars",state.goldBars||0],
+   ["rank","Rank",tiers[activeTier()].name],["notoriety","Notoriety",Math.floor(state.notoriety)],["crew","Crew",crewSize()],
+   ["activeCrew","Combat Crew",`${combatCrewCount()}/${combatCrewLimit()}`],["record","Fight Record",`${state.wins}W / ${state.losses}L`],
+   ["heat","Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["income","Net Income",money(netIncome())+"/hr"],["gold","Gold Bars",state.goldBars||0],
    ["territory","Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]
  ];
  profile.innerHTML=stats.map(x=>`<div class="card profile-hint-card">${x[1]}<button class="profile-hint" onclick="showProfileHelp('${x[0]}',event)">?</button><strong>${x[2]}</strong></div>`).join("");
 
- collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>{
-   if(k==="Energy Drink"){
-     return `<div class="inventory-use"><div><div class="title">🥤 Energy Drink</div><div class="sub">Restores a random 3–7 Energy. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div></div>`;
-   }
-   if(k==="Adrenaline Shot"){
-     return `<div class="inventory-use adrenaline-item"><div><div class="title">💉 Adrenaline Shot</div><div class="sub">Restores a random 1–3 Stamina. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useAdrenalineShot()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
-   }
-   return `<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`;
- }).join(""):"<p class='sub'>No rare items recovered yet.</p>";
+ const consumables=["Energy Drink","Adrenaline Shot","Energy Pack","Stamina Pack"];
+ const consumeHtml=consumables.filter(k=>(state.loot[k]||0)>0).map(k=>{
+   const v=state.loot[k];
+   if(k==="Energy Drink")return `<div class="inventory-use"><div><div class="title">🥤 ${k}</div><div class="sub">Restores 3–7 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
+   if(k==="Adrenaline Shot")return `<div class="inventory-use"><div><div class="title">💉 ${k}</div><div class="sub">Restores 1–3 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useAdrenalineShot()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
+   if(k==="Energy Pack")return `<div class="inventory-use pack-item"><div><div class="title">📦 ${k}</div><div class="sub">Rare crew supply. Restores 10–15 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useEnergyPack()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
+   return `<div class="inventory-use pack-item"><div><div class="title">📦 ${k}</div><div class="sub">Rare crew supply. Restores 4–7 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useStaminaPack()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
+ }).join("");
+
+ const collectionHtml=collectionDefs.map(c=>{
+   const done=!!state.collectionClaimed[c.id],ready=collectionReady(c),have=c.items.filter(x=>(state.loot[x]||0)>=1).length;
+   return `<div class="collection-row ${done?"complete":""}"><div class="collection-head"><div class="collection-name">${done?"✓ ":""}${c.name}</div><div class="collection-progress">${have}/${c.items.length}</div></div><div class="collection-items">${c.items.map(x=>`${(state.loot[x]||0)>=1?"✓":"○"} ${x}`).join(" · ")}</div><div class="collection-reward">Reward: ${c.reward}</div><button class="btn small" style="margin-top:5px" onclick="claimCollection('${c.id}')" ${!ready||done?"disabled":""}>${done?"CLAIMED":"CLAIM REWARD"}</button></div>`;
+ }).join("");
+
+ const specialLoot=Object.entries(state.loot).filter(([k,v])=>v>0&&!consumables.includes(k));
+ collections.innerHTML=`${consumeHtml}${collectionHtml}<div class="section-title" style="margin-top:8px"><h2>Loose Rare Loot</h2><span>${specialLoot.length} types</span></div>${specialLoot.length?specialLoot.map(([k,v])=>`<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`).join(""):"<p class='sub'>No loose rare items recovered yet.</p>"}`;
 
  const defs=achievementDefs(),newly=[];
  defs.forEach(a=>{if(a.current>=a.target&&!state.achievementUnlocked[a.id]){state.achievementUnlocked[a.id]=now();newly.push(a)}});
  if(newly.length){
    newly.forEach(a=>{log(`Achievement unlocked: ${a.title}.`);queueUnlockPopup("Achievement",a.title)});
-   const count=Object.keys(state.achievementUnlocked).length;
-   if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.")}
-   save();
+   const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.")}save();
  }
  const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
  ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+
