@@ -349,7 +349,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 #view-jobs,#view-jobs .cards,#view-jobs .card{width:100%!important;max-width:100%!important;min-width:0!important}
 #view-jobs .card{clear:both}
 #view-jobs .art{max-width:92px!important}
-.mini-hud{position:fixed;top:0;left:0;right:0;z-index:2147482500;height:38px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;padding:3px 4px;background:rgba(6,7,8,.97);border-bottom:1px solid #555;box-shadow:0 4px 14px rgba(0,0,0,.55);transform:translateY(-110%);opacity:0;pointer-events:none;transition:transform .14s ease,opacity .14s ease}
+.mini-hud{position:fixed;top:0;left:0;right:0;z-index:2147482500;height:38px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;padding:3px 4px;background:rgba(6,7,8,.97);border-bottom:1px solid #555;box-shadow:0 4px 14px rgba(0,0,0,.55);transform:translateY(-110%);opacity:0;pointer-events:none;transition:transform .14s ease,opacity .14s ease}
 .mini-hud.show{transform:translateY(0);opacity:1;pointer-events:auto}
 .mini-hud-item{min-width:0;background:linear-gradient(#191b1e,#0a0b0c);border:1px solid #343638;padding:3px 5px;display:flex;align-items:center;justify-content:center;gap:4px;font-size:9px;white-space:nowrap;overflow:hidden}
 .mini-hud-item b{min-width:0;overflow:hidden;text-overflow:ellipsis;font-size:10px;color:#eee}
@@ -1171,9 +1171,9 @@ body.compact-stats .mini-hud{
   font-size:9px;color:#969087
 }
 
-/* The compact HUD must be a single four-cell row above Campaign/Latest. */
+/* The compact HUD is a single five-cell row above Campaign/Latest. */
 .mini-hud{
-  grid-template-columns:repeat(4,minmax(0,1fr))!important;
+  grid-template-columns:repeat(5,minmax(0,1fr))!important;
 }
 body.compact-stats .mini-hud{
   position:sticky!important;
@@ -1224,6 +1224,17 @@ body.compact-stats .mini-hud{
   z-index:2147482500!important;
 }
 
+
+.mini-hud-item.heat b{color:#d88963}
+.mini-hud-item.heat.high{border-color:#825037;background:linear-gradient(#24150f,#0c0907)}
+.mini-hud-item.heat.critical{border-color:#9d3e33;background:linear-gradient(#2b1110,#0d0707)}
+.mini-hud-item.heat.manhunt{border-color:#c13b32;background:linear-gradient(#3a1010,#100606)}
+.mini-hud-item.heat.manhunt b{color:#ff8a78}
+@media(max-width:430px){
+  .mini-hud-item{padding:2px!important;gap:1px!important}
+  .mini-hud-item b{font-size:8px!important}
+}
+
 </style>
 </head>
 <body>
@@ -1248,6 +1259,7 @@ body.compact-stats .mini-hud{
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
   <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
   <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)">💵 <b id="miniCash">$0</b></div>
+  <div class="mini-hud-item heat stat-clickable" id="miniHeatItem" onclick="showStatHelp('heat',event)">🔥 <b id="miniHeat">0</b></div>
 </div>
 
 <div id="campaignTop" class="campaign-top" onclick="go('home')" title="Open current campaign">
@@ -1657,7 +1669,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.9";
+const BUILD_NUMBER="0.17.10";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4563,11 +4575,22 @@ function render(){syncStatHudMode();const sx=document.getElementById("sfxState")
  if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
  lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);goldT.textContent=(state.goldBars||0).toLocaleString();crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
  hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
- const miniHp=document.getElementById("miniHp"),miniEn=document.getElementById("miniEn"),miniSt=document.getElementById("miniSt"),miniCash=document.getElementById("miniCash");
+ const miniHp=document.getElementById("miniHp"),miniEn=document.getElementById("miniEn"),miniSt=document.getElementById("miniSt"),miniCash=document.getElementById("miniCash"),miniHeat=document.getElementById("miniHeat"),miniHeatItem=document.getElementById("miniHeatItem");
  if(miniHp)miniHp.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;
  if(miniEn)miniEn.textContent=`${Math.floor(state.en)}/${state.maxEn}`;
  if(miniSt)miniSt.textContent=`${Math.floor(state.st)}/${state.maxSt}`;
  if(miniCash){miniCash.textContent=compactMoney(state.cash);miniCash.title=money(state.cash);}
+ if(miniHeat){
+   const h=Math.floor(state.heat);
+   miniHeat.textContent=h;
+   miniHeat.title=`Heat ${h} · ${heatLabel()}`;
+ }
+ if(miniHeatItem){
+   miniHeatItem.classList.toggle("high",state.heat>=45&&state.heat<70);
+   miniHeatItem.classList.toggle("critical",state.heat>=70&&state.heat<90);
+   miniHeatItem.classList.toggle("manhunt",state.heat>=90);
+   miniHeatItem.title=`Heat ${Math.floor(state.heat)} · ${heatLabel()}`;
+ }
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
