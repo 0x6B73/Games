@@ -1079,6 +1079,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 .gold-reel-item.cash{border-color:#547044;color:#a7cf88;background:linear-gradient(#14200f,#080d06)}
 .gold-reel-item.energy{border-color:#46627a;color:#9fc6e5;background:linear-gradient(#0e1820,#060b0f)}
 .gold-reel-item.stamina{border-color:#78534c;color:#dda095;background:linear-gradient(#1d100e,#0d0706)}
+.gold-reel-item.blackmail{border-color:#7a4a4a;color:#e3a5a0;background:linear-gradient(#24100f,#0d0706)}
 .help-reel-legend{
   margin-top:5px;font-size:7px;color:#8f887d;line-height:1.4;text-align:center
 }
@@ -2957,7 +2958,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.18";
+const BUILD_NUMBER="0.22.19";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3899,7 +3900,7 @@ function renderCampaignTopBar(){
  objEl.textContent=label;
  fill.style.width=`${pct}%`;
 
- if(state.heat>=90){
+ if(currentHeat()>=90){
    objEl.innerHTML=`<span style="color:#ff8074">MANHUNT:</span> ${objEl.textContent} · Win fights or open Heat controls to recover.`;
  }
 }
@@ -4078,12 +4079,13 @@ function helpRewardTile(kind,goldUnlocked=true){
  if(kind==="stamina")return `<div class="gold-reel-item stamina" data-reward-kind="stamina">${spriteIconHtml("adrenaline","lg")}<br>ADRENALINE</div>`;
  if(kind==="energyPack")return `<div class="gold-reel-item pack" data-reward-kind="energyPack">${spriteIconHtml("2:energy-pack","lg")}<br>ENERGY PACK</div>`;
  if(kind==="staminaPack")return `<div class="gold-reel-item pack" data-reward-kind="staminaPack">${spriteIconHtml("2:stamina-pack","lg")}<br>STAMINA PACK</div>`;
+ if(kind==="blackmail")return `<div class="gold-reel-item blackmail" data-reward-kind="blackmail">${spriteIconHtml("heat","lg")}<br>BLACKMAIL</div>`;
  return `<div class="gold-reel-item empty" data-reward-kind="nothing">NOTHING</div>`;
 }
 
 function buildGoldReel(outcome,goldUnlocked){
  const reel=document.getElementById("goldReel");if(!reel)return;
- const ordinary=["energy","stamina","nothing","energy","stamina","energyPack","staminaPack"];
+ const ordinary=["energy","stamina","nothing","energy","stamina","energyPack","staminaPack","blackmail"];
  const items=[];
  for(let i=0;i<19;i++){
    let kind;
@@ -4145,6 +4147,9 @@ function spinGoldReel(id,outcome,goldStatus){
      S.ok();
    }else if(outcome.kind==="staminaPack"){
      showActionFlash("STAMINA PACK RECEIVED",`${d.name} sent a rare Stamina Pack · Stash: ${state.loot["Stamina Pack"]||0}/99`,"good");
+     S.ok();
+   }else if(outcome.kind==="blackmail"){
+     showActionFlash("BLACKMAIL RECEIVED",`${d.name} sent Blackmail · Reduces selected-location Heat by 5 points · Stash: ${state.loot["Blackmail"]||0}/99`,"good");
      S.ok();
    }else{
      const stashFull=outcome.resultText==="STASH FULL — NOTHING ADDED";
@@ -4210,7 +4215,7 @@ function fresh(){
  bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
  campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
- wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
+ wins:0,losses:0,heat:0,heatByCity:{east:0,downtown:0,north:0},heatMetaByCity:{east:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},downtown:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},north:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0}},notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,cashBribeWindowStart:0,cashBribeCount:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
  intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
@@ -4458,6 +4463,27 @@ function migrate(){
 
  if(!cities.some(c=>c.id===state.currentCity))state.currentCity="east";
 
+ // Heat is tracked independently for East Harbor, Downtown, and Northside.
+ // Existing saves migrate their old global Heat into the location they were currently viewing.
+ if(!state.heatByCity||typeof state.heatByCity!=="object")state.heatByCity={east:0,downtown:0,north:0};
+ const heatCityIds=cities.map(c=>c.id);
+ const legacyHeat=Math.max(0,Math.min(100,Number(state.heat)||0));
+ const existingHeatTotal=heatCityIds.reduce((n,id)=>n+Math.max(0,Number(state.heatByCity[id])||0),0);
+ if(existingHeatTotal<=0&&legacyHeat>0)state.heatByCity[state.currentCity]=legacyHeat;
+ heatCityIds.forEach(id=>{state.heatByCity[id]=Math.max(0,Math.min(100,Number(state.heatByCity[id])||0));});
+ if(!state.heatMetaByCity||typeof state.heatMetaByCity!=="object")state.heatMetaByCity={};
+ heatCityIds.forEach(id=>{
+   const meta=state.heatMetaByCity[id]&&typeof state.heatMetaByCity[id]==="object"?state.heatMetaByCity[id]:{};
+   state.heatMetaByCity[id]={
+     lastDecay:Number.isFinite(Number(meta.lastDecay))?Number(meta.lastDecay):(id===state.currentCity?Number(state.lastHeatDecay)||regenBase:regenBase),
+     lastGain:Number.isFinite(Number(meta.lastGain))?Number(meta.lastGain):(id===state.currentCity?Number(state.lastHeatGain)||regenBase:regenBase),
+     lastLayLow:Number.isFinite(Number(meta.lastLayLow))?Number(meta.lastLayLow):(id===state.currentCity?Number(state.lastLayLow)||0:0),
+     bribeWindowStart:Number.isFinite(Number(meta.bribeWindowStart))?Math.max(0,Number(meta.bribeWindowStart)):(id===state.currentCity?Math.max(0,Number(state.cashBribeWindowStart)||0):0),
+     bribeCount:Number.isFinite(Number(meta.bribeCount))?Math.max(0,Math.floor(Number(meta.bribeCount))):(id===state.currentCity?Math.max(0,Math.floor(Number(state.cashBribeCount)||0)):0)
+   };
+ });
+ state.heat=state.heatByCity[state.currentCity]||0;
+
  // Clamp important numeric values.
  const numericDefaults=["level","xp","skill","cash","hp","maxHp","en","maxEn","st","maxSt","attack","defense","wins","losses","heat","notoriety"];
  numericDefaults.forEach(k=>{
@@ -4469,7 +4495,7 @@ function migrate(){
  state.maxHp=Math.max(1,state.maxHp); state.hp=Math.max(0,Math.min(state.hp,state.maxHp));
  state.maxEn=Math.max(1,state.maxEn); state.en=Math.max(0,Math.min(state.en,state.maxEn));
  state.maxSt=Math.max(1,state.maxSt); state.st=Math.max(0,Math.min(state.st,state.maxSt));
- state.heat=Math.max(0,Math.min(100,state.heat));
+ state.heat=Math.max(0,Math.min(100,state.heatByCity[state.currentCity]||0));
  if(!state.unlockTrackingReady){
    getUnlockCatalog().filter(x=>state.level>=x.level).forEach(x=>state.seenUnlocks[x.id]=true);
    state.unlockTrackingReady=true;
@@ -4538,51 +4564,58 @@ const HEAT_QUIET_MIN_MS=60000;
 const LAY_LOW_COOLDOWN_MS=10*60000;
 const CASH_BRIBE_WINDOW_MS=60*60000;
 
+function heatCityId(city=state.currentCity){return cities.some(c=>c.id===city)?city:"east"}
+function heatCityName(city=state.currentCity){return cities.find(c=>c.id===heatCityId(city))?.name||"East Harbor"}
+function heatMeta(city=state.currentCity){
+ const id=heatCityId(city);
+ if(!state.heatMetaByCity||typeof state.heatMetaByCity!=="object")state.heatMetaByCity={};
+ if(!state.heatMetaByCity[id]||typeof state.heatMetaByCity[id]!=="object")state.heatMetaByCity[id]={lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0};
+ return state.heatMetaByCity[id];
+}
+function heatForCity(city=state.currentCity){
+ const id=heatCityId(city);
+ if(!state.heatByCity||typeof state.heatByCity!=="object")state.heatByCity={east:0,downtown:0,north:0};
+ return Math.max(0,Math.min(100,Number(state.heatByCity[id])||0));
+}
+function setHeatForCity(city,value){
+ const id=heatCityId(city);
+ if(!state.heatByCity||typeof state.heatByCity!=="object")state.heatByCity={east:0,downtown:0,north:0};
+ state.heatByCity[id]=Math.max(0,Math.min(100,Number(value)||0));
+ if(id===state.currentCity)state.heat=state.heatByCity[id];
+ return state.heatByCity[id];
+}
+function currentHeat(){return heatForCity(state.currentCity)}
+function syncLegacyHeatAlias(){state.heat=currentHeat();return state.heat}
 function heatBaseDecayMs(){
  const tier=endgameTier("heat");
  if(tier<=0)return 300000;
  const seconds=ENDGAME_TIER_DEFS.heat.rates[tier-1]||300;
  return seconds*1000;
 }
-function heatQuietRecoveryActive(t=now()){
- return t-(Number(state.lastHeatGain)||0)>=HEAT_QUIET_AFTER_MS;
-}
-function heatDecayMs(t=now()){
+function heatQuietRecoveryActive(t=now(),city=state.currentCity){return t-(Number(heatMeta(city).lastGain)||0)>=HEAT_QUIET_AFTER_MS}
+function heatDecayMs(t=now(),city=state.currentCity){
  const base=heatBaseDecayMs();
- return heatQuietRecoveryActive(t)?Math.max(HEAT_QUIET_MIN_MS,Math.round(base*HEAT_QUIET_MULTIPLIER)):base;
+ return heatQuietRecoveryActive(t,city)?Math.max(HEAT_QUIET_MIN_MS,Math.round(base*HEAT_QUIET_MULTIPLIER)):base;
 }
-function addHeat(amount){
- const gain=Math.max(0,Number(amount)||0);
- if(gain<=0)return 0;
- const before=state.heat;
- state.lastHeatGain=now();
- state.heat=Math.min(100,state.heat+gain);
- return Math.max(0,state.heat-before);
+function addHeat(amount,city=state.currentCity){
+ const gain=Math.max(0,Number(amount)||0);if(gain<=0)return 0;
+ const id=heatCityId(city),before=heatForCity(id),meta=heatMeta(id);
+ meta.lastGain=now();
+ const after=setHeatForCity(id,before+gain);
+ return Math.max(0,after-before);
 }
-function layLowRemaining(){
- return Math.max(0,LAY_LOW_COOLDOWN_MS-(now()-(Number(state.lastLayLow)||0)));
+function layLowRemaining(city=state.currentCity){return Math.max(0,LAY_LOW_COOLDOWN_MS-(now()-(Number(heatMeta(city).lastLayLow)||0)))}
+function syncCashBribeWindow(t=now(),city=state.currentCity){
+ const meta=heatMeta(city),start=Number(meta.bribeWindowStart)||0,count=Math.max(0,Math.floor(Number(meta.bribeCount)||0));
+ if(!start||!count||t-start>=CASH_BRIBE_WINDOW_MS){meta.bribeWindowStart=0;meta.bribeCount=0;return}
+ meta.bribeCount=count;
 }
-function syncCashBribeWindow(t=now()){
- const start=Number(state.cashBribeWindowStart)||0;
- const count=Math.max(0,Math.floor(Number(state.cashBribeCount)||0));
- if(!start||!count||t-start>=CASH_BRIBE_WINDOW_MS){
-   state.cashBribeWindowStart=0;
-   state.cashBribeCount=0;
-   return;
- }
- state.cashBribeCount=count;
-}
-function cashHeatBribeCost(){
- return Math.max(2000,Math.max(1,Math.floor(Number(state.level)||1))*2000);
-}
-function cashHeatBribePercent(t=now()){
- syncCashBribeWindow(t);
- return Math.max(1,10-(Number(state.cashBribeCount)||0));
-}
-function cashHeatBribeResetRemaining(t=now()){
- syncCashBribeWindow(t);
- if(!(state.cashBribeCount>0)||!state.cashBribeWindowStart)return 0;
- return Math.max(0,CASH_BRIBE_WINDOW_MS-(t-state.cashBribeWindowStart));
+function cashHeatBribeCost(){return Math.max(2000,Math.max(1,Math.floor(Number(state.level)||1))*2000)}
+function cashHeatBribePercent(t=now(),city=state.currentCity){syncCashBribeWindow(t,city);return Math.max(1,10-(Number(heatMeta(city).bribeCount)||0))}
+function cashHeatBribeResetRemaining(t=now(),city=state.currentCity){
+ syncCashBribeWindow(t,city);const meta=heatMeta(city);
+ if(!(meta.bribeCount>0)||!meta.bribeWindowStart)return 0;
+ return Math.max(0,CASH_BRIBE_WINDOW_MS-(t-meta.bribeWindowStart));
 }
 function staminaCostMarkup(cost){return `${spriteIconHtml("stamina","xs")} ${cost}`;}
 function fightStaminaCost(o){
@@ -4924,22 +4957,16 @@ function combatPower(kind){
 }
 
 function bribeLawEnforcement(){
- const cost=10;
- if(state.heat<=0)return showRequirementPopup("Your Heat is already at 0.");
+ const cost=10,city=state.currentCity,heat=currentHeat();
+ if(heat<=0)return showRequirementPopup(`${heatCityName(city)} Heat is already at 0.`);
  if((state.goldBars||0)<cost)return showRequirementPopup(`Bribing law enforcement costs ${cost} Gold Bars. You have ${state.goldBars||0}.`);
-
- const oldHeat=Math.floor(state.heat);
- state.goldBars-=cost;
- state.heat=0;
- state.lastHeatDecay=now();
-
- log(`Paid 10 Gold Bars in bribes to reset Heat from ${oldHeat} to 0.`);
- showActionFlash("LAW ENFORCEMENT BRIBED",`10 Gold Bars · Heat ${oldHeat} → 0`,"good");
- closeModal("statHelpModal");
- S.cash();save();render();
+ const oldHeat=Math.floor(heat);
+ state.goldBars-=cost;setHeatForCity(city,0);heatMeta(city).lastDecay=now();
+ log(`Paid 10 Gold Bars in bribes to reset ${heatCityName(city)} Heat from ${oldHeat} to 0.`);
+ showActionFlash("LAW ENFORCEMENT BRIBED",`${heatCityName(city)} · 10 Gold Bars · Heat ${oldHeat} → 0`,"good");
+ closeModal("statHelpModal");S.cash();save();render();
 }
-
-function heatLabel(){return state.heat>=90?"MANHUNT":state.heat>=70?"Critical":state.heat>=45?"High":state.heat>=20?"Watched":"Low"}
+function heatLabel(city=state.currentCity){const heat=heatForCity(city);return heat>=90?"MANHUNT":heat>=70?"Critical":heat>=45?"High":heat>=20?"Watched":"Low"}
 
 function checkSkillReminder(){
  if((state.skill||0)<=10)return;
@@ -4960,7 +4987,7 @@ const PROFILE_HELP={
  crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
  activeCrew:{title:"Combat Crew",text:"The number of currently fielded crew members. Jobs can use your full recruited crew, but combat has a level/prestige-based field limit and diminishing returns. Each fielded member can use one weapon, one armor item, and one vehicle."},
  record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and reduces Heat. Harder opponents require stronger Attack, better equipment, and more active crew; Defense also supports the highest-threat offensive fights."},
- heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. You can always use Lay Low, pay a Cash bribe, win fights, or use the Heat-free fallback Job to recover."},
+ heat:{title:"Heat",text:"Heat is tracked separately in East Harbor, Downtown, and Northside. Jobs raise Heat only in their location, and only that location's Heat affects its Jobs and MANHUNT pressure. Lay Low, bribes, fights, Blackmail, and passive decay affect the currently selected location."},
  income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
  gold:{title:"Gold Bars",text:"Rare currency used for permanent Gold Vault unlocks. They can appear through Ask for Help or be acquired through the Cash exchange."},
  territory:{title:"Territory",text:"The number of districts under your control. Territory provides income and represents long-term organizational power."}
@@ -4983,7 +5010,7 @@ const STAT_HELP={
  cash:{title:"Cash",text:"Cash buys equipment and properties, pays favors and operating costs, and covers losses. You can also exchange $100,000 Cash for 1 Gold Bar in the Gear tab."},
  gold:{title:"Gold Bars",text:"Gold Bars are rare currency for permanent special unlocks. They can appear as an exceptionally rare Ask for Help reward, or you can exchange $100,000 Cash for 1 Gold Bar."},
  crew:{title:"Crew",text:"Crew size unlocks Jobs and increases combat power. Each available recruited crew member contributes to your organization. Injured or arrested members temporarily stop contributing to active combat power."},
- heat:{title:"Heat",text:"Heat measures law-enforcement and rival attention. Jobs raise Heat. Higher Heat lowers Job success and can trigger cleanup costs or arrests. Heat falls naturally, and after 5 minutes without gaining Heat the recovery timer speeds up substantially."}
+ heat:{title:"Heat",text:"Heat is separate for East Harbor, Downtown, and Northside. The HUD shows the currently selected location. Higher local Heat lowers local Job success and can trigger cleanup costs or arrests. Each location also has its own passive recovery timer."}
 };
 function showStatHelp(key,e){
  if(e?.stopPropagation)e.stopPropagation();
@@ -4992,9 +5019,10 @@ function showStatHelp(key,e){
  const actions=document.getElementById("statHelpActions");
  if(actions){
    if(key==="heat"){
-     const layWait=layLowRemaining(),cashCost=cashHeatBribeCost(),cashPct=cashHeatBribePercent(),cashReset=cashHeatBribeResetRemaining(),quiet=heatQuietRecoveryActive(),decay=heatDecayMs();
+     const city=state.currentCity,heat=currentHeat(),layWait=layLowRemaining(city),cashCost=cashHeatBribeCost(),cashPct=cashHeatBribePercent(now(),city),cashReset=cashHeatBribeResetRemaining(now(),city),quiet=heatQuietRecoveryActive(now(),city),decay=heatDecayMs(now(),city),blackmail=Number(state.loot["Blackmail"]||0);
      const bribeResetText=cashReset>0?` · Effectiveness resets in ${fmt(cashReset)}`:" · First bribe this hour";
-     actions.innerHTML=`<div class="bribe-box" style="border-color:#5f5134;background:#141108"><b style="color:#efd36a">HEAT CONTROL</b><span>${quiet?"Quiet recovery active":"Stay clean for 5 minutes to accelerate passive recovery"} · Current decay: -1 every ${formatRegenTime(decay)}.<br>The fallback Job <b style="display:inline;color:#ddd3c1">Deliver a Sealed Package</b> stays available at any Heat and generates no Heat.<br>Cash bribes cost $2,000 × Level. The first bribe removes 10% Heat; each additional bribe in the same hour removes 1% less, to a minimum of 1%${bribeResetText}.</span><button class="btn green" style="margin-top:6px" onclick="layLow()" ${state.heat<=0||layWait>0?"disabled":""}>${layWait>0?`LAY LOW · ${fmt(layWait)}`:"LAY LOW · FREE · -15 HEAT"}</button><button class="btn secondary" style="margin-top:5px" onclick="cashHeatBribe()" ${state.heat<=0||state.cash<cashCost?"disabled":""}>CASH BRIBE · ${money(cashCost)} · -${cashPct}% HEAT</button><button class="btn red" style="margin-top:5px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>FULL WIPE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
+     const heatSummary=cities.map(c=>`${c.name}: <b style="display:inline;color:#ddd3c1">${Math.floor(heatForCity(c.id))}</b>`).join(" · ");
+     actions.innerHTML=`<div class="bribe-box" style="border-color:#5f5134;background:#141108"><b style="color:#efd36a">${heatCityName(city).toUpperCase()} HEAT CONTROL</b><span>${heatSummary}<br><br>${quiet?"Quiet recovery active":"Stay clean here for 5 minutes to accelerate passive recovery"} · Current decay: -1 every ${formatRegenTime(decay)}.<br>Heat, Lay Low cooldowns, and cash-bribe effectiveness are tracked separately for each location.<br>Cash bribes cost $2,000 × Level. The first bribe removes 10% Heat; each additional bribe in the same hour removes 1% less, to a minimum of 1%${bribeResetText}.</span><button class="btn green" style="margin-top:6px" onclick="layLow()" ${heat<=0||layWait>0?"disabled":""}>${layWait>0?`LAY LOW · ${fmt(layWait)}`:"LAY LOW · FREE · -15 HEAT"}</button><button class="btn secondary" style="margin-top:5px" onclick="cashHeatBribe()" ${heat<=0||state.cash<cashCost?"disabled":""}>CASH BRIBE · ${money(cashCost)} · -${cashPct}% HEAT</button><button class="btn secondary" style="margin-top:5px" onclick="useBlackmail()" ${heat<=0||blackmail<=0?"disabled":""}>USE BLACKMAIL · ${blackmail} OWNED · -5 HEAT</button><button class="btn red" style="margin-top:5px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||heat<=0?"disabled":""}>FULL WIPE · ${spriteIconHtml("gold","xs")} 10 GOLD BARS</button></div>`;
    }else if(key==="cash"){
      const gross=propertyIncome()+facilityIncome()+territoryIncome(),upkeep=propertyUpkeep()+facilityUpkeep()+gearUpkeep(),net=netIncome();
      actions.innerHTML=`<div class="bribe-box" style="border-color:#4e4939;background:#100f0b"><b style="color:#efd36a">CASH FLOW</b><span>Properties + Facilities + Territory: ${money(gross)}/hr<br>Upkeep: ${money(upkeep)}/hr<br>Net: ${net>=0?"+":"-"}${money(Math.abs(net))}/hr<br>Banked: ${money(state.bankCash)}</span><button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal');go('more')">OPEN BANK</button></div>`;
@@ -5176,7 +5204,7 @@ function jobStatBonus(j){
 function defenseMitigation(){return Math.min(.50,Math.max(0,state.defense)*.012)}
 function jobChance(j){
  if(j?.guaranteed)return 100;
- let chance=92-j.risk-state.heat*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30)+jobStatBonus(j);
+ let chance=92-j.risk-heatForCity(j.city)*.18+crewRoleBonus(j.role)+Math.min(12,jobState(j.id).mastery*4)+Math.min(10,state.notoriety/30)+jobStatBonus(j);
  return Math.max(30,Math.min(97,Math.round(chance)));
 }
 let jobBusy=false;
@@ -5231,7 +5259,7 @@ function doJob(id){
  const j=jobDefs.find(x=>x.id===id),miss=reqMissing(j);
  if(miss.length)return showRequirementPopup(`Missing requirement${miss.length===1?"":"s"}: ${miss.join(" · ")}`);
  if(state.en<j.energy){S.bad();document.getElementById("energyModal").classList.add("show");return}
- setJobBusy(id,true);state.en-=j.energy;addHeat(j.heat);
+ setJobBusy(id,true);state.en-=j.energy;addHeat(j.heat,j.city);
  const chance=jobChance(j),success=rnd(1,100)<=chance,jobData=jobState(id);
  if(success){
    const eventMult=state.event.ends>now()?1.25:1;
@@ -5278,9 +5306,9 @@ function doJob(id){
    showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · -${hpLoss} Health · Defense saved ${Math.round(mitigation*100)}%`);
    playJobSound(j,false);
    if(Math.random()<Math.max(.12,.35-mitigation*.35))injureRandomCrew();
-   if(state.heat>65&&Math.random()<Math.max(.08,.25-mitigation*.20))arrestRandomCrew();
+   if(heatForCity(j.city)>65&&Math.random()<Math.max(.08,.25-mitigation*.20))arrestRandomCrew();
  }
- save();render();if(!j.fallback)maybeHeatEvent();setTimeout(()=>setJobBusy(id,false),700);
+ save();render();if(!j.fallback)maybeHeatEvent(j.city);setTimeout(()=>setJobBusy(id,false),700);
 }
 function injureRandomCrew(){
  const ids=availableCrew();if(!ids.length)return null;
@@ -5604,8 +5632,8 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
 
  if(won){
    const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult());
-   const heatDrop=Math.min(state.heat,hit?rnd(3,5):revengeId?rnd(2,4):rnd(1,3));
-   state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));state.heat=Math.max(0,state.heat-heatDrop);
+   const heatDrop=Math.min(currentHeat(),hit?rnd(3,5):revengeId?rnd(2,4):rnd(1,3));
+   state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));setHeatForCity(state.currentCity,currentHeat()-heatDrop);
    addXp(Math.floor((10+o.level*2)*prestigeXpMult()));
    if(rivalUpdate.fled){
      removeFleeingRivalFromFightList(o.id);
@@ -5650,7 +5678,7 @@ function fightBoss(t){
    const payout=Math.floor(1800*(t+1)*(1+rematches*.15)*prestigeCashMult());
    const xpEarned=Math.floor((120+50*t+rematches*10)*prestigeXpMult());
    state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.notoriety+=first?25:8;
-   addXp(xpEarned);addHeat(12);
+   addXp(xpEarned);const bossHeatCity=(jobDefs.find(j=>j.tier===t&&j.city===state.currentCity&&!j.fallback)?.city||jobDefs.find(j=>j.tier===t&&!j.fallback)?.city||state.currentCity);addHeat(12,bossHeatCity);
 
    const extras=[];
    const pool=bossLootDefs[t]||["Boss Trophy"];
@@ -5751,7 +5779,7 @@ function takeTerritory(id){
  state.st-=2;state.lifetimeTerritoryMoves++;
  const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
  if(p>=e){
-   ts.progress+=35;addHeat(8);
+   ts.progress+=35;addHeat(8,t.city);
    if(ts.progress>=100){
      ts.owned=true;ts.progress=100;state.notoriety+=18;
      log(`You took control of ${t.name}.`);
@@ -5763,7 +5791,7 @@ function takeTerritory(id){
    S.ok();
  }else{
    const hpBefore=state.hp;
-   state.hp=Math.max(1,state.hp-rnd(8,18));addHeat(5);
+   state.hp=Math.max(1,state.hp-rnd(8,18));addHeat(5,t.city);
    const hpLoss=Math.max(0,Math.floor(hpBefore-state.hp));
    log(`Your move on ${t.name} failed.`);
    showActionFlash("TERRITORY MOVE FAILED",`${t.name} · -2 Stamina · -${hpLoss} Health`,"bad");
@@ -5876,19 +5904,21 @@ function openHelpCache(id=null){
  const cache=state.helpCaches[idx];
  const responders=Math.max(0,Number(cache.responders)||0);
  const rolls=Math.max(1,Math.min(6,1+Math.floor(responders/4)));
- const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,cash:0,limited:0,nothing:0,blocked:0};
+ const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,blackmail:0,cash:0,limited:0,nothing:0,blocked:0};
 
  for(let i=0;i<rolls;i++){
    let r=Math.random();
    if(responders===0)r=Math.min(.999,r+.24);
-   if(r<.31){
+   if(r<.29){
      if(addLootItem("Energy Drink",1,999)>0)rewards.energy++;else rewards.blocked++;
-   }else if(r<.58){
+   }else if(r<.54){
      if(addLootItem("Adrenaline Shot",1,999)>0)rewards.stamina++;else rewards.blocked++;
-   }else if(r<.72){
+   }else if(r<.67){
      if(addLootItem("Energy Pack",1,99)>0)rewards.energyPack++;else rewards.blocked++;
-   }else if(r<.84){
+   }else if(r<.78){
      if(addLootItem("Stamina Pack",1,99)>0)rewards.staminaPack++;else rewards.blocked++;
+   }else if(r<.85){
+     if(addLootItem("Blackmail",1,99)>0)rewards.blackmail++;else rewards.blocked++;
    }else if(r<.94){
      const amount=rnd(250,700)+Math.max(1,Number(cache.level)||1)*25+responders*20;
      state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;rewards.cash+=amount;
@@ -5904,6 +5934,7 @@ function openHelpCache(id=null){
  if(rewards.stamina)parts.push(`${rewards.stamina} Adrenaline Shot${rewards.stamina===1?"":"s"}`);
  if(rewards.energyPack)parts.push(`Energy Pack ×${rewards.energyPack}`);
  if(rewards.staminaPack)parts.push(`Stamina Pack ×${rewards.staminaPack}`);
+ if(rewards.blackmail)parts.push(`Blackmail ×${rewards.blackmail}`);
  if(rewards.cash)parts.push(money(rewards.cash));
  if(rewards.limited)parts.push(`Weekly Loot ×${rewards.limited}`);
  if(rewards.blocked)parts.push(`Stash full ×${rewards.blocked}`);
@@ -5981,22 +6012,26 @@ function openHelpRequest(id){
    outcome={kind:"gold",amount:1,resultText:"GOLD BAR SECURED"};
  }else if(Math.random()<helpChance){
    const r=Math.random();
-   if(r<.38){
+   if(r<.35){
      const added=addLootItem("Energy Drink",1,999);
      if(added>0){f.response="Sent you an Energy Drink.";outcome={kind:"energy",amount:1,resultText:"ENERGY DRINK"}}
      else{f.response="Your Energy Drink stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
-   }else if(r<.70){
+   }else if(r<.64){
      const added=addLootItem("Adrenaline Shot",1,999);
      if(added>0){f.response="Sent you an Adrenaline Shot.";outcome={kind:"stamina",amount:1,resultText:"ADRENALINE SHOT"}}
      else{f.response="Your Adrenaline Shot stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
-   }else if(r<.85){
+   }else if(r<.78){
      const added=addLootItem("Energy Pack",1,99);
      if(added>0){f.response="I had an Energy Pack tucked away. It is yours.";outcome={kind:"energyPack",amount:1,resultText:"ENERGY PACK"}}
      else{f.response="Your Energy Pack stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
-   }else{
+   }else if(r<.92){
      const added=addLootItem("Stamina Pack",1,99);
      if(added>0){f.response="I found a Stamina Pack. Save it for a bad night.";outcome={kind:"staminaPack",amount:1,resultText:"STAMINA PACK"}}
      else{f.response="Your Stamina Pack stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
+   }else{
+     const added=addLootItem("Blackmail",1,99);
+     if(added>0){f.response="I found something useful on the right person. Keep it quiet.";outcome={kind:"blackmail",amount:1,resultText:"BLACKMAIL"}}
+     else{f.response="Your Blackmail stash is full.";outcome={kind:"nothing",amount:0,resultText:"STASH FULL — NOTHING ADDED"}}
    }
  }else{
    f.response=meanReplies[rnd(0,meanReplies.length-1)];
@@ -6498,7 +6533,7 @@ function defenseRequirementStatus(a){
 }
 
 function maybeIncomingAttack(){
- const manhunt=state.heat>=90;
+ const manhunt=currentHeat()>=90;
  const minGap=manhunt?3*60000:8*60000;
  const chance=manhunt?.35:.20;
  if(now()-state.lastAttack<minGap||Math.random()>chance)return;
@@ -6603,69 +6638,53 @@ function processPendingAttacks(){
  renderInbox();
 }
 
-function maybeHeatEvent(){
- if(state.heat<60)return;
- const manhunt=state.heat>=90;
- const chance=manhunt?.48:.25;
- if(Math.random()>chance)return;
-
+function maybeHeatEvent(city=state.currentCity){
+ const id=heatCityId(city),heat=heatForCity(id);if(heat<60)return;
+ const manhunt=heat>=90,chance=manhunt?.48:.25;if(Math.random()>chance)return;
  if(manhunt){
    if(Math.random()<.55){
      const seizure=Math.min(state.cash,600+state.level*75+rnd(100,700));
-     state.cash=Math.max(0,state.cash-seizure);
-     state.heat=Math.max(0,state.heat-rnd(4,8));
-     log(`MANHUNT crackdown: authorities seized ${money(seizure)} while pressure shifted.`);
-     showActionFlash("MANHUNT CRACKDOWN",`${money(seizure)} seized · Heat remains dangerous`,"bad");
-     S.siren();
+     state.cash=Math.max(0,state.cash-seizure);setHeatForCity(id,heatForCity(id)-rnd(4,8));
+     log(`${heatCityName(id)} MANHUNT crackdown: authorities seized ${money(seizure)} while pressure shifted.`);
+     showActionFlash("MANHUNT CRACKDOWN",`${heatCityName(id)} · ${money(seizure)} seized · Heat remains dangerous`,"bad");S.siren();
    }else{
-     arrestRandomCrew();
-     if(Math.random()<.22)arrestRandomCrew();
-     state.heat=Math.max(0,state.heat-rnd(3,6));
-     showActionFlash("MANHUNT RAID","Crew members were targeted by a major crackdown.","bad");
-     S.siren();
+     arrestRandomCrew();if(Math.random()<.22)arrestRandomCrew();setHeatForCity(id,heatForCity(id)-rnd(3,6));
+     showActionFlash("MANHUNT RAID",`${heatCityName(id)} · Crew members were targeted by a major crackdown.`,"bad");S.siren();
    }
    return;
  }
-
  if(state.cash>=250){
-   state.cash-=250;
-   state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;
-   state.heat=Math.max(0,state.heat-12);
-   log("You paid $250 in legal and cleanup costs to reduce pressure.");
-   showActionFlash("HEAT CLEANUP",`${money(250)} paid · Heat reduced by 12`,"cash");
+   state.cash-=250;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;setHeatForCity(id,heatForCity(id)-12);
+   log(`You paid $250 in legal and cleanup costs to reduce ${heatCityName(id)} pressure.`);
+   showActionFlash("HEAT CLEANUP",`${heatCityName(id)} · ${money(250)} paid · Heat reduced by 12`,"cash");
  }else arrestRandomCrew();
 }
 function layLow(){
- if(state.heat<=0)return toast("Your Heat is already at 0.");
- const remaining=layLowRemaining();
- if(remaining>0)return showRequirementPopup(`Lay Low is available again in ${fmt(remaining)}.`);
- const oldHeat=state.heat;
- state.heat=Math.max(0,state.heat-15);
- state.lastLayLow=now();
- const heatDrop=Math.floor(oldHeat-state.heat);
- log(`You laid low and reduced Heat by ${heatDrop}.`);
- showActionFlash("LAID LOW",`Free cooldown action · -${heatDrop} Heat · Ready again in 10m`,"good");
- save();render();
+ const city=state.currentCity,heat=currentHeat();if(heat<=0)return toast(`${heatCityName(city)} Heat is already at 0.`);
+ const remaining=layLowRemaining(city);if(remaining>0)return showRequirementPopup(`Lay Low in ${heatCityName(city)} is available again in ${fmt(remaining)}.`);
+ const oldHeat=heat;setHeatForCity(city,heat-15);heatMeta(city).lastLayLow=now();
+ const heatDrop=Math.floor(oldHeat-currentHeat());log(`You laid low in ${heatCityName(city)} and reduced Heat by ${heatDrop}.`);
+ showActionFlash("LAID LOW",`${heatCityName(city)} · -${heatDrop} Heat · Ready again in 10m`,"good");save();render();
 }
 function cashHeatBribe(){
- if(state.heat<=0)return toast("Your Heat is already at 0.");
- syncCashBribeWindow();
- const cost=cashHeatBribeCost();
- const pct=cashHeatBribePercent();
+ const city=state.currentCity,heat=currentHeat();if(heat<=0)return toast(`${heatCityName(city)} Heat is already at 0.`);
+ syncCashBribeWindow(now(),city);const cost=cashHeatBribeCost(),pct=cashHeatBribePercent(now(),city);
  if(state.cash<cost)return showRequirementPopup(`A cash bribe costs ${money(cost)} at Level ${state.level}. You have ${money(state.cash)}.`);
- const oldHeat=state.heat;
- state.cash-=cost;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
- // Apply the current bribe effectiveness to the player's current Heat, rounded to whole Heat.
- const heatDrop=Math.min(oldHeat,Math.max(1,Math.round(oldHeat*(pct/100))));
- state.heat=Math.max(0,oldHeat-heatDrop);
- if(!(state.cashBribeCount>0)||!state.cashBribeWindowStart)state.cashBribeWindowStart=now();
- state.cashBribeCount=(Number(state.cashBribeCount)||0)+1;
- const nextPct=cashHeatBribePercent();
- const reset=cashHeatBribeResetRemaining();
- log(`Paid ${money(cost)} in cash bribes and reduced Heat by ${heatDrop} (${pct}% of current Heat).`);
- showActionFlash("CASH BRIBE PAID",`${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");
- S.cash();save();render();
+ const oldHeat=heat,meta=heatMeta(city);state.cash-=cost;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
+ const heatDrop=Math.min(oldHeat,Math.max(1,Math.round(oldHeat*(pct/100))));setHeatForCity(city,oldHeat-heatDrop);
+ if(!(meta.bribeCount>0)||!meta.bribeWindowStart)meta.bribeWindowStart=now();meta.bribeCount=(Number(meta.bribeCount)||0)+1;
+ const nextPct=cashHeatBribePercent(now(),city),reset=cashHeatBribeResetRemaining(now(),city);
+ log(`Paid ${money(cost)} in ${heatCityName(city)} cash bribes and reduced Heat by ${heatDrop} (${pct}% of current Heat).`);
+ showActionFlash("CASH BRIBE PAID",`${heatCityName(city)} · ${money(cost)} · -${heatDrop} Heat (${pct}%) · Next ${nextPct}% · Reset ${fmt(reset)}`,"cash");S.cash();save();render();
+}
+function useBlackmail(){
+ const qty=Math.max(0,Math.floor(Number(state.loot["Blackmail"])||0));if(qty<=0)return toast("You do not have any Blackmail.");
+ const city=state.currentCity,heat=currentHeat();if(heat<=0)return toast(`${heatCityName(city)} Heat is already at 0.`);
+ const heatDrop=Math.min(5,heat);
+ state.loot["Blackmail"]=qty-1;if(state.loot["Blackmail"]<=0)delete state.loot["Blackmail"];
+ setHeatForCity(city,heat-heatDrop);heatMeta(city).lastDecay=now();
+ log(`Used Blackmail to reduce ${heatCityName(city)} Heat by ${heatDrop}.`);
+ showActionFlash("BLACKMAIL USED",`${heatCityName(city)} · -${heatDrop} Heat · ${Math.max(0,qty-1)} remaining`,"good");save();render();
 }
 function claimDaily(){
  const today=new Date().toISOString().slice(0,10);
@@ -6686,7 +6705,7 @@ function claimDaily(){
  showActionFlash("DAILY COLLECTION",detail,"cash");
  save();render();S.ok();
 }
-function switchCity(id){const c=cities.find(x=>x.id===id);if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;save();render()}
+function switchCity(id){const c=cities.find(x=>x.id===id);if(!c)return;if(state.level<c.level)return toast(`Unlocks at level ${c.level}.`);state.currentCity=id;syncLegacyHeatAlias();save();render()}
 
 
 
@@ -6923,7 +6942,7 @@ function prestigeGame(){
  if(!canPrestige())return showRequirementPopup("Prestige requires Level 100 and every rank boss defeated.");
  if(!confirm("Become a higher-tier Kingpin? This resets level, cash, jobs, bosses, properties, territory, equipment, and run statistics. Crew, custom identities, Gold Bars, Gold Vault unlocks, rare loot, achievements, and completed collections are preserved."))return;
  state.prestige=(state.prestige||0)+1;
- state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.lastHeatGain=now();state.lastLayLow=0;state.cashBribeWindowStart=0;state.cashBribeCount=0;state.notoriety=10*state.prestige;
+ state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.heatByCity={east:0,downtown:0,north:0};state.heatMetaByCity={};cities.forEach(c=>state.heatMetaByCity[c.id]={lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0});state.lastHeatGain=now();state.lastLayLow=0;state.cashBribeWindowStart=0;state.cashBribeCount=0;state.notoriety=10*state.prestige;
  state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
  state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
  state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
@@ -7050,7 +7069,7 @@ function showFightBreakdown(i,hit=false,revengeId=null,e){
  document.getElementById("statHelpModal").classList.add("show");
 }
 
-function render(){syncStatHudMode();const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",state.heat>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;const hbn=document.getElementById("homeBuildNumber");if(hbn)hbn.textContent=`BUILD ${BUILD_NUMBER}`;
+function render(){syncLegacyHeatAlias();syncStatHudMode();const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",currentHeat()>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;const hbn=document.getElementById("homeBuildNumber");if(hbn)hbn.textContent=`BUILD ${BUILD_NUMBER}`;
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
  if(heroName)heroName.textContent=state.playerName?`${displayName}'s Criminal Empire`:"Build Your Criminal Empire.";
@@ -7058,23 +7077,23 @@ function render(){syncStatHudMode();const sx=document.getElementById("sfxState")
  if(profileName)profileName.textContent=displayName;
  const pAvatar=document.getElementById("playerAvatar");
  if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
- lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);goldT.textContent=(state.goldBars||0).toLocaleString();crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
- hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
+ lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=compactMoney(state.cash);cashT.title=money(state.cash);goldT.textContent=(state.goldBars||0).toLocaleString();crewT.textContent=crewSize();heatT.textContent=`${Math.floor(currentHeat())} ${heatLabel()}`;heatT.title=`${heatCityName()} Heat`;
+ hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=currentHeat()+"%";energyStat.classList.toggle("energy-empty",state.en<=0);updateRegenTimers();
  const miniHp=document.getElementById("miniHp"),miniEn=document.getElementById("miniEn"),miniSt=document.getElementById("miniSt"),miniCash=document.getElementById("miniCash"),miniHeat=document.getElementById("miniHeat"),miniHeatItem=document.getElementById("miniHeatItem");
  if(miniHp)miniHp.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;
  if(miniEn)miniEn.textContent=`${Math.floor(state.en)}/${state.maxEn}`;
  if(miniSt)miniSt.textContent=`${Math.floor(state.st)}/${state.maxSt}`;
  if(miniCash){miniCash.textContent=compactMoney(state.cash);miniCash.title=money(state.cash);}
  if(miniHeat){
-   const h=Math.floor(state.heat);
+   const h=Math.floor(currentHeat());
    miniHeat.textContent=h;
-   miniHeat.title=`Heat ${h} · ${heatLabel()}`;
+   miniHeat.title=`${heatCityName()} Heat ${h} · ${heatLabel()}`;
  }
  if(miniHeatItem){
-   miniHeatItem.classList.toggle("high",state.heat>=45&&state.heat<70);
-   miniHeatItem.classList.toggle("critical",state.heat>=70&&state.heat<90);
-   miniHeatItem.classList.toggle("manhunt",state.heat>=90);
-   miniHeatItem.title=`Heat ${Math.floor(state.heat)} · ${heatLabel()}`;
+   miniHeatItem.classList.toggle("high",currentHeat()>=45&&currentHeat()<70);
+   miniHeatItem.classList.toggle("critical",currentHeat()>=70&&currentHeat()<90);
+   miniHeatItem.classList.toggle("manhunt",currentHeat()>=90);
+   miniHeatItem.title=`${heatCityName()} Heat ${Math.floor(currentHeat())} · ${heatLabel()}`;
  }
  const homeGoldBars=document.getElementById("homeGoldBars");
  const homeCrewSize=document.getElementById("homeCrewSize");
@@ -7118,7 +7137,7 @@ function renderJobs(){
  }
  const t=activeTier();
  const bossT=currentBossTier();
- tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
+ tierEl.innerHTML=`Location · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:190px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name} · Heat ${Math.floor(heatForCity(c.id))}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
  const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
@@ -7239,7 +7258,7 @@ function renderCrew(){
          <summary>RELATIONSHIP</summary>
          <div class="compact-details-body">
            Reputation ${rep} · Trust ${f.trust} · Respect ${f.respect} · Fear ${f.fear} · Resentment ${f.resentment}<br>
-           ${inactive?"Help unavailable while this contact is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Energy Drinks, Adrenaline Shots, supply packs, Nothing, or an exceptionally rare reward."}
+           ${inactive?"Help unavailable while this contact is inactive.":!responsive?"Offline — help requests unavailable.":"Ask for Help can return Energy Drinks, Adrenaline Shots, supply packs, semi-rare Blackmail, Nothing, or an exceptionally rare reward."}
            ${(()=>{const gs=crewGiftRequestStatus(id);return gs.request?`<br><b>Gift request:</b> ${gs.request.item} ×${gs.request.qty} · You have ${gs.owned}${gs.owned<gs.request.qty?" · INSUFFICIENT":" · READY"}`:""})()}
            ${f.response?`<br><b>${d.name}:</b> ${f.response}`:""}
          </div>
@@ -7411,6 +7430,7 @@ function renderInventory(){
  const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
  const ep=Math.max(0,Number(state.loot["Energy Pack"])||0);
  const sp=Math.max(0,Number(state.loot["Stamina Pack"])||0);
+ const blackmail=Math.max(0,Number(state.loot["Blackmail"])||0);
  const mystery=Math.max(0,Number(state.loot["Mystery Crate"])||0);
  const caches=Array.isArray(state.helpCaches)?state.helpCaches.length:0;
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
@@ -7423,6 +7443,7 @@ function renderInventory(){
    <div class="inventory-resource stamina"><div class="resource-head">${spriteIconHtml("adrenaline","resource")}<div class="ir-label">ADRENALINE</div><b>${shots}</b></div><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:energy-pack","resource")}<div class="ir-label">ENERGY PACKS</div><b>${ep}</b></div><button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:stamina-pack","resource")}<div class="ir-label">STAMINA PACKS</div><b>${sp}</b></div><button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
+   <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("heat","resource")}<div class="ir-label">BLACKMAIL</div><b>${blackmail}</b></div><button class="btn small" style="margin-top:4px" onclick="useBlackmail()" ${blackmail<=0||currentHeat()<=0?"disabled":""}>USE · -5 HEAT</button></div>
    <div class="inventory-resource cache"><div class="resource-head">${spriteIconHtml("2:help-cache","resource")}<div class="ir-label">MYSTERY CRATES</div><b>${mystery}</b></div><button class="btn small" style="margin-top:4px" onclick="useMysteryCrate()" ${mystery<=0?"disabled":""}>OPEN</button></div>
    <div class="inventory-resource cache"><div class="resource-head">${spriteIconHtml("2:help-cache","resource")}<div class="ir-label">HELP CACHES</div><b>${caches}</b></div><button class="btn small" style="margin-top:4px" onclick="openHelpCache()" ${caches<=0?"disabled":""}>OPEN</button></div>
  </div>`;
@@ -7704,18 +7725,19 @@ function renderProfile(){
  const stats=[
    ["rank","Rank",tiers[activeTier()].name],["notoriety","Notoriety",Math.floor(state.notoriety)],["crew","Crew",crewSize()],
    ["activeCrew","Combat Crew",`${combatCrewCount()}/${combatCrewLimit()}`],["record","Fight Record",`${state.wins}W / ${state.losses}L`],
-   ["heat","Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["income","Net Income",money(netIncome())+"/hr"],["gold","Gold Bars",state.goldBars||0],
+   ["heat","Heat",`${heatCityName()} · ${Math.floor(currentHeat())} ${heatLabel()}`],["income","Net Income",money(netIncome())+"/hr"],["gold","Gold Bars",state.goldBars||0],
    ["territory","Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]
  ];
  profile.innerHTML=stats.map(x=>`<div class="card profile-hint-card">${x[1]}<button class="profile-hint" onclick="showProfileHelp('${x[0]}',event)">?</button><strong>${x[2]}</strong></div>`).join("");
 
- const consumables=["Energy Drink","Adrenaline Shot","Energy Pack","Stamina Pack","Mystery Crate"];
+ const consumables=["Energy Drink","Adrenaline Shot","Energy Pack","Stamina Pack","Blackmail","Mystery Crate"];
  const consumeHtml=consumables.filter(k=>(state.loot[k]||0)>0).map(k=>{
    const v=state.loot[k];
    if(k==="Energy Drink")return `<div class="inventory-use"><div><div class="title">${spriteIconHtml("drink","sm")} ${k}</div><div class="sub">Restores 3–7 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
    if(k==="Adrenaline Shot")return `<div class="inventory-use"><div><div class="title">${spriteIconHtml("adrenaline","sm")} ${k}</div><div class="sub">Restores 1–3 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useAdrenalineShot()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
    if(k==="Energy Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:energy-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 10–15 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useEnergyPack()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
    if(k==="Stamina Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:stamina-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 4–7 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useStaminaPack()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
+   if(k==="Blackmail")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("heat","sm")} ${k}</div><div class="sub">Semi-rare Help reward. Reduces Heat in the selected location by 5 points.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useBlackmail()" ${currentHeat()<=0?"disabled":""}>USE</button></div></div>`;
    return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:help-cache","sm")} ${k}</div><div class="sub">Open for Cash or useful supplies. Full supply stacks convert to Cash.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useMysteryCrate()">OPEN</button></div></div>`;
  }).join("");
 
@@ -7840,20 +7862,16 @@ function tick(){
  try{processContactPresence(t)}catch(e){console.error("Presence update failed",e)}
  try{ensureGeneratedContact(t)}catch(e){console.error("Generated contact failed",e)}
 
- // Heat uses its own clock. Endgame infrastructure can shorten the decay interval.
- if(!Number.isFinite(state.lastHeatDecay))state.lastHeatDecay=t;
- if(state.heat>0){
-   const interval=heatDecayMs(t);
-   const elapsed=Math.max(0,t-state.lastHeatDecay);
-   const cool=Math.floor(elapsed/interval);
-   if(cool>0){
-     state.heat=Math.max(0,state.heat-cool);
-     state.lastHeatDecay+=cool*interval;
-     if(state.heat<=0)state.lastHeatDecay=t;
-   }
- }else{
-   state.lastHeatDecay=t;
- }
+ // Each location has its own Heat and recovery clock.
+ cities.forEach(c=>{
+   const meta=heatMeta(c.id),heat=heatForCity(c.id);
+   if(!Number.isFinite(meta.lastDecay))meta.lastDecay=t;
+   if(heat>0){
+     const interval=heatDecayMs(t,c.id),elapsed=Math.max(0,t-meta.lastDecay),cool=Math.floor(elapsed/interval);
+     if(cool>0){setHeatForCity(c.id,heat-cool);meta.lastDecay+=cool*interval;if(heatForCity(c.id)<=0)meta.lastDecay=t;}
+   }else meta.lastDecay=t;
+ });
+ syncLegacyHeatAlias();
 
  // Endgame automated manufacturing.
  try{processProduction(t)}catch(e){console.error("Production automation failed",e)}
