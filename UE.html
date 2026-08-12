@@ -1696,7 +1696,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.18.0";
+const BUILD_NUMBER="0.18.1";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2581,6 +2581,8 @@ const bossLootDefs=[
  ["Varga War Medal","Reserve Vault Crest"]
 ];
 const FIGHT_REFRESH_COOLDOWN_MS=2*60000;
+const RIVAL_FLEE_STREAK=3;
+const RIVAL_FLEE_MS=30*60000;
 const BOSS_REMATCH_COOLDOWN_MS=30*60000;
 const goldUnlockDefs=[
  {id:"safehouse_cache",name:"Safehouse Cache",cost:3,desc:"+5 Maximum Energy"},
@@ -3536,13 +3538,30 @@ function rivalRecordBase(level){
 }
 function makeFightRival(i){
  const base=genOpponent(i,false);
- const recent=Object.values(state.rivalHistory||{}).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+ const recent=Object.values(state.rivalHistory||{})
+   .filter(h=>(h.fleeUntil||0)<=now())
+   .sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
+
  if(i<2&&recent.length&&Math.random()<.45){
    const h=recent[i%recent.length];
-   const scale=1+Math.min(.18,(h.timesFought||1)*.025);
-   return {...base,id:h.id,name:h.name,recordWins:h.recordWins||base.level*6,recordLosses:h.recordLosses||base.level*4,power:Math.round(base.power*scale),rivalReturn:true};
+   const scale=1+Math.min(.22,(h.timesFought||1)*.025);
+   return {
+     ...base,
+     id:h.id,
+     name:h.name,
+     recordWins:h.recordWins||base.level*6,
+     recordLosses:h.recordLosses||base.level*4,
+     power:Math.round(base.power*scale),
+     rivalReturn:true
+   };
  }
- return {...base,id:`foe_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,name:generatedContactName(),...rivalRecordBase(base.level)};
+
+ return {
+   ...base,
+   id:`foe_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,
+   name:generatedContactName(),
+   ...rivalRecordBase(base.level)
+ };
 }
 function ensureFightList(){
  if(!Array.isArray(state.fightList))state.fightList=[];
@@ -3563,14 +3582,64 @@ function refreshFightList(force=false){
  if(!force)showActionFlash("FIGHT LIST REFRESHED","New rival organizations located.","info");
 }
 function updateRivalHistory(o,playerWon){
- if(!o?.id)return;
- const h=state.rivalHistory[o.id]||{id:o.id,name:o.name,timesFought:0,playerWins:0,playerLosses:0,recordWins:o.recordWins||0,recordLosses:o.recordLosses||0};
- h.name=o.name;h.level=o.level;h.crew=o.crew;h.timesFought++;h.lastSeen=now();
- if(playerWon){h.playerWins++;h.recordLosses=(h.recordLosses||0)+1}else{h.playerLosses++;h.recordWins=(h.recordWins||0)+1}
+ if(!o?.id)return {fled:false,streak:0};
+
+ const h=state.rivalHistory[o.id]||{
+   id:o.id,
+   name:o.name,
+   timesFought:0,
+   playerWins:0,
+   playerLosses:0,
+   consecutivePlayerWins:0,
+   fleeUntil:0,
+   recordWins:o.recordWins||0,
+   recordLosses:o.recordLosses||0
+ };
+
+ h.name=o.name;
+ h.level=o.level;
+ h.crew=o.crew;
+ h.timesFought++;
+ h.lastSeen=now();
+
+ if(playerWon){
+   h.playerWins++;
+   h.recordLosses=(h.recordLosses||0)+1;
+   h.consecutivePlayerWins=(h.consecutivePlayerWins||0)+1;
+ }else{
+   h.playerLosses++;
+   h.recordWins=(h.recordWins||0)+1;
+   h.consecutivePlayerWins=0;
+ }
+
+ let fled=false;
+ if(playerWon&&h.consecutivePlayerWins>=RIVAL_FLEE_STREAK){
+   h.fleeUntil=now()+RIVAL_FLEE_MS;
+   h.consecutivePlayerWins=0;
+   fled=true;
+ }
+
  state.rivalHistory[o.id]=h;
- const entries=Object.values(state.rivalHistory).sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0)).slice(0,50);
+
+ const entries=Object.values(state.rivalHistory)
+   .sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0))
+   .slice(0,50);
  state.rivalHistory=Object.fromEntries(entries.map(x=>[x.id,x]));
+
+ return {fled,streak:h.consecutivePlayerWins||0,fleeUntil:h.fleeUntil||0};
 }
+
+function removeFleeingRivalFromFightList(id){
+ if(!id||!Array.isArray(state.fightList))return;
+ const before=state.fightList.length;
+ state.fightList=state.fightList.filter(x=>x.id!==id);
+ if(state.fightList.length===before)return;
+
+ while(state.fightList.length<5){
+   state.fightList.push(makeFightRival(state.fightList.length));
+ }
+}
+
 function bountyPlacementCost(o){
  return Math.max(1500,Math.round(1800+o.level*550+opponentThreat(o)*400));
 }
@@ -3663,15 +3732,24 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
 
  const profile=offensiveFightProfile(o),rollMax=fightRollMax(o),p=profile.total+rnd(1,rollMax),e=o.power+rnd(1,rollMax);
  const won=p>=e;
- updateRivalHistory(o,won);
+ const rivalUpdate=updateRivalHistory(o,won);
 
  if(won){
    const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult());
    const heatDrop=Math.min(state.heat,hit?rnd(3,5):revengeId?rnd(2,4):rnd(1,3));
    state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));state.heat=Math.max(0,state.heat-heatDrop);
    addXp(Math.floor((10+o.level*2)*prestigeXpMult()));
-   log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
-   showActionFlash("FIGHT WON",`${o.name} · ${profile.total} vs ${o.power} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
+   if(rivalUpdate.fled){
+     removeFleeingRivalFromFightList(o.id);
+     log(`${o.name} fled your territory after losing ${RIVAL_FLEE_STREAK} fights in a row. They will stay off the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes.`);
+   }else{
+     log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
+   }
+   showActionFlash(
+     rivalUpdate.fled?"RIVAL FLED":"FIGHT WON",
+     `${o.name} · ${profile.total} vs ${o.power} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}${rivalUpdate.fled?` · Gone ${Math.round(RIVAL_FLEE_MS/60000)}m`:""}`,
+     "good"
+   );
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
    if(bountyId)state.playerBounties=state.playerBounties.filter(x=>x.id!==bountyId);
  }else{
@@ -4808,7 +4886,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
+   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>⚔ ${atk} · 🛡 ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat now means a stronger enemy organization—it does not boost your own power. Beat the same rival ${RIVAL_FLEE_STREAK} times in a row and they flee the Fight List for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Equipment sets and Prestige add permanent bonuses. Defense reduces losses by ${mit}%.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy">Fight Lists persist until refreshed. Previous rivals can return stronger.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH RIVALS"}</button>`;
@@ -4819,7 +4897,7 @@ function renderFight(){
    return `<div class="row"><div class="fight-row-main"><div class="fight-row-copy">
     <div class="title">${o.name}${o.rivalReturn?'<span class="threat-badge">RETURNING RIVAL</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
     <div class="sub">LVL ${o.level} · Crew ${o.crew}</div><div class="fight-power-line">Power ${p.total} vs ${o.power}</div>
-    <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}`:""}</div>
+    <div class="rival-record">Record ${o.recordWins||0}W / ${o.recordLosses||0}L${h?` · vs You ${h.playerWins||0}–${h.playerLosses||0}${h.consecutivePlayerWins?` · ${h.consecutivePlayerWins}/${RIVAL_FLEE_STREAK} intimidation`:``}`:""}</div>
    </div><div class="fight-row-actions">
     <button class="btn secondary small fight-help-btn" onclick="showFightBreakdown(${i},false,null,event)">?</button>
     <button class="btn secondary small bounty-btn" onclick="placeBountyOnRival('${o.id}')" ${state.cash<cost?"disabled":""}>BOUNTY ${compactMoney(cost)}</button>
