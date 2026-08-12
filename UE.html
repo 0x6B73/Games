@@ -2100,6 +2100,11 @@ body:after{
 .inbox-fab .nav-icon{width:24px;height:24px;background-size:144px 96px;background-position:-96px -24px;filter:none}
 
 
+/* LEVEL 6 LOGISTICS CALLOUT */
+.logistics-level-callout{margin-top:7px;padding:8px;border:1px solid #66552d;border-left:3px solid #d1ad43;background:linear-gradient(#17140b,#0b0b09)}
+.logistics-level-callout b{display:block;font-size:10px;color:#f0d36d;margin-bottom:3px}
+.logistics-level-callout span{display:block;font-size:9px;color:#b9af9d;line-height:1.4}
+
 /* TERRITORY STREAMLINE + MORE UNIFORMITY — BUILD 0.22.4 */
 #view-territory .fold-body{padding:5px}
 #view-territory .explainer-details{margin:0 0 5px!important}
@@ -2731,7 +2736,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.5";
+const BUILD_NUMBER="0.22.6";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -2945,7 +2950,7 @@ const propDefs=[
 ];
 
 const facilityDefs=[
- {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:75000,income:1000,upkeep:400,level:12,crewReq:15,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
+ {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:37500,income:1000,upkeep:400,level:6,crewReq:8,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
  {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:20,crewReq:30,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
  {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:35,crewReq:60,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
  {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:55,crewReq:100,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
@@ -6506,7 +6511,8 @@ function showLevelUpModal(level){
  body.innerHTML=`<div class="sub">Your organization has grown.</div>
   <div class="level-up-summary"><div>SKILL POINTS<b>+5</b></div><div>MAX HEALTH<b>+5</b></div><div>MAX ENERGY<b>+2</b></div></div>
   <div class="level-up-summary"><div>MAX STAMINA<b>+1</b></div><div>NOTORIETY<b>+10</b></div><div>PRESTIGE<b>${state.prestige||0}</b></div></div>
-  <div class="level-unlocks">${unlocks.length?`New at this level:<br>${unlocks.map(x=>`• ${x.title}`).join("<br>")}`:"No new catalog unlocks at this exact level."}</div>`;
+  <div class="level-unlocks">${unlocks.length?`New at this level:<br>${unlocks.map(x=>`• ${x.title}`).join("<br>")}`:"No new catalog unlocks at this exact level."}</div>
+  ${level===6?`<div class="logistics-level-callout"><b>LOGISTICS WAREHOUSE NOW AVAILABLE</b><span>Build it in Territory → Facilities for ${money(facilityDefs.find(f=>f.id==="logisticsWarehouse")?.cost||37500)} once you have ${facilityDefs.find(f=>f.id==="logisticsWarehouse")?.crewReq||8} Crew. It unlocks DASH, which can automatically buy missing Job equipment at the convenience markup.</span></div>`:""}`;
  document.getElementById("levelUpModal").classList.add("show");
 }
 
