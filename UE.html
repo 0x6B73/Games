@@ -741,6 +741,64 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   color:#a79e8f;background:#111;font-size:7px;vertical-align:1px
 }
 
+
+/* RECENT INTELLIGENCE */
+.intel-item{
+  padding:6px 0;border-bottom:1px solid #28221b
+}
+.intel-item:last-child{border-bottom:0}
+.intel-head{
+  display:flex;justify-content:space-between;gap:8px;align-items:center
+}
+.intel-title{font-size:9px;font-weight:900;color:#ddd1bc}
+.intel-age{font-size:7px;color:#6f6a62;white-space:nowrap}
+.intel-detail{font-size:8px;color:#999187;line-height:1.35;margin-top:2px}
+.intel-item.good{border-left:3px solid #719c45;padding-left:5px}
+.intel-item.bad{border-left:3px solid #a54035;padding-left:5px}
+.intel-item.cash{border-left:3px solid #c5a346;padding-left:5px}
+.intel-item.info{border-left:3px solid #535a61;padding-left:5px}
+
+
+/* COLLAPSIBLE CURRENT CREW */
+.crew-fold{
+  border:1px solid #3b3d3f;
+  background:#090a0b;
+  margin:0;
+}
+.crew-fold>summary{
+  list-style:none;
+  cursor:pointer;
+  padding:7px 8px;
+  background:linear-gradient(#1a1c1e,#0d0e0f);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  font-size:10px;
+  font-weight:900;
+  color:#ddd3c1;
+}
+.crew-fold>summary::-webkit-details-marker{display:none}
+.crew-fold>summary:before{
+  content:"▾";
+  color:#d2b44f;
+  margin-right:5px;
+}
+.crew-fold:not([open])>summary:before{content:"▸"}
+.crew-fold>summary span:first-child{display:flex;align-items:center}
+.crew-fold>summary #crewSummary{
+  margin-left:auto;
+  font-size:8px;
+  color:#999187;
+  font-weight:600;
+}
+.crew-fold-body{
+  margin:0!important;
+  border-left:0!important;
+  border-right:0!important;
+  border-bottom:0!important;
+}
+
 </style>
 </head>
 <body>
@@ -750,7 +808,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
  <div class="stats">
   <div class="stat">❤️ HEALTH<button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
   <div class="stat stat-clickable" id="energyStat" onclick="openEnergyReserve()">⚡ ENERGY<button class="stat-help" onclick="showStatHelp('energy',event)">?</button><b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
-  <div class="stat">🥊 STAMINA<button class="stat-help" onclick="showStatHelp('stamina',event)">?</button><b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
+  <div class="stat stat-clickable" id="staminaStat" onclick="openStaminaReserve()">🥊 STAMINA<button class="stat-help" onclick="showStatHelp('stamina',event)">?</button><b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
   <div class="stat">💵 CASH<button class="stat-help" onclick="showStatHelp('cash',event)">?</button><b id="cashT"></b></div>
   <div class="stat gold-stat">🪙 GOLD BARS<button class="stat-help" onclick="showStatHelp('gold',event)">?</button><b id="goldT">0</b></div>
   <div class="stat">👥 CREW<button class="stat-help" onclick="showStatHelp('crew',event)">?</button><b id="crewT"></b></div>
@@ -771,7 +829,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div id="miniHud" class="mini-hud" aria-hidden="true">
   <div class="mini-hud-item health">❤️ <b id="miniHp">100</b></div>
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()">⚡ <b id="miniEn">20</b></div>
-  <div class="mini-hud-item stamina">🥊 <b id="miniSt">10</b></div>
+  <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()">🥊 <b id="miniSt">10</b></div>
   <div class="mini-hud-item cash">💵 <b id="miniCash">$0</b></div>
 </div>
 
@@ -810,20 +868,30 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 </section>
 
 <section id="view-crew" class="view">
- <div class="section-title"><h2>Your Crew</h2><span id="crewSummary"></span></div>
- <div class="myspace">
-  <div class="ms-head">UNDERWORLDSPACE — CONTACT NETWORK</div>
-  <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
-  <div class="ms-body">
-  <div class="custom-friend-box">
-    <b>ADD A CUSTOM FRIEND</b>
-    <div class="sub">Create your own contact and add them directly to your network.</div>
-    <button class="btn small" onclick="openCustomFriendModal()">ADD FRIEND</button>
+ <details class="crew-fold" open>
+  <summary>
+    <span>YOUR CREW</span>
+    <span id="crewSummary"></span>
+  </summary>
+  <div class="myspace crew-fold-body">
+    <div class="ms-head">UNDERWORLDSPACE — CONTACT NETWORK</div>
+    <div class="ms-sub">Contacts / favors / recruiting / loyalty</div>
+    <div class="ms-body">
+      <div class="custom-friend-box">
+        <b>ADD A CUSTOM FRIEND</b>
+        <div class="sub">Create your own contact and add them directly to your network.</div>
+        <button class="btn small" onclick="openCustomFriendModal()">ADD FRIEND</button>
+      </div>
+      <div id="friends"></div>
+    </div>
   </div>
-  <div id="friends"></div>
-  <div class="ms-sub" style="margin:10px -7px 0">Potential Associates</div>
-  <div id="potentials"></div>
-</div>
+ </details>
+
+ <div class="section-title" style="margin-top:8px"><h2>Potential Associates</h2><span>new people in your network</span></div>
+ <div class="myspace">
+  <div class="ms-body">
+    <div id="potentials"></div>
+  </div>
  </div>
 </section>
 
@@ -961,6 +1029,17 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 </div></div>
 
 
+
+<div class="modal" id="staminaReserveModal"><div class="mbox">
+  <h2>Stamina Reserve</h2>
+  <div id="staminaReserveBody"></div>
+  <div class="actions" style="margin-top:8px">
+    <button class="btn" id="staminaReserveUseBtn" onclick="useAdrenalineShot()">USE ADRENALINE SHOT</button>
+    <button class="btn secondary" onclick="go('crew');closeModal('staminaReserveModal')">REQUEST HELP</button>
+  </div>
+  <button class="btn secondary" style="margin-top:6px" onclick="closeModal('staminaReserveModal')">CLOSE</button>
+</div></div>
+
 <div class="modal" id="helpRequestModal"><div class="mbox">
   <h2>Request Help</h2>
   <div id="helpRequestContact" class="sub">Choose what you need.</div>
@@ -1073,7 +1152,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.13.0";
+const BUILD_NUMBER="0.13.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -2037,6 +2116,7 @@ function fresh(){
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
+ intel:[{t:now(),title:"WELCOME TO EAST HARBOR",detail:"Your organization is active. New notifications will appear here.",type:"info"}],
  log:["You came to East Harbor with $700, eight contacts, and no territory."]};
 }
 let state=load();migrate();
@@ -2111,6 +2191,9 @@ function migrate(){
  if(!Array.isArray(state.pendingAttacks))state.pendingAttacks=[];
  if(!Array.isArray(state.log))state.log=[...defaults.log];
  state.log=state.log.slice(0,20);
+ if(!Array.isArray(state.intel))state.intel=[];
+ state.intel=state.intel.filter(x=>x&&typeof x==="object"&&typeof x.title==="string").slice(0,20);
+ if(!state.intel.length)state.intel=[{t:now(),title:"INTELLIGENCE FEED READY",detail:"Action notifications will appear here.",type:"info"}];
 
  // Normalize built-in contacts while retaining custom contacts.
  if(!state.friends||typeof state.friends!=="object")state.friends={};
@@ -2228,7 +2311,32 @@ function log(s){
  state.log=state.log.slice(0,20);
 }
 
+function intelAge(ts){
+ const d=Math.max(0,now()-(Number(ts)||now()));
+ if(d<60000)return "NOW";
+ if(d<3600000)return `${Math.floor(d/60000)}m`;
+ if(d<86400000)return `${Math.floor(d/3600000)}h`;
+ return `${Math.floor(d/86400000)}d`;
+}
+function renderRecentIntel(){
+ const el=document.getElementById("log");if(!el)return;
+ const items=(state.intel||[]).slice(0,20);
+ el.innerHTML=items.length?items.map(x=>`<div class="intel-item ${x.type||"info"}">
+   <div class="intel-head"><span class="intel-title">${x.title}</span><span class="intel-age">${intelAge(x.t)}</span></div>
+   ${x.detail?`<div class="intel-detail">${x.detail}</div>`:""}
+ </div>`).join(""):`<div class="intel-item info"><div class="intel-title">NO RECENT INTELLIGENCE</div></div>`;
+}
+function recordIntel(title,detail="",type="info"){
+ if(!state||typeof state!=="object")return;
+ if(!Array.isArray(state.intel))state.intel=[];
+ state.intel.unshift({t:now(),title:String(title||"UPDATE"),detail:String(detail||""),type});
+ state.intel=state.intel.slice(0,20);
+ renderRecentIntel();
+ try{save()}catch(e){}
+}
 function showActionFlash(title,detail="",type="good"){
+ recordIntel(title,detail,type);
+
  const box=document.getElementById("actionFlash");
  const t=document.getElementById("actionFlashTitle");
  const d=document.getElementById("actionFlashDetail");
@@ -2343,6 +2451,30 @@ function showStatHelp(key,e){
 
  document.getElementById("statHelpModal").classList.add("show");
 }
+
+function renderStaminaReserve(){
+ const body=document.getElementById("staminaReserveBody");
+ const btn=document.getElementById("staminaReserveUseBtn");
+ if(!body||!btn)return;
+
+ const qty=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ const regen=regenCountdown(state.lastStaminaRegen,STAMINA_REGEN_MS,state.st,state.maxSt);
+
+ body.innerHTML=`<div class="energy-reserve">
+   <div class="er"><span>CURRENT STAMINA</span><b>${Math.floor(state.st)}/${state.maxSt}</b></div>
+   <div class="er"><span>ADRENALINE SHOTS</span><b>💉 ${qty}</b></div>
+ </div>
+ <div class="energy-rate"><b>Natural recovery:</b> ${state.st>=state.maxSt?"FULL":`1 Stamina every ${formatRegenTime(STAMINA_REGEN_MS)} · Next in ${regen.text.replace("+1 IN ","")}`}</div>
+ <p class="sub">Stamina powers fights, incoming-attack defenses, and territory moves. Adrenaline Shots restore a random 1–3 Stamina and stack to 999.</p>`;
+
+ btn.textContent=`USE ADRENALINE SHOT${qty?` (x${qty})`:""}`;
+ btn.disabled=qty<=0||state.st>=state.maxSt;
+}
+function openStaminaReserve(){
+ renderStaminaReserve();
+ document.getElementById("staminaReserveModal").classList.add("show");
+}
+
 function renderEnergyReserve(){
  const body=document.getElementById("energyReserveBody"),btn=document.getElementById("energyReserveDrinkBtn");
  if(!body||!btn)return;
@@ -2452,30 +2584,42 @@ function jobChance(j){
 }
 let jobBusy=false;
 let lastJobResult=null;
+let jobResultToken=0;
 
 function showJobResult(success,title,detail){
- lastJobResult={success,title,detail,shownAt:now()};
+ const token=++jobResultToken;
+ lastJobResult={success:!!success,title,detail,shownAt:now(),token};
 
- // First show the large center notification.
- showActionFlash(title,detail,success?"good":"bad");
+ // Immediately remove any previous top result so an old JOB COMPLETE can
+ // never remain visible while a new failure popup is playing.
+ const old=document.getElementById("jobResult");
+ if(old){
+   old.className="job-result";
+   old.innerHTML="";
+ }
 
- // Then place the same result in the persistent Jobs result box.
  clearTimeout(window._jrShow);
  clearTimeout(window._jrHide);
 
- window._jrShow=setTimeout(()=>{
-   const el=document.getElementById("jobResult");
-   if(!el||!lastJobResult)return;
-   el.className="job-result show "+(lastJobResult.success?"good":"bad");
-   el.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`;
- },1450);
+ // Center notification first.
+ showActionFlash(title,detail,success?"good":"bad");
 
- // Keep it visible well after the center popup has finished.
+ // After the center animation completes, surface THIS exact result at the
+ // top of Jobs. Token check prevents an older delayed success from winning.
+ window._jrShow=setTimeout(()=>{
+   if(!lastJobResult||lastJobResult.token!==token)return;
+   const el=document.getElementById("jobResult");
+   if(!el)return;
+   el.className="job-result show "+(success?"good":"bad");
+   el.innerHTML=`<b>${title}</b><div class="detail">${detail}</div>`;
+ },1850);
+
  window._jrHide=setTimeout(()=>{
+   if(!lastJobResult||lastJobResult.token!==token)return;
    const el=document.getElementById("jobResult");
    if(el)el.classList.remove("show");
    lastJobResult=null;
- },10000);
+ },11850);
 }
 function setJobBusy(id,on){
  jobBusy=on;
@@ -2533,8 +2677,14 @@ function genOpponent(i,hit=false){
 }
 
 function fight(i,hit=false,revengeId=null){
- if(state.st<1)return toast("Not enough stamina.");
- if(state.hp<10)return toast("Health too low.");
+ if(state.st<1){
+   showActionFlash("NOT ENOUGH STAMINA",`You need 1 Stamina to fight. You have ${Math.floor(state.st)}/${state.maxSt}. Tap Stamina to use an Adrenaline Shot.`,"bad");
+   return;
+ }
+ if(state.hp<10){
+   showActionFlash("HEALTH TOO LOW",`You need at least 10 Health to start a fight. Current Health: ${Math.floor(state.hp)}.`,"bad");
+   return;
+ }
 
  state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
  const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);if(!o)return;
@@ -2946,9 +3096,11 @@ function maybeGift(){
  const id=ids[rnd(0,ids.length-1)];
  const item=["Energy Drink","Adrenaline Shot","Burner Phone","Cash Envelope"][rnd(0,3)];
  addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`});
+ showSocial("Gift waiting",`${nameOf(id)} sent you a ${item}. Open Messages to accept it.`);
 }
 function showSocial(title,text){
  if(state.messagePopups===false)return;
+ recordIntel(title,text,"info");
  socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;
  socialPop.classList.add("show");
 }
@@ -3240,8 +3392,8 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
- document.getElementById("log").innerHTML=state.log.slice(0,20).map(x=>`<div class="sub" style="padding:6px 0;border-bottom:1px solid #28221b">${x}</div>`).join("");
- renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderCampaignTopBar();renderPreferences();
+ renderRecentIntel();
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
@@ -3256,9 +3408,12 @@ function renderJobs(){
  const resultEl=document.getElementById("jobResult");
  if(resultEl&&lastJobResult){
    const age=now()-lastJobResult.shownAt;
-   if(age>=1350&&age<10000){
+   if(age>=1800&&age<11850){
      resultEl.className="job-result show "+(lastJobResult.success?"good":"bad");
      resultEl.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`;
+   }else if(age<1800){
+     resultEl.className="job-result";
+     resultEl.innerHTML="";
    }
  }
 
@@ -3807,7 +3962,7 @@ document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style
 document.addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;
  const action=b.getAttribute("onclick")||"";
- const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|openHelpRequest|requestHelpItem|useAdrenalineShot|testAudioPack|toggleTheme|toggleSound/.test(action);
+ const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|openHelpRequest|requestHelpItem|useAdrenalineShot|openStaminaReserve|testAudioPack|toggleTheme|toggleSound/.test(action);
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
