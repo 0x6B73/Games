@@ -799,6 +799,22 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   border-bottom:0!important;
 }
 
+
+/* NETWORK ARRIVAL TIMER */
+.network-arrival{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:6px 8px;margin-bottom:5px;border:1px solid #4d493d;
+  background:linear-gradient(#15140f,#090a0a)
+}
+.network-arrival>div:first-child{min-width:0}
+.network-arrival-label{display:block;font-size:7px;color:#8f887d;font-weight:900;letter-spacing:.08em}
+.network-arrival b{display:block;margin-top:2px;font-size:14px;color:#efd36a}
+.network-arrival-status{max-width:52%;text-align:right;font-size:8px;color:#aaa195;line-height:1.35}
+.network-arrival.paused{border-color:#55545a}
+.network-arrival.paused b{color:#a8a39a}
+.network-arrival.cap{border-color:#6d3c36;background:#160c0a}
+.network-arrival.cap b{color:#df8c81}
+
 </style>
 </head>
 <body>
@@ -888,6 +904,13 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
  </details>
 
  <div class="section-title" style="margin-top:8px"><h2>Potential Associates</h2><span>new people in your network</span></div>
+ <div id="networkArrival" class="network-arrival">
+   <div>
+     <span class="network-arrival-label">NEXT POTENTIAL ASSOCIATE</span>
+     <b id="networkArrivalTime">≤ 30:00</b>
+   </div>
+   <div id="networkArrivalStatus" class="network-arrival-status">Network search active.</div>
+ </div>
  <div class="myspace">
   <div class="ms-body">
     <div id="potentials"></div>
@@ -1120,7 +1143,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 
   <div class="actions">
     <button class="btn" onclick="saveEditedProfile()">SAVE PROFILE</button>
-    <button class="btn secondary" onclick="removePlayerPhoto()">USE GENERATED AVATAR</button>
+    <button class="btn secondary" onclick="removePlayerPhoto()">🎲 RANDOM GENERATED AVATAR</button>
     <button class="btn secondary" onclick="closeModal('editProfileModal')">CANCEL</button>
   </div>
 </div></div>
@@ -1152,7 +1175,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.13.2";
+const BUILD_NUMBER="0.13.4";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -1314,7 +1337,8 @@ function avatarUrl(id,name=""){
   return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=1f2937,374151,4b5563&radius=8`;
 }
 function generatedPlayerAvatarUrl(){
-  const seed=encodeURIComponent((state.playerName||"east-harbor-boss").toLowerCase());
+  const seedValue=state.playerAvatarSeed||(state.playerName||"east-harbor-boss").toLowerCase();
+  const seed=encodeURIComponent(seedValue);
   return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=111827,1f2937,374151&radius=8`;
 }
 function playerAvatarUrl(){
@@ -1397,13 +1421,20 @@ function saveEditedProfile(){
 function removePlayerPhoto(){
   state.playerPhoto="";
   pendingPlayerPhoto="";
-  save();
+
+  // Every click deliberately chooses a new seed, so the generated avatar
+  // cycles instead of returning to the same name-based portrait.
+  state.playerAvatarSeed=`boss-${now().toString(36)}-${Math.random().toString(36).slice(2,10)}`;
+
+  const photo=document.getElementById("editPlayerPhoto");
+  if(photo)photo.value="";
 
   const preview=document.getElementById("editPlayerPreview");
   if(preview)preview.src=generatedPlayerAvatarUrl();
 
+  save();
   render();
-  toast("Using generated avatar.");
+  toast("New generated avatar selected. Click again to cycle.");
 }
 
 function promptForPlayerName(){
@@ -1553,7 +1584,8 @@ const GENERATED_CONTACT_INTERVAL_MS=30*60000;
 const PRESENCE_UPDATE_MS=10*60000;
 const CONTACT_RESPONSE_WINDOW_MS=90*60000;
 const HELP_REQUEST_COOLDOWN_MIN=30;
-const MAX_UNADDED_GENERATED_CONTACTS=12;
+const MAX_POTENTIAL_ASSOCIATES=5;
+const MAX_CREW_MEMBERS=1000;
 
 const generatedFirstNames=[
  "Alex","Avery","Bianca","Cam","Carmen","Dante","Elena","Eli","Gia","Grant",
@@ -1620,11 +1652,21 @@ function generatedContactName(){
  }
  return `${generatedFirstNames[rnd(0,generatedFirstNames.length-1)]} ${generatedLastNames[rnd(0,generatedLastNames.length-1)]} ${rnd(2,99)}`;
 }
+function potentialAssociateIds(){
+ return allPotentialDefs()
+   .filter(p=>state.potentials[p.id]&&!state.potentials[p.id].added&&!state.friends[p.id])
+   .map(p=>p.id);
+}
+function potentialAssociateCount(){
+ return potentialAssociateIds().length;
+}
 function pruneGeneratedPotentials(){
  const ids=Object.keys(state.generatedContacts||{})
    .filter(id=>state.potentials[id]&&!state.potentials[id].added&&!state.friends[id])
    .sort((a,b)=>(state.potentials[a].generatedAt||0)-(state.potentials[b].generatedAt||0));
- while(ids.length>MAX_UNADDED_GENERATED_CONTACTS){
+
+ // This should rarely run because generation stops at five potentials.
+ while(ids.length>MAX_POTENTIAL_ASSOCIATES){
    const id=ids.shift();
    delete state.potentials[id];
    delete state.generatedContacts[id];
@@ -1632,6 +1674,9 @@ function pruneGeneratedPotentials(){
  }
 }
 function generatePotentialContact(t=now(),announce=true){
+ if(crewSize()>=MAX_CREW_MEMBERS)return null;
+ if(potentialAssociateCount()>=MAX_POTENTIAL_ASSOCIATES)return null;
+
  const id="network_"+t.toString(36)+"_"+Math.random().toString(36).slice(2,7);
  const name=generatedContactName();
  const role=generatedRoles[rnd(0,generatedRoles.length-1)];
@@ -1647,7 +1692,8 @@ function generatePotentialContact(t=now(),announce=true){
  state.generatedContacts[id]=d;
  state.potentials[id]={rel:base,added:false,chat:[],lastOnline,activityScore,generatedAt:t};
 
- pruneGeneratedPotentials();
+ // A new person became available, so the 30-minute maximum clock restarts now.
+ state.lastGeneratedContact=t;
 
  if(announce){
    addInbox({
@@ -1660,20 +1706,29 @@ function generatePotentialContact(t=now(),announce=true){
  return id;
 }
 function ensureGeneratedContact(t=now()){
+ if(crewSize()>=MAX_CREW_MEMBERS)return false;
+ if(potentialAssociateCount()>=MAX_POTENTIAL_ASSOCIATES)return false;
+
  const last=state.lastGeneratedContact||t;
  const elapsed=Math.max(0,t-last);
  const due=Math.floor(elapsed/GENERATED_CONTACT_INTERVAL_MS);
  if(due<1)return false;
 
- // Catch up contacts that would have appeared while the game was closed.
- // The unadded generated-contact pool remains capped to prevent runaway saves.
- const count=Math.min(MAX_UNADDED_GENERATED_CONTACTS,due);
+ const slots=Math.max(0,MAX_POTENTIAL_ASSOCIATES-potentialAssociateCount());
+ const count=Math.min(slots,due);
+ if(count<1)return false;
+
  for(let i=0;i<count;i++){
    const generatedAt=last+GENERATED_CONTACT_INTERVAL_MS*(due-count+i+1);
    generatePotentialContact(generatedAt,i===count-1);
  }
- state.lastGeneratedContact=t;
- return true;
+
+ // The final generated contact resets lastGeneratedContact to its generated time.
+ // If catch-up reached "now", start a fresh full 30-minute maximum window.
+ if(count>0&&t-(state.lastGeneratedContact||0)>=GENERATED_CONTACT_INTERVAL_MS){
+   state.lastGeneratedContact=t;
+ }
+ return count>0;
 }
 function processContactPresence(t=now()){
  if(t-(state.lastPresenceUpdate||0)<PRESENCE_UPDATE_MS)return;
@@ -2112,7 +2167,7 @@ function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now()});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",playerAvatarSeed:"",customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -2144,6 +2199,7 @@ function migrate(){
 
  if(typeof state.playerName!=="string")state.playerName="";
  if(typeof state.playerPhoto!=="string")state.playerPhoto="";
+ if(typeof state.playerAvatarSeed!=="string")state.playerAvatarSeed="";
  if(!state.customFriends||typeof state.customFriends!=="object")state.customFriends={};
  if(!state.generatedContacts||typeof state.generatedContacts!=="object")state.generatedContacts={};
  if(!Number.isFinite(state.lastGeneratedContact))state.lastGeneratedContact=now();
@@ -2865,6 +2921,9 @@ function useAdrenalineShot(){
 function recruit(id){
  const f=fstate(id),d=getPersonDef(id);
  if(!f||!d||f.crew)return;
+ if(crewSize()>=MAX_CREW_MEMBERS){
+   return showRequirementPopup(`Your organization has reached the ${MAX_CREW_MEMBERS.toLocaleString()} crew-member limit.`);
+ }
  if(!requireResponsiveContact(id,"recruit"))return;
  if(cooldown(f.lastRecruit,12)>0)return;
  f.lastRecruit=now();
@@ -2927,6 +2986,7 @@ function addPotential(id,force=false){
    S.bad();
  }
  save();render();
+ updateNetworkArrivalTimer();
 }
 function openChat(id,potential=false){activeChat={id,potential};const d=potential?(potentialDefs.find(x=>x.id===id)||getPersonDef(id)):getPersonDef(id),f=potential?state.potentials[id]:state.friends[id];if(!f.chat)f.chat=[];chatTitle.textContent=`Chat with ${d.name}`;renderChat();chatbox.classList.add("show")}
 function closeChat(){chatbox.classList.remove("show");activeChat=null}
@@ -3393,7 +3453,7 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  renderRecentIntel();
- renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderStaminaReserve();renderCampaignTopBar();renderPreferences();updateNetworkArrivalTimer();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
@@ -3479,9 +3539,44 @@ function crewStatus(f){
  if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;
  return f.crew?"ACTIVE CREW":"CONTACT";
 }
+
+function networkArrivalRemaining(t=now()){
+ if(crewSize()>=MAX_CREW_MEMBERS)return 0;
+ if(potentialAssociateCount()>=MAX_POTENTIAL_ASSOCIATES)return 0;
+ const elapsed=Math.max(0,t-(state.lastGeneratedContact||t));
+ return Math.max(0,GENERATED_CONTACT_INTERVAL_MS-elapsed);
+}
+function updateNetworkArrivalTimer(){
+ const box=document.getElementById("networkArrival");
+ const timeEl=document.getElementById("networkArrivalTime");
+ const statusEl=document.getElementById("networkArrivalStatus");
+ if(!box||!timeEl||!statusEl)return;
+
+ const crew=crewSize();
+ const potentials=potentialAssociateCount();
+ box.classList.remove("paused","cap");
+
+ if(crew>=MAX_CREW_MEMBERS){
+   box.classList.add("cap");
+   timeEl.textContent="CREW CAP";
+   statusEl.textContent=`${crew.toLocaleString()} / ${MAX_CREW_MEMBERS.toLocaleString()} recruited. No new associates will generate.`;
+   return;
+ }
+
+ if(potentials>=MAX_POTENTIAL_ASSOCIATES){
+   box.classList.add("paused");
+   timeEl.textContent="PAUSED";
+   statusEl.textContent=`${potentials}/${MAX_POTENTIAL_ASSOCIATES} potential associates are already waiting. Add or recruit someone to resume the network search.`;
+   return;
+ }
+
+ const ms=networkArrivalRemaining();
+ timeEl.textContent=`≤ ${formatRegenTime(ms)}`;
+ statusEl.textContent=`${potentials}/${MAX_POTENTIAL_ASSOCIATES} waiting · New associate guaranteed within the displayed maximum time.`;
+}
 function renderCrew(){
  const inactiveCrew=crewIds().filter(id=>state.friends[id]?.inactive).length;
- crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
+ crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${availableCrew().length+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
 
  friends.innerHTML=Object.keys(state.friends).map(id=>{
    const d=getPersonDef(id),f=state.friends[id];
@@ -3534,7 +3629,8 @@ function renderCrew(){
      </div>
      <div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div>
    </div>`;
- }).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available yet. The network introduces someone new at least every 30 minutes.</div>";
+ }).join("")||"<div style='padding:8px;font-size:10px'>No potential associates are waiting. The network will generate a new person within 30 minutes while the waiting pool contains fewer than five people.</div>";
+ updateNetworkArrivalTimer();
 }
 function renderFight(){
  const fightEl=document.getElementById("fightlist");
@@ -3969,6 +4065,7 @@ setInterval(()=>{if(document.getElementById("view-crew").classList.contains("act
 setInterval(()=>{try{tick()}catch(e){console.error("Tick failed",e)}},15000);
 setInterval(()=>{try{updateRegenTimers()}catch(e){}},1000);
 setInterval(()=>{try{processPendingAttacks()}catch(e){console.error("Attack timer failed",e)}},1000);
+setInterval(()=>{try{updateNetworkArrivalTimer()}catch(e){}},1000);
 setInterval(()=>{try{checkSkillReminder()}catch(e){}},600000);
 setTimeout(()=>{try{checkSkillReminder()}catch(e){}},5000);
 try{tick()}catch(e){console.error("Initial tick failed",e);try{render()}catch(renderError){console.error("Initial render failed",renderError)}}
