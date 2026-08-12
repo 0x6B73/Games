@@ -1214,6 +1214,16 @@ body.compact-stats .mini-hud{
   color:#8f887d;font-size:9px
 }
 
+
+/* MOBILE STICKY HUD RELIABILITY */
+html,body{overflow-x:clip!important}
+body.compact-stats .mini-hud{
+  position:-webkit-sticky!important;
+  position:sticky!important;
+  top:0!important;
+  z-index:2147482500!important;
+}
+
 </style>
 </head>
 <body>
@@ -1647,7 +1657,7 @@ body.compact-stats .mini-hud{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.17.8";
+const BUILD_NUMBER="0.17.9";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
