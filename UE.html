@@ -669,6 +669,59 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   .inventory-resources{grid-template-columns:1fr 1fr!important}
 }
 
+
+/* BULK SHOP */
+.bulk-buy-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;clear:both;margin-top:5px}
+.bulk-buy-grid .btn{min-width:0;padding:5px 2px!important;font-size:8px!important;line-height:1.2}
+.bulk-buy-grid .bulk-discount{display:block;font-size:7px;color:#b7d18c;margin-top:2px}
+.bulk-buy-grid .bulk-price{display:block;font-size:7px;color:#9d968b;margin-top:1px}
+
+/* PROPERTY / FACTION EXPLANATION */
+.property-explainer,.faction-explainer{border:1px solid #4a4538;background:#100e09;padding:8px;margin-bottom:5px}
+.property-explainer b,.faction-explainer b{font-size:10px;color:#efd36a}
+.property-explainer p,.faction-explainer p{font-size:9px;color:#aaa093;line-height:1.45;margin:4px 0 0}
+.faction-detail{margin-top:4px;font-size:8px;color:#a69e92;line-height:1.4}
+.faction-status{display:inline-block;margin-top:3px;padding:2px 4px;border:1px solid #4a483d;font-size:8px;font-weight:900;color:#d2c49b;background:#12110d}
+.faction-status.contested{border-color:#80622d;color:#e1bf68}
+.faction-status.weakened{border-color:#815044;color:#daa493}
+.faction-status.broken{border-color:#456438;color:#a9ca8c}
+
+/* ENERGY SCALING */
+.energy-rate{margin-top:4px;padding:4px 5px;background:#0d0f10;border:1px solid #3d4042;font-size:8px;color:#bdb3a3}
+.energy-rate b{color:#efd36a}
+
+@media(max-width:430px){.bulk-buy-grid{grid-template-columns:1fr 1fr}}
+
+
+.job-result.bad b{color:#ff9288}
+.job-result.bad .detail{color:#e0b5af}
+
+
+/* DASH JOB SUPPLY SERVICE */
+.job-dash{
+  margin-top:5px;padding:6px;border:1px solid #554d3c;background:#12100b;clear:both
+}
+.job-dash-head{
+  display:flex;align-items:center;justify-content:space-between;gap:6px
+}
+.job-dash-brand{
+  font-size:10px;font-weight:900;color:#efd36a;letter-spacing:.06em
+}
+.job-dash-help{
+  width:17px;height:17px;min-height:0!important;padding:0!important;border-radius:50%!important;
+  border:1px solid #67604d!important;background:#17140e!important;color:#e8d493!important;
+  font-size:9px!important;line-height:15px!important
+}
+.job-dash-desc{font-size:8px;color:#9d9589;line-height:1.35;margin-top:3px}
+.job-dash-items{font-size:8px;color:#c6bda9;margin-top:3px}
+.job-dash .btn{margin-top:5px;width:100%}
+.job-dash-price{color:#efd36a;font-weight:900}
+.bribe-box{
+  margin:6px 0;padding:7px;border:1px solid #683b34;background:#170b0a
+}
+.bribe-box b{display:block;color:#f0a096;font-size:10px}
+.bribe-box span{display:block;color:#a99c91;font-size:8px;line-height:1.4;margin-top:3px}
+
 </style>
 </head>
 <body>
@@ -684,11 +737,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
   <div class="stat">👥 CREW<button class="stat-help" onclick="showStatHelp('crew',event)">?</button><b id="crewT"></b></div>
   <div class="stat">🔥 HEAT<button class="stat-help" onclick="showStatHelp('heat',event)">?</button><b id="heatT"></b><div class="bar"><div id="heatB" class="fill red"></div></div></div>
  </div>
- <div class="soundbar">
-   <button class="btn secondary" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
-   <button class="btn secondary" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
-   <div class="track">EAST HARBOR RADIO // DARK TRAP THEME</div>
- </div>
+ 
 </header>
 
 <div id="campaignTop" class="campaign-top" onclick="go('home')" title="Open current campaign">
@@ -784,10 +833,13 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 </section>
 
 <section id="view-territory" class="view">
- <div class="section-title"><h2>Territory</h2><span id="income"></span></div>
- <div id="factions"></div>
- <div class="section-title" style="margin-top:10px"><h2>Properties</h2><span>income and upkeep</span></div>
+ <div class="section-title"><h2>Properties</h2><span id="income"></span></div>
+ <div class="property-explainer">
+   <b>WHY BUY PROPERTIES?</b>
+   <p>Properties are the legitimate-looking backbone of your organization. They generate automatic hourly income even while you are not running Jobs, help offset equipment upkeep, and turn one-time Job money into a permanent revenue stream. Each additional copy costs more, so building a property empire is a long-term investment.</p>
+ </div>
  <div class="grid cards" id="props"></div>
+ <div id="factions" style="margin-top:10px"></div>
 </section>
 
 <section id="view-more" class="view">
@@ -827,6 +879,20 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
     </div>
     <button class="btn small" id="messagePopupToggle" onclick="toggleMessagePopups()">ON</button>
   </div>
+<div class="toggle-row" style="margin-top:7px">
+  <div>
+    <b>Theme Music</b>
+    <div class="sub">Dark trap background theme.</div>
+  </div>
+  <button class="btn secondary small" id="musicBtn" onclick="toggleTheme()">▶ THEME</button>
+</div>
+<div class="toggle-row" style="margin-top:7px">
+  <div>
+    <b>Sound Effects</b>
+    <div class="sub">Jobs, fights, purchases, alerts, and interface sounds.</div>
+  </div>
+  <button class="btn secondary small" onclick="toggleSound()">SFX: <span id="sfxState">ON</span></button>
+</div>
 </div>
 
 <div class="card" style="margin-top:8px">
@@ -862,7 +928,8 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="modal" id="statHelpModal"><div class="mbox">
   <h2 id="statHelpTitle">Stat</h2>
   <p id="statHelpText" class="stat-help-text"></p>
-  <button class="btn secondary" onclick="closeModal('statHelpModal')">CLOSE</button>
+  <div id="statHelpActions"></div>
+  <button class="btn secondary" style="margin-top:6px" onclick="closeModal('statHelpModal')">CLOSE</button>
 </div></div>
 
 <div class="modal" id="energyReserveModal"><div class="mbox">
@@ -987,7 +1054,7 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.11.0";
+const BUILD_NUMBER="0.12.2";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -1114,8 +1181,10 @@ const territoryDefs=[
  {id:"northyard",name:"North Freight Yard",city:"north",reqNot:260,income:1600,enemy:"Varga Syndicate",desc:"Acres of rail lines, containers, loading cranes, and guarded routes. Control the yard and you do not just intercept shipments — you decide what moves through Northside."}
 ];
 const factions=[
- {id:"harbor",name:"Harbor Kings",city:"east",strength:55},{id:"rossi",name:"Rossi Crew",city:"east",strength:75},
- {id:"bellini",name:"Bellini Family",city:"downtown",strength:120},{id:"varga",name:"Varga Syndicate",city:"north",strength:190}
+ {id:"harbor",name:"Harbor Kings",city:"east",strength:55,desc:"Dock thieves and cargo crews who treat East Harbor like inherited property. They are your first organized obstacle and control routes your operation needs."},
+ {id:"rossi",name:"Rossi Crew",city:"east",strength:75,desc:"An old neighborhood crew with shopkeepers, bookmakers, and market muscle on their side. They are smaller than a Family but deeply embedded in local business."},
+ {id:"bellini",name:"Bellini Family",city:"downtown",strength:120,desc:"A polished Downtown organization with political access, clubs, money, and people who have been making problems disappear for decades."},
+ {id:"varga",name:"Varga Syndicate",city:"north",strength:190,desc:"A heavily armed logistics syndicate controlling Northside freight routes. Fighting them means attacking an organization built around moving serious cargo at scale."}
 ];
 const friendDefs=[
  {id:"jenny",name:"Jenny Sparks",av:"JS",tag:"Reliable. Knows everyone.",role:"Fixer",base:82,join:.9,help:.85,temper:.15,agenda:"Protect Lisa",rival:"chad"},
@@ -1986,6 +2055,23 @@ function addXp(n){
 function crewRoleBonus(role){return roleCount(role)>0?8:0}
 function gearPower(kind){const slots=availableCrew().length+1,list=[];gearDefs.forEach(g=>{if(g.type===kind||(kind==="attack"&&g.type==="vehicle"))for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});list.sort((a,b)=>b-a);return list.slice(0,slots).reduce((a,b)=>a+b,0)}
 function combatPower(kind){return (kind==="attack"?state.attack:state.defense)+gearPower(kind)+(availableCrew().length+1)*2+Math.floor(state.notoriety/20)}
+
+function bribeLawEnforcement(){
+ const cost=10;
+ if(state.heat<=0)return showRequirementPopup("Your Heat is already at 0.");
+ if((state.goldBars||0)<cost)return showRequirementPopup(`Bribing law enforcement costs ${cost} Gold Bars. You have ${state.goldBars||0}.`);
+
+ const oldHeat=Math.floor(state.heat);
+ state.goldBars-=cost;
+ state.heat=0;
+ state.lastHeatDecay=now();
+
+ log(`Paid 10 Gold Bars in bribes to reset Heat from ${oldHeat} to 0.`);
+ showActionFlash("LAW ENFORCEMENT BRIBED",`🪙 10 Gold Bars · Heat ${oldHeat} → 0`,"good");
+ closeModal("statHelpModal");
+ S.cash();save();render();
+}
+
 function heatLabel(){return state.heat>=90?"MANHUNT":state.heat>=70?"Critical":state.heat>=45?"High":state.heat>=20?"Watched":"Low"}
 
 function checkSkillReminder(){
@@ -2007,22 +2093,25 @@ const PROFILE_HELP={
  crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
  activeCrew:{title:"Active Crew",text:"Crew members currently able to work. Injured or arrested associates temporarily stop contributing to combat power."},
  record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and now reduces Heat."},
- heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Heat falls naturally, and winning offensive fights lowers it faster."},
+ heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Winning offensive fights lowers Heat, or you can spend 10 Gold Bars to bribe law enforcement and reset Heat to 0 immediately."},
  income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
  gold:{title:"Gold Bars",text:"Rare currency used for permanent Gold Vault unlocks. Earn them through trusted contacts or exchange $100,000 Cash for one."},
  territory:{title:"Territory",text:"The number of districts under your control. Territory provides income and represents long-term organizational power."}
 };
 function showProfileHelp(key,e){
  if(e?.stopPropagation)e.stopPropagation();
+ if(key==="heat")return showStatHelp("heat",e);
  const h=PROFILE_HELP[key];if(!h)return;
  document.getElementById("statHelpTitle").textContent=h.title;
  document.getElementById("statHelpText").textContent=h.text;
+ const actions=document.getElementById("statHelpActions");
+ if(actions)actions.innerHTML="";
  document.getElementById("statHelpModal").classList.add("show");
 }
 
 const STAT_HELP={
  health:{title:"Health",text:"Health is the damage your character can take. Fights and failed operations can reduce it. You need at least 10 Health to initiate a fight. Health regenerates by 1 every 1 minute 30 seconds."},
- energy:{title:"Energy",text:"Energy powers Jobs. It regenerates by 1 every minute. Energy Drinks can be saved up to 999 and restore a random 3–7 Energy when consumed. Tap the Energy stat itself to view your drink reserve."},
+ energy:{title:"Energy",text:"Energy powers Jobs. Natural recovery is fastest when your reserve is almost empty: 0–2 Energy regenerates at 1 point per minute. As you bank more, each point takes progressively longer, reaching 12 minutes per point at 30+ Energy. Energy Drinks still restore 3–7 instantly."},
  stamina:{title:"Stamina",text:"Stamina powers fights, incoming-attack defenses, and territory actions. Most fights cost 1 Stamina and territory moves cost 2. Stamina regenerates by 1 every 3 minutes. Adrenaline Shots restore a random 1–3 Stamina and can be stored up to 999."},
  cash:{title:"Cash",text:"Cash buys equipment and properties, pays favors and operating costs, and covers losses. You can also exchange $100,000 Cash for 1 Gold Bar in the Gear tab."},
  gold:{title:"Gold Bars",text:"Gold Bars are rare currency for permanent special unlocks. A contact at 95+ Reputation can search for one once per hour with hidden odds, or you can exchange $100,000 Cash for 1 Gold Bar."},
@@ -2032,20 +2121,36 @@ const STAT_HELP={
 function showStatHelp(key,e){
  if(e?.stopPropagation)e.stopPropagation();
  const h=STAT_HELP[key];if(!h)return;
+
  document.getElementById("statHelpTitle").textContent=h.title;
  document.getElementById("statHelpText").textContent=h.text;
+
+ const actions=document.getElementById("statHelpActions");
+ if(actions){
+   if(key==="heat"){
+     actions.innerHTML=`<div class="bribe-box">
+       <b>BRIBE LAW ENFORCEMENT</b>
+       <span>Pay 10 Gold Bars to wipe your current Heat to 0 immediately. Expensive, corrupt, and effective.</span>
+       <button class="btn red" style="margin-top:6px" onclick="bribeLawEnforcement()" ${(state.goldBars||0)<10||state.heat<=0?"disabled":""}>BRIBE · 🪙 10 GOLD BARS</button>
+     </div>`;
+   }else{
+     actions.innerHTML="";
+   }
+ }
+
  document.getElementById("statHelpModal").classList.add("show");
 }
 function renderEnergyReserve(){
  const body=document.getElementById("energyReserveBody"),btn=document.getElementById("energyReserveDrinkBtn");
  if(!body||!btn)return;
  const qty=Math.max(0,Number(state.loot["Energy Drink"])||0);
- const regen=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
+ const regen=energyRegenCountdown();
  body.innerHTML=`<div class="energy-reserve">
    <div class="er"><span>CURRENT ENERGY</span><b>${Math.floor(state.en)}/${state.maxEn}</b></div>
    <div class="er"><span>ENERGY DRINKS</span><b>🥤 ${qty}</b></div>
  </div>
- <p class="sub">${state.en>=state.maxEn?"Energy is full.":`Next natural Energy: ${regen.text.replace("+1 IN ","")}.`} Each Energy Drink restores a random 3–7 Energy and can be saved up to a stack of 999.</p>`;
+ <div class="energy-rate"><b>Current natural recovery:</b> ${state.en>=state.maxEn?"FULL":energyRateLabel()}${state.en>=state.maxEn?"":` · Next Energy in ${regen.text.replace("+1 IN ","")}`}</div>
+ <p class="sub">Natural recovery slows as Energy is banked: 0–2 = 1:00 per point, 3–5 = 1:30, 6–9 = 2:00, 10–14 = 3:00, 15–19 = 5:00, 20–29 = 8:00, and 30+ = 12:00. Energy Drinks are unaffected.</p>`;
  btn.textContent=`DRINK ENERGY DRINK${qty?` (x${qty})`:""}`;
  btn.disabled=qty<=0||state.en>=state.maxEn;
 }
@@ -2079,6 +2184,52 @@ function showRequirementPopup(text){
  S.bad();
 }
 
+
+function dashMissingItems(j){
+ const items=[];
+ Object.entries(j.req||{}).forEach(([id,required])=>{
+   const g=gearDefs.find(x=>x.id===id);
+   if(!g)return;
+   const missing=Math.max(0,Number(required)-gearQty(id));
+   if(missing>0)items.push({g,missing});
+ });
+ return items;
+}
+function dashJobCost(j){
+ const items=dashMissingItems(j);
+ const base=items.reduce((sum,x)=>sum+x.g.cost*x.missing,0);
+ return {items,base,total:Math.ceil(base*1.50)};
+}
+function showDashHelp(jid,e){
+ if(e?.stopPropagation)e.stopPropagation();
+ const j=jobDefs.find(x=>x.id===jid);if(!j)return;
+ const d=dashJobCost(j);
+ const actions=document.getElementById("statHelpActions");
+ document.getElementById("statHelpTitle").textContent="DASH";
+ document.getElementById("statHelpText").textContent="DoorDash the required equipment for this Job. DASH instantly buys only the shop items you are currently missing. It costs 50% more than buying the same items yourself — but hey, you pay for convenience.";
+ if(actions){
+   actions.innerHTML=d.items.length
+     ?`<div class="sub">Missing now: ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}<br>Normal shop price: ${money(d.base)} · DASH price: ${money(d.total)}</div>`
+     :`<div class="sub">You already own all required shop equipment for this Job.</div>`;
+ }
+ document.getElementById("statHelpModal").classList.add("show");
+}
+function dashBuyJobItems(jid){
+ const j=jobDefs.find(x=>x.id===jid);if(!j)return;
+ const d=dashJobCost(j);
+ if(!d.items.length)return showRequirementPopup("You already own all required equipment for this Job.");
+ if(state.cash<d.total)return showRequirementPopup(`DASH delivery costs ${money(d.total)}. You currently have ${money(state.cash)}.`);
+
+ state.cash-=d.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+d.total;
+ d.items.forEach(x=>state.gear[x.g.id]=gearQty(x.g.id)+x.missing);
+
+ S.cash();
+ log(`DASH delivered Job equipment for ${j.name}. Paid ${money(d.total)} including the 50% convenience markup.`);
+ showActionFlash("DASH DELIVERY COMPLETE",`${j.name} · ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")} · ${money(d.total)}`,"cash");
+ save();render();
+}
+
 function reqMissing(j){const m=[];if(crewSize()<j.crew)m.push(`${j.crew} crew`);Object.entries(j.req).forEach(([id,q])=>{if(gearQty(id)<q)m.push(`${q} ${gearDefs.find(g=>g.id===id).name}`)});if(cities.find(c=>c.id===j.city).level>state.level)m.push(`LVL ${cities.find(c=>c.id===j.city).level}`);return m}
 function jobStatKind(j){
  if(["Enforcer","Collector","Smuggler"].includes(j.role))return "attack";
@@ -2097,15 +2248,31 @@ function jobChance(j){
  return Math.max(30,Math.min(97,Math.round(chance)));
 }
 let jobBusy=false;
+let lastJobResult=null;
+
 function showJobResult(success,title,detail){
- const el=document.getElementById("jobResult");
- if(el){
-   el.className="job-result show "+(success?"good":"bad");
-   el.innerHTML=`<b>${title}</b><div class="detail">${detail}</div>`;
-   clearTimeout(window._jr);
-   window._jr=setTimeout(()=>el.classList.remove("show"),4200);
- }
+ lastJobResult={success,title,detail,shownAt:now()};
+
+ // First show the large center notification.
  showActionFlash(title,detail,success?"good":"bad");
+
+ // Then place the same result in the persistent Jobs result box.
+ clearTimeout(window._jrShow);
+ clearTimeout(window._jrHide);
+
+ window._jrShow=setTimeout(()=>{
+   const el=document.getElementById("jobResult");
+   if(!el||!lastJobResult)return;
+   el.className="job-result show "+(lastJobResult.success?"good":"bad");
+   el.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`;
+ },1450);
+
+ // Keep it visible well after the center popup has finished.
+ window._jrHide=setTimeout(()=>{
+   const el=document.getElementById("jobResult");
+   if(el)el.classList.remove("show");
+   lastJobResult=null;
+ },10000);
 }
 function setJobBusy(id,on){
  jobBusy=on;
@@ -2199,16 +2366,27 @@ function fightBoss(t){
  else{state.hp=Math.max(1,state.hp-rnd(12,25));state.cash=Math.max(0,state.cash-rnd(300,900));log(`${name} stopped the operation. You took losses.`);S.bad();injureRandomCrew()}
  save();render()
 }
-function buyGear(id){
+function bulkGearPrice(g,qty){
+ const discount=qty===5?.03:qty===10?.07:qty===50?.10:0;
+ return {discount,total:Math.floor(g.cost*qty*(1-discount))};
+}
+
+function buyGear(id,qty=1){
  const g=gearDefs.find(x=>x.id===id);
  if(!g)return toast("Equipment unavailable.");
+ qty=[1,5,10,50].includes(Number(qty))?Number(qty):1;
  if(state.level<g.level)return toast(`Unlocks at level ${g.level}.`);
- if(state.cash<g.cost)return toast("Not enough cash.");
- state.cash-=g.cost;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+g.cost;
- state.gear[id]=gearQty(id)+1;
+
+ const price=bulkGearPrice(g,qty);
+ if(state.cash<price.total)return showRequirementPopup(`Buying ${qty} ${g.name}${qty===1?"":"s"} costs ${money(price.total)}. You have ${money(state.cash)}.`);
+
+ state.cash-=price.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+price.total;
+ state.gear[id]=gearQty(id)+qty;
+
  S.cash();
- showActionFlash("PURCHASE COMPLETE",`${g.name} · ${money(g.cost)}`,"cash");
+ const savings=g.cost*qty-price.total;
+ showActionFlash("PURCHASE COMPLETE",`${qty}× ${g.name} · ${money(price.total)}${savings>0?` · Saved ${money(savings)}`:""}`,"cash");
  save();render();
 }
 function buyProp(id){
@@ -2725,11 +2903,11 @@ function renderEnergy(id){
  const el=document.getElementById(id);if(!el)return;
  const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0);
  if(state.en<=0){
-   const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
-   el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Ask contacts for Energy Drinks, use one from your stash, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button>${drinks>0?`<button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK (x${drinks})</button>`:""}</div></div>`;
+   const r=energyRegenCountdown();
+   el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Ask contacts for Energy Drinks, use one from your stash, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · ${energyRateLabel()}</div><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button>${drinks>0?`<button class="btn secondary" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK (x${drinks})</button>`:""}</div></div>`;
  }else if(state.en<=Math.max(3,state.maxEn*.2)){
-   const r=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
-   el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors, use an Energy Drink, or wait for recovery.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · 1 energy every 1:00</div><div class="actions"><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button>${drinks>0?`<button class="btn secondary small" onclick="drinkEnergyDrink()">DRINK (x${drinks})</button>`:""}</div></div>`;
+   const r=energyRegenCountdown();
+   el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Low reserves recover quickly. Banked Energy becomes progressively slower to regenerate.</p><div class="regen-detail">Next energy: ${r.text.replace("+1 IN ","")} · ${energyRateLabel()}</div><div class="actions"><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button>${drinks>0?`<button class="btn secondary small" onclick="drinkEnergyDrink()">DRINK (x${drinks})</button>`:""}</div></div>`;
  }else el.innerHTML="";
 }
 
@@ -2778,6 +2956,15 @@ function renderJobs(){
  const bossEl=document.getElementById("boss");
  if(!jobsEl||!tierEl||!bossEl)return;
 
+ const resultEl=document.getElementById("jobResult");
+ if(resultEl&&lastJobResult){
+   const age=now()-lastJobResult.shownAt;
+   if(age>=1350&&age<10000){
+     resultEl.className="job-result show "+(lastJobResult.success?"good":"bad");
+     resultEl.innerHTML=`<b>${lastJobResult.title}</b><div class="detail">${lastJobResult.detail}</div>`;
+   }
+ }
+
  const t=activeTier();
  tierEl.innerHTML=`${tiers[t].name} · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:150px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">
    ${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}
@@ -2785,7 +2972,16 @@ function renderJobs(){
 
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
  jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
-   const js=jobState(j.id),miss=reqMissing(j),pct=Math.max(0,Math.min(100,js.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit,statKind=jobStatKind(j),statBonus=jobStatBonus(j);
+   const jobStateData=jobState(j.id);
+   const miss=reqMissing(j);
+   const pct=Math.max(0,Math.min(100,jobStateData.runs*20));
+   const ch=jobChance(j);
+   const art=IMG[j.img]||IMG.suit;
+   const statKind=jobStatKind(j);
+   const statBonus=jobStatBonus(j);
+   const dash=dashJobCost(j);
+   const dashMarkup=dash.total-dash.base;
+
    return `<div class="card job-card" id="job-${j.id}">
      <img class="art" src="${art}" alt="">
      <h3>${j.name}</h3>
@@ -2794,10 +2990,23 @@ function renderJobs(){
        <span class="badge">👥 ${j.crew}</span><span class="badge red">🔥 +${j.heat}</span>
        <span class="badge gold">${ch}% success</span><span class="badge">${statKind==="attack"?"⚔ ATTACK":statKind==="defense"?"🛡 DEFENSE":"⚔🛡 BOTH"} +${statBonus}%</span>
      </div>
-     <div class="role">Preferred role: ${j.role}</div><div class="job-stat-note">${statKind==="attack"?"Attack raises this job’s success chance.":statKind==="defense"?"Defense raises this job’s success chance and reduces failure losses.":"Attack and Defense both contribute to this job."}</div>
-     <div class="sub">Mastery ${js.mastery}/3</div>
+     <div class="role">Preferred role: ${j.role}</div>
+     <div class="job-stat-note">${statKind==="attack"?"Attack raises this job’s success chance.":statKind==="defense"?"Defense raises this job’s success chance and reduces failure losses.":"Attack and Defense both contribute to this job."}</div>
+     <div class="sub">Mastery ${jobStateData.mastery}/3</div>
      <div class="mastery"><div style="width:${pct}%"></div></div>
      ${miss.length?`<div class="lock">Requires: ${miss.join(" · ")}</div>`:""}
+     ${dash.items.length?`<div class="job-dash">
+       <div class="job-dash-head">
+         <span class="job-dash-brand">DASH</span>
+         <button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button>
+       </div>
+       <div class="job-dash-desc">Instantly deliver the missing shop equipment for this Job.</div>
+       <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
+       <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>
+         DASH REQUIRED ITEMS · <span class="job-dash-price">${money(dash.total)}</span>
+       </button>
+       <div class="sub">Includes ${money(dashMarkup)} convenience markup (+50%).</div>
+     </div>`:""}
      <p>Possible rare items: ${j.loot.join(", ")}</p>
      <button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button>
    </div>`;
@@ -2809,7 +3018,7 @@ function renderJobs(){
    <h3>${tiers[t].boss}</h3>
    <p>Control this rank by defeating the organization standing above you.</p>
    <div class="meta"><span class="badge">🥊 3</span><span class="badge">Power ${bossDef(t)}</span></div>
-   <button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"CHALLENGE BOSS":"MASTER EACH JOB ONCE"}</button>
+   <button class="btn red" onclick="fightBoss(${t})" ${done||!bossReady(t)?"disabled":""}>${done?"DEFEATED":bossReady(t)?"FIGHT BOSS":"REQUIREMENTS NOT MET"}</button>
  </div>`;
 }
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
@@ -2887,40 +3096,88 @@ function renderGear(){
  upkeepEl.textContent=`Gear upkeep ${money(gearUpkeep())}/hr`;
  gearEl.innerHTML=gearDefs.map(g=>{
    const uses=jobsUsingGear(g.id);
+   const p1=bulkGearPrice(g,1),p5=bulkGearPrice(g,5),p10=bulkGearPrice(g,10),p50=bulkGearPrice(g,50);
+   const lock=state.level<g.level;
+   const buyButton=(qty,p,label,discount="")=>`<button class="btn ${qty>1?"secondary":""}" onclick="buyGear('${g.id}',${qty})" ${lock||state.cash<p.total?"disabled":""}>
+     ${lock?`LVL ${g.level}`:label}
+     ${discount?`<span class="bulk-discount">${discount} OFF</span>`:""}
+     <span class="bulk-price">${money(p.total)}</span>
+   </button>`;
+
    return `<div class="card">
      <img class="art" src="${IMG[g.img]||IMG.suit}" alt="">
      <h3>${g.name}</h3>
      <div class="meta">
        <span class="badge">${gearEffectLabel(g)}</span>
        <span class="badge">Owned ${gearQty(g.id)}</span>
-       <span class="badge">${money(g.cost)}</span>
-       <span class="badge red">Upkeep ${money(g.upkeep)}/hr</span>
+       <span class="badge">${money(g.cost)} each</span>
+       <span class="badge red">Upkeep ${money(g.upkeep)}/hr each</span>
      </div>
      <p class="item-flavor">${g.desc}</p>
      <div class="item-use">${uses.length?`Required by: ${uses.slice(0,3).join(" · ")}${uses.length>3?" · +more":""}`:"Optional equipment — improves the organization without gating a Job."}</div>
-     <button class="btn" onclick="buyGear('${g.id}')" ${state.level<g.level||state.cash<g.cost?"disabled":""}>
-       ${state.level<g.level?"UNLOCK LVL "+g.level:"BUY ONE"}
-     </button>
+     <div class="bulk-buy-grid">
+       ${buyButton(1,p1,"BUY 1")}
+       ${buyButton(5,p5,"BUY 5","3%")}
+       ${buyButton(10,p10,"BUY 10","7%")}
+       ${buyButton(50,p50,"BUY 50","10%")}
+     </div>
    </div>`;
  }).join("");
 }
+function factionPressure(f){
+ const linked=territoryDefs.filter(t=>t.enemy===f.name);
+ if(!linked.length)return 0;
+ const total=linked.reduce((n,t)=>n+Math.min(100,state.territory[t.id]?.progress||0),0);
+ return Math.round(total/linked.length);
+}
+function factionStatus(pressure){
+ if(pressure>=100)return {label:"BROKEN",cls:"broken",text:"You have stripped this faction of the territory represented here."};
+ if(pressure>=65)return {label:"WEAKENED",cls:"weakened",text:"Their local control is collapsing. Keep pressing their territories."};
+ if(pressure>0)return {label:"CONTESTED",cls:"contested",text:"Your territory moves are actively eroding their control."};
+ return {label:"ENTRENCHED",cls:"",text:"You have not meaningfully challenged their local control yet."};
+}
+
 function renderTerritory(){
  const incomeEl=document.getElementById("income");
  const factionsEl=document.getElementById("factions");
  const propsEl=document.getElementById("props");
  if(!incomeEl||!factionsEl||!propsEl)return;
 
- incomeEl.textContent=`Net ${money(Math.max(0,netIncome()))}/hr`;
+ incomeEl.textContent=`Net ${money(Math.max(0,netIncome()))}/hr after upkeep`;
 
- const factionRows=factions.map(f=>`
-   <div class="row">
+ propsEl.innerHTML=propDefs.map(p=>{
+   const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
+   return `<div class="card">
+     <img class="art" src="${IMG[p.img]}" alt="">
+     <h3>${p.name}</h3>
+     <div class="meta">
+       <span class="badge">Owned ${q}</span>
+       <span class="badge green">+${money(p.income)}/hr each</span>
+       <span class="badge red">-${money(p.upkeep)}/hr upkeep each</span>
+       <span class="badge">Net +${money(Math.max(0,p.income-p.upkeep))}/hr each</span>
+     </div>
+     <p class="property-flavor">${p.desc}</p>
+     <div class="item-use">Buying another permanently increases hourly income by ${money(p.income)} before its ${money(p.upkeep)} upkeep. Current next-copy cost: ${money(c)}.</div>
+     <button class="btn green" onclick="buyProp('${p.id}')" ${state.level<p.level||state.cash<c?"disabled":""}>
+       ${state.level<p.level?`UNLOCK LVL ${p.level}`:`BUY PROPERTY · ${money(c)}`}
+     </button>
+   </div>`;
+ }).join("");
+
+ const factionRows=factions.map(f=>{
+   const pressure=factionPressure(f),status=factionStatus(pressure);
+   const linked=territoryDefs.filter(t=>t.enemy===f.name);
+   const controlled=linked.filter(t=>state.territory[t.id]?.owned).length;
+   return `<div class="row">
      <div>
        <div class="title">${f.name}</div>
-       <div class="sub">${cities.find(c=>c.id===f.city).name} · Strength ${f.strength}</div>
-       <div class="factionbar"><div style="width:${Math.min(100,state.factions[f.id]||0)}%"></div></div>
+       <div class="sub">${cities.find(c=>c.id===f.city).name} · Combat Strength ${f.strength} · Your Pressure ${pressure}%</div>
+       <div class="factionbar"><div style="width:${pressure}%"></div></div>
+       <span class="faction-status ${status.cls}">${status.label}</span>
+       <div class="faction-detail">${f.desc}<br><b>How it changes:</b> successful moves against territories they control raise your pressure. <b>Why it matters:</b> their Strength is the resistance roll you face when taking territory; beating them converts contested districts into permanent income and Notoriety. Controlled territory: ${controlled}/${linked.length}.</div>
      </div>
-   </div>
- `).join("");
+   </div>`;
+ }).join("");
 
  const territoryRows=territoryDefs.map(t=>{
    if(!state.territory[t.id])state.territory[t.id]={owned:false,progress:0};
@@ -2928,41 +3185,23 @@ function renderTerritory(){
    return `<div class="row territory ${s.owned?"owned":"enemy"}">
      <div>
        <div class="title">${t.name}</div>
-       <div class="sub">${cities.find(c=>c.id===t.city).name} · Rival: ${t.enemy} · Income ${money(t.income)}/hr · Requires ${t.reqNot} notoriety</div><div class="territory-flavor">${t.desc}</div>
-       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div>`:""}
+       <div class="sub">${cities.find(c=>c.id===t.city).name} · Rival: ${t.enemy} · Income ${money(t.income)}/hr · Requires ${t.reqNot} Notoriety</div>
+       <div class="territory-flavor">${t.desc}</div>
+       ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="sub">Takeover progress: ${s.progress}% · Successful territory moves add 35%.</div>`:"<div class='sub'>Controlled · permanent territory income active.</div>"}
      </div>
-     <button class="btn ${s.owned?"green":"red"} small"
-       onclick="takeTerritory('${t.id}')"
-       ${s.owned||state.notoriety<t.reqNot?"disabled":""}>
-       ${s.owned?"CONTROLLED":"TAKE TERRITORY"}
+     <button class="btn ${s.owned?"green":"red"} small" onclick="takeTerritory('${t.id}')" ${s.owned||state.notoriety<t.reqNot?"disabled":""}>
+       ${s.owned?"CONTROLLED":"TAKE TERRITORY · 2 STAMINA"}
      </button>
    </div>`;
  }).join("");
 
  factionsEl.innerHTML=`
-   <div class="section-title"><h2>Rival Factions</h2><span>pressure and control</span></div>
+   <div class="section-title"><h2>Rival Factions</h2><span>who controls the ground you want</span></div>
+   <div class="faction-explainer"><b>WHAT ARE RIVAL FACTIONS?</b><p>These are the established organizations standing between you and new territory. Their <strong>Strength</strong> makes territory attacks harder. Your <strong>Pressure</strong> rises as you successfully contest their districts. Factions do not grant passive bonuses by themselves — they are the resistance you dismantle to convert territory into income, Notoriety, and control.</p></div>
    ${factionRows}
-   <div class="section-title" style="margin-top:10px"><h2>Territory</h2><span>notoriety unlocks expansion</span></div>
+   <div class="section-title" style="margin-top:10px"><h2>Territory Takeovers</h2><span>2 stamina per move</span></div>
    ${territoryRows}
  `;
-
- propsEl.innerHTML=propDefs.map(p=>{
-   const q=state.props[p.id]||0;
-   const c=Math.floor(p.cost*Math.pow(1.22,q));
-   return `<div class="card">
-     <img class="art" src="${IMG[p.img]}" alt="">
-     <h3>${p.name}</h3>
-     <div class="meta">
-       <span class="badge">Owned ${q}</span>
-       <span class="badge">${money(p.income)}/hr</span>
-       <span class="badge red">Upkeep ${money(p.upkeep)}/hr</span>
-     </div>
-     <p class="property-flavor">${p.desc}</p>
-     <button class="btn green" onclick="buyProp('${p.id}')" ${state.level<p.level||state.cash<c?"disabled":""}>
-       BUY ${money(c)}
-     </button>
-   </div>`;
- }).join("");
 }
 function achievementDefs(){
  const defs=[],add=(category,prefix,targets,current,labelFn)=>targets.forEach((t,i)=>defs.push({id:`${prefix}_${t}`,category,title:labelFn(t,i),target:t,current:Math.floor(current())}));
@@ -3044,6 +3283,27 @@ const ENERGY_REGEN_MS=60000;
 const STAMINA_REGEN_MS=180000;
 const HEALTH_REGEN_MS=90000;
 
+function energyRegenPeriod(current){
+  const e=Math.max(0,Math.floor(Number(current)||0));
+  if(e<=2)return 60000;
+  if(e<=5)return 90000;
+  if(e<=9)return 120000;
+  if(e<=14)return 180000;
+  if(e<=19)return 300000;
+  if(e<=29)return 480000;
+  return 720000;
+}
+function energyRateLabel(current=state.en){
+  return `1 Energy every ${formatRegenTime(energyRegenPeriod(current))}`;
+}
+function energyRegenCountdown(){
+  if(state.en>=state.maxEn)return {text:"FULL",ms:0,full:true,period:0};
+  const period=energyRegenPeriod(state.en);
+  const elapsed=Math.max(0,now()-state.lastEnergyRegen);
+  const ms=Math.max(0,period-elapsed);
+  return {text:`+1 IN ${formatRegenTime(ms)}`,ms,full:false,period};
+}
+
 function regenCountdown(last,period,current,max){
   if(current>=max)return {text:"FULL",ms:0,full:true};
   const elapsed=Math.max(0,now()-last);
@@ -3058,14 +3318,14 @@ function formatRegenTime(ms){
   return `${m}:${String(s).padStart(2,"0")}`;
 }
 function updateRegenTimers(){
-  const e=regenCountdown(state.lastEnergyRegen,ENERGY_REGEN_MS,state.en,state.maxEn);
+  const e=energyRegenCountdown();
   const st=regenCountdown(state.lastStaminaRegen,STAMINA_REGEN_MS,state.st,state.maxSt);
 
   const ee=document.getElementById("enRegenT");
   const se=document.getElementById("stRegenT");
 
   if(ee){
-    ee.textContent=e.text;
+    ee.textContent=e.full?"FULL":`${e.text} · ${energyRateLabel()}`;
     ee.classList.toggle("full",e.full);
     ee.classList.toggle("soon",!e.full&&e.ms<=15000);
   }
@@ -3076,21 +3336,22 @@ function updateRegenTimers(){
   }
 }
 function applyRegeneration(t=now()){
-  // Energy
   if(state.en>=state.maxEn){
     state.en=state.maxEn;
     state.lastEnergyRegen=t;
   }else{
-    const elapsed=Math.max(0,t-state.lastEnergyRegen);
-    const gain=Math.floor(elapsed/ENERGY_REGEN_MS);
-    if(gain>0){
-      state.en=Math.min(state.maxEn,state.en+gain);
-      state.lastEnergyRegen+=gain*ENERGY_REGEN_MS;
-      if(state.en>=state.maxEn)state.lastEnergyRegen=t;
+    if(!Number.isFinite(state.lastEnergyRegen))state.lastEnergyRegen=t;
+    let cursor=state.lastEnergyRegen,safety=0;
+    while(state.en<state.maxEn&&safety<5000){
+      const period=energyRegenPeriod(state.en);
+      if(t-cursor<period)break;
+      cursor+=period;
+      state.en=Math.min(state.maxEn,state.en+1);
+      safety++;
     }
+    state.lastEnergyRegen=state.en>=state.maxEn?t:cursor;
   }
 
-  // Stamina
   if(state.st>=state.maxSt){
     state.st=state.maxSt;
     state.lastStaminaRegen=t;
@@ -3104,7 +3365,6 @@ function applyRegeneration(t=now()){
     }
   }
 
-  // Health
   if(state.hp>=state.maxHp){
     state.hp=state.maxHp;
     state.lastHealthRegen=t;
@@ -3118,7 +3378,7 @@ function applyRegeneration(t=now()){
     }
   }
 
-  state.lastTick=t; // retained for compatibility / general timing
+  state.lastTick=t;
 }
 
 function tick(){
