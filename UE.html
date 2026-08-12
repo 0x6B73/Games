@@ -132,6 +132,20 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .job-card.busy{opacity:.72;pointer-events:none}.job-card.busy:after{content:'OPERATION IN PROGRESS';position:absolute;inset:0;background:#050607cc;display:flex;align-items:center;justify-content:center;color:#f0d36d;font-size:11px;font-weight:900;letter-spacing:.06em;z-index:8}
 .nav button.active{box-shadow:inset 0 2px #d0ad45}.audio-good{color:#8fc060}.audio-bad{color:#cf7062}
 
+
+.profile-avatar{
+ width:44px;height:44px;object-fit:cover;border:2px solid #665640;background:#1a1a1a;display:block
+}
+.player-name{
+ color:#f0d36d;font-weight:900
+}
+.name-modal-copy{
+ font-size:11px;color:#b8aa99;line-height:1.4;margin-bottom:8px
+}
+.name-input{
+ width:100%;padding:9px;background:#070706;color:#eee;border:1px solid #5a4d3a;margin:4px 0 10px
+}
+
 </style>
 </head>
 <body>
@@ -157,7 +171,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <section id="view-home" class="view active">
  <div class="hero">
   <img src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1200&q=80" alt="">
-  <div class="copy"><h1>Build Your Criminal Empire.</h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
+  <div class="copy"><h1><span id="playerNameHero">Build Your Criminal Empire.</span></h1><p>Take jobs, earn influence, recruit loyal associates, control territory, and survive the attention that comes with power.</p></div>
  </div>
  <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;background:linear-gradient(#d8d8d8,#8d8d8d);border:1px solid #111;color:#111;padding:4px 7px;margin-bottom:4px;font-weight:900;font-size:11px">
  <span>CREW GIFTS! SEND SUPPLIES TO YOUR ASSOCIATES</span><button class="btn" onclick="go('crew')">SEND GIFTS</button>
@@ -216,7 +230,13 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 
 <section id="view-more" class="view">
  <div class="section-title"><h2>Profile</h2><span>organization overview</span></div>
- <div class="profile-grid" id="profile"></div>
+ <div class="card" style="margin-bottom:8px">
+  <div style="display:flex;align-items:center;gap:9px">
+    <img id="playerAvatar" class="profile-avatar" src="" alt="">
+    <div><div class="sub">PLAYER</div><div id="playerProfileName" class="player-name">Unknown</div></div>
+  </div>
+</div>
+<div class="profile-grid" id="profile"></div>
  <div class="card" style="margin-top:8px"><h3>Collections & Rare Loot</h3><div id="collections"></div></div>
  <div class="card" style="margin-top:8px"><h3>Achievements</h3><div id="ach"></div></div>
  
@@ -259,6 +279,14 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <div class="modal" id="energyModal"><div class="mbox"><h2>You do not have enough energy.</h2><p class="sub">Wait for recovery, request help from your contacts, or acquire additional energy.</p><div class="actions"><button class="btn" onclick="go('crew');closeModal('energyModal')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="openCheckout()">ACQUIRE ENERGY</button></div><button class="btn secondary" style="margin-top:6px" onclick="closeModal('energyModal')">Wait for recovery</button></div></div>
 
 <div class="modal" id="checkoutModal"><div class="mbox"><h2>Acquire Energy</h2><p class="sub">Demonstration only. Do not enter real financial information.</p><div class="checkout-grid"><label>Fictional Account Number<input id="moneyNumber" placeholder="FAKE-0000-ENERGY"></label><label>Hours of work required to cover this purchase<input id="workHours" type="number" min="0" max="999" step=".5" placeholder="3.5"></label><label>Authorization Note<input id="authorization" placeholder="Approved for immediate use"></label></div><button class="btn" onclick="completeCheckout()">PURCHASE ENERGY</button><button class="btn secondary" style="margin-top:6px" onclick="closeModal('checkoutModal')">Cancel</button></div></div>
+
+
+<div class="modal" id="nameModal"><div class="mbox">
+  <h2>Who are you?</h2>
+  <div class="name-modal-copy">Every organization starts with a name. This will appear on your profile and throughout East Harbor.</div>
+  <input id="playerNameInput" class="name-input" maxlength="24" placeholder="Enter your name">
+  <button class="btn" onclick="savePlayerName()">ENTER EAST HARBOR</button>
+</div></div>
 
 <div class="toast" id="toast"></div>
 
@@ -519,11 +547,37 @@ const meanReplies=["You are asking too much of me.","Handle this one yourself.",
 const joinReplies=["I am in.","You have my support.","Count me in.","I will stand with you."];
 const refuseReplies=["Not yet.","I am not ready to commit.","I will stay independent for now.","No."];
 
+
+function avatarUrl(id,name=""){
+  const seed=encodeURIComponent(`${id}-${name}`.toLowerCase());
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=1f2937,374151,4b5563&radius=8`;
+}
+function playerAvatarUrl(){
+  const seed=encodeURIComponent((state.playerName||"east-harbor-boss").toLowerCase());
+  return `https://api.dicebear.com/9.x/personas/svg?seed=${seed}&backgroundColor=111827,1f2937,374151&radius=8`;
+}
+function promptForPlayerName(){
+  if(state.playerName)return;
+  const modal=document.getElementById("nameModal");
+  const input=document.getElementById("playerNameInput");
+  if(modal){modal.classList.add("show");setTimeout(()=>input?.focus(),150)}
+}
+function savePlayerName(){
+  const input=document.getElementById("playerNameInput");
+  const value=(input?.value||"").trim().replace(/\s+/g," ");
+  if(value.length<2)return toast("Enter a name with at least 2 characters.");
+  state.playerName=value.slice(0,24);
+  save();
+  document.getElementById("nameModal")?.classList.remove("show");
+  render();
+  if(!state.tutorialDone)setTimeout(startTutorial,250);
+}
+
 function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -531,7 +585,7 @@ function fresh(){
 }
 let state=load();migrate();
 function load(){try{return Object.assign(fresh(),JSON.parse(localStorage.getItem(KEY))||{})}catch(e){return fresh()}}
-function migrate(){if(!state.friends)state=fresh();if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
+function migrate(){if(!state.friends)state=fresh();if(!("playerName" in state))state.playerName="";if(!state.revenge)state.revenge=[];if(!state.pendingAttacks)state.pendingAttacks=[];if(!state.daily)state.daily={last:"",streak:0};if(!state.event)state.event={id:"weekend",ends:now()+86400000};if(!state.territory){state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0})}}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
 function xpNeed(){return 100+(state.level-1)*65}
 function activeTier(){let t=0;tiers.forEach((x,i)=>{if(state.level>=x.level)t=i});return t}
@@ -895,6 +949,13 @@ function skipTutorial(){state.tutorialDone=true;tutorial.classList.remove("show"
 
 function renderEnergy(id){const el=document.getElementById(id);if(!el)return;if(state.en<=0)el.innerHTML=`<div class="notice"><h3>ENERGY DEPLETED</h3><p>Contact your associates, wait for recovery, or acquire more energy.</p><div class="actions"><button class="btn" onclick="go('crew')">CONTACT ASSOCIATES</button><button class="btn secondary" onclick="energyModal.classList.add('show')">ACQUIRE ENERGY</button></div></div>`;else if(state.en<=Math.max(3,state.maxEn*.2))el.innerHTML=`<div class="notice"><h3>Energy is running low.</h3><p>Call in favors now or wait for recovery.</p><button class="btn small" onclick="go('crew')">REQUEST ASSISTANCE</button></div>`;else el.innerHTML=""}
 function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";
+ const displayName=state.playerName||"Unknown";
+ const heroName=document.getElementById("playerNameHero");
+ if(heroName)heroName.textContent=state.playerName?`${displayName}'s Criminal Empire`:"Build Your Criminal Empire.";
+ const profileName=document.getElementById("playerProfileName");
+ if(profileName)profileName.textContent=displayName;
+ const pAvatar=document.getElementById("playerAvatar");
+ if(pAvatar){pAvatar.src=playerAvatarUrl();pAvatar.alt=displayName}
  lvl.textContent=`LVL ${state.level}`;hpT.textContent=`${Math.floor(state.hp)}/${state.maxHp}`;enT.textContent=`${Math.floor(state.en)}/${state.maxEn}`;stT.textContent=`${Math.floor(state.st)}/${state.maxSt}`;cashT.textContent=money(state.cash);crewT.textContent=crewSize();heatT.textContent=`${Math.floor(state.heat)} ${heatLabel()}`;
  hpB.style.width=(state.hp/state.maxHp*100)+"%";enB.style.width=(state.en/state.maxEn*100)+"%";stB.style.width=(state.st/state.maxSt*100)+"%";heatB.style.width=state.heat+"%";energyStat.classList.toggle("energy-empty",state.en<=0);
  rankBox.textContent=tiers[activeTier()].name;notorietyBox.textContent=Math.floor(state.notoriety);atkBox.textContent=combatPower("attack");defBox.textContent=combatPower("defense");cityTitle.textContent=cityDef().name+" Operations";citySub.textContent=cityDef().sub;spLabel.textContent=state.skill+" skill points available";
@@ -915,8 +976,8 @@ function renderJobs(){
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
 function renderCrew(){
  crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active`;
- friends.innerHTML=Object.keys(state.friends).map(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><div class="avatar">${d.av}</div><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
- potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><div class="avatar">${p.av}</div><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
+ friends.innerHTML=Object.keys(state.friends).map(id=>{const d=friendDefs.find(x=>x.id===id)||potentialDefs.find(x=>x.id===id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10);return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')">SEND GIFT -$250</button></div></div>`}).join("");
+ potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(p.id,p.name)}" alt="${p.name}"><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
 }
 function renderFight(){
  const fightEl=document.getElementById("fightlist");
@@ -1045,7 +1106,7 @@ function tick(){
 function go(v){const target=document.getElementById("view-"+v);if(!target)return;document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.v===v));window.scrollTo({top:0,behavior:"auto"});S.tap()}
 function exportSave(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(state))));navigator.clipboard?.writeText(d).then(()=>toast("Save copied")).catch(()=>prompt("Copy save:",d))}
 function importSave(){const d=prompt("Paste save code:");if(!d)return;try{state=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(d)))));migrate();save();render();toast("Imported")}catch(e){toast("Invalid save")}}
-function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem(KEY);state=fresh();save();render();setTimeout(startTutorial,250)}}
+function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem(KEY);state=fresh();save();render();setTimeout(promptForPlayerName,250)}}
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style.display="none"},true);
 document.addEventListener("click",e=>{
@@ -1055,7 +1116,7 @@ document.addEventListener("click",e=>{
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
-setInterval(tick,15000);setInterval(processPendingAttacks,1000);tick();setTimeout(startTutorial,350);setTimeout(tryAutoTheme,500);
+setInterval(tick,15000);setInterval(processPendingAttacks,1000);tick();setTimeout(()=>{if(state.playerName)startTutorial();else promptForPlayerName()},350);setTimeout(tryAutoTheme,500);
 
 document.addEventListener("visibilitychange",()=>{
   if(document.hidden && themeOn){externalTheme.pause();}
