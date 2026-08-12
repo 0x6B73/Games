@@ -2926,7 +2926,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.13";
+const BUILD_NUMBER="0.22.14";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -6003,17 +6003,35 @@ function sendGift(id){
  if(!requireResponsiveContact(id,"gift"))return;
  const wait=cooldown(f.lastGift||0,30);
  if(wait>0)return showRequirementPopup(`You already sent ${d.name} a gift. Try again in ${fmt(wait)}.`);
- if(state.cash<250)return toast("Not enough cash for a gift.");
- state.cash-=250;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;
+
+ const gift=rollOutgoingCrewGift();
+ if(!gift){
+   return showRequirementPopup("You do not have any standard supplies or equipment available to send as a gift.");
+ }
+
+ if(gift.kind==="gear"){
+   const owned=Math.max(0,Math.floor(Number(state.gear[gift.itemId])||0));
+   const sent=Math.min(gift.qty,owned);
+   if(sent<=0)return showRequirementPopup("That gift is no longer available in your inventory.");
+   state.gear[gift.itemId]=owned-sent;
+   if(state.gear[gift.itemId]<=0)delete state.gear[gift.itemId];
+   gift.qty=sent;
+ }else{
+   const owned=Math.max(0,Math.floor(Number(state.loot[gift.item])||0));
+   const sent=Math.min(gift.qty,owned);
+   if(sent<=0)return showRequirementPopup("That gift is no longer available in your inventory.");
+   state.loot[gift.item]=owned-sent;
+   if(state.loot[gift.item]<=0)delete state.loot[gift.item];
+   gift.qty=sent;
+ }
+
  f.lastGift=now();
- S.cash();
  changeRelationship(id,{trust:5,respect:2,resentment:-3,rel:4});
  f.gifts=(f.gifts||0)+1;
- f.response="I received the package. Thank you.";
- log(`You sent a gift to ${d.name}.`);
- showActionFlash("GIFT SENT",`${d.name} · $250 · Next gift in 30m`,"cash");
- save();render();
+ f.response=`I received the ${gift.item}${gift.qty>1?` ×${gift.qty}`:""}. Thank you.`;
+ log(`You sent ${gift.item} ×${gift.qty} to ${d.name}.`);
+ showActionFlash("GIFT SENT",`${d.name} · ${gift.item} ×${gift.qty} · Next gift in 30m`,"good");
+ S.ok();save();render();
 }
 function nameOf(id){return getPersonDef(id)?.name||id}
 function addPotential(id,force=false){
@@ -6240,7 +6258,7 @@ function maybeSocialEvent(){
  save();
 }
 function weightedCrewGiftQuantity(){
- // 1 is deliberately most common, with steadily lower odds through 5.
+ // Outgoing gift quantity: 1 is most common, with steadily lower odds through 5.
  const roll=Math.random()*100;
  if(roll<45)return 1;
  if(roll<70)return 2;
@@ -6250,22 +6268,25 @@ function weightedCrewGiftQuantity(){
 }
 function accessibleCrewGiftItems(){
  const supplies=[
-   {kind:"loot",item:"Energy Drink",cap:999},
-   {kind:"loot",item:"Adrenaline Shot",cap:999},
-   {kind:"loot",item:"Energy Pack",cap:99},
-   {kind:"loot",item:"Stamina Pack",cap:99}
- ].filter(x=>Math.max(0,Number(state.loot[x.item])||0)<x.cap);
+   {kind:"loot",item:"Energy Drink"},
+   {kind:"loot",item:"Adrenaline Shot"},
+   {kind:"loot",item:"Energy Pack"},
+   {kind:"loot",item:"Stamina Pack"}
+ ].map(x=>({...x,owned:Math.max(0,Math.floor(Number(state.loot[x.item])||0))}))
+  .filter(x=>x.owned>0);
 
  const availableGear=gearDefs
-   .filter(g=>state.level>=g.level&&(!g.crewReq||crewSize()>=g.crewReq))
-   .map(g=>({kind:"gear",item:g.name,itemId:g.id}));
+   .map(g=>({kind:"gear",item:g.name,itemId:g.id,owned:Math.max(0,Math.floor(Number(state.gear[g.id])||0))}))
+   .filter(x=>x.owned>0);
 
  return [...supplies,...availableGear];
 }
-function rollCrewGiftItem(){
+function rollOutgoingCrewGift(){
  const pool=accessibleCrewGiftItems();
  if(!pool.length)return null;
- return pool[rnd(0,pool.length-1)];
+ const gift={...pool[rnd(0,pool.length-1)]};
+ gift.qty=Math.min(weightedCrewGiftQuantity(),gift.owned);
+ return gift;
 }
 function maybeGift(){
  const t=now();
@@ -6280,13 +6301,14 @@ function maybeGift(){
  });
  if(!ids.length){save();return}
 
+ // Incoming gifts keep their original small reward pool. The randomized
+ // 1-5 item gift system is for gifts the player sends to crew.
  const id=ids[rnd(0,ids.length-1)];
- const gift=rollCrewGiftItem();
- if(!gift){save();return}
- const qty=weightedCrewGiftQuantity();
- const giftText=`Sent you ${gift.item} ×${qty}.`;
- addInbox({type:"gift",from:nameOf(id),personId:id,item:gift.item,itemId:gift.itemId||"",giftKind:gift.kind,qty,text:giftText});
- showSocial("Gift waiting",`${nameOf(id)} sent you ${gift.item} ×${qty}. Open Messages to accept it.`);
+ const item=["Energy Drink","Adrenaline Shot","Burner Phone","Cash Envelope"][rnd(0,3)];
+ const amount=item==="Cash Envelope"?rnd(250,700)+Math.max(1,state.level)*20:0;
+ const giftText=item==="Cash Envelope"?`Sent you a Cash Envelope worth ${money(amount)}.`:`Sent you a ${item}.`;
+ addInbox({type:"gift",from:nameOf(id),personId:id,item,amount,text:giftText});
+ showSocial("Gift waiting",`${nameOf(id)} sent you ${item==="Cash Envelope"?money(amount):`a ${item}`}. Open Messages to accept it.`);
 }
 function showSocial(title,text){
  recordIntel(title,text,"info");
@@ -7134,7 +7156,7 @@ function renderCrew(){
        <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"ASK FOR HELP"}</button>
        <button onclick="recruit('${id}')" ${f.crew||!responsive||r?"disabled":""}>${f.crew?"RECRUITED":inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
        <button onclick="doFavor('${id}')" ${!responsive||fv||state.cash<100?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":fv?fmt(fv):"RETURN FAVOR -$100"}</button>
-       <button onclick="sendGift('${id}')" ${!responsive||(f.lastGift&&cooldown(f.lastGift,30)>0)?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:"SEND GIFT -$250"}</button>
+       <button onclick="sendGift('${id}')" ${!responsive||(f.lastGift&&cooldown(f.lastGift,30)>0)||accessibleCrewGiftItems().length===0?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:accessibleCrewGiftItems().length===0?"NO GIFT ITEMS":"SEND RANDOM GIFT"}</button>
      </div>
    </div>`;
  }).join(""):`<div class="crew-filter-empty">No contacts match this filter${crewSearchText?" or search":""}.</div>`;
