@@ -589,6 +589,86 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
   .stat-help{right:2px;top:1px;width:14px;height:14px;font-size:8px!important;line-height:12px!important}
 }
 
+
+/* CURRENT CAMPAIGN TOP STRIP */
+.campaign-top{
+  margin:4px 4px 0;padding:5px 7px;background:linear-gradient(#17191b,#090a0b);
+  border:1px solid #45484b;border-left:3px solid #c6a33e;cursor:pointer
+}
+.campaign-top-head{display:flex;justify-content:space-between;gap:8px;font-size:8px;font-weight:900;color:#aa9f89}
+#campaignTopPct{font-size:11px;color:#efd36a}
+.campaign-top-objective{font-size:9px;color:#d9d0bf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 4px}
+.campaign-top-track{height:6px;background:#030404;border:1px solid #3e3c35;overflow:hidden}
+.campaign-top-track>div{height:100%;width:0;background:linear-gradient(#e0bd51,#8f6c19);transition:width .25s ease}
+
+/* COLLAPSIBLE MORE */
+.fold-card{margin-top:6px;border:1px solid #393b3d;background:#0a0b0c}
+.fold-card summary{
+  list-style:none;cursor:pointer;padding:7px 8px;font-size:10px;font-weight:900;color:#ddd3c1;
+  display:flex;justify-content:space-between;align-items:center;gap:8px;background:linear-gradient(#17191b,#0c0d0e)
+}
+.fold-card summary::-webkit-details-marker{display:none}
+.fold-card summary:before{content:"▸";color:#d2b44f;margin-right:5px}
+.fold-card[open] summary:before{content:"▾"}
+.fold-card summary span{font-size:8px;color:#77736c;font-weight:400;margin-left:auto}
+.fold-body{padding:6px}
+
+/* PROFILE HINTS */
+.profile-hint-card{position:relative}
+.profile-hint{
+  position:absolute;right:4px;top:4px;width:17px;height:17px;min-height:0!important;padding:0!important;
+  border-radius:50%!important;border:1px solid #555!important;background:#111!important;color:#cfc5b2!important;
+  font-size:9px!important;line-height:15px!important
+}
+
+/* HELP REQUEST CHOICE */
+.help-choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0}
+.help-choice{
+  min-height:88px!important;padding:8px!important;text-align:left!important;border:1px solid #5a5035!important;
+  background:linear-gradient(#191919,#090909)!important;color:#ddd!important
+}
+.help-choice b{display:block;color:#efd36a;font-size:10px;margin-bottom:5px}
+.help-choice span{display:block;font-size:9px;color:#aaa198;line-height:1.4}
+
+/* BACKUP REQUEST CLARITY */
+.backup-need{
+  margin:5px 0;padding:6px;border:1px solid #5f5134;background:#151107;font-size:9px;color:#d5c28c
+}
+.backup-need.ready{border-color:#456038;background:#0d150b;color:#afce96}
+.backup-need.not-ready{border-color:#743e37;background:#190d0b;color:#d5a39b}
+.backup-need b{color:#efd36a}
+
+/* MESSAGE POPUP TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.toggle-row>div{min-width:0}
+.toggle-row b{font-size:10px;color:#ddd3c1}
+
+/* ADRENALINE */
+.inventory-resource.stamina b{color:#e5a3a0}
+.adrenaline-item{border-left:3px solid #a44943!important}
+
+/* MANHUNT */
+body.manhunt:after{
+  content:"";position:fixed;inset:0;z-index:2147483600;pointer-events:none;
+  border:4px solid rgba(210,32,25,.88);box-shadow:inset 0 0 28px rgba(210,20,15,.42);
+  animation:manhuntPulse 1.35s ease-in-out infinite alternate
+}
+body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
+@keyframes manhuntPulse{
+  from{border-color:rgba(190,28,20,.55);box-shadow:inset 0 0 15px rgba(190,20,15,.25)}
+  to{border-color:rgba(255,53,42,.98);box-shadow:inset 0 0 34px rgba(230,25,15,.56)}
+}
+.manhunt-inline{
+  margin-top:4px;padding:4px 6px;border:1px solid #86352d;background:#1a0908;
+  color:#ff8c80;font-size:8px;font-weight:900
+}
+
+@media(max-width:430px){
+  .help-choice-grid{grid-template-columns:1fr}
+  .campaign-top{margin-left:2px;margin-right:2px}
+  .inventory-resources{grid-template-columns:1fr 1fr!important}
+}
+
 </style>
 </head>
 <body>
@@ -610,6 +690,15 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
    <div class="track">EAST HARBOR RADIO // DARK TRAP THEME</div>
  </div>
 </header>
+
+<div id="campaignTop" class="campaign-top" onclick="go('home')" title="Open current campaign">
+  <div class="campaign-top-head">
+    <span id="campaignTopLevel">CAMPAIGN</span>
+    <span id="campaignTopPct">0%</span>
+  </div>
+  <div id="campaignTopObjective" class="campaign-top-objective">Loading current objective...</div>
+  <div class="campaign-top-track"><div id="campaignTopFill"></div></div>
+</div>
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
   <div class="mini-hud-item health">❤️ <b id="miniHp">100</b></div>
@@ -712,21 +801,33 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <button class="btn secondary small" onclick="openEditProfile()">EDIT PROFILE</button>
   </div>
 </div>
-<div class="profile-grid" id="profile"></div>
+<details class="fold-card">
+  <summary>Profile Stats <span>tap to expand</span></summary>
+  <div class="fold-body"><div class="profile-grid" id="profile"></div></div>
+</details>
+<details class="fold-card">
+  <summary>Campaign Progress <span>tap to expand</span></summary>
+  <div class="fold-body"><div id="campaignList" class="campaign-list"></div></div>
+</details>
+<details class="fold-card">
+  <summary>Collections & Rare Loot <span>tap to expand</span></summary>
+  <div class="fold-body"><div id="collections"></div></div>
+</details>
+<details class="fold-card">
+  <summary>Achievements <span>tap to expand</span></summary>
+  <div class="fold-body"><div id="ach"></div></div>
+</details>
+
 <div class="card" style="margin-top:8px">
-  <h3>Campaign Progress</h3>
-  <div id="campaignList" class="campaign-list"></div>
+  <h3>Preferences</h3>
+  <div class="toggle-row">
+    <div>
+      <b>Message Popups</b>
+      <div class="sub">Messages still arrive in the inbox when popups are disabled.</div>
+    </div>
+    <button class="btn small" id="messagePopupToggle" onclick="toggleMessagePopups()">ON</button>
+  </div>
 </div>
-<div class="card" style="margin-top:8px"><h3>Collections & Rare Loot</h3><div id="collections"></div></div>
- <div class="card" style="margin-top:8px"><h3>Achievements</h3><div id="ach"></div></div>
- 
- 
- <div class="card" style="margin-top:8px">
-   <h3>Audio System</h3>
-   <p id="audioStatusText">Audio engine ready.</p>
-   <div id="audioStatusList" class="sub"></div>
-   <button class="btn secondary" onclick="testAudioPack()">TEST AUDIO PACK</button>
- </div>
 
 <div class="card" style="margin-top:8px">
    <h3>Audio Credits</h3>
@@ -771,6 +872,23 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
     <button class="btn" id="energyReserveDrinkBtn" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK</button>
     <button class="btn secondary" onclick="closeModal('energyReserveModal')">CLOSE</button>
   </div>
+</div></div>
+
+
+<div class="modal" id="helpRequestModal"><div class="mbox">
+  <h2>Request Help</h2>
+  <div id="helpRequestContact" class="sub">Choose what you need.</div>
+  <div class="help-choice-grid">
+    <button class="help-choice" onclick="requestHelpItem('energy')">
+      <b>🥤 ENERGY DRINK</b>
+      <span>Save it for later. Restores a random 3–7 Energy when used.</span>
+    </button>
+    <button class="help-choice" onclick="requestHelpItem('stamina')">
+      <b>💉 ADRENALINE SHOT</b>
+      <span>Save it for later. Restores a random 1–3 Stamina when used.</span>
+    </button>
+  </div>
+  <button class="btn secondary" onclick="closeModal('helpRequestModal')">CANCEL</button>
 </div></div>
 
 <div class="modal" id="energyModal"><div class="mbox">
@@ -869,7 +987,7 @@ button{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.10.0";
+const BUILD_NUMBER="0.11.0";
 const KEY="underworld_empire_full_v4", now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const money=n=>"$"+Math.max(0,Math.floor(n)).toLocaleString();
 
@@ -1397,6 +1515,35 @@ function claimCampaign(){
  save();
  render();
 }
+
+function renderCampaignTopBar(){
+ const levelEl=document.getElementById("campaignTopLevel");
+ const pctEl=document.getElementById("campaignTopPct");
+ const objEl=document.getElementById("campaignTopObjective");
+ const fill=document.getElementById("campaignTopFill");
+ if(!levelEl||!pctEl||!objEl||!fill)return;
+
+ const idx=Math.min(state.campaignIndex||0,campaignDefs.length-1);
+ const c=campaignDefs[idx];
+ const current=c.objectives.find(o=>!campaignObjectiveDone(o));
+ let pct=100,label="All objectives complete — claim the campaign reward.";
+
+ if(current){
+   const val=campaignObjectiveValue(current);
+   pct=Math.min(100,Math.floor(val/current.target*100));
+   label=`${current.label} · ${Math.min(val,current.target).toLocaleString()} / ${current.target.toLocaleString()}`;
+ }
+
+ levelEl.textContent=`CAMPAIGN ${idx+1}/${campaignDefs.length} · ${c.title}`;
+ pctEl.textContent=`${pct}%`;
+ objEl.textContent=label;
+ fill.style.width=`${pct}%`;
+
+ if(state.heat>=90){
+   objEl.innerHTML=`<span style="color:#ff8074">MANHUNT:</span> ${objEl.textContent} · Win fights to reduce Heat.`;
+ }
+}
+
 function renderCampaign(){
  const box=document.getElementById("campaignBox");
  const list=document.getElementById("campaignList");
@@ -1638,7 +1785,7 @@ function fresh(){
  const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0});
  const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[]});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
- return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ return {playerName:"",playerPhoto:"",customFriends:{},campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,lifetimeEnergyPurchases:0,whale:false,messagePopups:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,notoriety:0,gear:{},props:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -1839,14 +1986,44 @@ function addXp(n){
 function crewRoleBonus(role){return roleCount(role)>0?8:0}
 function gearPower(kind){const slots=availableCrew().length+1,list=[];gearDefs.forEach(g=>{if(g.type===kind||(kind==="attack"&&g.type==="vehicle"))for(let i=0;i<gearQty(g.id);i++)list.push(g.power)});list.sort((a,b)=>b-a);return list.slice(0,slots).reduce((a,b)=>a+b,0)}
 function combatPower(kind){return (kind==="attack"?state.attack:state.defense)+gearPower(kind)+(availableCrew().length+1)*2+Math.floor(state.notoriety/20)}
-function heatLabel(){return state.heat<20?"Low":state.heat<45?"Watched":state.heat<70?"High":"Critical"}
+function heatLabel(){return state.heat>=90?"MANHUNT":state.heat>=70?"Critical":state.heat>=45?"High":state.heat>=20?"Watched":"Low"}
+
+function checkSkillReminder(){
+ if((state.skill||0)<=10)return;
+ const t=now();
+ if(t-(state.lastSkillReminder||0)<600000)return;
+ state.lastSkillReminder=t;
+ save();
+ showActionFlash("UNSPENT SKILL POINTS",`You have ${state.skill} Skill Points. Open Home → Character to raise your stats.`,"good");
+}
+
 function spendSkill(k){if(state.skill<1)return toast("No skill points.");state.skill--;if(k==="attack")state.attack++;if(k==="defense")state.defense++;if(k==="energy"){state.maxEn+=2;state.en+=2}if(k==="health"){state.maxHp+=5;state.hp+=5}if(k==="stamina"){state.maxSt++;state.st++}S.tap();save();render()}
 
+
+
+const PROFILE_HELP={
+ rank:{title:"Rank",text:"Rank follows your level and determines which job tiers and bosses are available."},
+ notoriety:{title:"Notoriety",text:"Notoriety is your underworld reputation. It unlocks territory, improves Job success, and contributes to Attack and Defense Power."},
+ crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
+ activeCrew:{title:"Active Crew",text:"Crew members currently able to work. Injured or arrested associates temporarily stop contributing to combat power."},
+ record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and now reduces Heat."},
+ heat:{title:"Heat",text:"Heat measures police and rival pressure. Jobs raise it and Heat lowers Job success. At 60+ you can trigger cleanup costs or arrests. At 90+ you enter MANHUNT: crackdowns become harsher and rival attacks become more frequent. Heat falls naturally, and winning offensive fights lowers it faster."},
+ income:{title:"Net Income",text:"Hourly property and territory income after property and equipment upkeep."},
+ gold:{title:"Gold Bars",text:"Rare currency used for permanent Gold Vault unlocks. Earn them through trusted contacts or exchange $100,000 Cash for one."},
+ territory:{title:"Territory",text:"The number of districts under your control. Territory provides income and represents long-term organizational power."}
+};
+function showProfileHelp(key,e){
+ if(e?.stopPropagation)e.stopPropagation();
+ const h=PROFILE_HELP[key];if(!h)return;
+ document.getElementById("statHelpTitle").textContent=h.title;
+ document.getElementById("statHelpText").textContent=h.text;
+ document.getElementById("statHelpModal").classList.add("show");
+}
 
 const STAT_HELP={
  health:{title:"Health",text:"Health is the damage your character can take. Fights and failed operations can reduce it. You need at least 10 Health to initiate a fight. Health regenerates by 1 every 1 minute 30 seconds."},
  energy:{title:"Energy",text:"Energy powers Jobs. It regenerates by 1 every minute. Energy Drinks can be saved up to 999 and restore a random 3–7 Energy when consumed. Tap the Energy stat itself to view your drink reserve."},
- stamina:{title:"Stamina",text:"Stamina powers fights, incoming-attack defenses, and territory actions. Most fights cost 1 Stamina and territory moves cost 2. Stamina regenerates by 1 every 3 minutes."},
+ stamina:{title:"Stamina",text:"Stamina powers fights, incoming-attack defenses, and territory actions. Most fights cost 1 Stamina and territory moves cost 2. Stamina regenerates by 1 every 3 minutes. Adrenaline Shots restore a random 1–3 Stamina and can be stored up to 999."},
  cash:{title:"Cash",text:"Cash buys equipment and properties, pays favors and operating costs, and covers losses. You can also exchange $100,000 Cash for 1 Gold Bar in the Gear tab."},
  gold:{title:"Gold Bars",text:"Gold Bars are rare currency for permanent special unlocks. A contact at 95+ Reputation can search for one once per hour with hidden odds, or you can exchange $100,000 Cash for 1 Gold Bar."},
  crew:{title:"Crew",text:"Crew size unlocks Jobs and increases combat power. Each available recruited crew member contributes to your organization. Injured or arrested members temporarily stop contributing to active combat power."},
@@ -1988,15 +2165,21 @@ function genOpponent(i,hit=false){
 function fight(i,hit=false,revengeId=null){
  if(state.st<1)return toast("Not enough stamina.");
  if(state.hp<10)return toast("Health too low.");
+
  state.st--;state.lifetimeFights++;runScene([[0,fxReload],[260,fxGun]]);
  const o=revengeId?state.revenge.find(x=>x.id===revengeId):genOpponent(i,hit);if(!o)return;
+
  const attackPower=combatPower("attack"),p=attackPower+rnd(1,20),e=o.power+rnd(1,20);
  if(p>=e){
    const c=rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0);
+   const heatDrop=Math.min(state.heat,hit?rnd(6,9):revengeId?rnd(4,7):rnd(3,6));
    state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;
-   state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));addXp(10+o.level*2);
-   log(`Defeated ${o.name}. Attack Power ${attackPower} carried the offensive fight. Took ${money(c)}.`);
-   showActionFlash("FIGHT WON",`${o.name} · Attack Power ${attackPower} · +${money(c)}`,"good");
+   state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));
+   state.heat=Math.max(0,state.heat-heatDrop);
+   addXp(10+o.level*2);
+
+   log(`Defeated ${o.name}. Took ${money(c)}${heatDrop?` and shifted ${heatDrop} Heat onto rival crews`:""}.`);
+   showActionFlash("FIGHT WON",`${o.name} · +${money(c)}${heatDrop?` · -${heatDrop} Heat`:""}`,"good");
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
  }else{
    const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,180)+o.level*20);
@@ -2077,25 +2260,42 @@ function doFavor(id){
  showActionFlash("FAVOR COMPLETED",`${d.name} · Relationship improved`,"good");
  save();render();
 }
-function askEnergy(id){
- const f=fstate(id),d=getPersonDef(id);
- if(cooldown(f.lastAsk,8)>0)return;
- f.lastAsk=now();
+let activeHelpContactId=null;
 
+function openHelpRequest(id){
+ const f=fstate(id),d=getPersonDef(id);
+ if(!f||!d)return;
+ const wait=cooldown(f.lastAsk,8);
+ if(wait>0)return showRequirementPopup(`${d.name} can help again in ${fmt(wait)}.`);
+ activeHelpContactId=id;
+ const label=document.getElementById("helpRequestContact");
+ if(label)label.textContent=`Ask ${d.name} for one consumable. This uses their help request cooldown.`;
+ document.getElementById("helpRequestModal").classList.add("show");
+}
+
+function requestHelpItem(kind){
+ const id=activeHelpContactId;
+ const f=fstate(id),d=getPersonDef(id);
+ if(!f||!d)return closeModal("helpRequestModal");
+ if(cooldown(f.lastAsk,8)>0){closeModal("helpRequestModal");return showRequirementPopup(`${d.name} is not ready to help again yet.`)}
+
+ const item=kind==="stamina"?"Adrenaline Shot":"Energy Drink";
+ f.lastAsk=now();
  const chance=Math.max(.08,Math.min(.96,(d.help||.5)+(f.trust-50)/160-(f.resentment/180)));
  changeRelationship(id,{trust:-2,resentment:3,rel:-2});
+ closeModal("helpRequestModal");
 
  if(Math.random()<chance){
-   const current=Math.max(0,Number(state.loot["Energy Drink"])||0);
+   const current=Math.max(0,Number(state.loot[item])||0);
    if(current>=999){
-     f.response="I tried to send you an Energy Drink, but your stash is full.";
-     log(`${d.name} tried to send an Energy Drink, but you already have 999.`);
-     showActionFlash("ENERGY DRINK STASH FULL","Maximum stack: 999","bad");
+     f.response=`I tried to send you a ${item}, but your stash is full.`;
+     log(`${d.name} tried to send a ${item}, but you already have 999.`);
+     showActionFlash(`${item.toUpperCase()} STASH FULL`,"Maximum stack: 999","bad");
    }else{
-     state.loot["Energy Drink"]=Math.min(999,current+1);
-     f.response="Sent you an Energy Drink. Save it or drink it when you need energy.";
-     log(`${d.name} sent you an Energy Drink.`);
-     showActionFlash("ENERGY DRINK RECEIVED",`${d.name} sent you 1 · Stash: ${state.loot["Energy Drink"]}/999`,"good");
+     state.loot[item]=Math.min(999,current+1);
+     f.response=`Sent you a ${item}. Save it until you need it.`;
+     log(`${d.name} sent you a ${item}.`);
+     showActionFlash(`${item.toUpperCase()} RECEIVED`,`${d.name} sent you 1 · Stash: ${state.loot[item]}/999`,"good");
      S.ok();
    }
  }else{
@@ -2105,6 +2305,25 @@ function askEnergy(id){
  }
  save();render();
 }
+
+function askEnergy(id){openHelpRequest(id)}
+
+function useAdrenalineShot(){
+ const qty=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
+ if(qty<=0)return toast("You do not have any Adrenaline Shots.");
+ if(state.st>=state.maxSt)return toast("Your stamina is already full.");
+
+ const rolled=rnd(1,3);
+ const actual=Math.min(rolled,state.maxSt-state.st);
+ state.loot["Adrenaline Shot"]=qty-1;
+ if(state.loot["Adrenaline Shot"]<=0)delete state.loot["Adrenaline Shot"];
+ state.st=Math.min(state.maxSt,state.st+rolled);
+
+ log(`Used an Adrenaline Shot. Restored ${actual} stamina.`);
+ showActionFlash("ADRENALINE SHOT USED",`+${actual} Stamina · ${Math.max(0,qty-1)} remaining`,"good");
+ S.ok();save();render();
+}
+
 function recruit(id){
  const f=fstate(id),d=getPersonDef(id);if(f.crew)return;if(cooldown(f.lastRecruit,12)>0)return;f.lastRecruit=now();
  const chance=Math.max(.05,Math.min(.97,(d.join||.5)+(f.trust-50)/120+(f.respect-50)/180-(f.resentment/150)));
@@ -2174,52 +2393,90 @@ function toggleInbox(){inboxPanel.classList.toggle("show");if(inboxPanel.classLi
 function dismissInbox(id){state.inbox=state.inbox.filter(x=>x.id!==id);save();renderInbox()}
 function answerInbox(id,choice){
  const x=state.inbox.find(y=>y.id===id);if(!x)return;
+
  if(x.type==="favor"){
-   if(choice==="help"){const cost=x.amount||150;if(state.cash<cost)return toast("Not enough cash.");state.cash-=cost;changeRelationship(x.personId,{trust:8,respect:4,resentment:-4,rel:6});socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);S.ok()}
-   else{changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);S.bad()}
+   if(choice==="help"){
+     const cost=x.amount||150;
+     if(state.cash<cost)return showRequirementPopup(`You need ${money(cost)} Cash to help ${x.from}.`);
+     state.cash-=cost;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
+     changeRelationship(x.personId,{trust:8,respect:4,resentment:-4,rel:6});
+     socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);S.ok();
+   }else{
+     changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);S.bad();
+   }
  }
+
  if(x.type==="backup"){
-   if(choice==="help"){if(state.st<1)return toast("Not enough stamina.");state.st--;changeRelationship(x.personId,{trust:7,respect:5,rel:5});state.notoriety+=2;socialConflict(x.personId);log(`You backed ${x.from} on a job.`);S.ok()}
-   else{changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`)}
+   if(choice==="help"){
+     if(state.st<1)return showRequirementPopup(`Backing ${x.from} requires 1 Stamina. You currently have ${Math.floor(state.st)}.`);
+     state.st--;
+     changeRelationship(x.personId,{trust:7,respect:5,rel:5});
+     state.notoriety+=2;socialConflict(x.personId);
+     log(`You backed ${x.from} on a job.`);
+     showActionFlash("BACKUP PROVIDED",`${x.from} · -1 Stamina · Trust and Respect improved`,"good");
+     S.ok();
+   }else{
+     changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`);
+   }
  }
- if(x.type==="gift"){
-   if(choice==="accept"){
-   if(x.item==="Energy Pack"||x.item==="Energy Drink"){
-     const current=Math.max(0,Number(state.loot["Energy Drink"])||0);
+
+ if(x.type==="gift"&&choice==="accept"){
+   const item=x.item==="Energy Pack"?"Energy Drink":x.item;
+   if(item==="Energy Drink"||item==="Adrenaline Shot"){
+     const current=Math.max(0,Number(state.loot[item])||0);
      if(current<999){
-       state.loot["Energy Drink"]=Math.min(999,current+1);
-       log(`${x.from} sent you an Energy Drink.`);
-       showActionFlash("ENERGY DRINK RECEIVED",`${x.from} · Stash: ${state.loot["Energy Drink"]}/999`,"good");
+       state.loot[item]=Math.min(999,current+1);
+       log(`${x.from} sent you a ${item}.`);
+       showActionFlash(`${item.toUpperCase()} RECEIVED`,`${x.from} · Stash: ${state.loot[item]}/999`,"good");
      }else{
-       log(`${x.from}'s Energy Drink could not be stored because your stash is full.`);
-       showActionFlash("ENERGY DRINK STASH FULL","Maximum stack: 999","bad");
+       log(`${x.from}'s ${item} could not be stored because your stash is full.`);
+       showActionFlash(`${item.toUpperCase()} STASH FULL`,"Maximum stack: 999","bad");
      }
    }else{
-     state.loot[x.item]=(state.loot[x.item]||0)+1;
-     log(`${x.from} sent you ${x.item}.`);
+     state.loot[item]=(state.loot[item]||0)+1;
+     log(`${x.from} sent you ${item}.`);
    }
-   S.ok()
+   S.ok();
  }
- }
- dismissInbox(id);render()
+
+ dismissInbox(id);render();
 }
 function acceptRequest(id){const x=state.inbox.find(y=>y.id===id);if(x?.personId)addPotential(x.personId);dismissInbox(id);render()}
 function maybeSocialEvent(){
- if(now()-state.lastSocial<75000)return;state.lastSocial=now();const ids=Object.keys(state.friends),roll=Math.random();
- if(roll<.55&&ids.length){
+ if(now()-state.lastSocial<180000)return;
+ state.lastSocial=now();
+
+ // Not every eligible window creates a request.
+ if(Math.random()>.72){save();return}
+
+ const ids=Object.keys(state.friends),roll=Math.random();
+ if(roll<.60&&ids.length){
    const id=ids[rnd(0,ids.length-1)],d=nameOf(id);
-   if(Math.random()<.55)addInbox({type:"favor",from:d,personId:id,amount:rnd(100,320),text:"I need money for something that cannot wait. Can you cover it?"});
-   else addInbox({type:"backup",from:d,personId:id,text:"I need backup on a situation. I would remember the favor."});
-   showSocial(`${d} needs something`,`Open your messages to respond.`);
+   if(Math.random()<.50){
+     const amount=rnd(100,320);
+     addInbox({type:"favor",from:d,personId:id,amount,text:`I need ${money(amount)} for something that cannot wait. Can you cover it?`});
+   }else{
+     addInbox({type:"backup",from:d,personId:id,text:"I need backup on a situation. Backing me costs 1 Stamina, but I will remember who showed up."});
+   }
+   showSocial(`${d} needs something`,"Open your messages to review the request and its requirements.");
  }else{
-   const av=potentialDefs.filter(p=>!state.potentials[p.id].added);if(av.length){const p=av[rnd(0,av.length-1)];addInbox({type:"request",from:p.name,personId:p.id,text:"Sent you a contact request through mutual associates."});showSocial("New contact request",`${p.name} wants to connect.`)}
+   const av=potentialDefs.filter(p=>!state.potentials[p.id].added);
+   if(av.length){
+     const p=av[rnd(0,av.length-1)];
+     addInbox({type:"request",from:p.name,personId:p.id,text:"Sent you a contact request through mutual associates."});
+     showSocial("New contact request",`${p.name} wants to connect.`);
+   }
  }
- save()
+ save();
 }
 function maybeGift(){
- if(Math.random()>.15)return;const ids=Object.keys(state.friends).filter(id=>state.friends[id].trust>65);if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],item=["Energy Drink","Burner Phone","Cash Envelope"][rnd(0,2)];addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`})
+ if(Math.random()>.15)return;const ids=Object.keys(state.friends).filter(id=>state.friends[id].trust>65);if(!ids.length)return;const id=ids[rnd(0,ids.length-1)],item=["Energy Drink","Adrenaline Shot","Burner Phone","Cash Envelope"][rnd(0,3)];addInbox({type:"gift",from:nameOf(id),personId:id,item,text:`Sent you a ${item}.`})
 }
-function showSocial(title,text){socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;socialPop.classList.add("show")}
+function showSocial(title,text){
+ if(state.messagePopups===false)return;
+ socialPopBody.innerHTML=`<h3>${title}</h3><p>${text}</p><button class="btn" onclick="socialPop.classList.remove('show');toggleInbox()">OPEN MESSAGES</button><button class="btn secondary" style="margin-top:5px" onclick="socialPop.classList.remove('show')">DISMISS</button>`;
+ socialPop.classList.add("show");
+}
 
 function expireInboxMessages(t=now()){
  state.inbox=state.inbox.filter(x=>{
@@ -2231,6 +2488,7 @@ function expireInboxMessages(t=now()){
 function renderInbox(){
  if(!Array.isArray(state.inbox))state.inbox=[];
  expireInboxMessages(now());
+
  if(state.inbox.length===0){
    const panel=document.getElementById("inboxPanel");
    if(panel)panel.classList.remove("show");
@@ -2238,6 +2496,7 @@ function renderInbox(){
 
  inboxCount.textContent=unread();
  inboxCount.style.display=unread()?"flex":"none";
+
  inboxItems.innerHTML=state.inbox.length?state.inbox.map(x=>{
    let attackHtml="";
    if(x.type==="attack"){
@@ -2245,22 +2504,30 @@ function renderInbox(){
      if(a){
        const left=Math.max(0,a.expires-now());
        const rs=defenseRequirementStatus(a);
-       attackHtml=`<div class="attack-timer ${left<10000?"attack-danger":""}">RESPOND IN ${fmt(left)}</div>
+       attackHtml=`<div class="attack-timer ${left<60000?"attack-danger":""}">RESPOND IN ${fmt(left)}</div>
        ${a.requirement?`<div class="attack-req ${rs.met?"met":"fail"}"><strong>SPECIAL DEFENSE REQUIREMENT</strong><br>${a.requirement.label}<br>Status: ${rs.met?"READY":"NOT READY"} — ${rs.text}<br><span class="sub">If this requirement is not met when you defend, the defense automatically fails.</span></div>`:`<div class="attack-req met"><strong>DEFENSE READY</strong><br>No special requirement. You need 1 Stamina to respond.</div>`}
        <button class="btn red small" onclick="defendAttack('${a.id}')">DEFEND NOW</button>`;
-     }else{
-       attackHtml=`<div class="sub">Attack resolved.</div>`;
-     }
+     }else attackHtml=`<div class="sub">Attack resolved.</div>`;
    }
+
    const messageLeft=Math.max(0,(x.expiresAt||now()+300000)-now());
    const messageTimer=x.type==="attack"?"":`<div class="message-timer ${messageLeft<60000?"message-danger":""}">EXPIRES IN ${fmt(messageLeft)}</div>`;
-   return `<div class="inbox-item ${x.type==="attack"?"attack-alert":""}"><b>${x.from}</b><p>${x.text}</p>${messageTimer}<div class="inbox-actions">
-   ${x.type==="favor"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">HELP</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">REFUSE</button>`:""}
-   ${x.type==="backup"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">BACK THEM</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">IGNORE</button>`:""}
-   ${x.type==="request"?`<button class="btn small" onclick="acceptRequest('${x.id}')">ACCEPT</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
-   ${x.type==="gift"?`<button class="btn small" onclick="answerInbox('${x.id}','accept')">ACCEPT GIFT</button>`:""}
-   ${attackHtml}</div></div>`;
- }).join(""):"<div class='inbox-item'><p>No new messages.</p></div>"
+
+   const backupHtml=x.type==="backup"
+     ?`<div class="backup-need ${state.st>=1?"ready":"not-ready"}"><b>BACKUP REQUIREMENT: 1 STAMINA</b><br>You have ${Math.floor(state.st)}/${state.maxSt} Stamina · ${state.st>=1?"READY":"NOT READY"}<br><span class="sub">Helping improves Trust and Respect and gives +2 Notoriety.</span></div>`
+     :"";
+
+   return `<div class="inbox-item ${x.type==="attack"?"attack-alert":""}">
+     <b>${x.from}</b><p>${x.text}</p>${messageTimer}${backupHtml}
+     <div class="inbox-actions">
+       ${x.type==="favor"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">HELP</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">REFUSE</button>`:""}
+       ${x.type==="backup"?`<button class="btn small" onclick="answerInbox('${x.id}','help')" ${state.st<1?"disabled":""}>BACK THEM · 1 STAMINA</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">IGNORE</button>`:""}
+       ${x.type==="request"?`<button class="btn small" onclick="acceptRequest('${x.id}')">ACCEPT</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
+       ${x.type==="gift"?`<button class="btn small" onclick="answerInbox('${x.id}','accept')">ACCEPT GIFT</button>`:""}
+       ${attackHtml}
+     </div>
+   </div>`;
+ }).join(""):"<div class='inbox-item'><p>No new messages.</p></div>";
 
  if(state.inbox.length===0){
    const panel=document.getElementById("inboxPanel");
@@ -2299,33 +2566,27 @@ function defenseRequirementStatus(a){
 }
 
 function maybeIncomingAttack(){
- if(now()-state.lastAttack<120000||Math.random()>.32)return;
+ const manhunt=state.heat>=90;
+ const minGap=manhunt?60000:120000;
+ const chance=manhunt?.52:.32;
+ if(now()-state.lastAttack<minGap||Math.random()>chance)return;
+
  state.lastAttack=now();
  const o=genOpponent(rnd(1,4));
  const attack={
-   id:"a"+now(),
-   name:o.name,
-   level:o.level,
-   crew:o.crew,
-   power:o.power,
-   cash:o.cash,
-   created:now(),
-   expires:now()+300000,
-   resolved:false,
-   requirement:randomDefenseRequirement()
+   id:"a"+now(),name:o.name,level:o.level,crew:o.crew,power:o.power,cash:o.cash,
+   created:now(),expires:now()+300000,resolved:false,requirement:randomDefenseRequirement()
  };
  state.pendingAttacks.unshift(attack);
  state.pendingAttacks=state.pendingAttacks.slice(0,6);
+
  addInbox({
-   type:"attack",
-   from:"SECURITY ALERT",
-   attackId:attack.id,
-   expiresAt:attack.expires,
-   text:`${o.name} is moving against your operation. You have 5 minutes to respond.${attack.requirement?" Special requirement: "+attack.requirement.label+".":""}`
+   type:"attack",from:"SECURITY ALERT",attackId:attack.id,expiresAt:attack.expires,
+   text:`${o.name} is moving against your operation. You have 5 minutes to respond.${attack.requirement?" Special requirement: "+attack.requirement.label+".":""}${manhunt?" MANHUNT pressure is drawing more rivals toward you.":""}`
  });
  S.siren();
  showSocial("Your operation is under attack",`${o.name} is moving now. Respond before the window closes.`);
- save();render()
+ save();render();
 }
 
 function defendAttack(id){
@@ -2404,7 +2665,35 @@ function processPendingAttacks(){
 }
 
 function maybeHeatEvent(){
- if(state.heat<60||Math.random()>.25)return;if(state.cash>=250){state.cash-=250;state.heat=Math.max(0,state.heat-12);log("You paid $250 in legal and cleanup costs to reduce pressure.")}else arrestRandomCrew()
+ if(state.heat<60)return;
+ const manhunt=state.heat>=90;
+ const chance=manhunt?.48:.25;
+ if(Math.random()>chance)return;
+
+ if(manhunt){
+   if(Math.random()<.55){
+     const seizure=Math.min(state.cash,600+state.level*75+rnd(100,700));
+     state.cash=Math.max(0,state.cash-seizure);
+     state.heat=Math.max(0,state.heat-rnd(4,8));
+     log(`MANHUNT crackdown: authorities seized ${money(seizure)} while pressure shifted.`);
+     showActionFlash("MANHUNT CRACKDOWN",`${money(seizure)} seized · Heat remains dangerous`,"bad");
+     S.siren();
+   }else{
+     arrestRandomCrew();
+     if(Math.random()<.22)arrestRandomCrew();
+     state.heat=Math.max(0,state.heat-rnd(3,6));
+     showActionFlash("MANHUNT RAID","Crew members were targeted by a major crackdown.","bad");
+     S.siren();
+   }
+   return;
+ }
+
+ if(state.cash>=250){
+   state.cash-=250;
+   state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+250;
+   state.heat=Math.max(0,state.heat-12);
+   log("You paid $250 in legal and cleanup costs to reduce pressure.");
+ }else arrestRandomCrew();
 }
 function layLow(){if(state.cash<300)return toast("You need $300 to disappear for a while.");state.cash-=300;state.lifetimeCashSpent+=300;S.cash();state.heat=Math.max(0,state.heat-25);state.en=Math.min(state.maxEn,state.en+3);log("You laid low and reduced heat.");save();render()}
 function claimDaily(){
@@ -2458,7 +2747,7 @@ function renderEnergyDrinkQuick(){
  el.innerHTML=`<div class="row"><div><div class="title">🥤 Energy Drinks <span class="badge gold">x${qty}</span></div><div class="sub">Restore 3–7 Energy per drink · Stack limit 999</div></div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div>`;
 }
 
-function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;
+function render(){const sx=document.getElementById("sfxState");if(sx)sx.textContent=state.sound?"ON":"OFF";document.body.classList.toggle("manhunt",state.heat>=90);const bn=document.getElementById("buildNumber");if(bn)bn.textContent=`BUILD ${BUILD_NUMBER}`;
  const displayName=state.playerName||"Unknown";
  const heroName=document.getElementById("playerNameHero");
  if(heroName)heroName.textContent=state.playerName?`${displayName}'s Criminal Empire`:"Build Your Criminal Empire.";
@@ -2477,7 +2766,7 @@ function render(){const sx=document.getElementById("sfxState");if(sx)sx.textCont
  const sk=[["attack","Attack",state.attack],["defense","Defense",state.defense],["energy","Energy",state.maxEn],["health","Health",state.maxHp],["stamina","Stamina",state.maxSt]];
  skills.innerHTML=sk.map(x=>`<div class="skill">${x[1]}<strong>${x[2]}</strong><button class="btn small" onclick="spendSkill('${x[0]}')" ${state.skill<1?"disabled":""}>+ ADD</button></div>`).join("");
  document.getElementById("log").innerHTML=state.log.slice(0,20).map(x=>`<div class="sub" style="padding:6px 0;border-bottom:1px solid #28221b">${x}</div>`).join("");
- renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();
+ renderDaily();renderEvent();renderCampaign();renderEnergy("energyHome");renderEnergy("energyJobs");renderEnergyDrinkQuick();renderGoldVault();renderInventory();renderEnergyReserve();renderCampaignTopBar();renderPreferences();
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
@@ -2526,7 +2815,7 @@ function renderJobs(){
 function crewStatus(f){if(f.arrestedUntil>now())return `ARRESTED ${fmt(f.arrestedUntil-now())}`;if(f.injuredUntil>now())return `INJURED ${fmt(f.injuredUntil-now())}`;return f.crew?"ACTIVE CREW":"CONTACT"}
 function renderCrew(){
  crewSummary.textContent=`${crewSize()} total · ${availableCrew().length+1} active`;
- friends.innerHTML=Object.keys(state.friends).map(id=>{const d=getPersonDef(id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10),rep=contactReputation(f),gb=goldBarPersonCooldown(f);return `<div class="friend"><img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">REP<b>${rep}</b></div><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div><div class="gold-contact">${rep>=95?(gb>0?`Gold Bar available again in ${fmt(gb)}`:"Eligible to provide a Gold Bar"):`Gold Bars require 95 Reputation`}</div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="askEnergy('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')" ${(f.lastGift&&cooldown(f.lastGift,30)>0)?"disabled":""}>${(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:"SEND GIFT -$250"}</button><button onclick="claimGoldBar('${id}')" ${rep<95||gb>0?"disabled":""}>${rep<95?"GOLD: REP 95":gb>0?`GOLD ${fmt(gb)}`:"ASK FOR GOLD BAR"}</button></div></div>`}).join("");
+ friends.innerHTML=Object.keys(state.friends).map(id=>{const d=getPersonDef(id),f=state.friends[id],a=cooldown(f.lastAsk,8),r=cooldown(f.lastRecruit,12),fv=cooldown(f.lastFavor,10),rep=contactReputation(f),gb=goldBarPersonCooldown(f);return `<div class="friend"><img class="profile-avatar" src="${personAvatarUrl(id,d.name)}" alt="${d.name}"><div><div class="fname">${d.name} ${f.crew?"★":""}</div><div class="ftag">${d.tag||"Trusted contact"}</div><div class="fmeta">${d.role} · ${crewStatus(f)}</div><div class="relationship-grid"><div class="relstat">REP<b>${rep}</b></div><div class="relstat">TRUST<b>${f.trust}</b></div><div class="relstat">RESPECT<b>${f.respect}</b></div><div class="relstat">FEAR<b>${f.fear}</b></div><div class="relstat">RESENT<b>${f.resentment}</b></div></div><div class="gold-contact">${rep>=95?(gb>0?`Gold Bar available again in ${fmt(gb)}`:"Eligible to provide a Gold Bar"):`Gold Bars require 95 Reputation`}</div>${f.response?`<div class="fresponse"><b>${d.name}:</b> ${f.response}</div>`:""}</div><div class="fbtns"><button onclick="openHelpRequest('${id}')" ${a?"disabled":""}>${a?fmt(a):"REQUEST HELP"}</button><button onclick="recruit('${id}')" ${f.crew||r?"disabled":""}>${f.crew?"RECRUITED":r?fmt(r):"RECRUIT"}</button><button onclick="doFavor('${id}')" ${fv||state.cash<100?"disabled":""}>${fv?fmt(fv):"RETURN FAVOR -$100"}</button><button onclick="sendGift('${id}')" ${(f.lastGift&&cooldown(f.lastGift,30)>0)?"disabled":""}>${(f.lastGift&&cooldown(f.lastGift,30)>0)?`GIFT ${fmt(cooldown(f.lastGift,30))}`:"SEND GIFT -$250"}</button><button onclick="claimGoldBar('${id}')" ${rep<95||gb>0?"disabled":""}>${rep<95?"GOLD: REP 95":gb>0?`GOLD ${fmt(gb)}`:"ASK FOR GOLD BAR"}</button></div></div>`}).join("");
  potentials.innerHTML=potentialDefs.filter(p=>!state.potentials[p.id].added).map(p=>{const f=state.potentials[p.id];return `<div class="friend"><img class="profile-avatar" src="${avatarUrl(p.id,p.name)}" alt="${p.name}"><div><div class="fname">${p.name}</div><div class="ftag">${p.tag}</div><div class="fmeta">${p.role} · Rapport ${f.rel}/100</div><div class="relbar"><div style="width:${f.rel}%"></div></div></div><div class="fbtns"><button onclick="addPotential('${p.id}')">SEND CONTACT REQUEST</button></div></div>`}).join("")||"<div style='padding:8px;font-size:10px'>No additional contacts are available.</div>"
 }
 function renderFight(){
@@ -2537,7 +2826,7 @@ function renderFight(){
  const combatInfo=document.getElementById("combatInfo");
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<div class="combat-info"><div class="combat-info-grid"><div class="combat-stat"><div class="label">⚔ ATTACK POWER</div><b>${atk}</b><div class="desc">Used when YOU initiate Fight List, Revenge, and Hitlist attacks. Your roll is Attack Power + 1–20 versus the enemy roll.</div></div><div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Used when you respond to incoming attack messages. Defense also reduces failed-job and lost-fight damage by ${mit}%.</div></div></div><div class="combat-note">Power includes your base stat, relevant gear, active crew, and Notoriety. Skill points invested in Attack or Defense now directly change these outcomes.</div></div>`;
+   combatInfo.innerHTML=`<div class="combat-info"><div class="combat-info-grid"><div class="combat-stat"><div class="label">⚔ ATTACK POWER</div><b>${atk}</b><div class="desc">Used when YOU initiate Fight List, Revenge, and Hitlist attacks. Your roll is Attack Power + 1–20 versus the enemy roll.</div></div><div class="combat-stat"><div class="label">🛡 DEFENSE POWER</div><b>${def}</b><div class="desc">Used when you respond to incoming attack messages. Defense also reduces failed-job and lost-fight damage by ${mit}%.</div></div></div><div class="combat-note">Power includes your base stat, relevant gear, active crew, and Notoriety. Skill points invested in Attack or Defense directly change these outcomes. Winning offensive fights also reduces Heat by shifting attention onto rival crews.</div></div>`;
  }
 
  fightEl.innerHTML=[0,1,2,3,4].map(i=>{
@@ -2574,11 +2863,13 @@ function jobsUsingGear(id){
 function renderInventory(){
  const el=document.getElementById("inventory");if(!el)return;
  const drinks=Math.max(0,Number(state.loot["Energy Drink"])||0);
+ const shots=Math.max(0,Number(state.loot["Adrenaline Shot"])||0);
  const owned=gearDefs.filter(g=>gearQty(g.id)>0);
  el.innerHTML=`<div class="inventory-resources">
    <div class="inventory-resource"><div class="ir-label">CASH</div><b>${compactMoney(state.cash)}</b></div>
    <div class="inventory-resource gold"><div class="ir-label">GOLD BARS</div><b>🪙 ${state.goldBars||0}</b></div>
    <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()"><div class="ir-label">ENERGY DRINKS</div><b>🥤 ${drinks}</b></div>
+   <div class="inventory-resource stamina"><div class="ir-label">ADRENALINE SHOTS</div><b>💉 ${shots}</b><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
  </div>
  <div class="inventory-equipment">
    ${owned.length?owned.map(g=>`<div class="inventory-item">
@@ -2712,18 +3003,40 @@ function drinkEnergyDrink(){
 }
 
 function renderProfile(){
- profile.innerHTML=[["Rank",tiers[activeTier()].name],["Notoriety",Math.floor(state.notoriety)],["Crew",crewSize()],["Active Crew",availableCrew().length+1],["Fight Record",`${state.wins}W / ${state.losses}L`],["Heat",`${Math.floor(state.heat)} ${heatLabel()}`],["Net Income",money(netIncome())+"/hr"],["Gold Bars",state.goldBars||0],["Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]].map(x=>`<div class="card">${x[0]}<strong>${x[1]}</strong></div>`).join("");
+ const stats=[
+   ["rank","Rank",tiers[activeTier()].name],
+   ["notoriety","Notoriety",Math.floor(state.notoriety)],
+   ["crew","Crew",crewSize()],
+   ["activeCrew","Active Crew",availableCrew().length+1],
+   ["record","Fight Record",`${state.wins}W / ${state.losses}L`],
+   ["heat","Heat",`${Math.floor(state.heat)} ${heatLabel()}`],
+   ["income","Net Income",money(netIncome())+"/hr"],
+   ["gold","Gold Bars",state.goldBars||0],
+   ["territory","Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]
+ ];
+ profile.innerHTML=stats.map(x=>`<div class="card profile-hint-card">${x[1]}<button class="profile-hint" onclick="showProfileHelp('${x[0]}',event)">?</button><strong>${x[2]}</strong></div>`).join("");
+
  collections.innerHTML=Object.keys(state.loot).length?Object.entries(state.loot).map(([k,v])=>{
    if(k==="Energy Drink"){
-     return `<div class="inventory-use"><div><div class="title">🥤 Energy Drink</div><div class="sub">Drink to restore a random 3–7 Energy. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div></div>`;
+     return `<div class="inventory-use"><div><div class="title">🥤 Energy Drink</div><div class="sub">Restores a random 3–7 Energy. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="drinkEnergyDrink()" ${state.en>=state.maxEn?"disabled":""}>DRINK</button></div></div>`;
+   }
+   if(k==="Adrenaline Shot"){
+     return `<div class="inventory-use adrenaline-item"><div><div class="title">💉 Adrenaline Shot</div><div class="sub">Restores a random 1–3 Stamina. Stack limit 999.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useAdrenalineShot()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
    }
    return `<div class="row"><div class="title">${k}</div><b>x${v}</b></div>`;
  }).join(""):"<p class='sub'>No rare items recovered yet.</p>";
+
  const defs=achievementDefs(),newly=[];
  defs.forEach(a=>{if(a.current>=a.target&&!state.achievementUnlocked[a.id]){state.achievementUnlocked[a.id]=now();newly.push(a)}});
- if(newly.length){newly.forEach(a=>{log(`Achievement unlocked: ${a.title}.`);queueUnlockPopup("Achievement",a.title)});const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.");}save()}
+ if(newly.length){
+   newly.forEach(a=>{log(`Achievement unlocked: ${a.title}.`);queueUnlockPopup("Achievement",a.title)});
+   const count=Object.keys(state.achievementUnlocked).length;
+   if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.")}
+   save();
+ }
  const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
- ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?"✓ ":""}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
+ ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+
+ defs.map(a=>{const done=!!state.achievementUnlocked[a.id],pct=Math.min(100,Math.floor(a.current/a.target*100));return `<div class="achievement-row ${done?"done":""}"><div><div class="an">${done?"✓ ":""}${a.title}</div><div class="ap">${Math.min(a.current,a.target).toLocaleString()} / ${a.target.toLocaleString()} · ${pct}%</div></div><div class="av">${done?"UNLOCKED":a.category}</div></div>`}).join("")+"</div>";
 }
 
 
@@ -2852,6 +3165,22 @@ function tick(){
  try{maybeGift()}catch(e){console.error("Gift event failed",e)}
  try{maybeIncomingAttack()}catch(e){console.error("Incoming attack failed",e)}
 }
+
+function toggleMessagePopups(){
+ state.messagePopups=state.messagePopups===false;
+ if(state.messagePopups===false){
+   const p=document.getElementById("socialPop");if(p)p.classList.remove("show");
+ }
+ save();renderPreferences();
+}
+function renderPreferences(){
+ const b=document.getElementById("messagePopupToggle");if(!b)return;
+ const on=state.messagePopups!==false;
+ b.textContent=on?"ON":"OFF";
+ b.classList.toggle("green",on);
+ b.classList.toggle("red",!on);
+}
+
 function go(v){const target=document.getElementById("view-"+v);if(!target)return;document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));target.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.v===v));window.scrollTo({top:0,behavior:"auto"});S.tap()}
 function exportSave(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(state))));navigator.clipboard?.writeText(d).then(()=>toast("Save copied")).catch(()=>prompt("Copy save:",d))}
 function importSave(){const d=prompt("Paste save code:");if(!d)return;try{state=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(d)))));migrate();save();render();toast("Imported")}catch(e){toast("Invalid save")}}
@@ -2861,13 +3190,15 @@ document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style
 document.addEventListener("click",e=>{
  const b=e.target.closest("button");if(!b)return;
  const action=b.getAttribute("onclick")||"";
- const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|completeCheckout|testAudioPack|toggleTheme|toggleSound/.test(action);
+ const hasOwnSound=/doJob|fight\(|buyGear|buyProp|sendGift|claimDaily|answerInbox|recruit|askEnergy|openHelpRequest|requestHelpItem|useAdrenalineShot|completeCheckout|testAudioPack|toggleTheme|toggleSound/.test(action);
  if(!hasOwnSound)S.tap();
 });
 setInterval(()=>{if(document.getElementById("view-crew").classList.contains("active"))renderCrew()},1000);
 setInterval(()=>{try{tick()}catch(e){console.error("Tick failed",e)}},15000);
 setInterval(()=>{try{updateRegenTimers()}catch(e){}},1000);
 setInterval(()=>{try{processPendingAttacks()}catch(e){console.error("Attack timer failed",e)}},1000);
+setInterval(()=>{try{checkSkillReminder()}catch(e){}},600000);
+setTimeout(()=>{try{checkSkillReminder()}catch(e){}},5000);
 try{tick()}catch(e){console.error("Initial tick failed",e);try{render()}catch(renderError){console.error("Initial render failed",renderError)}}
 setTimeout(()=>{try{if(state.playerName)startTutorial();else promptForPlayerName()}catch(e){console.error("Onboarding failed",e)}},350);
 setTimeout(()=>{try{tryAutoTheme()}catch(e){console.error("Theme startup failed",e)}},500);
