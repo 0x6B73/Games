@@ -2377,6 +2377,17 @@ body:after{
   transform:rotate(45deg) translateY(-1px)!important;
 }
 
+
+/* 0.23 PROGRESSION / RETENTION PASS */
+.location-identity{margin:5px 0;padding:6px 7px;border:1px solid #554a32;background:#121008;font-size:8px;color:#bcb29e;line-height:1.4}
+.location-identity b{color:#efd36a}
+.property-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px}.property-actions .btn{width:auto}
+.property-upgrade{font-size:8px;color:#d9c476;margin-top:3px}.property-upgrade b{color:#efd36a}
+.prestige-perk-select{margin:6px 0;padding:7px;border:1px solid #4a4031;background:#0d0c0a}.prestige-perk-select label{display:block;font-size:8px;color:#a99f90;margin-bottom:4px}.prestige-perk-select select{width:100%;background:#090a0b;color:#ddd3c1;border:1px solid #5a4d36;padding:7px;font-size:10px}.prestige-perk-list{font-size:8px;color:#aaa092;line-height:1.5;margin-top:6px}.prestige-perk-list b{color:#e8ce73}
+.crew-mafia-summary{margin:5px 0;padding:5px 6px;border:1px solid #3d3a33;background:#0b0c0d;font-size:8px;color:#a89f90}.crew-mafia-summary b{color:#efd36a}
+.gift-actions{display:flex;gap:4px;flex-wrap:wrap}.gift-actions button{flex:1 1 auto}
+.arc-banner{margin:5px 0;padding:6px;border-left:3px solid #8d733a;background:#121008;color:#bfb5a3;font-size:8px}.arc-banner b{color:#efd36a}
+.event-bonus-line{margin-top:4px;color:#d8c57d;font-size:8px}
 </style>
 </head>
 <body>
@@ -2830,7 +2841,7 @@ body:after{
   <div id="energyReserveBody"></div>
   <div class="actions" style="margin-top:8px">
     <button class="btn" id="energyReserveDrinkBtn" onclick="drinkEnergyDrink()">DRINK ENERGY DRINK</button>
-    <button class="btn secondary" id="energyReservePackBtn" onclick="useEnergyPack()">USE ENERGY PACK</button>
+    <button class="btn" id="energyReservePackBtn" onclick="useEnergyPack()">USE ENERGY PACK</button>
     <button class="btn secondary" onclick="closeModal('energyReserveModal')">CLOSE</button>
   </div>
 </div></div>
@@ -2842,7 +2853,7 @@ body:after{
   <div id="staminaReserveBody"></div>
   <div class="actions" style="margin-top:8px">
     <button class="btn" id="staminaReserveUseBtn" onclick="useAdrenalineShot()">USE ADRENALINE SHOT</button>
-    <button class="btn secondary" id="staminaReservePackBtn" onclick="useStaminaPack()">USE STAMINA PACK</button>
+    <button class="btn" id="staminaReservePackBtn" onclick="useStaminaPack()">USE STAMINA PACK</button>
     <button class="btn secondary" onclick="go('crew');closeModal('staminaReserveModal')">REQUEST HELP</button>
   </div>
   <button class="btn secondary" style="margin-top:6px" onclick="closeModal('staminaReserveModal')">CLOSE</button>
@@ -3041,7 +3052,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.22.29";
+const BUILD_NUMBER="0.23.0";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3662,6 +3673,7 @@ const GENERATED_CONTACT_INTERVAL_MS=30*60000;
 const PRESENCE_UPDATE_MS=10*60000;
 const CONTACT_RESPONSE_WINDOW_MS=90*60000;
 const CONTACT_REQUEST_COOLDOWN_MIN=10;
+const CHECK_IN_COOLDOWN_MIN=10;
 const HELP_REQUEST_COOLDOWN_MIN=30;
 const MASS_MONEY_COOLDOWN_MIN=60;
 const MAX_HELP_CACHES=20;
@@ -3771,7 +3783,7 @@ function generatePotentialContact(t=now(),announce=true){
    activityScore,lastOnline,generatedAt:t,generated:true
  };
  state.generatedContacts[id]=d;
- state.potentials[id]={rel:base,added:false,chat:[],lastOnline,activityScore,generatedAt:t,lastContactRequest:0,lastContactReply:""};
+ state.potentials[id]={rel:base,added:false,chat:[],lastOnline,activityScore,generatedAt:t,lastContactRequest:0,lastContactReply:"",lastCheckIn:0};
 
  // A new person became available, so the 30-minute maximum clock restarts now.
  state.lastGeneratedContact=t;
@@ -3834,29 +3846,92 @@ function processContactPresence(t=now()){
  }
 }
 
+const campaignArcDefs=[
+ {id:"harbor",name:"East Harbor",story:"Build a name on the waterfront, turn street contacts into an organization, and take the first ground that matters.",rewardItem:"Harbor Campaign Seal"},
+ {id:"downtown",name:"Downtown",story:"Move into clubs, money, judges, and influence. Downtown rewards polish, cash flow, and the right people on your side.",rewardItem:"Downtown Campaign Ledger"},
+ {id:"north",name:"Northside",story:"Northside is heavier: armored routes, organized rivals, and operations that require a real crew behind you.",rewardItem:"Northside Campaign Crest"},
+ {id:"families",name:"Family War",story:"The established families stop treating you like a nuisance. Win fights, break bosses, and prove your organization survives pressure.",rewardItem:"Family War Dossier"},
+ {id:"citywide",name:"Citywide Control",story:"The operation becomes infrastructure. Properties, territory, specialties, and income matter as much as individual jobs.",rewardItem:"Citywide Control Charter"},
+ {id:"empire",name:"Empire",story:"Scale everything. This is the long game: mastery, sustained revenue, bosses, and the organization required to become a Kingpin.",rewardItem:"Empire Campaign Signet"}
+];
 const campaignDefs=(()=>{
  const chapters=[];
- const chapterNames=["A Name on the Street","Arm the Crew","Harbor Pressure","Make It an Organization","Remove the Man Above You","Take Ground","Downtown Money","Family Business","The Long War","No Longer Small"];
+ const legacyNames=["A Name on the Street","Arm the Crew","Harbor Pressure","Make It an Organization","Remove the Man Above You","Take Ground","Downtown Money","Family Business","The Long War","No Longer Small"];
+ const phaseTitles=["Expansion","Pressure","Control","Consolidation","War","Influence","Revenue","Reputation","Dominance","Legacy"];
  for(let i=0;i<60;i++){
-   const phase=Math.floor(i/10),pos=i%10;
-   const jobs=Math.round(10*Math.pow(1.158,i)),wins=Math.round(3*Math.pow(1.155,i)),notoriety=Math.round(20*Math.pow(1.15,i));
-   const cashEarned=Math.round(3500*Math.pow(1.205,i)),gear=Math.round(5+i*5+Math.pow(i,1.35)),props=Math.round(1+i*2.6);
-   const mastery=Math.round(1+i*1.5),crew=Math.round(Math.min(120,3+i*1.65)),level=Math.round(3+i*3.5),spend=Math.round(1200*Math.pow(1.19,i));
-   const pools=[
-    [{type:"lifetimeJobs",target:jobs,label:`Complete ${jobs.toLocaleString()} lifetime jobs`},{type:"crew",target:crew,label:`Build a crew of ${crew}`},{type:"lifetimeCashEarned",target:cashEarned,label:`Earn ${money(cashEarned)} lifetime cash`}],
-    [{type:"gear",target:gear,label:`Own ${gear.toLocaleString()} pieces of equipment`},{type:"wins",target:wins,label:`Win ${wins.toLocaleString()} fights`},{type:"notoriety",target:notoriety,label:`Reach ${notoriety.toLocaleString()} Notoriety`}],
-    [{type:"properties",target:props,label:`Own ${props.toLocaleString()} properties`},{type:"masteryTotal",target:mastery,label:`Earn ${mastery.toLocaleString()} total mastery ranks`},{type:"lifetimeCashSpent",target:spend,label:`Spend ${money(spend)} building the organization`}],
-    [{type:"lifetimeJobs",target:jobs,label:`Complete ${jobs.toLocaleString()} lifetime jobs`},{type:"wins",target:wins,label:`Win ${wins.toLocaleString()} fights`},{type:"level",target:level,label:`Reach Level ${level}`}]
-   ];
-   const objectives=[...pools[pos%4]];
-   if(i>=3&&pos===4)objectives.push({type:"attack",target:10+Math.floor(i*1.4),label:`Raise Attack to ${10+Math.floor(i*1.4)}`});
-   if(i>=3&&pos===7)objectives.push({type:"defense",target:10+Math.floor(i*1.4),label:`Raise Defense to ${10+Math.floor(i*1.4)}`});
-   if(i>=20&&pos===8)objectives.push({type:"lifetimeGoldBars",target:10+Math.floor((i-20)*2.5),label:`Acquire ${10+Math.floor((i-20)*2.5)} lifetime Gold Bars`});
-   if(i>=8&&pos%3===0)objectives.push({type:"territories",target:Math.min(6,1+Math.floor(i/10)),label:`Control ${Math.min(6,1+Math.floor(i/10))} territories`});
-   if(i>=12&&pos%4===1)objectives.push({type:"bosses",target:Math.min(6,1+Math.floor(i/12)),label:`Defeat ${Math.min(6,1+Math.floor(i/12))} rank bosses`});
-   if(i>=18&&pos%5===2)objectives.push({type:"roles",target:Math.min(8,3+Math.floor(i/10)),label:`Maintain ${Math.min(8,3+Math.floor(i/10))} crew specialties`});
-   const cashReward=Math.round(700*Math.pow(1.15,i)),xpReward=Math.round(60*Math.pow(1.12,i));
-   chapters.push({id:`campaign_${i+1}`,title:i<10?chapterNames[i]:`${["East Harbor","Downtown","Northside","The Families","Citywide","Empire"][phase%6]}: ${["Expansion","Pressure","Control","Consolidation","War","Influence","Revenue","Reputation","Dominance","Legacy"][pos]}`,story:i<10?"Build the organization one deliberate step at a time. Every chapter is meant to last longer than the one before it.":`Chapter ${i+1}. Your organization is measured by sustained operations, not one good night. Scale, survive, and keep expanding.`,objectives,reward:{cash:cashReward,xp:xpReward,skill:(i+1)%5===0?2:0,energy:(i+1)%3===0?4:0,notoriety:Math.max(2,Math.floor(i/2))},rewardText:`${money(cashReward)} · ${xpReward.toLocaleString()} XP${(i+1)%5===0?" · +2 Skill Points":""}${(i+1)%3===0?" · +4 Energy":""}`});
+   const phase=Math.floor(i/10),pos=i%10,arc=campaignArcDefs[phase];
+   const runJobs=Math.max(8,Math.round(10*Math.pow(1.12,i)));
+   const runFights=Math.max(3,Math.round(3*Math.pow(1.105,i)));
+   const cashEarned=Math.round(3500*Math.pow(1.17,i));
+   const spend=Math.round(1200*Math.pow(1.165,i));
+   const notoriety=Math.round(20*Math.pow(1.115,i));
+   const crew=Math.round(Math.min(450,3+i*5.2));
+   const level=Math.round(Math.min(100,3+i*2.1));
+   const mastery=Math.min(45,Math.max(1,Math.round(1+i*.72)));
+   const propertyInfluence=Math.min(90,Math.max(1,Math.round(1+i*1.45)));
+   const cityJobTarget=Math.max(5,Math.round(6*Math.pow(1.10,pos+phase*2)));
+   const territoryTarget=Math.min(6,Math.max(1,Math.floor((i+8)/10)));
+   const bossesTarget=Math.min(6,Math.max(1,Math.floor((i+4)/10)));
+   const rolesTarget=Math.min(8,Math.max(2,2+Math.floor(i/10)));
+   const objectives=[];
+
+   if(phase===0){
+     const picks=[
+       {type:"runJobs",target:runJobs,label:`Complete ${runJobs.toLocaleString()} jobs this run`},
+       {type:"crew",target:crew,label:`Build a Mafia of ${crew}`},
+       {type:"cityJobs",city:"east",target:cityJobTarget,label:`Complete ${cityJobTarget.toLocaleString()} East Harbor jobs this run`},
+       {type:"notoriety",target:notoriety,label:`Reach ${notoriety.toLocaleString()} Notoriety`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"level",target:level,label:`Reach Level ${level}`});
+   }else if(phase===1){
+     const picks=[
+       {type:"cityJobs",city:"downtown",target:cityJobTarget,label:`Complete ${cityJobTarget.toLocaleString()} Downtown jobs this run`},
+       {type:"runCashEarned",target:cashEarned,label:`Earn ${money(cashEarned)} this run`},
+       {type:"propertyInfluence",target:propertyInfluence,label:`Reach ${propertyInfluence} Property Influence`},
+       {type:"crew",target:crew,label:`Build a Mafia of ${crew}`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"level",target:level,label:`Reach Level ${level}`});
+   }else if(phase===2){
+     const picks=[
+       {type:"cityJobs",city:"north",target:cityJobTarget,label:`Complete ${cityJobTarget.toLocaleString()} Northside jobs this run`},
+       {type:"runFights",target:runFights,label:`Win ${runFights.toLocaleString()} fights this run`},
+       {type:"notoriety",target:notoriety,label:`Reach ${notoriety.toLocaleString()} Notoriety`},
+       {type:"roles",target:rolesTarget,label:`Maintain ${rolesTarget} active crew specialties`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"level",target:level,label:`Reach Level ${level}`});
+   }else if(phase===3){
+     const picks=[
+       {type:"runFights",target:runFights,label:`Win ${runFights.toLocaleString()} fights this run`},
+       {type:"bosses",target:bossesTarget,label:`Defeat ${bossesTarget} rank bosses this run`},
+       {type:"territories",target:territoryTarget,label:`Control ${territoryTarget} territories`},
+       {type:pos%2?"attack":"defense",target:20+Math.floor(i*2.1),label:`Raise ${pos%2?"Attack":"Defense"} to ${20+Math.floor(i*2.1)}`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"runJobs",target:runJobs,label:`Complete ${runJobs.toLocaleString()} jobs this run`});
+   }else if(phase===4){
+     const picks=[
+       {type:"propertyInfluence",target:propertyInfluence,label:`Reach ${propertyInfluence} Property Influence`},
+       {type:"netIncome",target:Math.round(cashEarned/18),label:`Reach ${money(Math.round(cashEarned/18))}/hr net income`},
+       {type:"crew",target:crew,label:`Build a Mafia of ${crew}`},
+       {type:"roles",target:rolesTarget,label:`Maintain ${rolesTarget} active crew specialties`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"runCashSpent",target:spend,label:`Invest ${money(spend)} this run`});
+   }else{
+     const picks=[
+       {type:"runJobs",target:runJobs,label:`Complete ${runJobs.toLocaleString()} jobs this run`},
+       {type:"runCashEarned",target:cashEarned,label:`Earn ${money(cashEarned)} this run`},
+       {type:"masteryTotal",target:mastery,label:`Earn ${mastery} mastery ranks this run`},
+       {type:"bosses",target:bossesTarget,label:`Defeat ${bossesTarget} rank bosses this run`}
+     ]; objectives.push(picks[pos%picks.length],picks[(pos+1)%picks.length],{type:"level",target:Math.max(level,70+pos*3),label:`Reach Level ${Math.max(level,70+pos*3)}`});
+   }
+
+   const cashReward=Math.round(900*Math.pow(1.13,i)),xpReward=Math.round(70*Math.pow(1.105,i));
+   const arcEnd=pos===9;
+   const reward={cash:cashReward,xp:xpReward,skill:(i+1)%5===0?2:0,energy:(i+1)%3===0?4:0,notoriety:Math.max(2,Math.floor(i/2))};
+   if(arcEnd)reward.loot=arc.rewardItem;
+   chapters.push({
+     id:`campaign_${i+1}`,
+     arc:arc.id,arcName:arc.name,
+     title:i<10?legacyNames[i]:`${arc.name}: ${phaseTitles[pos]}`,
+     story:arc.story,
+     objectives,
+     reward,
+     rewardText:`${money(cashReward)} · ${xpReward.toLocaleString()} XP${reward.skill?" · +2 Skill Points":""}${reward.energy?" · +4 Energy":""}${arcEnd?` · ${arc.rewardItem}`:""}`
+   });
  }
  return chapters;
 })();
@@ -3880,6 +3955,15 @@ function totalTerritoryProgress(){
 function totalMasteryRanks(){
  return Object.values(state.jobs||{}).reduce((n,j)=>n+(j.mastery||0),0);
 }
+function totalPropertyUpgradeRanks(){return Object.values(state.propertyUpgrades||{}).reduce((n,v)=>n+Math.max(0,Math.floor(Number(v)||0)),0)}
+function propertyInfluence(){return totalPropertiesOwned()+totalPropertyUpgradeRanks()*3}
+function prestigePerkRank(id){return Math.max(0,Math.floor(Number(state.prestigePerks?.[id])||0))}
+function prestigePerkSummary(){
+ const labels={smuggler:"Smuggler Network",oldMoney:"Old Money",hardCrew:"Hard Crew",insideInfo:"Inside Information",longMemory:"Long Memory",territoryBroker:"Territory Brokers"};
+ return Object.entries(labels).filter(([id])=>prestigePerkRank(id)>0).map(([id,label])=>`${label} ${prestigePerkRank(id)}`).join(" · ")||"No perk ranks yet";
+}
+function activeCrewCount(){return crewIds().filter(id=>!state.friends[id]?.inactive).length+1}
+
 function jobsAtMasteryOne(){
  return Object.values(state.jobs||{}).filter(j=>(j.mastery||0)>=1).length;
 }
@@ -3906,11 +3990,14 @@ function campaignObjectiveValue(o){
  switch(o.type){
    case "jobs":return totalJobsCompleted();
    case "lifetimeJobs":return state.lifetimeJobs||0;
+   case "runJobs":return state.runJobs||0;
    case "crew":return crewSize();
    case "cash":return Math.floor(state.cash);
    case "gear":return totalGearOwned();
    case "properties":return totalPropertiesOwned();
+   case "propertyInfluence":return propertyInfluence();
    case "wins":return state.wins||0;
+   case "runFights":return state.runWins||0;
    case "lifetimeFights":return state.lifetimeFights||0;
    case "notoriety":return Math.floor(state.notoriety||0);
    case "jobMasteries":return jobsAtMasteryOne();
@@ -3921,9 +4008,11 @@ function campaignObjectiveValue(o){
    case "netIncome":return Math.max(0,Math.floor(netIncome()));
    case "bosses":return defeatedBosses();
    case "level":return state.level||1;
-   case "cityJobs":return completedCityJobs(o.city);
+   case "cityJobs":return Math.max(0,Number(state.runCityJobs?.[o.city])||0);
    case "lifetimeCashEarned":return state.lifetimeCashEarned||0;
    case "lifetimeCashSpent":return state.lifetimeCashSpent||0;
+   case "runCashEarned":return state.runCashEarned||0;
+   case "runCashSpent":return state.runCashSpent||0;
    case "attack":return state.attack||0;
    case "defense":return state.defense||0;
    case "lifetimeGoldBars":return state.lifetimeGoldBars||0;
@@ -3947,7 +4036,7 @@ function claimCampaign(){
  if(!campaignComplete(c))return toast("Complete every campaign objective first.");
 
  const r=c.reward||{};
- if(r.cash){state.cash+=r.cash;state.lifetimeCashEarned+=r.cash;}
+ if(r.cash){state.cash+=r.cash;state.lifetimeCashEarned+=r.cash;state.runCashEarned=(state.runCashEarned||0)+r.cash;}
  if(r.xp)addXp(r.xp);
  if(r.energy)state.en=Math.min(state.maxEn,state.en+r.energy);
  if(r.stamina)state.st=Math.min(state.maxSt,state.st+r.stamina);
@@ -3958,6 +4047,7 @@ function claimCampaign(){
  if(r.loot)addLootItem(r.loot,1,999);
 
  state.campaignClaimed[c.id]=true;
+ state.lifetimeCampaigns=(state.lifetimeCampaigns||0)+1;
  log(`Campaign completed: ${c.title}.`);
  showActionFlash("CAMPAIGN COMPLETE",`${c.title} · Reward claimed`,"good");
  S.ok();
@@ -4032,7 +4122,7 @@ function renderCampaign(){
        <div class="campaign-next">${next?`NEXT: ${next.label} (${Math.min(campaignObjectiveValue(next),next.target).toLocaleString()} / ${next.target.toLocaleString()})`:"All objectives complete — claim your reward."}</div>
      </div>`;
    })()}
-   <div class="campaign-story">${c.story}</div>
+    <div class="arc-banner"><b>${c.arcName||"Campaign"}</b> · ${c.story}</div>
    <div class="campaign-objectives">
      ${c.objectives.map(o=>{
        const val=campaignObjectiveValue(o);
@@ -4073,6 +4163,65 @@ function renderCampaign(){
 }
 
 
+const worldEventDefs=[
+ {id:"harborSurge",name:"Harbor Surge",desc:"Jobs pay 25% more Cash today.",jobCash:1.25},
+ {id:"streetWar",name:"Street War",desc:"Fight payouts are 25% higher today.",fightCash:1.25},
+ {id:"crewWeekend",name:"Crew Weekend",desc:"Recruitment gets +10% and Check In cooldowns are cut in half today.",recruitBonus:.10,checkInCooldownMult:.5},
+ {id:"smugglerWindow",name:"Smuggler's Window",desc:"DASH convenience markup is reduced by 15 percentage points today.",dashMarkupDelta:-.15},
+ {id:"propertyBoom",name:"Property Boom",desc:"Property income is 20% higher today.",propertyIncome:1.20},
+ {id:"blackMarket",name:"Black Market Window",desc:"Successful Jobs get +5% rare-loot chance today.",rareLootBonus:.05}
+];
+function activeWorldEvent(t=now()){
+ const day=Math.floor(t/86400000),def=worldEventDefs[((day%worldEventDefs.length)+worldEventDefs.length)%worldEventDefs.length];
+ return {...def,ends:(day+1)*86400000};
+}
+function worldEventValue(key,fallback=0){const v=activeWorldEvent()?.[key];return Number.isFinite(Number(v))?Number(v):fallback}
+const locationIdentityDefs={
+ east:{name:"Harbor Network",desc:"East Harbor Jobs have +3% rare-loot chance.",rareLootBonus:.03},
+ downtown:{name:"Downtown Money",desc:"Downtown properties produce +5% income.",propertyIncome:1.05},
+ north:{name:"Northside Muscle",desc:"Northside Fight List wins pay +5% Cash.",fightCash:1.05}
+};
+const territoryBonusDefs={
+ dock9:{desc:"East Harbor Job rare-loot chance +2%.",rareLootBonus:{east:.02},controlLoot:"Dock 9 Control Stamp"},
+ market:{desc:"East Harbor property income +5%.",propertyIncome:{east:1.05},controlLoot:"Old Market Tribute Ledger"},
+ river:{desc:"DASH markup reduced by 5 percentage points.",dashMarkupDelta:-.05,controlLoot:"River Ward Protection List"},
+ clubrow:{desc:"Downtown Job Cash +5%.",jobCash:{downtown:1.05},controlLoot:"Club Row VIP Pass"},
+ civic:{desc:"Downtown property income +5%.",propertyIncome:{downtown:1.05},controlLoot:"Civic Center Influence File"},
+ northyard:{desc:"Northside Fight Cash +8%.",fightCash:{north:1.08},controlLoot:"North Freight Route Seal"}
+};
+function territoryBonusOwned(id){return !!state.territory?.[id]?.owned}
+function locationIdentity(city=state.currentCity){return locationIdentityDefs[heatCityId(city)]||locationIdentityDefs.east}
+function jobCashBonusMult(city){
+ let m=worldEventValue("jobCash",1)||1;
+ for(const [id,b] of Object.entries(territoryBonusDefs))if(territoryBonusOwned(id)&&b.jobCash?.[city])m*=b.jobCash[city];
+ return m;
+}
+function jobRareLootChance(city){
+ let chance=.20+worldEventValue("rareLootBonus",0)+prestigePerkRank("insideInfo")*.02+(locationIdentity(city).rareLootBonus||0);
+ for(const [id,b] of Object.entries(territoryBonusDefs))if(territoryBonusOwned(id)&&b.rareLootBonus?.[city])chance+=b.rareLootBonus[city];
+ return Math.min(.40,chance);
+}
+function propertyLocationIncomeMult(city){
+ let m=worldEventValue("propertyIncome",1)||1;
+ const identity=locationIdentity(city);if(identity.propertyIncome)m*=identity.propertyIncome;
+ for(const [id,b] of Object.entries(territoryBonusDefs))if(territoryBonusOwned(id)&&b.propertyIncome?.[city])m*=b.propertyIncome[city];
+ m*=1+prestigePerkRank("oldMoney")*.05;
+ return m;
+}
+function fightLocationCashMult(city){
+ let m=worldEventValue("fightCash",1)||1;
+ const identity=locationIdentity(city);if(identity.fightCash)m*=identity.fightCash;
+ for(const [id,b] of Object.entries(territoryBonusDefs))if(territoryBonusOwned(id)&&b.fightCash?.[city])m*=b.fightCash[city];
+ return m;
+}
+function territoryIncomeMult(){return 1+prestigePerkRank("territoryBroker")*.05}
+function dashMarkupRate(){
+ let rate=.50-prestigePerkRank("smuggler")*.05+worldEventValue("dashMarkupDelta",0);
+ for(const [id,b] of Object.entries(territoryBonusDefs))if(territoryBonusOwned(id)&&Number.isFinite(b.dashMarkupDelta))rate+=b.dashMarkupDelta;
+ return Math.max(.15,Math.min(.50,rate));
+}
+function checkInCooldownMinutes(){return Math.max(2,Math.round(CHECK_IN_COOLDOWN_MIN*(worldEventValue("checkInCooldownMult",1)||1)))}
+
 const GOLD_BAR_COOLDOWN_MS=3600000;
 
 const equipmentSetDefs=[
@@ -4085,7 +4234,12 @@ const collectionDefs=[
  {id:"street_evidence",name:"Street Evidence",items:["Burner Phone","Stolen Plate","Old Ledger"],reward:"+1 Attack",apply:()=>{state.attack+=1}},
  {id:"harbor_papers",name:"Harbor Papers",items:["Dock Manifest","Marked Dice","Customs Seal","Crate Key","Union Card"],reward:"+1 Defense, +2 Max Energy",apply:()=>{state.defense+=1;state.maxEn+=2;state.en+=2}},
  {id:"downtown_access",name:"Downtown Access",items:["Loaded Deck","VIP Ledger","Brass Key","Black Seal","Court Docket"],reward:"+2 Attack, +2 Defense",apply:()=>{state.attack+=2;state.defense+=2}},
- {id:"northside_intel",name:"Northside Intelligence",items:["Security Badge","Route Schedule","Family Ledger","Reserve Bond"],reward:"+3 Attack, +3 Defense, +1 Max Stamina",apply:()=>{state.attack+=3;state.defense+=3;state.maxSt+=1;state.st+=1}}
+ {id:"northside_intel",name:"Northside Intelligence",items:["Security Badge","Route Schedule","Family Ledger","Reserve Bond"],reward:"+3 Attack, +3 Defense, +1 Max Stamina",apply:()=>{state.attack+=3;state.defense+=3;state.maxSt+=1;state.st+=1}},
+ {id:"territory_tokens",name:"City Control Tokens",items:["Dock 9 Control Stamp","Old Market Tribute Ledger","River Ward Protection List","Club Row VIP Pass","Civic Center Influence File","North Freight Route Seal"],reward:"+4 Attack, +4 Defense",apply:()=>{state.attack+=4;state.defense+=4}},
+ {id:"boss_trophies",name:"Boss Trophies",items:["Dockmaster's Ring","Rossi Family Ledger","Bellini Signet","Judge's Black Book","Varga War Medal","Vale Signet"],reward:"+5 Attack, +5 Defense",apply:()=>{state.attack+=5;state.defense+=5}},
+ {id:"weekly_contraband",name:"Weekly Contraband Archive",items:["Black-Market Wristwatch","Corrupt Detective Badge","Diamond-Cut Money Clip","Ghost Plate","Smuggler's Seal","Burned Federal File"],reward:"+5 Max Energy, +2 Max Stamina",apply:()=>{state.maxEn+=5;state.en+=5;state.maxSt+=2;state.st+=2}},
+ {id:"campaign_legacy",name:"Campaign Legacy",items:["Harbor Campaign Seal","Downtown Campaign Ledger","Northside Campaign Crest","Family War Dossier","Citywide Control Charter","Empire Campaign Signet"],reward:"+5 Attack, +5 Defense, +5 Max Energy",apply:()=>{state.attack+=5;state.defense+=5;state.maxEn+=5;state.en+=5}},
+ {id:"prestige_legacy",name:"Kingpin Legacy",items:["Prestige Mark I","Prestige Mark II","Prestige Mark III"],reward:"+10 Attack, +10 Defense",apply:()=>{state.attack+=10;state.defense+=10}}
 ];
 const limitedLootDefs=[
  {name:"Black-Market Wristwatch",desc:"A weekly contraband collectible."},
@@ -4307,13 +4461,13 @@ function renderGoldVault(){
 }
 
 function fresh(){
- const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
- const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now(),lastContactRequest:0,lastContactReply:""});
+ const friends={};friendDefs.forEach(f=>friends[f.id]={rel:f.base,trust:f.base,respect:50,fear:15,resentment:0,crew:false,lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,lastCheckIn:0,response:"",chat:[],injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,35)*60000,activityScore:.72+rnd(0,24)/100,inactive:false,dropOffAt:Math.random()<.06?now()+rnd(36,168)*3600000:0,joinedAt:now()});
+ const potentials={};potentialDefs.forEach(f=>potentials[f.id]={rel:f.base,added:false,chat:[],lastOnline:now()-rnd(0,60)*60000,activityScore:.60+rnd(0,35)/100,generatedAt:now(),lastContactRequest:0,lastContactReply:"",lastCheckIn:0});
  const territory={};territoryDefs.forEach(t=>territory[t.id]={owned:false,progress:0});
  return {playerName:"",playerPhoto:"",playerAvatarSeed:"",playerAvatarSpec:{},customFriends:{},generatedContacts:{},lastGeneratedContact:now(),lastPresenceUpdate:now(),lastGiftEvent:now(),
- bankCash:0,prestige:0,collectionClaimed:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
+ bankCash:0,prestige:0,prestigePerks:{smuggler:0,oldMoney:0,hardCrew:0,insideInfo:0,longMemory:0,territoryBroker:0},collectionClaimed:{},propertyUpgrades:{},fightList:[],dynamicHitlist:[],fightListsInitialized:false,lastFightRefresh:0,fightListsByCity:{east:[],downtown:[],north:[]},hitlistsByCity:{east:[],downtown:[],north:[]},fightInitializedByCity:{east:false,downtown:false,north:false},lastFightRefreshByCity:{east:0,downtown:0,north:0},rivalHistory:{},playerBounties:[],bossLastFight:{},bossRematches:{},combatBalanceVersion:3,helpCaches:[],
  endgameInfra:{autoMessages:false,autoMessagesEnabled:false,autoDefense:false,autoDefenseEnabled:false,energyTier:0,adrenalineTier:0,heatTier:0,lastEnergyProduction:now(),lastAdrenalineProduction:now()},
- campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,themeMusic:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
+ campaignIndex:0,campaignClaimed:{},achievementUnlocked:{},achievementMilestonesAwarded:0,lifetimeCampaigns:0,lifetimeMastery:0,lifetimeWins:0,runJobs:0,runCashEarned:0,runCashSpent:0,runFights:0,runWins:0,runTerritoryMoves:0,runCityJobs:{east:0,downtown:0,north:0},goldBars:0,lifetimeGoldBars:0,lastGoldBarClaim:0,goldUnlocks:{},seenUnlocks:{},unlockTrackingReady:false,lifetimeJobs:0,lifetimeCashEarned:0,lifetimeCashSpent:0,lifetimeFights:0,lifetimeTerritoryMoves:0,messagePopups:true,themeMusic:true,lastSkillReminder:0,level:1,xp:0,skill:5,cash:700,hp:100,maxHp:100,en:20,maxEn:20,st:10,maxSt:10,attack:5,defense:5,
  wins:0,losses:0,heat:0,heatByCity:{east:0,downtown:0,north:0},heatMetaByCity:{east:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},downtown:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0},north:{lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0}},notoriety:0,gear:{},props:{},facilities:{},jobs:{},loot:{},friends,potentials,territory,
  factions:{harbor:0,rossi:0,bellini:0,varga:0},inbox:[],revenge:[],pendingAttacks:[],bosses:{},daily:{last:"",streak:0},event:{id:"weekend",ends:now()+86400000},
  currentCity:"east",lastTick:now(),lastEnergyRegen:now(),lastStaminaRegen:now(),lastHealthRegen:now(),lastHeatDecay:now(),lastHeatGain:now(),lastLayLow:0,cashBribeWindowStart:0,cashBribeCount:0,lastIncome:now(),lastUpkeep:now(),lastSocial:now(),lastAttack:now(),tutorialDone:false,sound:true,
@@ -4378,11 +4532,28 @@ function migrate(){
  if(!state.generatedContacts||typeof state.generatedContacts!=="object")state.generatedContacts={};
  if(!Number.isFinite(state.bankCash)||state.bankCash<0)state.bankCash=0;
  if(!Number.isInteger(state.prestige)||state.prestige<0)state.prestige=0;
+ if(!state.prestigePerks||typeof state.prestigePerks!=="object")state.prestigePerks={};
+ state.prestigePerks=Object.assign({smuggler:0,oldMoney:0,hardCrew:0,insideInfo:0,longMemory:0,territoryBroker:0},state.prestigePerks);
+ Object.keys(state.prestigePerks).forEach(k=>state.prestigePerks[k]=Math.max(0,Math.floor(Number(state.prestigePerks[k])||0)));
+ if(!state.propertyUpgrades||typeof state.propertyUpgrades!=="object")state.propertyUpgrades={};
+ for(const p of propDefs)state.propertyUpgrades[p.id]=Math.max(0,Math.min(5,Math.floor(Number(state.propertyUpgrades[p.id])||0)));
  if(!state.collectionClaimed||typeof state.collectionClaimed!=="object")state.collectionClaimed={};
  if(!Array.isArray(state.fightList))state.fightList=[];
  if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
  if(typeof state.fightListsInitialized!=="boolean")state.fightListsInitialized=false;
  if(!Number.isFinite(state.lastFightRefresh))state.lastFightRefresh=0;
+ if(!state.fightListsByCity||typeof state.fightListsByCity!=="object")state.fightListsByCity={east:[],downtown:[],north:[]};
+ if(!state.hitlistsByCity||typeof state.hitlistsByCity!=="object")state.hitlistsByCity={east:[],downtown:[],north:[]};
+ if(!state.fightInitializedByCity||typeof state.fightInitializedByCity!=="object")state.fightInitializedByCity={east:false,downtown:false,north:false};
+ if(!state.lastFightRefreshByCity||typeof state.lastFightRefreshByCity!=="object")state.lastFightRefreshByCity={east:0,downtown:0,north:0};
+ for(const c of cities){
+   if(!Array.isArray(state.fightListsByCity[c.id]))state.fightListsByCity[c.id]=[];
+   if(!Array.isArray(state.hitlistsByCity[c.id]))state.hitlistsByCity[c.id]=[];
+   state.fightInitializedByCity[c.id]=!!state.fightInitializedByCity[c.id];
+   state.lastFightRefreshByCity[c.id]=Math.max(0,Number(state.lastFightRefreshByCity[c.id])||0);
+ }
+ if(state.fightList.length&&!state.fightListsByCity[state.currentCity]?.length){state.fightListsByCity[state.currentCity]=state.fightList.map(x=>({...x,city:x.city||state.currentCity}));state.fightInitializedByCity[state.currentCity]=true;}
+ if(state.dynamicHitlist.length&&!state.hitlistsByCity[state.currentCity]?.length){state.hitlistsByCity[state.currentCity]=state.dynamicHitlist.map(x=>({...x,city:x.city||state.currentCity}));state.fightInitializedByCity[state.currentCity]=true;}
  if(!state.rivalHistory||typeof state.rivalHistory!=="object")state.rivalHistory={};
  if(!Array.isArray(state.playerBounties))state.playerBounties=[];
  if(!state.endgameInfra||typeof state.endgameInfra!=="object")state.endgameInfra={};
@@ -4407,7 +4578,12 @@ function migrate(){
  if(!state.bossRematches||typeof state.bossRematches!=="object")state.bossRematches={};
  if(!Number.isInteger(state.combatBalanceVersion)||state.combatBalanceVersion<3){
    state.fightList=[];
+   state.dynamicHitlist=[];
    state.lastFightRefresh=0;
+   state.fightListsByCity={east:[],downtown:[],north:[]};
+   state.hitlistsByCity={east:[],downtown:[],north:[]};
+   state.fightInitializedByCity={east:false,downtown:false,north:false};
+   state.lastFightRefreshByCity={east:0,downtown:0,north:0};
    state.combatBalanceVersion=3;
  }
  const validCustomTargets=new Set([
@@ -4460,8 +4636,21 @@ function migrate(){
  if(!Number.isInteger(state.campaignIndex)||state.campaignIndex<0)state.campaignIndex=0;
  state.campaignIndex=Math.min(state.campaignIndex,Math.max(0,campaignDefs.length-1));
 
- ["lifetimeJobs","lifetimeCashEarned","lifetimeCashSpent","lifetimeFights","lifetimeTerritoryMoves"]
+ ["lifetimeJobs","lifetimeCashEarned","lifetimeCashSpent","lifetimeFights","lifetimeTerritoryMoves","lifetimeCampaigns","lifetimeMastery","lifetimeWins","runJobs","runCashEarned","runCashSpent","runFights","runWins","runTerritoryMoves","achievementMilestonesAwarded"]
    .forEach(k=>{if(!Number.isFinite(state[k])||state[k]<0)state[k]=0});
+ if(!state.runCityJobs||typeof state.runCityJobs!=="object")state.runCityJobs={east:0,downtown:0,north:0};
+ for(const c of cities)state.runCityJobs[c.id]=Math.max(0,Math.floor(Number(state.runCityJobs[c.id])||0));
+ state.lifetimeMastery=Math.max(state.lifetimeMastery,totalMasteryRanks());
+ state.lifetimeWins=Math.max(state.lifetimeWins,state.wins||0);
+ state.lifetimeCampaigns=Math.max(state.lifetimeCampaigns,Object.keys(state.campaignClaimed||{}).length);
+ if(state.runJobs===0&&state.prestige===0)state.runJobs=state.lifetimeJobs||0;
+ if(state.runCashEarned===0&&state.prestige===0)state.runCashEarned=state.lifetimeCashEarned||0;
+ if(state.runCashSpent===0&&state.prestige===0)state.runCashSpent=state.lifetimeCashSpent||0;
+ if(state.runFights===0&&state.prestige===0)state.runFights=state.lifetimeFights||0;
+ if(state.runWins===0&&state.prestige===0)state.runWins=state.wins||0;
+ if(state.runTerritoryMoves===0&&state.prestige===0)state.runTerritoryMoves=state.lifetimeTerritoryMoves||0;
+ if(state.prestige===0&&Object.values(state.runCityJobs).every(v=>v===0)){for(const c of cities)state.runCityJobs[c.id]=completedCityJobs(c.id)}
+ if(state.achievementMilestonesAwarded===0&&Object.keys(state.achievementUnlocked||{}).length>=5)state.achievementMilestonesAwarded=Math.floor(Object.keys(state.achievementUnlocked).length/5);
 
 
  // Reconstruct lifetime stats for older saves.
@@ -4522,7 +4711,7 @@ function migrate(){
    const d=getPersonDef(id);
    state.friends[id]=Object.assign({
      rel:50,trust:50,respect:50,fear:10,resentment:0,crew:false,
-     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,response:"",chat:[],
+     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,lastCheckIn:0,response:"",chat:[],
      injuredUntil:0,arrestedUntil:0,gifts:0,lastOnline:now()-rnd(0,45)*60000,
      activityScore:d?.generated?Math.max(.25,Math.min(.96,d.activityScore||.55)):.78,
      inactive:false,dropOffAt:0,joinedAt:now()
@@ -4534,6 +4723,7 @@ function migrate(){
    if(typeof state.friends[id].inactive!=="boolean")state.friends[id].inactive=false;
    if(!Number.isFinite(state.friends[id].dropOffAt))state.friends[id].dropOffAt=0;
    if(!Number.isFinite(state.friends[id].joinedAt))state.friends[id].joinedAt=now();
+   if(!Number.isFinite(state.friends[id].lastCheckIn))state.friends[id].lastCheckIn=0;
    const gr=state.friends[id].giftRequest;
    if(gr&&typeof gr==="object"){
      gr.qty=Math.max(1,Math.min(5,Math.floor(Number(gr.qty)||1)));
@@ -4548,7 +4738,7 @@ function migrate(){
  for(const id of Object.keys(state.generatedContacts||{})){
    if(!state.potentials[id]&&!state.friends[id]){
      const d=state.generatedContacts[id];
-     state.potentials[id]={rel:d.base||50,added:false,chat:[],lastOnline:d.lastOnline||now(),activityScore:d.activityScore||.55,generatedAt:d.generatedAt||now(),lastContactRequest:0,lastContactReply:""};
+     state.potentials[id]={rel:d.base||50,added:false,chat:[],lastOnline:d.lastOnline||now(),activityScore:d.activityScore||.55,generatedAt:d.generatedAt||now(),lastContactRequest:0,lastContactReply:"",lastCheckIn:0};
    }
  }
  for(const [id,p] of Object.entries(state.potentials)){
@@ -4560,6 +4750,7 @@ function migrate(){
    if(!Number.isFinite(p.lastContactRequest))p.lastContactRequest=0;
    if(typeof p.lastContactReply!=="string")p.lastContactReply="";
    if(typeof p.added!=="boolean")p.added=false;
+   if(!Number.isFinite(p.lastCheckIn))p.lastCheckIn=0;
  }
 
  if(!state.territory||typeof state.territory!=="object")state.territory={};
@@ -4651,12 +4842,14 @@ function availableCrew(){return crewIds().filter(id=>!state.friends[id].inactive
 function roleCount(role){return availableCrew().filter(id=>{const d=getPersonDef(id);return d?.role===role}).length}
 function gearQty(id){return state.gear[id]||0}
 function gearUpkeep(){return gearDefs.reduce((n,g)=>n+gearQty(g.id)*g.upkeep,0)}
-function propertyIncome(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.income,0)}
+function propertyUpgradeTier(id){return Math.max(0,Math.min(5,Math.floor(Number(state.propertyUpgrades?.[id])||0)))}
+function propertyUpgradeMult(id){return 1+propertyUpgradeTier(id)*.25}
+function propertyIncome(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.income*propertyUpgradeMult(p.id)*propertyLocationIncomeMult(p.city),0)}
 function propertyUpkeep(){return propDefs.reduce((n,p)=>n+(state.props[p.id]||0)*p.upkeep,0)}
 function facilityOwned(id){return !!state.facilities?.[id]}
 function facilityIncome(){return facilityDefs.reduce((n,f)=>n+(facilityOwned(f.id)?f.income:0),0)}
 function facilityUpkeep(){return facilityDefs.reduce((n,f)=>n+(facilityOwned(f.id)?f.upkeep:0),0)}
-function territoryIncome(){return territoryDefs.reduce((n,t)=>n+(state.territory[t.id]?.owned?t.income:0),0)}
+function territoryIncome(){return territoryDefs.reduce((n,t)=>n+(state.territory[t.id]?.owned?t.income:0),0)*territoryIncomeMult()}
 function netIncome(){return propertyIncome()+facilityIncome()+territoryIncome()-propertyUpkeep()-facilityUpkeep()-gearUpkeep()}
 function facilityForFeature(feature){return facilityDefs.find(f=>f.unlock===feature)||null}
 function automationUnlocked(feature){
@@ -5040,9 +5233,11 @@ function combatCrewCount(){
 }
 function crewCombatValue(count=combatCrewCount()){
  const c=Math.max(1,count);
- if(c<=25)return c*2;
- if(c<=100)return 50+(c-25)*1.25;
- return 143.75+(c-100)*.6;
+ let base=0;
+ if(c<=25)base=c*2;
+ else if(c<=100)base=50+(c-25)*1.25;
+ else base=143.75+(c-100)*.6;
+ return base*(1+prestigePerkRank("hardCrew")*.03);
 }
 function equipmentSetComplete(s){
  return Object.entries(s.items).every(([id,q])=>gearQty(id)>=q);
@@ -5116,7 +5311,8 @@ function spendSkill(k){if(state.skill<1)return toast("No skill points.");state.s
 const PROFILE_HELP={
  rank:{title:"Rank",text:"Rank follows your level and determines which job tiers and bosses are available."},
  notoriety:{title:"Notoriety",text:"Notoriety is your underworld reputation. It unlocks territory, improves Job success, and contributes to Attack and Defense Power."},
- crew:{title:"Crew",text:"Total recruited associates. Larger crews unlock Jobs and add combat power."},
+ crew:{title:"Mafia",text:"Your total recruited Mafia size. Inactive members remain in this number like old friends who stopped playing, but they no longer respond or contribute active combat power."},
+ activeMafia:{title:"Active Mafia",text:"Recruited Mafia members who have not gone inactive. Temporary offline status does not remove them from this count."},
  activeCrew:{title:"Combat Crew",text:"The number of currently fielded crew members. Jobs can use your full recruited crew, but combat has a level/prestige-based field limit and diminishing returns. Each fielded member can use one weapon, one armor item, and one vehicle."},
  record:{title:"Fight Record",text:"Your lifetime offensive fight wins and losses. Winning fights earns cash, XP, Notoriety, and reduces Heat. Harder opponents require stronger Attack, better equipment, and more active crew; Defense also supports the highest-threat offensive fights."},
  heat:{title:"Heat",text:"Heat is tracked separately in East Harbor, Downtown, and Northside. Jobs raise Heat only in their location, and only that location's Heat affects its Jobs and MANHUNT pressure. Lay Low, bribes, fights, Blackmail, and passive decay affect the currently selected location."},
@@ -5333,8 +5529,9 @@ function dashMissingItems(j){
 }
 function dashJobCost(j){
  const items=dashMissingItems(j);
- const base=items.reduce((sum,x)=>sum+x.g.cost*x.missing,0);
- return {items,base,total:Math.ceil(base*1.50)};
+ const base=items.reduce((n,x)=>n+x.g.cost*x.missing,0);
+ const markupRate=dashMarkupRate();
+ return {items,base,markupRate,total:Math.ceil(base*(1+markupRate))};
 }
 function showDashHelp(jid,e){
  if(e?.stopPropagation)e.stopPropagation();
@@ -5344,7 +5541,7 @@ function showDashHelp(jid,e){
  document.getElementById("statHelpTitle").textContent="DASH";
  const unlocked=automationUnlocked("dash");
  document.getElementById("statHelpText").textContent=unlocked
-   ?"DASH instantly buys only the shop items you are currently missing for this Job. It costs 50% more than buying those items yourself."
+   ?`DASH instantly buys only the shop items you are currently missing for this Job. Current convenience markup: ${Math.round(d.markupRate*100)}%.`
    :automationLockMessage("dash");
  if(actions){
    actions.innerHTML=unlocked
@@ -5363,11 +5560,11 @@ function dashBuyJobItems(jid){
  if(state.cash<d.total)return showRequirementPopup(`DASH delivery costs ${money(d.total)}. You currently have ${money(state.cash)}.`);
 
  state.cash-=d.total;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+d.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+d.total;state.runCashSpent=(state.runCashSpent||0)+d.total;
  d.items.forEach(x=>state.gear[x.g.id]=gearQty(x.g.id)+x.missing);
 
  S.cash();
- log(`DASH delivered Job equipment for ${j.name}. Paid ${money(d.total)} including the 50% convenience markup.`);
+ log(`DASH delivered Job equipment for ${j.name}. Paid ${money(d.total)} including the ${Math.round(d.markupRate*100)}% convenience markup.`);
  showActionFlash("DASH DELIVERY COMPLETE",`${j.name} · ${d.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")} · ${money(d.total)}`,"cash");
  save();render();
 }
@@ -5387,7 +5584,7 @@ function dashJobPanel(j,dash,dashMarkup){
    <div class="job-dash-head"><span class="job-dash-brand">DASH</span><button class="job-dash-help" onclick="showDashHelp('${j.id}',event)">?</button></div>
    <div class="job-dash-items">${dash.items.map(x=>`${x.missing}× ${x.g.name}`).join(" · ")}</div>
    <button class="btn secondary small" onclick="dashBuyJobItems('${j.id}')" ${state.cash<dash.total?"disabled":""}>DASH ITEMS · ${money(dash.total)}</button>
-   <div class="sub">+50% convenience markup (${money(dashMarkup)}).</div>
+   <div class="sub">+${Math.round(dash.markupRate*100)}% convenience markup (${money(dashMarkup)}).</div>
  </div>`;
 }
 
@@ -5492,10 +5689,10 @@ function doJob(id){
  setJobBusy(id,true);state.en-=j.energy;addHeat(j.heat,j.city);
  const chance=jobChance(j),success=rnd(1,100)<=chance,jobData=jobState(id);
  if(success){
-   const eventMult=state.event.ends>now()?1.25:1;
+   const eventMult=jobCashBonusMult(j.city);
    const c=Math.floor(rnd(j.cash[0],j.cash[1])*eventMult*jobMasteryCashMult(j)*prestigeCashMult());
    const xpEarned=Math.floor(j.xp*jobMasteryXpMult(j)*prestigeXpMult());
-   state.cash+=c;state.lifetimeJobs++;state.lifetimeCashEarned+=c;state.notoriety+=j.fallback?0:2;
+   state.cash+=c;state.lifetimeJobs++;state.runJobs=(state.runJobs||0)+1;state.runCityJobs[j.city]=(state.runCityJobs[j.city]||0)+1;state.lifetimeCashEarned+=c;state.runCashEarned=(state.runCashEarned||0)+c;state.notoriety+=j.fallback?0:2;
 
    if(!j.noMastery){
      jobData.runs++;
@@ -5503,6 +5700,7 @@ function doJob(id){
        jobData.runs=0;
        if(jobData.mastery<3){
          jobData.mastery++;
+         state.lifetimeMastery=(state.lifetimeMastery||0)+1;
          state.skill++;state.notoriety+=5;
          log(`${j.name} mastery advanced to ${jobData.mastery}/3. +1 skill point.`);
          grantMasteryReward(j,jobData.mastery);
@@ -5510,7 +5708,7 @@ function doJob(id){
      }
    }
 
-   if(Array.isArray(j.loot)&&j.loot.length&&Math.random()<.20){
+   if(Array.isArray(j.loot)&&j.loot.length&&Math.random()<jobRareLootChance(j.city)){
      const item=j.loot[rnd(0,j.loot.length-1)];
      const added=addLootItem(item,1,999);
      if(added>0)log(`Recovered rare item: ${item}.`);
@@ -5578,11 +5776,12 @@ function offensiveFightProfile(o){
  const notoriety=Math.floor(state.notoriety/20);
  const setBonus=equipmentSetBonus("attack");
  const prestigeBonus=prestigeStatBonus();
- const total=stat+gear+crew+notoriety+setBonus+prestigeBonus;
+ const defenseSupport=threat>=6?Math.round(Math.max(0,state.defense)*(threat-5)*.08):0;
+ const total=stat+gear+crew+notoriety+setBonus+prestigeBonus+defenseSupport;
 
  return {
    total,stat,gear,crew,notoriety,setBonus,prestigeBonus,
-   defenseSupport:0,threat,active
+   defenseSupport,threat,active
  };
 }
 function fightRollMax(o){
@@ -5636,7 +5835,7 @@ function rivalRecordBase(level){
 function makeFightRival(i){
  const base=genOpponent(i,false);
  const recent=Object.values(state.rivalHistory||{})
-   .filter(h=>(h.fleeUntil||0)<=now())
+   .filter(h=>(h.fleeUntil||0)<=now()&&(h.city||state.currentCity)===state.currentCity)
    .sort((a,b)=>(b.lastSeen||0)-(a.lastSeen||0));
 
  if(i<2&&recent.length&&Math.random()<.45){
@@ -5649,7 +5848,8 @@ function makeFightRival(i){
      recordWins:h.recordWins||base.level*6,
      recordLosses:h.recordLosses||base.level*4,
      power:Math.round(base.power*scale),
-     rivalReturn:true
+     rivalReturn:true,
+     city:state.currentCity
    };
  }
 
@@ -5657,6 +5857,7 @@ function makeFightRival(i){
    ...base,
    id:`foe_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,
    name:generatedContactName(),
+   city:state.currentCity,
    ...rivalRecordBase(base.level)
  };
 }
@@ -5666,31 +5867,43 @@ function makeHitlistRival(i){
    ...base,
    id:`hit_${now().toString(36)}_${i}_${Math.random().toString(36).slice(2,6)}`,
    name:generatedContactName(),
+   city:state.currentCity,
    ...rivalRecordBase(base.level)
  };
 }
 function ensureFightList(){
- if(!Array.isArray(state.fightList))state.fightList=[];
- if(!Array.isArray(state.dynamicHitlist))state.dynamicHitlist=[];
- if(!state.fightListsInitialized){
-   if(!state.fightList.length)state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
-   if(!state.dynamicHitlist.length)state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
-   state.fightListsInitialized=true;
-   if(!state.lastFightRefresh)state.lastFightRefresh=now();
+ const city=heatCityId(state.currentCity);
+ if(!state.fightListsByCity||typeof state.fightListsByCity!=="object")state.fightListsByCity={east:[],downtown:[],north:[]};
+ if(!state.hitlistsByCity||typeof state.hitlistsByCity!=="object")state.hitlistsByCity={east:[],downtown:[],north:[]};
+ if(!state.fightInitializedByCity||typeof state.fightInitializedByCity!=="object")state.fightInitializedByCity={east:false,downtown:false,north:false};
+ if(!Array.isArray(state.fightListsByCity[city]))state.fightListsByCity[city]=[];
+ if(!Array.isArray(state.hitlistsByCity[city]))state.hitlistsByCity[city]=[];
+ if(!state.fightInitializedByCity[city]){
+   state.fightListsByCity[city]=[0,1,2,3,4].map(i=>makeFightRival(i));
+   state.hitlistsByCity[city]=[0,1,2].map(i=>makeHitlistRival(i));
+   state.fightInitializedByCity[city]=true;
+   state.lastFightRefreshByCity[city]=state.lastFightRefreshByCity[city]||now();
  }
+ state.fightList=state.fightListsByCity[city];
+ state.dynamicHitlist=state.hitlistsByCity[city];
  return state.fightList;
 }
+function ensureHitlist(){ensureFightList();return state.hitlistsByCity[heatCityId(state.currentCity)]||[]}
 function fightRefreshWait(){
- return Math.max(0,FIGHT_REFRESH_COOLDOWN_MS-(now()-(state.lastFightRefresh||0)));
+ const city=heatCityId(state.currentCity),last=Number(state.lastFightRefreshByCity?.[city])||0;
+ return Math.max(0,FIGHT_REFRESH_COOLDOWN_MS-(now()-last));
 }
 function refreshFightList(force=false){
  const wait=fightRefreshWait();
- if(!force&&wait>0)return showRequirementPopup(`New rivals available in ${fmt(wait)}.`);
- state.fightList=[0,1,2,3,4].map(i=>makeFightRival(i));
- state.dynamicHitlist=[0,1,2].map(i=>makeHitlistRival(i));
- state.fightListsInitialized=true;
- state.lastFightRefresh=now();save();render();
- if(!force)showActionFlash("FIGHT LIST REFRESHED","Five rivals and three street bounties located.","info");
+ if(!force&&wait>0)return showRequirementPopup(`New ${heatCityName()} rivals available in ${fmt(wait)}.`);
+ const city=heatCityId(state.currentCity);
+ state.fightListsByCity[city]=[0,1,2,3,4].map(i=>makeFightRival(i));
+ state.hitlistsByCity[city]=[0,1,2].map(i=>makeHitlistRival(i));
+ state.fightInitializedByCity[city]=true;
+ state.lastFightRefreshByCity[city]=now();
+ state.fightList=state.fightListsByCity[city];state.dynamicHitlist=state.hitlistsByCity[city];
+ save();render();
+ if(!force)showActionFlash("FIGHT LIST REFRESHED",`${heatCityName()} · five rivals and three street bounties located.`,"info");
 }
 function updateRivalHistory(o,playerWon){
  if(!o?.id)return {fled:false,streak:0};
@@ -5708,6 +5921,7 @@ function updateRivalHistory(o,playerWon){
  };
 
  h.name=o.name;
+ h.city=o.city||state.currentCity;
  h.level=o.level;
  h.crew=o.crew;
  h.timesFought++;
@@ -5741,8 +5955,9 @@ function updateRivalHistory(o,playerWon){
 }
 
 function removeFleeingRivalFromFightList(id){
- if(!id||!Array.isArray(state.fightList))return;
- state.fightList=state.fightList.filter(x=>x.id!==id);
+ if(!id)return;
+ const city=heatCityId(state.currentCity),list=ensureFightList().filter(x=>x.id!==id);
+ state.fightListsByCity[city]=list;state.fightList=list;
 }
 
 function bountyPlacementCost(o){
@@ -5754,10 +5969,10 @@ function placeBountyOnRival(id){
  if(state.playerBounties.some(x=>x.id===id))return toast("That rival is already on your Hitlist.");
  const cost=bountyPlacementCost(o);
  if(state.cash<cost)return showRequirementPopup(`Placing this bounty costs ${money(cost)}. You have ${money(state.cash)}.`);
- state.cash-=cost;state.lifetimeCashSpent+=cost;
+ state.cash-=cost;state.lifetimeCashSpent+=cost;state.runCashSpent=(state.runCashSpent||0)+cost;
  state.playerBounties.unshift({...o,bounty:Math.round(cost*.35),placedCost:cost,placedAt:now()});
  state.playerBounties=state.playerBounties.slice(0,10);
- state.fightList=state.fightList.filter(x=>x.id!==id);
+ const city=heatCityId(state.currentCity);state.fightListsByCity[city]=ensureFightList().filter(x=>x.id!==id);state.fightList=state.fightListsByCity[city];
  showActionFlash("BOUNTY POSTED",`${o.name} · Cost ${money(cost)} · Hitlist reward ${money(Math.round(cost*.35))}`,"cash");
  save();render();
 }
@@ -5838,7 +6053,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    :revengeId
      ?state.revenge.find(x=>x.id===revengeId)
      :hit
-       ?(state.dynamicHitlist||[])[i]
+       ?ensureHitlist()[i]
        :ensureFightList()[i];
  if(!o)return;
 
@@ -5853,7 +6068,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
  }
 
  state.st-=staminaCost;
- state.lifetimeFights++;
+ state.lifetimeFights++;state.runFights=(state.runFights||0)+1;
  runScene([[0,fxReload],[260,fxGun]]);
 
  const profile=offensiveFightProfile(o),rollMax=fightRollMax(o),p=profile.total+rnd(1,rollMax),e=o.power+rnd(1,rollMax);
@@ -5861,9 +6076,9 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
  const rivalUpdate=updateRivalHistory(o,won);
 
  if(won){
-   const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult());
+   const c=Math.floor((rnd(Math.floor(o.cash*.7),Math.floor(o.cash*1.3))+(o.bounty||0))*prestigeCashMult()*fightLocationCashMult(o.city||state.currentCity));
    const heatDrop=Math.min(currentHeat(),hit?rnd(3,5):revengeId?rnd(2,4):rnd(1,3));
-   state.cash+=c;state.lifetimeCashEarned+=c;state.wins++;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));setHeatForCity(state.currentCity,currentHeat()-heatDrop);
+   state.cash+=c;state.lifetimeCashEarned+=c;state.runCashEarned=(state.runCashEarned||0)+c;state.wins++;state.lifetimeWins=(state.lifetimeWins||0)+1;state.runWins=(state.runWins||0)+1;state.notoriety+=2;state.hp=Math.max(1,state.hp-rnd(2,9));setHeatForCity(state.currentCity,currentHeat()-heatDrop);
    addXp(Math.floor((10+o.level*2)*prestigeXpMult()));
    if(rivalUpdate.fled){
      removeFleeingRivalFromFightList(o.id);
@@ -5878,7 +6093,7 @@ function fight(i,hit=false,revengeId=null,bountyId=null){
    );
    if(revengeId)state.revenge=state.revenge.filter(x=>x.id!==revengeId);
    if(bountyId)state.playerBounties=state.playerBounties.filter(x=>x.id!==bountyId);
-   if(hit&&!bountyId&&o?.id)state.dynamicHitlist=(state.dynamicHitlist||[]).filter(x=>x.id!==o.id);
+   if(hit&&!bountyId&&o?.id){const city=heatCityId(state.currentCity);state.hitlistsByCity[city]=ensureHitlist().filter(x=>x.id!==o.id);state.dynamicHitlist=state.hitlistsByCity[city];}
  }else{
    const mitigation=defenseMitigation(),threat=opponentThreat(o),baseLoss=Math.min(state.cash,rnd(90,210)+o.level*22+threat*35);
    const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(7+Math.floor(threat/2),17+threat)*(1-mitigation)));
@@ -5907,7 +6122,7 @@ function fightBoss(t){
  if(power>=enemy){
    const payout=Math.floor(1800*(t+1)*(1+rematches*.15)*prestigeCashMult());
    const xpEarned=Math.floor((120+50*t+rematches*10)*prestigeXpMult());
-   state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.notoriety+=first?25:8;
+   state.bosses[t]=true;state.cash+=payout;state.lifetimeCashEarned+=payout;state.runCashEarned=(state.runCashEarned||0)+payout;state.notoriety+=first?25:8;
    addXp(xpEarned);const bossHeatCity=(jobDefs.find(j=>j.tier===t&&j.city===state.currentCity&&!j.fallback)?.city||jobDefs.find(j=>j.tier===t&&!j.fallback)?.city||state.currentCity);addHeat(12,bossHeatCity);
 
    const extras=[];
@@ -5955,13 +6170,22 @@ function buyGear(id,qty=1){
  if(state.cash<price.total)return showRequirementPopup(`Buying ${qty} ${g.name}${qty===1?"":"s"} costs ${money(price.total)}. You have ${money(state.cash)}.`);
 
  state.cash-=price.total;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+price.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+price.total;state.runCashSpent=(state.runCashSpent||0)+price.total;
  state.gear[id]=gearQty(id)+qty;
 
  S.cash();
  const savings=g.cost*qty-price.total;
  showActionFlash("PURCHASE COMPLETE",`${qty}× ${g.name} · ${money(price.total)}${savings>0?` · Saved ${money(savings)}`:""}`,"cash");
  save();render();
+}
+
+function sellGear(id,qty=1){
+ const g=gearDefs.find(x=>x.id===id);if(!g)return;
+ const owned=gearQty(id),amount=Math.max(1,Math.min(owned,Math.floor(Number(qty)||1)));if(owned<=0)return toast(`You do not own ${g.name}.`);
+ const refund=Math.floor(g.cost*amount*.5);
+ if(!confirm(`Sell ${amount}× ${g.name} for ${money(refund)}?`))return;
+ state.gear[id]=owned-amount;if(state.gear[id]<=0)delete state.gear[id];state.cash+=refund;
+ showActionFlash("GEAR SOLD",`${amount}× ${g.name} · +${money(refund)}`,"cash");S.cash();save();render();
 }
 
 function buyFacility(id){
@@ -5973,7 +6197,7 @@ function buyFacility(id){
  if(state.cash<f.cost)return showRequirementPopup(`${f.name} costs ${money(f.cost)}. You have ${money(state.cash)}.`);
 
  state.cash-=f.cost;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+f.cost;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+f.cost;state.runCashSpent=(state.runCashSpent||0)+f.cost;
  state.facilities[id]=true;
 
  log(`${f.name} opened. ${f.unlockLabel} is now available.`);
@@ -5981,16 +6205,36 @@ function buyFacility(id){
  S.cash();save();render();
 }
 
+function propertyUpgradeCost(id){
+ const p=propDefs.find(x=>x.id===id),tier=propertyUpgradeTier(id);if(!p)return 0;
+ return Math.floor(p.cost*Math.pow(2.6,tier+1));
+}
+function upgradeProperty(id){
+ const p=propDefs.find(x=>x.id===id);if(!p)return;
+ const q=state.props[id]||0,tier=propertyUpgradeTier(id);if(q<=0)return showRequirementPopup(`Own at least one ${p.name} before upgrading it.`);
+ if(tier>=5)return showRequirementPopup(`${p.name} is already Upgrade Tier 5.`);
+ const cost=propertyUpgradeCost(id);if(state.cash<cost)return showRequirementPopup(`Upgrade Tier ${tier+1} costs ${money(cost)}. You have ${money(state.cash)}.`);
+ state.cash-=cost;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;state.runCashSpent=(state.runCashSpent||0)+cost;state.propertyUpgrades[id]=tier+1;
+ showActionFlash("PROPERTY UPGRADED",`${p.name} · Tier ${tier+1} · +25% gross income for this property type`,"cash");S.cash();save();render();
+}
+function sellProperty(id){
+ const p=propDefs.find(x=>x.id===id);if(!p)return;
+ const q=Math.max(0,Math.floor(Number(state.props[id])||0));if(q<=0)return toast(`You do not own a ${p.name}.`);
+ const refund=Math.max(1,Math.floor(p.cost*Math.pow(1.22,q-1)*.5));
+ if(!confirm(`Sell 1 ${p.name} for ${money(refund)}? This is 50% of the last unit's base purchase price.`))return;
+ state.props[id]=q-1;if(state.props[id]<=0)delete state.props[id];state.cash+=refund;
+ showActionFlash("PROPERTY SOLD",`${p.name} · +${money(refund)}`,"cash");S.cash();save();render();
+}
 function buyProp(id){
  const p=propDefs.find(x=>x.id===id);
  if(!p)return toast("Property unavailable.");
  const q=state.props[id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
  const access=catalogAccess(p);
  if(!access.levelMet)return showRequirementPopup(`${p.name} requires Level ${access.levelReq}. You are Level ${state.level}.`);
- if(!access.crewMet)return showRequirementPopup(`${p.name} requires a Crew of ${access.crewReq}. Your current Crew is ${crewSize()}.`);
+ if(!access.crewMet)return showRequirementPopup(`${p.name} requires a Mafia of ${access.crewReq}. Your current Mafia is ${crewSize()}.`);
  if(state.cash<c)return showRequirementPopup(`${p.name} costs ${money(c)}. You have ${money(state.cash)}.`);
  state.cash-=c;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+c;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+c;state.runCashSpent=(state.runCashSpent||0)+c;
  state.props[id]=q+1;
  state.notoriety+=2;
  S.cash();
@@ -6006,14 +6250,15 @@ function takeTerritory(id){
  if(state.st<2)return toast("Territory moves cost 2 stamina.");
  const enemy=factions.find(f=>f.name===t.enemy);
  if(!enemy)return toast("Rival faction unavailable.");
- state.st-=2;state.lifetimeTerritoryMoves++;
+ state.st-=2;state.lifetimeTerritoryMoves++;state.runTerritoryMoves=(state.runTerritoryMoves||0)+1;
  const p=combatPower("attack")+rnd(1,25),e=enemy.strength+rnd(1,25);
  if(p>=e){
    ts.progress+=35;addHeat(8,t.city);
    if(ts.progress>=100){
      ts.owned=true;ts.progress=100;state.notoriety+=18;
-     log(`You took control of ${t.name}.`);
-     showActionFlash("TERRITORY TAKEN",`${t.name} is now under your control`,"good");
+     const controlLoot=territoryBonusDefs[t.id]?.controlLoot;if(controlLoot)addLootItem(controlLoot,1,99);
+     log(`You took control of ${t.name}.${controlLoot?` Recovered ${controlLoot}.`:""}`);
+     showActionFlash("TERRITORY TAKEN",`${t.name} is now under your control${controlLoot?` · ${controlLoot}`:""}`,"good");
    }else{
      log(`You weakened ${t.enemy}'s hold on ${t.name}.`);
      showActionFlash("TERRITORY PRESSURE",`${t.name} · ${Math.min(100,ts.progress)}% takeover progress · -2 Stamina`,"good");
@@ -6059,11 +6304,18 @@ function crewBulkQuote(kind){
 }
 function helpCacheTier(cache){
  const n=Math.max(0,Number(cache?.responders)||0);
+ if(n>=250)return "EMPIRE CACHE";
+ if(n>=100)return "SYNDICATE CACHE";
+ if(n>=50)return "HEAVY NETWORK CACHE";
  if(n>=20)return "HEAVY CACHE";
  if(n>=10)return "PACKED CACHE";
  if(n>=4)return "CREW CACHE";
  if(n>=1)return "SMALL CACHE";
  return "THIN CACHE";
+}
+function helpCacheProfile(cache){
+ const responders=Math.max(0,Number(cache?.responders)||0);
+ return {rolls:Math.max(1,Math.min(12,1+Math.floor(responders/8))),rareBoost:Math.min(.10,responders/2000)};
 }
 function massCrewOperation(kind){
  if(!automationUnlocked(kind))return showRequirementPopup(automationLockMessage(kind));
@@ -6074,7 +6326,7 @@ function massCrewOperation(kind){
  if(!confirm(`Spend ${money(q.total)} to ${names[kind]||"contact"} ${q.count} eligible crew member${q.count===1?"":"s"}?`))return;
 
  state.cash-=q.total;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+q.total;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+q.total;state.runCashSpent=(state.runCashSpent||0)+q.total;
  const t=now();
 
  if(kind==="money"){
@@ -6133,26 +6385,27 @@ function openHelpCache(id=null){
  if(idx<0)return showRequirementPopup("That Help Cache is no longer available.");
  const cache=state.helpCaches[idx];
  const responders=Math.max(0,Number(cache.responders)||0);
- const rolls=Math.max(1,Math.min(6,1+Math.floor(responders/4)));
+ const profile=helpCacheProfile(cache),rolls=profile.rolls,rareBoost=profile.rareBoost;
  const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,blackmail:0,cash:0,limited:0,nothing:0,blocked:0};
 
  for(let i=0;i<rolls;i++){
    let r=Math.random();
    if(responders===0)r=Math.min(.999,r+.24);
-   if(r<.29){
+   const energyEnd=.28-rareBoost*.4,adrenalineEnd=.53-rareBoost*.6,energyPackEnd=.66,staminaPackEnd=.78,blackmailEnd=.85+rareBoost*.5,cashEnd=.94,limitedEnd=Math.min(.995,.98+rareBoost*.15);
+   if(r<energyEnd){
      if(addLootItem("Energy Drink",1,999)>0)rewards.energy++;else rewards.blocked++;
-   }else if(r<.54){
+   }else if(r<adrenalineEnd){
      if(addLootItem("Adrenaline Shot",1,999)>0)rewards.stamina++;else rewards.blocked++;
-   }else if(r<.67){
+   }else if(r<energyPackEnd){
      if(addLootItem("Energy Pack",1,99)>0)rewards.energyPack++;else rewards.blocked++;
-   }else if(r<.78){
+   }else if(r<staminaPackEnd){
      if(addLootItem("Stamina Pack",1,99)>0)rewards.staminaPack++;else rewards.blocked++;
-   }else if(r<.85){
+   }else if(r<blackmailEnd){
      if(addLootItem("Blackmail",1,99)>0)rewards.blackmail++;else rewards.blocked++;
-   }else if(r<.94){
+   }else if(r<cashEnd){
      const amount=rnd(250,700)+Math.max(1,Number(cache.level)||1)*25+responders*20;
-     state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;rewards.cash+=amount;
-   }else if(r<.98&&responders>=8){
+     state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;rewards.cash+=amount;
+   }else if(r<limitedEnd&&responders>=8){
      const limited=activeLimitedLoot();
      if(addLootItem(limited.name,1,99)>0)rewards.limited++;else rewards.blocked++;
    }else rewards.nothing++;
@@ -6197,7 +6450,7 @@ function renderCrewOperations(){
  el.innerHTML=`<div class="crew-op-grid">
    ${opCard("MASS SEND MONEY","Distribute level-scaled Cash to every eligible recruited crew member. 60m per-person cooldown.",qm,"money","SEND MONEY")}
    ${opCard("MASS RETURN FAVORS","Settle obligations across eligible recruited crew. Uses each contact's normal favor cooldown.",qf,"favor","RETURN FAVORS")}
-   ${opCard("MASS ASK FOR HELP","Coordinate one request across eligible recruited crew. Replies are sealed into a Help Cache for later.",qh,"help","ASK FOR HELP")}
+   ${opCard("MASS ASK FOR HELP","Coordinate one request across eligible recruited crew. Larger response counts improve cache quality and can add more reward rolls.",qh,"help","ASK FOR HELP")}
  </div>
  <div class="help-cache-head"><b>SEALED HELP CACHES</b><span>${caches.length}/${MAX_HELP_CACHES}</span></div>
  <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>${spriteIconHtml("2:help-cache","sm")} ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
@@ -6213,7 +6466,7 @@ function sendContactMoney(id){
  const amount=crewBulkUnitCost("money");
  if(state.cash<amount)return showRequirementPopup(`Sending money to ${d.name} costs ${money(amount)}. You have ${money(state.cash)}.`);
  state.cash-=amount;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+amount;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+amount;state.runCashSpent=(state.runCashSpent||0)+amount;
  f.lastMoney=now();
  changeRelationship(id,{trust:4,respect:2,resentment:-3,rel:4});
  f.response=`Received ${money(amount)}. I appreciate it.`;
@@ -6229,7 +6482,7 @@ function doFavor(id){
  if(cooldown(f.lastFavor,10)>0)return;
  if(state.cash<100)return toast("Not enough cash.");
  state.cash-=100;
- state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+100;
+ state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+100;state.runCashSpent=(state.runCashSpent||0)+100;
  S.cash();
  f.lastFavor=now();
  changeRelationship(id,{trust:7,respect:3,resentment:-5,rel:6});
@@ -6251,7 +6504,8 @@ function openHelpRequest(id){
  if(goldStatus.unlocked)f.lastGoldBarAsk=now();
 
  const helpChance=Math.max(.08,Math.min(.88,(d.help||.5)+(f.trust-50)/170-(f.resentment/160)));
- changeRelationship(id,{trust:-2,resentment:3,rel:-2});
+ const memoryFactor=Math.max(.4,1-prestigePerkRank("longMemory")*.10);
+ changeRelationship(id,{trust:-Math.max(1,Math.round(2*memoryFactor)),resentment:Math.max(1,Math.round(3*memoryFactor)),rel:-Math.max(1,Math.round(2*memoryFactor))});
  let outcome=null;
 
  if(goldStatus.unlocked&&(Math.random()*100)<goldBarChance(id)){
@@ -6323,7 +6577,7 @@ function recruit(id){
  if(cooldown(f.lastRecruit,12)>0)return;
  f.lastRecruit=now();
 
- const chance=Math.max(.05,Math.min(.92,(d.join||.5)+(f.trust-50)/120+(f.respect-50)/180-(f.resentment/150)));
+ const chance=Math.max(.05,Math.min(.92,(d.join||.5)+(f.trust-50)/120+(f.respect-50)/180-(f.resentment/150)+worldEventValue("recruitBonus",0)));
  if(Math.random()<chance){
    f.crew=true;changeRelationship(id,{respect:4,rel:3});
    f.response=joinReplies[rnd(0,joinReplies.length-1)];
@@ -6332,6 +6586,16 @@ function recruit(id){
    changeRelationship(id,{resentment:4,rel:-3});
    f.response=refuseReplies[rnd(0,refuseReplies.length-1)];S.bad();
  }
+ save();render();
+}
+function declineGiftRequest(id){
+ const f=fstate(id),d=getPersonDef(id);if(!f||!d)return;
+ const request=f.giftRequest;if(!request)return showRequirementPopup(`${d.name} does not have a gift request right now.`);
+ f.giftRequest=null;f.lastGift=now()-15*60000;
+ changeRelationship(id,{trust:-2,rel:-1,resentment:2});
+ f.response=`No problem. I will ask somebody else about the ${request.item}.`;
+ log(`Declined ${d.name}'s request for ${request.item} ×${request.qty}.`);
+ showActionFlash("GIFT REQUEST DECLINED",`${d.name} · small relationship penalty · new request available later`,"info");
  save();render();
 }
 function sendGift(id){
@@ -6388,7 +6652,7 @@ function addPotential(id,force=false){
 
    state.friends[id]={
      rel:p.rel,trust:p.rel,respect:45,fear:10,resentment:0,crew:false,
-     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,
+     lastAsk:0,lastRecruit:0,lastFavor:0,lastGift:0,lastMoney:0,lastGoldBarAsk:0,lastCheckIn:0,
      response:"Good to have a direct line.",chat:p.chat||[],
      injuredUntil:0,arrestedUntil:0,gifts:0,
      lastOnline:p.lastOnline||now(),activityScore:p.activityScore||d.activityScore||.60,
@@ -6422,7 +6686,8 @@ function renderChat(){
  f.chat=f.chat||[];
 
  chatLog.innerHTML=f.chat.length?f.chat.map(m=>`<div class="bubble ${m.me?"me":""}">${m.text}</div>`).join(""):`<div class="bubble">I heard your name through a mutual contact.</div>`;
- const opts=[`<button onclick="chatAction('smalltalk')">Check in</button>`];
+ const checkWait=cooldown(Number(f.lastCheckIn)||0,checkInCooldownMinutes());
+ const opts=[`<button onclick="chatAction('smalltalk')" ${checkWait>0?"disabled":""}>${checkWait>0?`Check in ${fmt(checkWait)}`:"Check in"}</button>`];
  if(potential&&!f.added){
    const contactWait=cooldown(f.lastContactRequest||0,CONTACT_REQUEST_COOLDOWN_MIN);
    opts.push(`<button onclick="chatAction('add')" ${contactWait>0?"disabled":""}>${contactWait>0?`Contact request ${fmt(contactWait)}`:"Send contact request"}</button>`);
@@ -6444,12 +6709,17 @@ function chatAction(type){
  f.chat=f.chat||[];
 
  if(type==="smalltalk"){
-   f.chat.push({me:true,text:"I wanted to check in."});
-   if(!potential&&!contactCanRespond(f)){
-     f.chat.push({me:false,text:`No response. Last online ${formatPresenceAge(f.lastOnline)}.`});
-   }else{
-     f.chat.push({me:false,text:genericReplies[rnd(0,genericReplies.length-1)]});
-     if(potential)f.rel=Math.min(100,f.rel+2);else changeRelationship(id,{trust:2,rel:2});
+   const wait=cooldown(Number(f.lastCheckIn)||0,checkInCooldownMinutes());
+   if(wait>0){f.chat.push({me:false,text:`We already talked. Check back in ${fmt(wait)}.`});}
+   else{
+     f.lastCheckIn=now();
+     f.chat.push({me:true,text:"I wanted to check in."});
+     if(!potential&&!contactCanRespond(f)){
+       f.chat.push({me:false,text:`No response. Last online ${formatPresenceAge(f.lastOnline)}.`});
+     }else{
+       f.chat.push({me:false,text:genericReplies[rnd(0,genericReplies.length-1)]});
+       if(potential)f.rel=Math.min(100,f.rel+2);else changeRelationship(id,{trust:1,rel:1});
+     }
    }
  }
  if(type==="add"){
@@ -6658,6 +6928,11 @@ function ensureCrewGiftRequest(id){
  const pool=crewGiftRequestPool();
  if(!pool.length)return null;
  const request={...pool[rnd(0,pool.length-1)],qty:weightedCrewGiftQuantity(),createdAt:now()};
+ if(request.kind==="gear"&&request.itemId){
+   const g=gearDefs.find(x=>x.id===request.itemId),cost=Number(g?.cost)||0;
+   const maxQty=cost>=50000?1:cost>=10000?2:cost>=5000?3:5;
+   request.qty=Math.min(request.qty,maxQty);
+ }
  f.giftRequest=request;
  save();
  return request;
@@ -6957,7 +7232,7 @@ function claimDaily(){
  const c=400+state.daily.streak*120;
  const oldEnergy=state.en;
  state.cash+=c;
- state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;
+ state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;
  state.en=Math.min(state.maxEn,state.en+5);
  const energyGain=Math.floor(state.en-oldEnergy);
  const crateDay=state.daily.streak%3===0;
@@ -7104,35 +7379,35 @@ function useMysteryCrate(){
  let detail="",type="good";
  if(r<.35){
    const amount=rnd(300,800)+Math.max(1,state.level)*15;
-   state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+   state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
    detail=`+${money(amount)} Cash`;
    type="cash";
  }else if(r<.60){
    const added=addLootItem("Energy Drink",1,999);
    if(added>0)detail="Energy Drink ×1";
    else{
-     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
      detail=`Energy Drink stash full · +${money(amount)} Cash instead`;type="cash";
    }
  }else if(r<.82){
    const added=addLootItem("Adrenaline Shot",1,999);
    if(added>0)detail="Adrenaline Shot ×1";
    else{
-     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
      detail=`Adrenaline stash full · +${money(amount)} Cash instead`;type="cash";
    }
  }else if(r<.92){
    const added=addLootItem("Energy Pack",1,99);
    if(added>0)detail="Energy Pack ×1";
    else{
-     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
      detail=`Energy Pack stash full · +${money(amount)} Cash instead`;type="cash";
    }
  }else{
    const added=addLootItem("Stamina Pack",1,99);
    if(added>0)detail="Stamina Pack ×1";
    else{
-     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;
+     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
      detail=`Stamina Pack stash full · +${money(amount)} Cash instead`;type="cash";
    }
  }
@@ -7145,7 +7420,7 @@ function bankDeposit(pct=1){
  if(state.cash<=0)return toast("No Cash available to deposit.");
  const amount=Math.max(1,Math.floor(state.cash*Math.max(.01,Math.min(1,pct))));
  const fee=Math.ceil(amount*.10),deposited=Math.max(0,amount-fee);
- state.cash-=amount;state.bankCash+=deposited;state.lifetimeCashSpent+=fee;
+ state.cash-=amount;state.bankCash+=deposited;state.lifetimeCashSpent+=fee;state.runCashSpent=(state.runCashSpent||0)+fee;
  showActionFlash("BANK DEPOSIT",`${money(deposited)} protected · ${money(fee)} laundering fee`,"cash");
  save();render();
 }
@@ -7164,7 +7439,7 @@ function hospitalHeal(){
  const cost=hospitalCost();
  if(state.hp>=state.maxHp)return toast("Health is already full.");
  if(state.cash<cost)return showRequirementPopup(`Hospital treatment costs ${money(cost)}. You have ${money(state.cash)}.`);
- state.cash-=cost;state.lifetimeCashSpent+=cost;state.hp=state.maxHp;
+ state.cash-=cost;state.lifetimeCashSpent+=cost;state.runCashSpent=(state.runCashSpent||0)+cost;state.hp=state.maxHp;
  showActionFlash("HOSPITAL TREATMENT",`Health restored · ${money(cost)} paid`,"good");
  save();render();
 }
@@ -7204,28 +7479,45 @@ function resetGoldUnlockStats(){
 }
 function prestigeGame(){
  if(!canPrestige())return showRequirementPopup("Prestige requires Level 100 and every rank boss defeated.");
- if(!confirm("Become a higher-tier Kingpin? This resets level, cash, jobs, bosses, properties, territory, equipment, and run statistics. Crew, custom identities, Gold Bars, Gold Vault unlocks, rare loot, achievements, and completed collections are preserved."))return;
+ const select=document.getElementById("prestigePerkChoice"),perk=select?.value||prestigePerkSelection||"";
+ const perkNames={smuggler:"Smuggler Network",oldMoney:"Old Money",hardCrew:"Hard Crew",insideInfo:"Inside Information",longMemory:"Long Memory",territoryBroker:"Territory Brokers"};
+ if(!perkNames[perk])return showRequirementPopup("Choose a permanent Prestige perk before beginning the next run.");
+ if(!confirm(`Become a higher-tier Kingpin and add 1 rank to ${perkNames[perk]}? Level, cash, current-run jobs, bosses, properties, territory, and equipment reset. Lifetime statistics, Mafia members, Gold, rare loot, achievements, collections, and Prestige perks remain.`))return;
  state.prestige=(state.prestige||0)+1;
+ state.prestigePerks[perk]=(state.prestigePerks[perk]||0)+1;
+ if(state.prestige<=3)addLootItem(`Prestige Mark ${["I","II","III"][state.prestige-1]}`,1,99);
  state.level=1;state.xp=0;state.skill=5;state.cash=700;state.bankCash=0;state.heat=0;state.heatByCity={east:0,downtown:0,north:0};state.heatMetaByCity={};cities.forEach(c=>state.heatMetaByCity[c.id]={lastDecay:now(),lastGain:now(),lastLayLow:0,bribeWindowStart:0,bribeCount:0});state.lastHeatGain=now();state.lastLayLow=0;state.cashBribeWindowStart=0;state.cashBribeCount=0;state.notoriety=10*state.prestige;
- state.gear={};state.props={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
+ state.gear={};state.props={};state.propertyUpgrades={};state.jobs={};state.bosses={};state.bossLastFight={};state.bossRematches={};state.territory={};territoryDefs.forEach(t=>state.territory[t.id]={owned:false,progress:0});
  state.factions={harbor:0,rossi:0,bellini:0,varga:0};state.campaignIndex=0;state.campaignClaimed={};state.currentCity="east";
- state.wins=0;state.losses=0;state.lifetimeJobs=0;state.lifetimeCashEarned=0;state.lifetimeCashSpent=0;state.lifetimeFights=0;state.lifetimeTerritoryMoves=0;
- state.fightList=[];state.dynamicHitlist=[];state.fightListsInitialized=false;state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
+ state.wins=0;state.losses=0;state.runJobs=0;state.runCashEarned=0;state.runCashSpent=0;state.runFights=0;state.runWins=0;state.runTerritoryMoves=0;state.runCityJobs={east:0,downtown:0,north:0};
+ state.fightList=[];state.dynamicHitlist=[];state.fightListsInitialized=false;state.fightListsByCity={east:[],downtown:[],north:[]};state.hitlistsByCity={east:[],downtown:[],north:[]};state.fightInitializedByCity={east:false,downtown:false,north:false};state.lastFightRefreshByCity={east:0,downtown:0,north:0};state.playerBounties=[];state.rivalHistory={};state.lastFightRefresh=0;
  resetGoldUnlockStats();
- log(`Kingpin Prestige ${state.prestige} began. Permanent bonuses increased.`);
- showActionFlash("KINGPIN PRESTIGE",`Prestige ${state.prestige} · +${state.prestige*5}% Job Cash/XP · +${state.prestige*2} Attack/Defense`,"cash");
+ log(`Kingpin Prestige ${state.prestige} began. ${perkNames[perk]} increased to Rank ${state.prestigePerks[perk]}.`);
+ showActionFlash("KINGPIN PRESTIGE",`Prestige ${state.prestige} · ${perkNames[perk]} Rank ${state.prestigePerks[perk]}`,"cash");
  save();render();
 }
+
 function renderPrestige(){
  const el=document.getElementById("prestigePanel");if(!el)return;
  const p=state.prestige||0,ready=canPrestige();
+ const perkOptions=[
+   ["smuggler","Smuggler Network","DASH markup -5 percentage points per rank (minimum applies)."],
+   ["oldMoney","Old Money","Property income +5% per rank."],
+   ["hardCrew","Hard Crew","Active crew combat contribution +3% per rank."],
+   ["insideInfo","Inside Information","Job rare-loot chance +2% per rank."],
+   ["longMemory","Long Memory","Ask for Help damages relationships less per rank."],
+   ["territoryBroker","Territory Brokers","Territory income +5% per rank."]
+ ];
  el.innerHTML=`<div class="prestige-card">
   <div class="service-head"><div class="service-name">${spriteIconHtml("2:prestige-crown","sm")} Kingpin Prestige</div><div class="prestige-level">${p}</div></div>
-  <div class="prestige-bonuses">Permanent bonus: +${p*5}% Job Cash · +${p*5}% Job XP · +${p*2} Attack · +${p*2} Defense · +${p*20} combat crew capacity.</div>
-  <div class="service-note">${ready?"You control every rank and have reached Level 100. A new run is available.":`Requires Level 100 and all ${tiers.length} rank bosses defeated.`}</div>
+  <div class="prestige-bonuses">Base permanent bonus: +${p*5}% Job Cash · +${p*5}% Job XP · +${p*2} Attack · +${p*2} Defense · +${p*20} combat crew capacity.</div>
+  <div class="prestige-perk-list"><b>PERMANENT PERKS:</b> ${prestigePerkSummary()}</div>
+  <div class="prestige-perk-select"><label for="prestigePerkChoice">CHOOSE ONE PERMANENT PERK RANK FOR THE NEXT PRESTIGE</label><select id="prestigePerkChoice" onchange="prestigePerkSelection=this.value"><option value="">Select a perk...</option>${perkOptions.map(([id,name,desc])=>`<option value="${id}" ${prestigePerkSelection===id?"selected":""}>${name} · Rank ${prestigePerkRank(id)} → ${prestigePerkRank(id)+1} · ${desc}</option>`).join("")}</select></div>
+  <div class="service-note">${ready?"You control every rank and have reached Level 100. Choose a perk and begin a new run.":`Requires Level 100 and all ${tiers.length} rank bosses defeated.`}</div>
   <button class="btn gold" style="margin-top:6px" onclick="prestigeGame()" ${ready?"":"disabled"}>BEGIN PRESTIGE ${p+1}</button>
  </div>`;
 }
+
 function showLevelUpModal(level){
  const title=document.getElementById("levelUpTitle"),body=document.getElementById("levelUpBody");
  if(!title||!body)return;
@@ -7244,6 +7536,7 @@ let gearGradeFilter="all";
 const gearBuySelections={};
 let crewListFilter="all";
 let crewSearchText="";
+let prestigePerkSelection="";
 const openRelationshipDetails=new Set();
 
 function setRelationshipOpen(id,isOpen){
@@ -7323,7 +7616,7 @@ function openGoldVaultFromStat(){
 }
 function showFightBreakdown(i,hit=false,revengeId=null,e){
  if(e?.stopPropagation)e.stopPropagation();
- const o=revengeId?state.revenge.find(x=>x.id===revengeId):(hit?(state.dynamicHitlist||[])[i]:ensureFightList()[i]);
+ const o=revengeId?state.revenge.find(x=>x.id===revengeId):(hit?ensureHitlist()[i]:ensureFightList()[i]);
  if(!o)return;
  const p=offensiveFightProfile(o),chance=fightWinChance(o);
  document.getElementById("statHelpTitle").textContent=`${o.name} · ${chance}% WIN`;
@@ -7386,9 +7679,9 @@ function render(){syncLegacyHeatAlias();syncStatHudMode();const sx=document.getE
 }
 function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and a Mystery Crate every third streak day.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
 function renderEvent(){
- const surge=state.event.ends>now(),limited=activeLimitedLoot(),left=limitedLootEndsAt()-now();
- eventBox.innerHTML=`${surge?`<div class="event"><b>Limited Operation: Harbor Surge</b><div class="sub">Jobs pay 25% more cash until the event expires.</div><div class="badge gold" style="margin-top:5px">Ends in ${fmtLong(state.event.ends-now())}</div></div>`:""}
- <div class="limited-loot"><b>WEEKLY LIMITED DROP: ${limited.name}</b><div class="sub">${limited.desc} Every successful Job has an 8% chance to recover one.</div><div class="badge gold" style="margin-top:4px">Rotates in ${fmtLong(left)}</div></div>`;
+ const ev=activeWorldEvent(),limited=activeLimitedLoot(),left=limitedLootEndsAt()-now();
+ eventBox.innerHTML=`<div class="event"><b>Rotating Operation: ${ev.name}</b><div class="sub">${ev.desc}</div><div class="badge gold" style="margin-top:5px">Rotates in ${fmtLong(ev.ends-now())}</div></div>
+ <div class="limited-loot"><b>WEEKLY LIMITED DROP: ${limited.name}</b><div class="sub">${limited.desc} Every successful non-fallback Job has an 8% chance to recover one.</div><div class="badge gold" style="margin-top:4px">Rotates in ${fmtLong(left)}</div></div>`;
 }
 function renderJobs(){
  const jobsEl=document.getElementById("jobs"),tierEl=document.getElementById("tierName"),bossEl=document.getElementById("boss");
@@ -7404,7 +7697,8 @@ function renderJobs(){
  tierEl.innerHTML=`Location · <select id="jobCitySelect" onchange="switchCity(this.value)" style="max-width:190px;background:#0b0a08;color:#ddd;border:1px solid #4a4032;padding:3px">${cities.map(c=>`<option value="${c.id}" ${state.currentCity===c.id?"selected":""} ${state.level<c.level?"disabled":""}>${c.name} · Heat ${Math.floor(heatForCity(c.id))}${state.level<c.level?` (LVL ${c.level})`:""}</option>`).join("")}</select>`;
  const limited=activeLimitedLoot();
  const visibleJobs=jobDefs.filter(j=>j.tier<=t&&j.city===state.currentCity);
- jobsEl.innerHTML=visibleJobs.length?visibleJobs.map(j=>{
+ const identity=locationIdentity(state.currentCity);
+ jobsEl.innerHTML=`<div class="location-identity"><b>${cityDef().name} · ${identity.name}</b><br>${identity.desc}</div>`+(visibleJobs.length?visibleJobs.map(j=>{
    const s=jobState(j.id),requirements=jobRequirementList(j),miss=reqMissing(j),pct=s.mastery>=3?100:Math.max(0,Math.min(100,s.runs*20)),ch=jobChance(j),art=IMG[j.img]||IMG.suit;
    const statKind=jobStatKind(j),statBonus=jobStatBonus(j),dash=dashJobCost(j),dashMarkup=dash.total-dash.base;
    const lo=Math.floor(j.cash[0]*jobMasteryCashMult(j)*prestigeCashMult()),hi=Math.floor(j.cash[1]*jobMasteryCashMult(j)*prestigeCashMult());
@@ -7421,7 +7715,7 @@ function renderJobs(){
     <div class="job-primary"><button class="btn" onclick="showJobRequirements('${j.id}')">${miss.length?"VIEW REQUIREMENTS":"DO JOB"}</button></div>
     <details class="compact-details"><summary>JOB DETAILS</summary><div class="compact-details-body">Preferred role: ${j.role}<br>${statKind==="attack"?"Attack raises success.":statKind==="defense"?"Defense raises success and reduces losses.":"Attack and Defense both contribute."} Current stat bonus: +${statBonus}%.<br>Crew requirement: ${j.crew} · Heat: +${j.heat}<br>Rare items: ${Array.isArray(j.loot)&&j.loot.length?j.loot.join(", "):"None"}<br><b>Weekly limited drop:</b> ${j.fallback?"Not available on fallback jobs":`${limited.name} (8% on success)`}</div></details>
    </div>`;
- }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`;
+ }).join(""):`<div class="tab-empty">No operations are available in ${cityDef().name} at your current rank.</div>`);
 
  const done=!!state.bosses[bossT],last=Number(state.bossLastFight[bossT]||0),wait=done?Math.max(0,BOSS_REMATCH_COOLDOWN_MS-(now()-last)):0,rematches=Number(state.bossRematches[bossT]||0);
  const power=bossDef(bossT)+rematches*22,pool=bossLootDefs[bossT]||[],bossProgress=bossJobProgress(bossT),ready=bossReady(bossT);
@@ -7489,8 +7783,8 @@ function renderCrew(){
  const recruitedIds=Object.keys(state.friends).filter(id=>state.friends[id]?.crew);
  const contactIds=Object.keys(state.friends).filter(id=>state.friends[id]&&!state.friends[id].crew);
  const inactiveCrew=recruitedIds.filter(id=>state.friends[id]?.inactive).length;
- const activeCrew=recruitedIds.filter(id=>contactCanRespond(state.friends[id])&&!state.friends[id]?.inactive).length;
- if(typeof crewSummary!=="undefined"&&crewSummary)crewSummary.textContent=`${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} total · ${activeCrew+1} active${inactiveCrew?` · ${inactiveCrew} inactive`:""}`;
+ const activeCrew=recruitedIds.filter(id=>!state.friends[id]?.inactive).length;
+ if(typeof crewSummary!=="undefined"&&crewSummary)crewSummary.textContent=`Mafia ${crewSize().toLocaleString()}/${MAX_CREW_MEMBERS.toLocaleString()} · ${activeCrew+1} active${inactiveCrew?` · ${inactiveCrew} inactive legacy members`:""}`;
  const contactSummary=document.getElementById("contactSummary");
  if(contactSummary){
    const activeContacts=contactIds.filter(id=>contactCanRespond(state.friends[id])&&!state.friends[id]?.inactive).length;
@@ -7526,7 +7820,7 @@ function renderCrew(){
          <span class="crew-pill ${repCls}">REP ${rep}</span>
        </div>
        <div class="presence-line ${presence.cls}">${presence.text}</div>
-       ${inactive?`<div class="inactive-note">Still listed, but no longer responds or contributes active combat power.</div>`:""}
+       ${inactive?`<div class="inactive-note">Still counts toward your Mafia size, but no longer responds or contributes active combat power.</div>`:""}
        <details class="compact-details" data-rel-id="${id}" ${openRelationshipDetails.has(id)?"open":""} ontoggle="setRelationshipOpen('${id}',this.open)">
          <summary>RELATIONSHIP</summary>
          <div class="compact-details-body">
@@ -7540,7 +7834,7 @@ function renderCrew(){
      <div class="fbtns">
        <button onclick="openHelpRequest('${id}')" ${!responsive||a?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":a?fmt(a):"ASK FOR HELP"}</button>
        <button onclick="doFavor('${id}')" ${!responsive||fv||state.cash<100?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":fv?fmt(fv):"RETURN FAVOR -$100"}</button>
-       ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>`})()}
+       ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<div class="gift-actions"><button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>${req&&responsive&&gs.wait<=0?`<button onclick="declineGiftRequest('${id}')">DECLINE</button>`:""}</div>`})()}
      </div>
    </div>`;
  }).join(""):`<div class="crew-filter-empty">No Crew members match this filter${crewSearchText?" or search":""}.</div>`;
@@ -7587,7 +7881,7 @@ function renderCrew(){
        <div class="fbtns">
          <button onclick="recruit('${id}')" ${!responsive||r?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":r?fmt(r):"RECRUIT"}</button>
          <button onclick="sendContactMoney('${id}')" ${!responsive||moneyWait||state.cash<sendAmount?"disabled":""}>${inactive?"INACTIVE":!responsive?"OFFLINE":moneyWait?`MONEY ${fmt(moneyWait)}`:`SEND ${money(sendAmount)}`}</button>
-         ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>`})()}
+         ${(()=>{const gs=crewGiftRequestStatus(id),req=gs.request;const disabled=!responsive||gs.wait>0||!req||!gs.ready;const label=inactive?"INACTIVE":!responsive?"OFFLINE":gs.wait>0?`GIFT ${fmt(gs.wait)}`:!req?"NO REQUEST":`SEND ${req.item} ×${req.qty}`;return `<div class="gift-actions"><button onclick="sendGift('${id}')" ${disabled?"disabled":""} title="${req?`${d.name} is requesting ${req.item} ×${req.qty}. You have ${gs.owned}.`:"No gift request available."}">${label}</button>${req&&responsive&&gs.wait<=0?`<button onclick="declineGiftRequest('${id}')">DECLINE</button>`:""}</div>`})()}
        </div>
      </div>`;
    }).join(""):`<div class="crew-filter-empty">No contacts are waiting. Accepted contact requests appear here before recruitment.</div>`;
@@ -7624,14 +7918,15 @@ function renderFight(){
  if(!fightEl||!revengeEl||!hitEl)return;
  const combatInfo=document.getElementById("combatInfo"),refreshEl=document.getElementById("fightRefreshBar");
  const list=ensureFightList();
- const streetBounties=state.dynamicHitlist||[];
+ const streetBounties=ensureHitlist();
  fightEl.className="fight-set-list";
  revengeEl.className="fight-set-list";
  hitEl.className="fight-set-list";
 
  if(combatInfo){
    const atk=combatPower("attack"),def=combatPower("defense"),mit=Math.round(defenseMitigation()*100);
-   combatInfo.innerHTML=`<details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat means a stronger enemy organization. Beat the same Fight List rival ${RIVAL_FLEE_STREAK} times in a row and they flee for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Defense reduces losses by ${mit}%. Stamina costs scale by Threat.</div><div class="fight-access-note">Fight List and street-bounty targets are finite. Fleeing rivals and posted bounties leave an empty slot. New targets only appear when you manually refresh the list.</div></details>`;
+   const identity=locationIdentity(state.currentCity);
+   combatInfo.innerHTML=`<div class="location-identity"><b>${heatCityName()} · ${identity.name}</b><br>${identity.desc}</div><details class="compact-details"><summary>YOUR COMBAT POWER <span>${spriteIconHtml("pistol","xs")} ${atk} · ${spriteIconHtml("armor","xs")} ${def}</span></summary><div class="compact-details-body">Combat uses up to ${combatCrewLimit()} active crew at your current level/prestige; ${combatCrewCount()} are currently fielded. Each member can contribute one weapon, one armor item, and one vehicle slot. Large crews have diminishing direct power returns. Higher Threat means a stronger enemy organization. Beat the same Fight List rival ${RIVAL_FLEE_STREAK} times in a row and they flee for ${Math.round(RIVAL_FLEE_MS/60000)} minutes. Defense reduces losses by ${mit}%. Stamina costs scale by Threat.</div><div class="fight-access-note">Fight List and street-bounty targets are finite. Fleeing rivals and posted bounties leave an empty slot. New targets only appear when you manually refresh the list.</div></details>`;
  }
  const wait=fightRefreshWait();
  if(refreshEl)refreshEl.innerHTML=`<div class="fight-refresh-copy"><b>${list.length}/5 RIVALS REMAIN · ${streetBounties.length}/3 STREET BOUNTIES</b>Targets do not auto-repopulate after they leave the list.</div><button class="btn secondary small" onclick="refreshFightList()" ${wait>0?"disabled":""}>${wait>0?`REFRESH ${fmt(wait)}`:"REFRESH LISTS"}</button>`;
@@ -7643,7 +7938,7 @@ function renderFight(){
        <div class="fight-card-icon">${spriteIconHtml("target","card")}</div>
        <div class="fight-card-copy">
          <div class="fight-card-name">${o.name}</div>
-         <div class="fight-card-tags">${o.rivalReturn?'<span class="threat-badge">RETURNING</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div>
+         <div class="fight-card-tags">${o.rivalReturn?'<span class="threat-badge">RETURNING</span>':""}<span class="threat-badge">${fightThreatLabel(o.threat)}</span><span class="threat-badge">${heatCityName(o.city||state.currentCity)}</span><span class="fight-stamina-badge">${staminaCostMarkup(stCost)}</span></div>
        </div>
        <div class="fight-card-odds"><span class="fight-chance ${chanceClass(chance)}">${chance}% WIN</span></div>
      </div>
@@ -7870,6 +8165,7 @@ function renderGear(){
        </button>
      </div>
      <div class="gear-shop-note ${lock||needCash?"locked":discount?"savings":""}">${note}</div>
+     ${owned>0?`<div class="property-actions"><button class="btn secondary small" onclick="sellGear('${g.id}',1)">SELL 1 · ${money(Math.floor(g.cost*.5))}</button>${owned>=5?`<button class="btn secondary small" onclick="sellGear('${g.id}',5)">SELL 5 · ${money(Math.floor(g.cost*5*.5))}</button>`:""}</div>`:""}
      <details class="compact-details gear-shop-details"><summary>DETAILS</summary><div class="compact-details-body"><b>${grade.label}</b> · ${grade.range}<br>${g.desc}<br>${uses.length?`Required by: ${uses.slice(0,5).join(" · ")}${uses.length>5?" · +more":""}`:"Optional equipment — improves your organization without gating a Job."}</div></details>
    </div>`;
  }).join(""):`<div class="tab-empty">No equipment matches these filters.</div>`;
@@ -7897,17 +8193,19 @@ function renderTerritory(){
  if(!incomeEl||!factionsEl||!propsEl)return;
 
  const ownedCount=territoryDefs.filter(t=>state.territory[t.id]?.owned).length;
- const totalTerritoryIncome=territoryDefs.filter(t=>state.territory[t.id]?.owned).reduce((n,t)=>n+t.income,0);
- incomeEl.innerHTML=`<div class="territory-toolbar">
+ const totalTerritoryIncome=Math.floor(territoryDefs.filter(t=>state.territory[t.id]?.owned).reduce((n,t)=>n+t.income,0)*territoryIncomeMult());
+ const identity=locationIdentity(state.currentCity);
+ incomeEl.innerHTML=`<div class="location-identity"><b>${cityDef().name} · ${identity.name}</b><br>${identity.desc}</div><div class="territory-toolbar">
    <div class="territory-toolbar-stat"><span>NET INCOME</span><b>${netIncome()>=0?"+":"-"}${money(Math.abs(netIncome()))}/hr</b></div>
    <div class="territory-toolbar-stat"><span>CONTROL</span><b>${ownedCount}/${territoryDefs.length}</b></div>
    <div class="territory-toolbar-stat"><span>TERRITORY</span><b>+${money(totalTerritoryIncome)}/hr</b></div>
  </div>`;
 
  propsEl.innerHTML=propDefs.map(p=>{
-   const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q));
+   const q=state.props[p.id]||0,c=Math.floor(p.cost*Math.pow(1.22,q)),tier=propertyUpgradeTier(p.id),upgradeCost=propertyUpgradeCost(p.id);
    const access=catalogAccess(p),elite=p.cost>=75000;
-   const netEach=Math.max(0,p.income-p.upkeep);
+   const grossEach=Math.floor(p.income*propertyUpgradeMult(p.id)*propertyLocationIncomeMult(p.city));
+   const netEach=Math.max(0,grossEach-p.upkeep);
    const reqs=[
      `<span class="gear-req ${state.level>=p.level?"met":"missing"}">LVL ${p.level}</span>`,
      p.crewReq?`<span class="gear-req ${access.crewMet?"met":"missing"}">CREW ${crewSize()}/${p.crewReq}</span>`:""
@@ -7917,17 +8215,19 @@ function renderTerritory(){
        <div class="territory-property-icon">${spriteIconHtml(spriteForProperty(p),"shop")}</div>
        <div class="territory-property-copy">
          <div class="territory-property-name-row"><div class="territory-property-name">${p.name}</div>${elite?'<span class="gear-grade-tag high">HIGH-END</span>':""}</div>
-         <div class="territory-property-statline"><span>OWNED <b>${q}</b></span><span>NET <b>+${money(netEach)}/hr</b></span><span>UPKEEP <b>${money(p.upkeep)}/hr</b></span></div>
+         <div class="territory-property-statline"><span>OWNED <b>${q}</b></span><span>NET <b>+${money(netEach)}/hr</b></span><span>UPGRADE <b>T${tier}</b></span></div>
+         <div class="property-upgrade">Gross per unit: <b>${money(grossEach)}/hr</b>${tier?` · ${tier*25}% upgrade bonus`:""}</div>
          <div class="territory-property-desc">${p.desc}</div>
        </div>
        <div class="territory-property-price"><b>${money(c)}</b><span>NEXT</span></div>
      </div>
      <div class="gear-shop-requirements">${reqs}</div>
      <div class="territory-property-buyrow">
-       <div class="territory-property-income">Gross ${money(p.income)}/hr each · permanent passive income</div>
+       <div class="territory-property-income">${cities.find(c=>c.id===p.city)?.name||"City"} · scalable passive income</div>
        <button class="btn green territory-property-buy" onclick="buyProp('${p.id}')" ${access.locked||state.cash<c?"disabled":""}>${access.locked?catalogLockText(p):`BUY · ${money(c)}`}</button>
      </div>
-     <details class="compact-details gear-shop-details"><summary>DETAILS</summary><div class="compact-details-body">${p.desc}<br>Gross income: ${money(p.income)}/hr each · Upkeep: ${money(p.upkeep)}/hr each.${p.crewReq?`<br>Organization requirement: Level ${p.level} · Crew ${p.crewReq}.`:""}</div></details>
+     <div class="property-actions"><button class="btn secondary small" onclick="upgradeProperty('${p.id}')" ${q<=0||tier>=5||state.cash<upgradeCost?"disabled":""}>${tier>=5?"UPGRADE T5 MAX":`UPGRADE T${tier+1} · ${money(upgradeCost)}`}</button><button class="btn secondary small" onclick="sellProperty('${p.id}')" ${q<=0?"disabled":""}>SELL 1 · 50%</button></div>
+     <details class="compact-details gear-shop-details"><summary>DETAILS</summary><div class="compact-details-body">${p.desc}<br>Current gross income: ${money(grossEach)}/hr each · Base upkeep: ${money(p.upkeep)}/hr each. Upgrade tiers add 25% gross income per tier.${p.crewReq?`<br>Organization requirement: Level ${p.level} · Crew ${p.crewReq}.`:""}</div></details>
    </div>`;
  }).join("");
 
@@ -7993,7 +8293,7 @@ function renderTerritory(){
          <div class="territory-title-row"><div class="title">${t.name}</div>${s.owned?'<span class="badge green">CONTROLLED</span>':`<span class="badge">${t.enemy}</span>`}</div>
          <div class="territory-subline">${cities.find(c=>c.id===t.city).name} · ${money(t.income)}/hr · Requires ${t.reqNot} Notoriety</div>
          <div class="territory-meta"><span class="badge ${state.notoriety>=t.reqNot?"green":"red"}">Notoriety ${state.notoriety}/${t.reqNot}</span><span class="badge">${spriteIconHtml("stamina","xs")} 2 to move</span></div>
-         ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="territory-progress-copy">Takeover ${s.progress}% · successful moves add 35%</div>`:`<div class='territory-note'>Controlled territory is already feeding your hourly income and organization reputation.</div>`}
+         ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="territory-progress-copy">Takeover ${s.progress}% · successful moves add 35%</div>`:`<div class='territory-note'>CONTROL BONUS: ${territoryBonusDefs[t.id]?.desc||"Additional organization influence."}</div>`}
          <details class="compact-details"><summary>TERRITORY DETAILS</summary><div class="compact-details-body">${t.desc}</div></details>
        </div>
      </div>
@@ -8007,15 +8307,15 @@ function achievementDefs(){
  const defs=[],add=(category,prefix,targets,current,labelFn)=>targets.forEach((t,i)=>defs.push({id:`${prefix}_${t}`,category,title:labelFn(t,i),target:t,current:Math.floor(current())}));
  add("LEVEL","level",[5,10,25,50,100,200,350,500],()=>state.level,t=>`Reach Level ${t}`);
  add("JOBS","jobs",[10,50,100,250,500,1000,2500,5000,10000,25000,50000],()=>state.lifetimeJobs||0,t=>`Complete ${t.toLocaleString()} Jobs`);
- add("COMBAT","wins",[10,25,50,100,250,500,1000,2500,5000,10000,25000],()=>state.wins||0,t=>`Win ${t.toLocaleString()} Fights`);
- add("CREW","crew",[5,10,15,25,40,60,80,100],()=>crewSize(),t=>`Build a Crew of ${t}`);
+ add("COMBAT","wins",[10,25,50,100,250,500,1000,2500,5000,10000,25000],()=>state.lifetimeWins||0,t=>`Win ${t.toLocaleString()} Lifetime Fights`);
+ add("MAFIA","crew",[5,10,15,25,40,60,80,100,250,500,750,1000],()=>crewSize(),t=>`Build a Mafia of ${t}`);
  add("NOTORIETY","notoriety",[50,100,250,500,1000,2500,5000,10000,25000,50000,100000],()=>state.notoriety||0,t=>`Reach ${t.toLocaleString()} Notoriety`);
  add("MONEY","earned",[10000,50000,100000,500000,1000000,5000000,10000000,50000000,100000000,1000000000],()=>state.lifetimeCashEarned||0,t=>`Earn ${money(t)} Lifetime`);
  add("SPENDING","spent",[5000,25000,100000,500000,1000000,5000000,10000000,50000000,100000000],()=>state.lifetimeCashSpent||0,t=>`Spend ${money(t)} Building the Empire`);
  add("GEAR","gear",[10,25,50,100,250,500,1000],()=>totalGearOwned(),t=>`Own ${t.toLocaleString()} Pieces of Gear`);
  add("PROPERTY","property",[5,10,25,50,100,250,500],()=>totalPropertiesOwned(),t=>`Own ${t.toLocaleString()} Properties`);
- add("MASTERY","mastery",[5,10,25,50,100,250,500],()=>totalMasteryRanks(),t=>`Earn ${t.toLocaleString()} Mastery Ranks`);
- add("CAMPAIGN","campaign",[5,10,20,30,40,50,60],()=>Object.keys(state.campaignClaimed||{}).length,t=>`Complete ${t} Campaign Chapters`);
+ add("MASTERY","mastery",[5,10,25,50,100,250,500,1000],()=>state.lifetimeMastery||0,t=>`Earn ${t.toLocaleString()} Lifetime Mastery Ranks`);
+ add("CAMPAIGN","campaign",[5,10,20,30,40,50,60,100,150,250],()=>state.lifetimeCampaigns||0,t=>`Complete ${t} Lifetime Campaign Chapters`);
  add("ATTACK","attack",[10,20,40,75,125,200],()=>state.attack||0,t=>`Raise Attack to ${t}`);
  add("DEFENSE","defense",[10,20,40,75,125,200],()=>state.defense||0,t=>`Raise Defense to ${t}`);
  add("GOLD","gold",[1,5,10,25,50,100,250],()=>state.lifetimeGoldBars||0,t=>`Acquire ${t} Lifetime Gold Bar${t===1?"":"s"}`);
@@ -8043,7 +8343,7 @@ function drinkEnergyDrink(){
 
 function renderProfile(){
  const stats=[
-   ["rank","Rank",tiers[activeTier()].name],["notoriety","Notoriety",Math.floor(state.notoriety)],["crew","Crew",crewSize()],
+   ["rank","Rank",tiers[activeTier()].name],["notoriety","Notoriety",Math.floor(state.notoriety)],["crew","Mafia",crewSize()],["activeMafia","Active Mafia",activeCrewCount()],
    ["activeCrew","Combat Crew",`${combatCrewCount()}/${combatCrewLimit()}`],["record","Fight Record",`${state.wins}W / ${state.losses}L`],
    ["heat","Heat",`${heatCityName()} · ${Math.floor(currentHeat())} ${heatLabel()}`],["income","Net Income",money(netIncome())+"/hr"],["gold","Gold Bars",state.goldBars||0],
    ["territory","Territory",`${Object.values(state.territory).filter(x=>x.owned).length}/${territoryDefs.length}`]
@@ -8073,7 +8373,8 @@ function renderProfile(){
  defs.forEach(a=>{if(a.current>=a.target&&!state.achievementUnlocked[a.id]){state.achievementUnlocked[a.id]=now();newly.push(a)}});
  if(newly.length){
    newly.forEach(a=>{log(`Achievement unlocked: ${a.title}.`);queueUnlockPopup("Achievement",a.title)});
-   const count=Object.keys(state.achievementUnlocked).length;if(count%5===0){state.skill++;log("Achievement milestone: +1 skill point.")}save();
+   const count=Object.keys(state.achievementUnlocked).length,milestones=Math.floor(count/5),awarded=Math.max(0,Math.floor(Number(state.achievementMilestonesAwarded)||0));
+   const due=Math.max(0,milestones-awarded);if(due>0){state.skill+=due;state.achievementMilestonesAwarded=milestones;log(`Achievement milestone: +${due} skill point${due===1?"":"s"}.`)}save();
  }
  const unlocked=defs.filter(a=>state.achievementUnlocked[a.id]).length;
  ach.innerHTML=`<div class="achievement-summary"><b>${unlocked} / ${defs.length} unlocked</b><span>${unlocked===defs.length?"LEGEND":"Long-term milestones"}</span></div><div class="achievement-grid">`+
