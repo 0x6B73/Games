@@ -68,7 +68,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .sprite-lg{width:22px;height:22px}
 .sprite-card{width:26px;height:26px}
 .sprite-resource{width:22px;height:22px;display:block;margin:0 auto 5px}
-.sprite-heart,.sprite-health{background-image:url("./Assets/ue-icon-sprite.png?v=02411")!important;background-size:500% 400%!important;background-position:0 0!important;background-repeat:no-repeat!important}
+.sprite-heart,.sprite-health{background-image:url("./Assets/ue-health-icon.png?v=02413")!important;background-size:100% 100%!important;background-position:center!important;background-repeat:no-repeat!important}
 .sprite-energy{background-position:25% 0%}
 .sprite-fist,.sprite-stamina,.sprite-attack,.sprite-fight{background-position:50% 0%}
 .sprite-cash{background-position:75% 0%}
@@ -3138,7 +3138,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.12";
+const BUILD_NUMBER="0.24.13";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
