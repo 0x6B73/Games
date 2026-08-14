@@ -90,9 +90,6 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .sprite-crew{background-position:100% 100%}
 .stat-label{display:inline-flex;align-items:center;gap:6px}
 .mini-hud-item .ue-sprite{width:12px;height:12px}
-.inline-health-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:13px;line-height:1;color:#d35a52;text-shadow:0 1px 1px #000}
-.stat-label .inline-health-icon{margin-right:0}
-.mini-hud-item .inline-health-icon{font-size:12px;width:12px;height:12px}
 .inventory-resource .resource-head{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .inventory-resource .resource-head .ir-label{margin:0}
 .inventory-resource .resource-head b{margin-top:0}
@@ -1148,6 +1145,9 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 .gold-reel-item.energy{border-color:#46627a;color:#9fc6e5;background:linear-gradient(#0e1820,#060b0f)}
 .gold-reel-item.stamina{border-color:#78534c;color:#dda095;background:linear-gradient(#1d100e,#0d0706)}
 .gold-reel-item.blackmail{border-color:#7a4a4a;color:#e3a5a0;background:linear-gradient(#24100f,#0d0706)}
+.gold-reel-item.rare{border-color:#6f5f86;color:#cdb8e6;background:linear-gradient(#1c1624,#0b080e)}
+.gold-reel-item.crate{border-color:#8a6d32;color:#e6c66d;background:linear-gradient(#241c0b,#0d0a04)}
+.mystery-reel-remaining{text-align:center;font-size:8px;color:#8f887d;margin:2px 0 7px}
 .help-reel-legend{
   margin-top:5px;font-size:7px;color:#8f887d;line-height:1.4;text-align:center
 }
@@ -2416,7 +2416,7 @@ body:after{
 <header class="top">
  <div class="brandrow"><div class="brand">UNDERWORLD EMPIRE</div><div class="lvl" id="lvl"></div></div>
  <div class="stats">
-  <div class="stat stat-clickable" onclick="showStatHelp('health',event)"><span class="stat-label"><span class="inline-health-icon" aria-hidden="true">♥</span>HEALTH</span><button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
+  <div class="stat stat-clickable" onclick="showStatHelp('health',event)"><span class="stat-label"><span class="ue-sprite sprite-health sprite-sm"></span>HEALTH</span><button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
   <div class="stat stat-clickable" id="energyStat" onclick="openEnergyReserve()"><span class="stat-label"><span class="ue-sprite sprite-energy sprite-sm"></span>ENERGY</span><button class="stat-help" onclick="showStatHelp('energy',event)">?</button><b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
   <div class="stat stat-clickable" id="staminaStat" onclick="openStaminaReserve()"><span class="stat-label"><span class="ue-sprite sprite-fist sprite-sm"></span>STAMINA</span><button class="stat-help" onclick="showStatHelp('stamina',event)">?</button><b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
   <div class="stat stat-clickable" onclick="showStatHelp('cash',event)"><span class="stat-label"><span class="ue-sprite sprite-cash sprite-sm"></span>CASH</span><button class="stat-help" onclick="showStatHelp('cash',event)">?</button><b id="cashT"></b></div>
@@ -2429,7 +2429,7 @@ body:after{
 
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
-  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)"><span class="inline-health-icon" aria-hidden="true">♥</span> <b id="miniHp">100</b></div>
+  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)"><span class="ue-sprite sprite-health sprite-sm"></span> <b id="miniHp">100</b></div>
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()"><span class="ue-sprite sprite-energy sprite-sm"></span> <b id="miniEn">20</b></div>
   <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()"><span class="ue-sprite sprite-fist sprite-sm"></span> <b id="miniSt">10</b></div>
   <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)"><span class="ue-sprite sprite-cash sprite-sm"></span> <b id="miniCash">$0</b></div>
@@ -3051,6 +3051,19 @@ body:after{
   <button class="btn secondary" id="goldReelClose" onclick="closeModal('goldReelModal')" disabled>CLOSE</button>
 </div></div>
 
+<div class="modal gold-reel-modal" id="mysteryCrateReelModal"><div class="mbox">
+  <h2>Mystery Crate</h2>
+  <div class="sub" id="mysteryCrateReelStatus">Breaking the seal...</div>
+  <div class="help-reel-legend">Possible: Cash Bundle · Energy Packs · Stamina Reserve · Blackmail · Rare Loot · Gold Bar</div>
+  <div class="gold-reel-wrap">
+    <div class="gold-reel-marker"></div>
+    <div id="mysteryCrateReel" class="gold-reel"></div>
+  </div>
+  <div id="mysteryCrateReelResult" class="gold-reel-result"></div>
+  <div id="mysteryCrateReelRemaining" class="mystery-reel-remaining"></div>
+  <button class="btn" id="mysteryCrateReelClose" onclick="closeModal('mysteryCrateReelModal')" disabled>COLLECT</button>
+</div></div>
+
 <div class="modal" id="messageSafeModal"><div class="mbox message-minigame-box">
   <div class="mg-head"><h2>Safecracker Assist</h2><div class="mg-from" id="mgSafeFrom">CREW REQUEST</div></div>
   <div class="sub" style="margin-bottom:6px">Three gates. Follow the required direction, feel out the contact meter, and lock each tumbler.</div>
@@ -3110,7 +3123,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.9";
+const BUILD_NUMBER="0.24.10";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -7645,6 +7658,61 @@ function mysteryCrateRareReward(){
  state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;
  return `Rare collection complete · ${money(cash)} premium Cash`;
 }
+function mysteryCrateRewardTile(kind){
+ if(kind==="cash")return `<div class="gold-reel-item cash" data-reward-kind="cash">${spriteIconHtml("cash","lg")}<br>CASH BUNDLE</div>`;
+ if(kind==="energy")return `<div class="gold-reel-item energy" data-reward-kind="energy">${spriteIconHtml("2:energy-pack","lg")}<br>ENERGY PACKS</div>`;
+ if(kind==="stamina")return `<div class="gold-reel-item stamina" data-reward-kind="stamina">${spriteIconHtml("2:stamina-pack","lg")}<br>STAMINA RESERVE</div>`;
+ if(kind==="blackmail")return `<div class="gold-reel-item blackmail" data-reward-kind="blackmail">${spriteIconHtml("heat","lg")}<br>BLACKMAIL</div>`;
+ if(kind==="rare")return `<div class="gold-reel-item rare" data-reward-kind="rare">${spriteIconHtml("2:collection","lg")}<br>RARE LOOT</div>`;
+ return `<div class="gold-reel-item gold" data-reward-kind="gold">${spriteIconHtml("gold","lg")}<br>GOLD BAR</div>`;
+}
+function buildMysteryCrateReel(outcomeKind){
+ const reel=document.getElementById("mysteryCrateReel");if(!reel)return;
+ const pool=["cash","cash","energy","energy","stamina","stamina","blackmail","rare","cash","energy","gold"];
+ const targetIndex=18,items=[];
+ for(let i=0;i<22;i++){
+   const kind=i===targetIndex?outcomeKind:pool[rnd(0,pool.length-1)];
+   items.push(mysteryCrateRewardTile(kind));
+ }
+ reel.innerHTML=items.join("");
+ reel.classList.remove("spinning");
+ reel.style.transform="translateX(0px)";
+ void reel.offsetWidth;
+ return targetIndex;
+}
+function mysteryCrateSpinSfx(){
+ if(!state.sound)return;
+ const times=[0,90,175,255,335,415,500,590,685,785,895,1015,1145,1285,1440,1610,1795,1995,2190];
+ runScene(times.map(t=>[t,fxClick]));
+}
+function spinMysteryCrateReel(outcomeKind,detail,remaining,type="good"){
+ const modal=document.getElementById("mysteryCrateReelModal"),reel=document.getElementById("mysteryCrateReel"),result=document.getElementById("mysteryCrateReelResult"),close=document.getElementById("mysteryCrateReelClose"),status=document.getElementById("mysteryCrateReelStatus"),remainingEl=document.getElementById("mysteryCrateReelRemaining");
+ if(!modal||!reel||!result||!close){
+   showMessageMissionReward("Mystery Crate Opened","",`Received: ${detail} · ${remaining} crate${remaining===1?"":"s"} remaining`,"MYSTERY CRATE REWARD");
+   return;
+ }
+ if(status)status.textContent="The crate is opening...";
+ if(remainingEl)remainingEl.textContent="";
+ result.textContent="";result.className="gold-reel-result";close.disabled=true;
+ const targetIndex=buildMysteryCrateReel(outcomeKind);
+ modal.classList.add("show");
+ mysteryCrateSpinSfx();
+ setTimeout(()=>{
+   const wrap=reel.closest(".gold-reel-wrap"),targetItem=reel.children[targetIndex];
+   if(!wrap||!targetItem)return;
+   const itemCenter=targetItem.offsetLeft+(targetItem.offsetWidth/2),viewportCenter=wrap.clientWidth/2,target=Math.max(0,itemCenter-viewportCenter);
+   reel.classList.add("spinning");reel.style.transform=`translateX(-${target}px)`;
+ },80);
+ setTimeout(()=>{
+   if(status)status.textContent=outcomeKind==="gold"?"JACKPOT":"CRATE OPENED";
+   result.textContent=detail;result.className="gold-reel-result win";
+   if(remainingEl)remainingEl.textContent=`${remaining} Mystery Crate${remaining===1?"":"s"} remaining`;
+   close.disabled=false;
+   if(outcomeKind==="gold")S.gold();else if(outcomeKind==="cash")S.cash();else S.ok();
+   showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${remaining} remaining`,type);
+   render();
+ },2450);
+}
 function useMysteryCrate(){
  const q=Math.max(0,Number(state.loot["Mystery Crate"])||0);
  if(q<=0)return toast("No Mystery Crates available.");
@@ -7652,33 +7720,32 @@ function useMysteryCrate(){
  if(state.loot["Mystery Crate"]<=0)delete state.loot["Mystery Crate"];
 
  const r=Math.random();
- let detail="",type="good";
+ let detail="",type="good",outcomeKind="cash";
  if(r<.25){
+   outcomeKind="cash";
    const amount=mysteryCrateCashAmount();
    state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
    detail=`PREMIUM CASH BUNDLE · ${money(amount)}`;type="cash";
  }else if(r<.47){
-   detail=mysteryCrateEnergyPackReward();
+   outcomeKind="energy";detail=mysteryCrateEnergyPackReward();
  }else if(r<.67){
-   detail=mysteryCrateStaminaReward();
+   outcomeKind="stamina";detail=mysteryCrateStaminaReward();
  }else if(r<.82){
-   detail=mysteryCrateBlackmailReward();
+   outcomeKind="blackmail";detail=mysteryCrateBlackmailReward();
  }else if(r<.95){
-   detail=mysteryCrateRareReward();
+   outcomeKind="rare";detail=mysteryCrateRareReward();
  }else{
+   outcomeKind="gold";
    const qty=Math.random()<.15?2:1;
    state.goldBars=(state.goldBars||0)+qty;
    state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+qty;
    detail=`JACKPOT · GOLD BAR ×${qty}`;type="cash";
-   S.gold();
  }
- log(`Opened a Mystery Crate: ${detail}.`);
- recordIntel("MYSTERY CRATE",detail,detail.includes("GOLD")?"good":"info");
  const remaining=Math.max(0,q-1);
- showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${remaining} remaining`,type);
- showMessageMissionReward("Mystery Crate Opened","",`Received: ${detail} · ${remaining} crate${remaining===1?"":"s"} remaining`,"MYSTERY CRATE REWARD");
- if(!detail.includes("GOLD"))S.ok();
+ log(`Opened a Mystery Crate: ${detail}.`);
+ recordIntel("MYSTERY CRATE",detail,outcomeKind==="gold"?"good":"info");
  save();render();
+ spinMysteryCrateReel(outcomeKind,detail,remaining,type);
 }
 
 function bankDeposit(pct=1){
