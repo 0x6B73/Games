@@ -90,6 +90,9 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .sprite-crew{background-position:100% 100%}
 .stat-label{display:inline-flex;align-items:center;gap:6px}
 .mini-hud-item .ue-sprite{width:12px;height:12px}
+.inline-health-icon{display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;font-size:13px;line-height:1;color:#d35a52;text-shadow:0 1px 1px #000}
+.stat-label .inline-health-icon{margin-right:0}
+.mini-hud-item .inline-health-icon{font-size:12px;width:12px;height:12px}
 .inventory-resource .resource-head{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .inventory-resource .resource-head .ir-label{margin:0}
 .inventory-resource .resource-head b{margin-top:0}
@@ -2413,7 +2416,7 @@ body:after{
 <header class="top">
  <div class="brandrow"><div class="brand">UNDERWORLD EMPIRE</div><div class="lvl" id="lvl"></div></div>
  <div class="stats">
-  <div class="stat stat-clickable" onclick="showStatHelp('health',event)"><span class="stat-label"><span class="ue-sprite sprite-health sprite-sm"></span>HEALTH</span><button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
+  <div class="stat stat-clickable" onclick="showStatHelp('health',event)"><span class="stat-label"><span class="inline-health-icon" aria-hidden="true">♥</span>HEALTH</span><button class="stat-help" onclick="showStatHelp('health',event)">?</button><b id="hpT"></b><div class="bar"><div id="hpB" class="fill red"></div></div></div>
   <div class="stat stat-clickable" id="energyStat" onclick="openEnergyReserve()"><span class="stat-label"><span class="ue-sprite sprite-energy sprite-sm"></span>ENERGY</span><button class="stat-help" onclick="showStatHelp('energy',event)">?</button><b id="enT"></b><div class="bar"><div id="enB" class="fill"></div></div><span id="enRegenT" class="regen-time"></span></div>
   <div class="stat stat-clickable" id="staminaStat" onclick="openStaminaReserve()"><span class="stat-label"><span class="ue-sprite sprite-fist sprite-sm"></span>STAMINA</span><button class="stat-help" onclick="showStatHelp('stamina',event)">?</button><b id="stT"></b><div class="bar"><div id="stB" class="fill green"></div></div><span id="stRegenT" class="regen-time"></span></div>
   <div class="stat stat-clickable" onclick="showStatHelp('cash',event)"><span class="stat-label"><span class="ue-sprite sprite-cash sprite-sm"></span>CASH</span><button class="stat-help" onclick="showStatHelp('cash',event)">?</button><b id="cashT"></b></div>
@@ -2426,7 +2429,7 @@ body:after{
 
 
 <div id="miniHud" class="mini-hud" aria-hidden="true">
-  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)"><span class="ue-sprite sprite-health sprite-sm"></span> <b id="miniHp">100</b></div>
+  <div class="mini-hud-item health stat-clickable" onclick="showStatHelp('health',event)"><span class="inline-health-icon" aria-hidden="true">♥</span> <b id="miniHp">100</b></div>
   <div class="mini-hud-item energy stat-clickable" onclick="openEnergyReserve()"><span class="ue-sprite sprite-energy sprite-sm"></span> <b id="miniEn">20</b></div>
   <div class="mini-hud-item stamina stat-clickable" onclick="openStaminaReserve()"><span class="ue-sprite sprite-fist sprite-sm"></span> <b id="miniSt">10</b></div>
   <div class="mini-hud-item cash stat-clickable" onclick="showStatHelp('cash',event)"><span class="ue-sprite sprite-cash sprite-sm"></span> <b id="miniCash">$0</b></div>
@@ -3107,7 +3110,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.8";
+const BUILD_NUMBER="0.24.9";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
