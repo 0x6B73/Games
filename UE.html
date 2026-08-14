@@ -3107,7 +3107,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.6";
+const BUILD_NUMBER="0.24.7";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -7617,7 +7617,7 @@ function mysteryCrateStaminaReward(){
  const overflow=(wantedShots-shots)+(wantedPacks-packs)*3;
  let cash=0;
  if(overflow>0){cash=overflow*(1200+Math.max(1,state.level)*90);state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;}
- return `Stamina Pack ×${packs} · Adrenaline Shot ×${shots}${cash?` · ${money(cash)} overflow Cash`:""} · roughly ${Math.round(target/maxSt*100)}% Max Stamina worth`;
+ return `Stamina Pack ×${packs} · Adrenaline Shot ×${shots}${cash?` · ${money(cash)} overflow Cash`:""}`;
 }
 function mysteryCrateBlackmailReward(){
  const basis=Math.max(10,currentHeat());
