@@ -3052,7 +3052,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.23.0";
+const BUILD_NUMBER="0.23.1";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3273,12 +3273,12 @@ const propDefs=[
  {id:"club",name:"Nightclub",city:"downtown",cost:9000,income:760,upkeep:120,level:10,img:"club",desc:"Velvet rope, private booths, loud music, expensive bottles, and half the city trying to impress the wrong people. This is where your organization stops looking small."},
  {id:"hotel",name:"Boutique Hotel",city:"downtown",cost:22000,income:1850,upkeep:300,level:16,img:"hotel",desc:"Polished marble upstairs, private entrances downstairs. Guests pay for rooms; your people pay for discretion, meeting space, and a place nobody thinks to search."},
  {id:"terminal",name:"Freight Terminal",city:"north",cost:48000,income:3900,upkeep:700,level:24,img:"docks",desc:"Loading bays, manifests, forklifts, and access to everything that moves through Northside by truck. Owning it makes your operation feel less like a crew and more like infrastructure."},
- {id:"casinoFloor",name:"Private Gaming Club",city:"downtown",cost:95000,income:7800,upkeep:1800,level:30,crewReq:25,img:"club",desc:"Invitation-only tables, private rooms, and enough legitimate-looking revenue to hide much more interesting money."},
- {id:"marina",name:"Private Marina",city:"east",cost:250000,income:21000,upkeep:5000,level:40,crewReq:50,img:"docks",desc:"Slips, repair bays, storage buildings, and quiet access to the water. A useful business for an organization that moves more than people."},
- {id:"distribution",name:"Regional Distribution Center",city:"north",cost:650000,income:55000,upkeep:14000,level:52,crewReq:85,img:"warehouse",desc:"A large logistics hub with docks, trucks, storage, and paperwork capable of making almost any shipment look ordinary."},
- {id:"towerHotel",name:"Luxury Hotel Tower",city:"downtown",cost:1250000,income:110000,upkeep:30000,level:65,crewReq:125,img:"hotel",desc:"A landmark property with private floors, controlled entrances, conference space, and a permanent stream of wealthy guests."},
- {id:"casinoResort",name:"Waterfront Casino Resort",city:"downtown",cost:2750000,income:250000,upkeep:75000,level:80,crewReq:200,img:"club",desc:"Gaming, hospitality, restaurants, private rooms, and a waterfront footprint large enough to become an institution."},
- {id:"shippingCo",name:"International Shipping Company",city:"north",cost:5000000,income:470000,upkeep:150000,level:95,crewReq:300,img:"docks",desc:"Ships, contracts, containers, warehouses, and international routes. At this scale, the organization no longer hides inside infrastructure—it owns it."}
+ {id:"casinoFloor",name:"Private Gaming Club",city:"downtown",cost:95000,income:7800,upkeep:1800,level:30,crewReq:20,img:"club",desc:"Invitation-only tables, private rooms, and enough legitimate-looking revenue to hide much more interesting money."},
+ {id:"marina",name:"Private Marina",city:"east",cost:250000,income:21000,upkeep:5000,level:40,crewReq:35,img:"docks",desc:"Slips, repair bays, storage buildings, and quiet access to the water. A useful business for an organization that moves more than people."},
+ {id:"distribution",name:"Regional Distribution Center",city:"north",cost:650000,income:55000,upkeep:14000,level:52,crewReq:50,img:"warehouse",desc:"A large logistics hub with docks, trucks, storage, and paperwork capable of making almost any shipment look ordinary."},
+ {id:"towerHotel",name:"Luxury Hotel Tower",city:"downtown",cost:1250000,income:110000,upkeep:30000,level:65,crewReq:75,img:"hotel",desc:"A landmark property with private floors, controlled entrances, conference space, and a permanent stream of wealthy guests."},
+ {id:"casinoResort",name:"Waterfront Casino Resort",city:"downtown",cost:2750000,income:250000,upkeep:75000,level:80,crewReq:100,img:"club",desc:"Gaming, hospitality, restaurants, private rooms, and a waterfront footprint large enough to become an institution."},
+ {id:"shippingCo",name:"International Shipping Company",city:"north",cost:5000000,income:470000,upkeep:150000,level:95,crewReq:150,img:"docks",desc:"Ships, contracts, containers, warehouses, and international routes. At this scale, the organization no longer hides inside infrastructure—it owns it."}
 ];
 
 const facilityDefs=[
@@ -8054,7 +8054,7 @@ function renderInventory(){
  el.innerHTML=`<div class="inventory-resources">
    <div class="inventory-resource"><div class="resource-head">${spriteIconHtml("cash","resource")}<div class="ir-label">CASH</div><b>${compactMoney(state.cash)}</b></div></div>
    <div class="inventory-resource gold"><div class="resource-head">${spriteIconHtml("gold","resource")}<div class="ir-label">GOLD BARS</div><b>${state.goldBars||0}</b></div></div>
-   <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()"><div class="resource-head">${spriteIconHtml("drink","resource")}<div class="ir-label">ENERGY DRINKS</div><b>${drinks}</b></div></div>
+   <div class="inventory-resource energy stat-clickable" onclick="openEnergyReserve()"><div class="resource-head">${spriteIconHtml("drink","resource")}<div class="ir-label">ENERGY DRINKS</div><b>${drinks}</b></div><button class="btn small" style="margin-top:4px" onclick="event.stopPropagation();drinkEnergyDrink()" ${drinks<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
    <div class="inventory-resource stamina"><div class="resource-head">${spriteIconHtml("adrenaline","resource")}<div class="ir-label">ADRENALINE</div><b>${shots}</b></div><button class="btn small" style="margin-top:4px" onclick="useAdrenalineShot()" ${shots<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:energy-pack","resource")}<div class="ir-label">ENERGY PACKS</div><b>${ep}</b></div><button class="btn small" style="margin-top:4px" onclick="useEnergyPack()" ${ep<=0||state.en>=state.maxEn?"disabled":""}>USE</button></div>
    <div class="inventory-resource pack"><div class="resource-head">${spriteIconHtml("2:stamina-pack","resource")}<div class="ir-label">STAMINA PACKS</div><b>${sp}</b></div><button class="btn small" style="margin-top:4px" onclick="useStaminaPack()" ${sp<=0||state.st>=state.maxSt?"disabled":""}>USE</button></div>
