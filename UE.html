@@ -2388,6 +2388,15 @@ body:after{
 .gift-actions{display:flex;gap:4px;flex-wrap:wrap}.gift-actions button{flex:1 1 auto}
 .arc-banner{margin:5px 0;padding:6px;border-left:3px solid #8d733a;background:#121008;color:#bfb5a3;font-size:8px}.arc-banner b{color:#efd36a}
 .event-bonus-line{margin-top:4px;color:#d8c57d;font-size:8px}
+
+/* Message-request mini-games */
+.message-minigame-box{max-width:520px;padding:9px;overflow:hidden}
+.mg-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}.mg-head h2{font-size:18px;margin:0}.mg-from{font-size:8px;color:#d0b75f;text-align:right}
+.mg-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:6px}.mg-stat{border:1px solid #343638;background:#090b0d;padding:5px;text-align:center;font-size:7px;color:#8d8f91;text-transform:uppercase}.mg-stat b{display:block;color:#eee;font-size:12px;margin-top:2px}.mg-stat b.gold{color:#efd36a}.mg-stat b.red{color:#e28d82}
+.mg-safe-zone{position:relative;width:min(76vw,330px);height:min(76vw,330px);max-width:330px;max-height:330px;margin:4px auto 7px;touch-action:none;user-select:none}.mg-safe-dial{position:absolute;inset:0;border-radius:50%;border:2px solid #08090a;background:radial-gradient(circle,#111315 0 20%,#3b3e41 20.5% 23%,#111315 23.5% 42%,#4a4e51 42.5% 44.5%,#16181a 45% 70%,#4b4f52 70.5% 72.5%,#111315 73%);box-shadow:inset 0 0 18px #000,0 5px 18px #000}.mg-safe-zone canvas{position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none}.mg-safe-pointer{position:absolute;z-index:7;top:-3px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-top:30px solid #efd36a;filter:drop-shadow(0 2px #000)}.mg-safe-hub{position:absolute;z-index:8;left:50%;top:50%;transform:translate(-50%,-50%);width:34%;height:34%;border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;background:radial-gradient(circle at 40% 35%,#777,#36393b 42%,#121314 72%);border:2px solid #777;pointer-events:none}.mg-safe-hub b{display:block;color:#efd36a;font-size:22px}.mg-safe-hub span{display:block;color:#999;font-size:6px;margin-top:2px}.mg-safe-dir{position:absolute;z-index:9;bottom:6%;left:50%;transform:translateX(-50%);border:1px solid #625632;background:#121008;color:#efd36a;padding:4px 7px;font-size:7px;font-weight:900;white-space:nowrap;pointer-events:none}
+.mg-meter{border:1px solid #343638;background:#090b0d;padding:6px;margin-bottom:5px}.mg-meter-head{display:flex;justify-content:space-between;font-size:8px;font-weight:900}.mg-meter-track{height:9px;border:1px solid #333;background:#020202;margin-top:4px;overflow:hidden}.mg-meter-fill{height:100%;width:0;background:linear-gradient(90deg,#62582d,#c49b39,#efd36a)}.mg-safe-controls{display:grid;grid-template-columns:75px 1fr 75px;gap:5px;margin-bottom:5px}.mg-status{border-left:3px solid #6a5731;background:#131109;color:#b8b0a5;padding:7px;font-size:9px;min-height:31px;margin-bottom:6px}.mg-status.good{border-left-color:#66804e;background:#0c1209;color:#b9d19a}.mg-status.bad{border-left-color:#8b413b;background:#160b0a;color:#db9f97}
+.mg-escape-wrap{position:relative;width:100%;height:min(58vh,560px);min-height:390px;border:1px solid #3b3e41;background:#08090a;overflow:hidden;touch-action:none;user-select:none}.mg-escape-wrap canvas{display:block;width:100%;height:100%;touch-action:none}.mg-escape-banner{position:absolute;top:8px;left:50%;transform:translateX(-50%);z-index:4;border:1px solid #625632;background:#121008e8;color:#efd36a;padding:4px 7px;font-size:7px;font-weight:900;pointer-events:none}.mg-escape-controls{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:5px}.mg-progress{height:8px;background:#020202;border:1px solid #333;margin:5px 0}.mg-progress>div{height:100%;width:0;background:linear-gradient(90deg,#695d2e,#c89f3c,#efd36a)}
+@media(max-width:380px){.message-minigame-box{padding:7px}.mg-safe-controls{grid-template-columns:66px 1fr 66px}.mg-escape-wrap{min-height:360px}}
 </style>
 </head>
 <body>
@@ -3019,6 +3028,25 @@ body:after{
   <button class="btn secondary" id="goldReelClose" onclick="closeModal('goldReelModal')" disabled>CLOSE</button>
 </div></div>
 
+<div class="modal" id="messageSafeModal"><div class="mbox message-minigame-box">
+  <div class="mg-head"><h2>Safecracker Assist</h2><div class="mg-from" id="mgSafeFrom">CREW REQUEST</div></div>
+  <div class="sub" style="margin-bottom:6px">Three gates. Follow the required direction, feel out the contact meter, and lock each tumbler.</div>
+  <div class="mg-stats"><div class="mg-stat">TIME<b class="gold" id="mgSafeTime">45.0</b></div><div class="mg-stat">TUMBLERS<b id="mgSafeStage">0 / 3</b></div><div class="mg-stat">FALSE LOCKS<b id="mgSafeAlarm">0 / 3</b></div></div>
+  <div class="mg-safe-zone" id="mgSafeZone"><div class="mg-safe-dial"></div><canvas id="mgSafeCanvas"></canvas><div class="mg-safe-pointer"></div><div class="mg-safe-hub"><div><b id="mgSafeNumber">00</b><span>AT INDEX</span></div></div><div class="mg-safe-dir" id="mgSafeDir">TURN ↻ CLOCKWISE</div></div>
+  <div class="mg-meter"><div class="mg-meter-head"><span id="mgSafeContact">NO CONTACT</span><span id="mgSafePct">0%</span></div><div class="mg-meter-track"><div class="mg-meter-fill" id="mgSafeFill"></div></div></div>
+  <div class="mg-safe-controls"><button class="btn secondary" type="button" onclick="messageSafeFine(-1)">↺ CCW</button><button class="btn" type="button" id="mgSafeLock" onclick="messageSafeLock()">LOCK TUMBLER</button><button class="btn secondary" type="button" onclick="messageSafeFine(1)">CW ↻</button></div>
+  <div class="mg-status" id="mgSafeStatus">Find the first gate.</div><button class="btn secondary" style="width:100%" type="button" onclick="abandonMessageMinigame('safe')">ABANDON REQUEST</button>
+</div></div>
+
+<div class="modal" id="messageEscapeModal"><div class="mbox message-minigame-box">
+  <div class="mg-head"><h2>Getaway Assist</h2><div class="mg-from" id="mgEscapeFrom">CREW REQUEST</div></div>
+  <div class="sub" style="margin-bottom:6px">Keep the driver alive for one minute. Swipe, tap, or hold and drag the car left/right.</div>
+  <div class="mg-stats"><div class="mg-stat">TIME<b class="gold" id="mgEscapeTime">1:00</b></div><div class="mg-stat">CAR<b id="mgEscapeHp">3 / 3</b></div><div class="mg-stat">RECOVERED<b id="mgEscapeCash">$0</b></div></div>
+  <div class="mg-escape-wrap" id="mgEscapeWrap"><canvas id="mgEscapeCanvas"></canvas><div class="mg-escape-banner" id="mgEscapeBanner">GET CLEAR OF THE CITY</div></div>
+  <div class="mg-progress"><div id="mgEscapeProgress"></div></div><div class="mg-escape-controls"><button class="btn secondary" type="button" onclick="messageEscapeLane(-1)">◀ LEFT</button><button class="btn secondary" type="button" onclick="messageEscapeLane(1)">RIGHT ▶</button></div>
+  <div class="mg-status" id="mgEscapeStatus">Stay off the roadblocks and lose the tail.</div><button class="btn secondary" style="width:100%" type="button" onclick="abandonMessageMinigame('escape')">ABANDON REQUEST</button>
+</div></div>
+
 <div class="modal" id="levelUpModal"><div class="mbox">
   <h2 id="levelUpTitle">Level Up</h2>
   <div id="levelUpBody"></div>
@@ -3052,7 +3080,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.23.1";
+const BUILD_NUMBER="0.24.0";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -4230,6 +4258,13 @@ const equipmentSetDefs=[
  {id:"professional",name:"Professional Outfit",items:{rifle:1,plates:1,armored:1},attack:10,defense:10},
  {id:"war",name:"War Machine",items:{lmg:1,bodyarmor:1,tacticalvan:1},attack:18,defense:15}
 ];
+const mysteryCrateCollectibles=[
+ "Diamond Courier Token",
+ "Federal Evidence Key",
+ "Black Ledger Fragment",
+ "Uncut Sapphire Packet",
+ "Ghost Account Cipher"
+];
 const collectionDefs=[
  {id:"street_evidence",name:"Street Evidence",items:["Burner Phone","Stolen Plate","Old Ledger"],reward:"+1 Attack",apply:()=>{state.attack+=1}},
  {id:"harbor_papers",name:"Harbor Papers",items:["Dock Manifest","Marked Dice","Customs Seal","Crate Key","Union Card"],reward:"+1 Defense, +2 Max Energy",apply:()=>{state.defense+=1;state.maxEn+=2;state.en+=2}},
@@ -4238,6 +4273,7 @@ const collectionDefs=[
  {id:"territory_tokens",name:"City Control Tokens",items:["Dock 9 Control Stamp","Old Market Tribute Ledger","River Ward Protection List","Club Row VIP Pass","Civic Center Influence File","North Freight Route Seal"],reward:"+4 Attack, +4 Defense",apply:()=>{state.attack+=4;state.defense+=4}},
  {id:"boss_trophies",name:"Boss Trophies",items:["Dockmaster's Ring","Rossi Family Ledger","Bellini Signet","Judge's Black Book","Varga War Medal","Vale Signet"],reward:"+5 Attack, +5 Defense",apply:()=>{state.attack+=5;state.defense+=5}},
  {id:"weekly_contraband",name:"Weekly Contraband Archive",items:["Black-Market Wristwatch","Corrupt Detective Badge","Diamond-Cut Money Clip","Ghost Plate","Smuggler's Seal","Burned Federal File"],reward:"+5 Max Energy, +2 Max Stamina",apply:()=>{state.maxEn+=5;state.en+=5;state.maxSt+=2;state.st+=2}},
+ {id:"mystery_cache_relics",name:"Mystery Cache Relics",items:[...mysteryCrateCollectibles],reward:"+4 Attack, +4 Defense, +5 Max Energy, +2 Max Stamina",apply:()=>{state.attack+=4;state.defense+=4;state.maxEn+=5;state.en+=5;state.maxSt+=2;state.st+=2}},
  {id:"campaign_legacy",name:"Campaign Legacy",items:["Harbor Campaign Seal","Downtown Campaign Ledger","Northside Campaign Crest","Family War Dossier","Citywide Control Charter","Empire Campaign Signet"],reward:"+5 Attack, +5 Defense, +5 Max Energy",apply:()=>{state.attack+=5;state.defense+=5;state.maxEn+=5;state.en+=5}},
  {id:"prestige_legacy",name:"Kingpin Legacy",items:["Prestige Mark I","Prestige Mark II","Prestige Mark III"],reward:"+10 Attack, +10 Defense",apply:()=>{state.attack+=10;state.defense+=10}}
 ];
@@ -6782,6 +6818,46 @@ function toggleInbox(){
  }
 }
 function dismissInbox(id){state.inbox=state.inbox.filter(x=>x.id!==id);save();renderInbox()}
+function messageRewardCash(kind="help"){
+ const lvl=Math.max(1,Math.floor(Number(state.level)||1));
+ const base=kind==="defense"?(700+lvl*95+lvl*lvl*7):(300+lvl*45+lvl*lvl*3);
+ return Math.max(250,Math.round(base*(.75+Math.random()*.55)/50)*50);
+}
+function grantMessageReward(kind="help"){
+ const defense=kind==="defense";
+ const roll=Math.random();
+ const crateChance=defense?.20:.15;
+ let detail="";
+ if(roll<crateChance){
+   const added=addLootItem("Mystery Crate",1,99);
+   if(added>0)detail="Mystery Crate ×1";
+   else{
+     const c=messageRewardCash(defense?"defense":"help")*2;
+     state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;
+     detail=`Mystery Crate stash full · ${money(c)} Cash instead`;
+   }
+ }else if(roll<(defense?.48:.50)){
+   const c=messageRewardCash(defense?"defense":"help");
+   state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;
+   detail=`${money(c)} Cash`;
+ }else if(roll<(defense?.66:.70)){
+   const item=defense?"Energy Pack":"Energy Drink",qty=defense?1:rnd(1,2),cap=defense?99:999;
+   const added=addLootItem(item,qty,cap);
+   if(added>0)detail=`${item} ×${added}`;
+   else{const c=messageRewardCash("help");state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;detail=`${item} stash full · ${money(c)} Cash instead`;}
+ }else if(roll<(defense?.84:.88)){
+   const item=defense?"Stamina Pack":"Adrenaline Shot",qty=defense?1:rnd(1,2),cap=defense?99:999;
+   const added=addLootItem(item,qty,cap);
+   if(added>0)detail=`${item} ×${added}`;
+   else{const c=messageRewardCash("help");state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;detail=`${item} stash full · ${money(c)} Cash instead`;}
+ }else{
+   const qty=defense?rnd(1,3):1,added=addLootItem("Blackmail",qty,99);
+   if(added>0)detail=`Blackmail ×${added}`;
+   else{const c=messageRewardCash("help");state.cash+=c;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+c;state.runCashEarned=(state.runCashEarned||0)+c;detail=`Blackmail stash full · ${money(c)} Cash instead`;}
+ }
+ recordIntel(defense?"DEFENSE SPOILS":"CONTACT REWARD",detail,detail.includes("Mystery Crate")?"good":"info");
+ return detail;
+}
 function answerInbox(id,choice){
  const x=state.inbox.find(y=>y.id===id);if(!x)return;
 
@@ -6792,7 +6868,8 @@ function answerInbox(id,choice){
      state.cash-=cost;state.lifetimeCashSpent=(state.lifetimeCashSpent||0)+cost;
      changeRelationship(x.personId,{trust:8,respect:4,resentment:-4,rel:6});
      socialConflict(x.personId);log(`You helped ${x.from} with ${money(cost)}.`);
-     showActionFlash("FAVOR REQUEST HELPED",`${x.from} · ${money(cost)} paid · Relationship improved`,"good");S.ok();
+     const reward=grantMessageReward("help");
+     showActionFlash("FAVOR REQUEST HELPED",`${x.from} · ${money(cost)} paid · Relationship improved · Reward: ${reward}`,"good");S.ok();
    }else{
      changeRelationship(x.personId,{trust:-5,resentment:7,rel:-5});log(`You refused ${x.from}.`);
      showActionFlash("FAVOR REQUEST REFUSED",`${x.from} · Trust decreased · Resentment increased`,"bad");S.bad();
@@ -6806,7 +6883,8 @@ function answerInbox(id,choice){
      changeRelationship(x.personId,{trust:7,respect:5,rel:5});
      state.notoriety+=2;socialConflict(x.personId);
      log(`You backed ${x.from} on a job.`);
-     showActionFlash("BACKUP PROVIDED",`${x.from} · -1 Stamina · Trust and Respect improved`,"good");
+     const reward=grantMessageReward("help");
+     showActionFlash("BACKUP PROVIDED",`${x.from} · -1 Stamina · Trust and Respect improved · Reward: ${reward}`,"good");
      S.ok();
    }else{
      changeRelationship(x.personId,{resentment:6,trust:-4,rel:-4});log(`You ignored ${x.from}'s request for backup.`);
@@ -6859,6 +6937,45 @@ function answerInbox(id,choice){
  dismissInbox(id);render();
 }
 function acceptRequest(id){const x=state.inbox.find(y=>y.id===id);if(x?.personId)addPotential(x.personId,true);dismissInbox(id);render()}
+let activeMessageMinigame=null;
+function messageMinigamePayout(kind,performanceBonus=0){
+ const msg=activeMessageMinigame?.msg;if(!msg)return "";
+ const base=mysteryCrateCashAmount(),mult=(kind==="safe"?.70:.82)+Math.max(0,Math.min(.35,performanceBonus));
+ const cash=Math.max(1000,Math.round(base*mult/100)*100);
+ state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;
+ const extras=[];
+ if(kind==="safe"){const b=addLootItem("Blackmail",rnd(1,3),99);if(b)extras.push(`Blackmail ×${b}`);const e=addLootItem("Energy Pack",1,99);if(e)extras.push("Energy Pack ×1");}
+ else{const e=addLootItem("Energy Pack",1,99);if(e)extras.push("Energy Pack ×1");const st=addLootItem("Stamina Pack",1,99);if(st)extras.push("Stamina Pack ×1");}
+ const crateChance=kind==="safe"?.45:.40;
+ if(Math.random()<crateChance){const c=addLootItem("Mystery Crate",1,99);if(c)extras.push("Mystery Crate ×1");else{const over=Math.round(base*.45/100)*100;state.cash+=over;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+over;state.runCashEarned=(state.runCashEarned||0)+over;extras.push(`${money(over)} crate-overflow Cash`);}}
+ if(msg.personId&&state.friends[msg.personId])changeRelationship(msg.personId,{trust:9,respect:8,resentment:-4,rel:8});state.notoriety+=3;
+ const summary=[money(cash),...extras].join(" · ");log(`${msg.from} paid you for a successful ${kind==="safe"?"safecracking":"getaway"} assist: ${summary}.`);recordIntel(kind==="safe"?"SAFECRACKING PAYOUT":"GETAWAY PAYOUT",`${msg.from} · ${summary}`,"good");return summary;
+}
+function launchMessageMinigame(id,kind){const x=state.inbox.find(y=>y.id===id);if(!x)return toast("That request is no longer available.");if(now()>x.expiresAt){dismissInbox(id);return toast("That request expired.");}activeMessageMinigame={msg:{...x},kind};state.inbox=state.inbox.filter(y=>y.id!==id);save();renderInbox();inboxPanel.classList.remove("show");setInboxFocus(false);document.getElementById("socialPop")?.classList.remove("show");if(kind==="safe")startMessageSafecracker(x);else startMessageEscape(x)}
+function finishMessageMinigame(kind,won,performanceBonus=0,reason=""){const msg=activeMessageMinigame?.msg;if(!msg)return;if(kind==="safe")stopMessageSafecracker();else stopMessageEscape();document.getElementById(kind==="safe"?"messageSafeModal":"messageEscapeModal")?.classList.remove("show");if(won){const payout=messageMinigamePayout(kind,performanceBonus);showActionFlash(kind==="safe"?"SAFE CRACKED":"GETAWAY COMPLETE",`${msg.from} · ${payout}`,"good");S.ok()}else{log(`${msg.from}'s ${kind==="safe"?"safecracking":"getaway"} request failed${reason?`: ${reason}`:"."}`);showActionFlash(kind==="safe"?"SAFE JOB FAILED":"GETAWAY FAILED",`${msg.from} · No payout${reason?` · ${reason}`:""}`,"bad");S.bad()}activeMessageMinigame=null;save();render()}
+function abandonMessageMinigame(kind){if(activeMessageMinigame)finishMessageMinigame(kind,false,0,"Request abandoned")}
+
+const msgSafe={active:false,stage:0,targets:[0,0,0],rotation:0,lastDir:0,alarm:0,endAt:0,raf:0,drag:false,pointer:null,lastAngle:0,ctx:null,size:0,dpr:1};
+function msgSafeNorm(n){n%=100;if(n<0)n+=100;return n}function msgSafeDisplay(){return msgSafeNorm(Math.round(-msgSafe.rotation/3.6))}function msgSafeDist(a,b){const d=Math.abs(a-b)%100;return Math.min(d,100-d)}function msgSafeTarget(){return msgSafeDist(msgSafeDisplay(),msgSafe.targets[msgSafe.stage])}function msgSafeRandom(ex=[]){let n;do n=rnd(0,99);while(ex.some(x=>msgSafeDist(x,n)<12));return n}
+function msgSafeResize(){const c=document.getElementById("mgSafeCanvas");if(!c)return;const r=c.getBoundingClientRect(),size=Math.max(1,Math.round(Math.min(r.width,r.height))),dpr=Math.max(1,Math.min(3,window.devicePixelRatio||1));c.width=Math.round(size*dpr);c.height=Math.round(size*dpr);msgSafe.ctx=c.getContext("2d");msgSafe.size=size;msgSafe.dpr=dpr;msgSafeDraw()}
+function msgSafeDraw(){const c=msgSafe.ctx,size=msgSafe.size;if(!c||!size)return;c.setTransform(msgSafe.dpr,0,0,msgSafe.dpr,0,0);c.clearRect(0,0,size,size);const cx=size/2,cy=size/2,outer=size*.475,labelR=outer*.77,rot=msgSafe.rotation*Math.PI/180;c.beginPath();c.arc(cx,cy,outer,0,Math.PI*2);c.strokeStyle="#777b7d";c.lineWidth=Math.max(1,size*.003);c.stroke();for(let i=0;i<100;i++){const a=-Math.PI/2+(i/100)*Math.PI*2+rot,major=i%10===0,mid=!major&&i%5===0,len=major?outer*.17:mid?outer*.13:outer*.09,inner=outer-len;c.beginPath();c.moveTo(cx+Math.cos(a)*inner,cy+Math.sin(a)*inner);c.lineTo(cx+Math.cos(a)*outer,cy+Math.sin(a)*outer);c.strokeStyle=major?"#e6e2d7":mid?"#b8bbbc":"#898d8f";c.lineWidth=major?Math.max(2,size*.006):mid?Math.max(1.4,size*.0045):Math.max(1,size*.0028);c.stroke()}c.font=`700 ${Math.max(10,Math.round(size*.038))}px Arial`;c.textAlign="center";c.textBaseline="middle";c.lineWidth=Math.max(2,size*.008);for(let v=0;v<100;v+=10){const a=-Math.PI/2+(v/100)*Math.PI*2+rot,x=cx+Math.cos(a)*labelR,y=cy+Math.sin(a)*labelR,t=String(v).padStart(2,"0");c.strokeStyle="#050607";c.strokeText(t,x,y);c.fillStyle=v===0?"#efd36a":"#d9d4c8";c.fillText(t,x,y)}}
+function msgSafeRender(){document.getElementById("mgSafeNumber").textContent=String(msgSafeDisplay()).padStart(2,"0");document.getElementById("mgSafeStage").textContent=`${msgSafe.stage} / 3`;document.getElementById("mgSafeAlarm").textContent=`${msgSafe.alarm} / 3`;const required=[1,-1,1][msgSafe.stage]||1;document.getElementById("mgSafeDir").textContent=`TURN ${required===1?"↻ CLOCKWISE":"↺ COUNTERCLOCKWISE"}`;const d=msgSafeTarget(),wrong=msgSafe.lastDir!==0&&msgSafe.lastDir!==required,s=wrong?Math.min(18,Math.max(0,Math.round((1-d/20)*100))):d>=20?0:Math.max(0,Math.round(Math.pow(1-d/20,1.35)*100));document.getElementById("mgSafeFill").style.width=`${s}%`;document.getElementById("mgSafePct").textContent=`${s}%`;document.getElementById("mgSafeContact").textContent=wrong?"WRONG DIRECTION":d===0?"CONTACT FOUND":d<=2?"ON THE GATE":d<=5?"HOT":d<=10?"WARM":d<=18?"FAINT CONTACT":"NO CONTACT";msgSafeDraw()}
+function messageSafeTurnDegrees(deg){if(!msgSafe.active)return;msgSafe.rotation=(msgSafe.rotation+deg)%360;if(msgSafe.rotation<0)msgSafe.rotation+=360;if(Math.abs(deg)>.15)msgSafe.lastDir=deg>0?1:-1;msgSafeRender()}function messageSafeFine(dir){messageSafeTurnDegrees(dir*3.6)}
+function messageSafeLock(){if(!msgSafe.active)return;const required=[1,-1,1][msgSafe.stage],d=msgSafeTarget(),status=document.getElementById("mgSafeStatus");if(msgSafe.lastDir!==required||d>2){msgSafe.alarm++;status.className="mg-status bad";status.textContent=msgSafe.lastDir!==required?"Wrong direction. Reverse the dial and approach the gate correctly.":"False gate. Slow down and center the contact.";if(msgSafe.alarm>=3)return finishMessageMinigame("safe",false,0,"Alarm tripped");msgSafeRender();return}msgSafe.stage++;msgSafe.lastDir=0;status.className="mg-status good";status.textContent=msgSafe.stage>=3?"All tumblers set. The safe is open.":`Tumbler ${msgSafe.stage} set. Reverse direction for the next gate.`;if(msgSafe.stage>=3){const left=Math.max(0,(msgSafe.endAt-performance.now())/45000);return finishMessageMinigame("safe",true,left)}msgSafeRender()}
+function msgSafeLoop(t){if(!msgSafe.active)return;const left=Math.max(0,(msgSafe.endAt-t)/1000),el=document.getElementById("mgSafeTime");if(el){el.textContent=left.toFixed(1);el.className=left<=10?"red":"gold"}if(left<=0)return finishMessageMinigame("safe",false,0,"Time expired");msgSafe.raf=requestAnimationFrame(msgSafeLoop)}
+function startMessageSafecracker(msg){msgSafe.active=true;msgSafe.stage=0;msgSafe.alarm=0;msgSafe.rotation=0;msgSafe.lastDir=0;msgSafe.targets[0]=msgSafeRandom();msgSafe.targets[1]=msgSafeRandom([msgSafe.targets[0]]);msgSafe.targets[2]=msgSafeRandom([msgSafe.targets[0],msgSafe.targets[1]]);msgSafe.endAt=performance.now()+45000;document.getElementById("mgSafeFrom").textContent=`REQUEST FROM ${msg.from.toUpperCase()}`;const st=document.getElementById("mgSafeStatus");st.className="mg-status";st.textContent="Find the first gate.";document.getElementById("messageSafeModal").classList.add("show");requestAnimationFrame(()=>{msgSafeResize();msgSafeRender()});msgSafe.raf=requestAnimationFrame(msgSafeLoop)}function stopMessageSafecracker(){msgSafe.active=false;cancelAnimationFrame(msgSafe.raf);msgSafe.drag=false;msgSafe.pointer=null}function msgSafePointerAngle(e){const r=document.getElementById("mgSafeZone").getBoundingClientRect();return Math.atan2(e.clientY-(r.top+r.height/2),e.clientX-(r.left+r.width/2))}
+
+const msgEscape={active:false,raf:0,last:0,start:0,end:0,W:0,H:0,dpr:1,ctx:null,lane:1,x:0,targetX:0,y:0,w:0,h:0,hp:3,cash:0,objects:[],road:0,spawn:0,cashSpawn:0,pointer:false,dragCar:false,pid:null,startX:0,startY:0};
+function msgEscapeLaneCenter(l){const left=msgEscape.W*.11,right=msgEscape.W*.89;return left+(right-left)/4*(l+.5)}function messageEscapeLane(dir){if(!msgEscape.active)return;msgEscape.lane=Math.max(0,Math.min(3,msgEscape.lane+dir));msgEscape.targetX=msgEscapeLaneCenter(msgEscape.lane)}
+function msgEscapeResize(){const c=document.getElementById("mgEscapeCanvas"),r=c.getBoundingClientRect();msgEscape.dpr=Math.max(1,Math.min(3,window.devicePixelRatio||1));msgEscape.W=Math.max(1,Math.round(r.width));msgEscape.H=Math.max(1,Math.round(r.height));c.width=Math.round(msgEscape.W*msgEscape.dpr);c.height=Math.round(msgEscape.H*msgEscape.dpr);msgEscape.ctx=c.getContext("2d");msgEscape.y=msgEscape.H*.82;msgEscape.w=(msgEscape.W*.78/4)*.52;msgEscape.h=msgEscape.w*1.7;if(!msgEscape.x){msgEscape.x=msgEscapeLaneCenter(msgEscape.lane);msgEscape.targetX=msgEscape.x}msgEscapeDraw()}
+function msgEscapeSpeed(){const p=Math.min(1,(performance.now()-msgEscape.start)/60000);return msgEscape.H*(.52+p*.18)}function msgEscapeSpawn(type,lane,y=-80){const lw=msgEscape.W*.78/4,o={type,lane,x:msgEscapeLaneCenter(lane),y,w:lw*.54,h:lw*.9,speed:msgEscapeSpeed()*(type==="police"?1.08:type==="cash"?.95:1),hit:false};if(type==="spikes"){o.w=lw*.75;o.h=lw*.28}else if(type==="roadblock"){o.w=lw*.82;o.h=lw*.5}else if(type==="cash"){o.w=lw*.38;o.h=lw*.38}msgEscape.objects.push(o)}
+function msgEscapeWave(){const p=(performance.now()-msgEscape.start)/60000;let type="traffic";const r=Math.random();if(p>.72&&r<.20)type="roadblock";else if(p>.55&&r<.38)type="spikes";else if(p>.28&&r<.62)type="police";msgEscapeSpawn(type,rnd(0,3));if(p>.65&&Math.random()<.35)msgEscapeSpawn(Math.random()<.5?"police":"traffic",rnd(0,3),-180)}function msgEscapeRect(){return{x:msgEscape.x-msgEscape.w*.36,y:msgEscape.y-msgEscape.h*.44,w:msgEscape.w*.72,h:msgEscape.h*.88}}function msgRectHit(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function msgEscapeUpdate(dt){msgEscape.x+=(msgEscape.targetX-msgEscape.x)*Math.min(1,dt*13);msgEscape.road+=msgEscapeSpeed()*dt*1.85;msgEscape.spawn-=dt;msgEscape.cashSpawn-=dt;if(msgEscape.spawn<=0){msgEscapeWave();msgEscape.spawn=.58+Math.random()*.48}if(msgEscape.cashSpawn<=0){msgEscapeSpawn("cash",rnd(0,3),-100);msgEscape.cashSpawn=3.2+Math.random()*2.5}const pr=msgEscapeRect();for(const o of msgEscape.objects){o.y+=o.speed*dt;if(o.hit)continue;const or={x:o.x-o.w*.42,y:o.y-o.h*.42,w:o.w*.84,h:o.h*.84};if(msgRectHit(pr,or)){o.hit=true;if(o.type==="cash"){const a=Math.round((300+state.level*45+Math.random()*400)/50)*50;msgEscape.cash+=a;document.getElementById("mgEscapeStatus").className="mg-status good";document.getElementById("mgEscapeStatus").textContent=`Cash recovered · +${money(a)}`}else{msgEscape.hp--;document.getElementById("mgEscapeStatus").className="mg-status bad";document.getElementById("mgEscapeStatus").textContent=o.type==="police"?"Police clipped the car.":o.type==="spikes"?"You caught a spike strip.":o.type==="roadblock"?"Roadblock impact.":"Traffic collision.";if(navigator.vibrate)navigator.vibrate([35,25,45]);if(msgEscape.hp<=0)return finishMessageMinigame("escape",false,0,"Car disabled")}}}msgEscape.objects=msgEscape.objects.filter(o=>o.y<msgEscape.H+120&&!o.hit)}
+function msgEscapeCar(x,y,w,h,kind){const c=msgEscape.ctx;c.save();c.translate(x,y);c.fillStyle=kind==="player"?"#2a2d2f":kind==="police"?"#25282c":"#45484a";c.fillRect(-w*.38,-h*.45,w*.76,h*.9);c.fillStyle="#0b0c0d";c.fillRect(-w*.25,-h*.22,w*.5,h*.36);c.fillStyle="#ded4a4";c.fillRect(-w*.27,-h*.45,w*.16,h*.05);c.fillRect(w*.11,-h*.45,w*.16,h*.05);c.fillStyle="#7e231e";c.fillRect(-w*.27,h*.39,w*.16,h*.05);c.fillRect(w*.11,h*.39,w*.16,h*.05);if(kind==="police"){const blink=Math.floor(performance.now()/140)%2===0;c.fillStyle=blink?"#b6352f":"#294d8b";c.fillRect(-w*.22,-h*.04,w*.21,h*.06);c.fillStyle=blink?"#294d8b":"#b6352f";c.fillRect(w*.01,-h*.04,w*.21,h*.06)}if(kind==="player"){c.strokeStyle="#d8b94e";c.lineWidth=Math.max(1,w*.035);c.strokeRect(-w*.39,-h*.46,w*.78,h*.92)}c.restore()}
+function msgEscapeDraw(){const c=msgEscape.ctx,W=msgEscape.W,H=msgEscape.H;if(!c||!W)return;c.setTransform(msgEscape.dpr,0,0,msgEscape.dpr,0,0);c.fillStyle="#090b0c";c.fillRect(0,0,W,H);const left=W*.11,right=W*.89,roadW=right-left,lw=roadW/4;c.fillStyle="#17191b";c.fillRect(left,0,roadW,H);c.fillStyle="#3a3d3f";c.fillRect(left-3,0,3,H);c.fillRect(right,0,3,H);c.strokeStyle="#a9a79e";c.lineWidth=Math.max(1,W*.003);c.setLineDash([H*.055,H*.045]);c.lineDashOffset=-msgEscape.road;for(let i=1;i<4;i++){const x=left+lw*i;c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke()}c.setLineDash([]);for(const o of msgEscape.objects){if(o.type==="cash"){c.save();c.translate(o.x,o.y);c.fillStyle="#5b4a20";c.fillRect(-o.w*.48,-o.h*.42,o.w*.96,o.h*.84);c.strokeStyle="#d1ad43";c.strokeRect(-o.w*.48,-o.h*.42,o.w*.96,o.h*.84);c.fillStyle="#efd36a";c.font=`900 ${Math.max(10,o.w*.42)}px Georgia`;c.textAlign="center";c.textBaseline="middle";c.fillText("$",0,0);c.restore()}else if(o.type==="spikes"){c.fillStyle="#656769";c.fillRect(o.x-o.w*.5,o.y-o.h*.5,o.w,o.h)}else if(o.type==="roadblock"){c.fillStyle="#4b4c4d";c.fillRect(o.x-o.w*.5,o.y-o.h*.34,o.w,o.h*.68);c.fillStyle="#c9b45a";for(let i=-2;i<=2;i++)c.fillRect(o.x+i*o.w*.18-o.w*.055,o.y-o.h*.34,o.w*.11,o.h*.68)}else msgEscapeCar(o.x,o.y,o.w,o.h,o.type)}msgEscapeCar(msgEscape.x,msgEscape.y,msgEscape.w,msgEscape.h,"player")}
+function msgEscapeLoop(t){if(!msgEscape.active)return;const dt=Math.min(.04,(t-msgEscape.last)/1000||0);msgEscape.last=t;const left=Math.max(0,(msgEscape.end-t)/1000);document.getElementById("mgEscapeTime").textContent=`${Math.floor(left/60)}:${String(Math.ceil(left)%60).padStart(2,"0")}`;document.getElementById("mgEscapeHp").textContent=`${msgEscape.hp} / 3`;document.getElementById("mgEscapeCash").textContent=money(msgEscape.cash);document.getElementById("mgEscapeProgress").style.width=`${Math.min(100,((t-msgEscape.start)/60000)*100)}%`;if(left<=0){state.cash+=msgEscape.cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+msgEscape.cash;state.runCashEarned=(state.runCashEarned||0)+msgEscape.cash;return finishMessageMinigame("escape",true,msgEscape.hp/12)}msgEscapeUpdate(dt);if(!msgEscape.active)return;msgEscapeDraw();msgEscape.raf=requestAnimationFrame(msgEscapeLoop)}
+function startMessageEscape(msg){msgEscape.active=true;msgEscape.objects=[];msgEscape.hp=3;msgEscape.cash=0;msgEscape.road=0;msgEscape.spawn=.5;msgEscape.cashSpawn=2;msgEscape.lane=1;msgEscape.x=0;msgEscape.targetX=0;msgEscape.start=performance.now();msgEscape.end=msgEscape.start+60000;msgEscape.last=msgEscape.start;document.getElementById("mgEscapeFrom").textContent=`REQUEST FROM ${msg.from.toUpperCase()}`;document.getElementById("mgEscapeStatus").className="mg-status";document.getElementById("mgEscapeStatus").textContent="Stay off the roadblocks and lose the tail.";document.getElementById("messageEscapeModal").classList.add("show");requestAnimationFrame(()=>{msgEscapeResize();msgEscape.raf=requestAnimationFrame(msgEscapeLoop)})}function stopMessageEscape(){msgEscape.active=false;cancelAnimationFrame(msgEscape.raf);msgEscape.pointer=false;msgEscape.dragCar=false;msgEscape.pid=null}function msgEscapeCanvasPoint(e){const r=document.getElementById("mgEscapeCanvas").getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
+
 function maybeSocialEvent(){
  if(now()-state.lastSocial<15*60000)return;
  state.lastSocial=now();
@@ -6868,7 +6985,7 @@ function maybeSocialEvent(){
  const ids=Object.keys(state.friends).filter(id=>contactCanRespond(state.friends[id]));
  const roll=Math.random();
 
- if(roll<.72&&ids.length){
+ if(roll<.55&&ids.length){
    const id=ids[rnd(0,ids.length-1)],d=nameOf(id);
    if(Math.random()<.50){
      const amount=Math.max(100,rnd(100,320)+Math.floor(state.level*18));
@@ -6877,6 +6994,11 @@ function maybeSocialEvent(){
      addInbox({type:"backup",from:d,personId:id,text:"I need backup on a situation. Backing me costs 1 Stamina, but I will remember who showed up."});
    }
    showSocial(`${d} needs something`,"Open your messages to review the request and its requirements.");
+ }else if(roll<.85&&ids.length){
+   const id=ids[rnd(0,ids.length-1)],d=nameOf(id),safe=Math.random()<.50;
+   if(safe)addInbox({type:"safecracker",from:d,personId:id,expiresAt:now()+15*60000,text:"I have a safe in front of me and the clock is running. I need somebody with steady hands on the dial."});
+   else addInbox({type:"getaway",from:d,personId:id,expiresAt:now()+15*60000,text:"The job went loud. I need a driver who can get me across the city before the road closes."});
+   showSocial(safe?`${d} needs a safecracker`:`${d} needs a getaway driver`,"Open Messages to take the job. Successful assists pay premium rewards.");
  }else{
    const av=allPotentialDefs().filter(p=>state.potentials[p.id]&&!state.potentials[p.id].added&&!state.friends[p.id]);
    if(av.length){
@@ -7011,16 +7133,19 @@ function renderInbox(){
    const messageTimer=x.type==="attack"?"":`<div class="message-timer ${messageLeft<60000?"message-danger":""}">EXPIRES IN ${fmt(messageLeft)}</div>`;
 
    const backupHtml=x.type==="backup"
-     ?`<div class="backup-need ${state.st>=1?"ready":"not-ready"}"><b>BACKUP REQUIREMENT: 1 STAMINA</b><br>You have ${Math.floor(state.st)}/${state.maxSt} Stamina · ${state.st>=1?"READY":"NOT READY"}<br><span class="sub">Helping improves Trust and Respect and gives +2 Notoriety.</span></div>`
+     ?`<div class="backup-need ${state.st>=1?"ready":"not-ready"}"><b>BACKUP REQUIREMENT: 1 STAMINA</b><br>You have ${Math.floor(state.st)}/${state.maxSt} Stamina · ${state.st>=1?"READY":"NOT READY"}<br><span class="sub">Helping improves Trust and Respect, gives +2 Notoriety, and earns a contact reward.</span></div>`
      :"";
+   const rewardHint=(x.type==="favor"||x.type==="backup")?`<div class="sub" style="margin:5px 0;color:#d2bd72">Successful help can pay Cash, supplies, Blackmail, or a Mystery Crate.</div>`:x.type==="attack"?`<div class="sub" style="margin:5px 0;color:#d2bd72">Repelling the attack earns defense spoils, with a chance at a Mystery Crate.</div>`:(x.type==="safecracker"||x.type==="getaway")?`<div class="sub" style="margin:5px 0;color:#d2bd72">Interactive crew job · Success pays scaled Cash, bonus supplies, and a strong Mystery Crate chance.</div>`:"";
 
    return `<div class="inbox-item ${x.type==="attack"?"attack-alert":""}">
-     <b>${x.from}</b><p>${x.text}</p>${messageTimer}${backupHtml}
+     <b>${x.from}</b><p>${x.text}</p>${messageTimer}${backupHtml}${rewardHint}
      <div class="inbox-actions">
        ${x.type==="favor"?`<button class="btn small" onclick="answerInbox('${x.id}','help')">HELP</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">REFUSE</button>`:""}
        ${x.type==="backup"?`<button class="btn small" onclick="answerInbox('${x.id}','help')" ${state.st<1?"disabled":""}>BACK THEM · 1 STAMINA</button><button class="btn secondary small" onclick="answerInbox('${x.id}','ignore')">IGNORE</button>`:""}
        ${x.type==="request"?`<button class="btn small" onclick="acceptRequest('${x.id}')">ACCEPT</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
        ${x.type==="gift"?`<button class="btn small" onclick="answerInbox('${x.id}','accept')">ACCEPT GIFT</button>`:""}
+       ${x.type==="safecracker"?`<button class="btn small" onclick="launchMessageMinigame('${x.id}','safe')">CRACK THE SAFE</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
+       ${x.type==="getaway"?`<button class="btn small" onclick="launchMessageMinigame('${x.id}','escape')">DRIVE GETAWAY</button><button class="btn secondary small" onclick="dismissInbox('${x.id}')">DECLINE</button>`:""}
        ${attackHtml}
      </div>
    </div>`;
@@ -7109,7 +7234,8 @@ function defendAttack(id){
  const defensePower=combatPower("defense"),p=defensePower+rnd(1,20),e=a.power+rnd(1,20);
  if(p>=e){
    state.notoriety+=2;log(`You defended against ${a.name}. Defense Power ${defensePower} repelled the attack.`);
-   showActionFlash("ATTACK REPELLED",`${a.name} · -1 Stamina · Defense Power ${defensePower}`,"good");
+   const reward=grantMessageReward("defense");
+   showActionFlash("ATTACK REPELLED",`${a.name} · -1 Stamina · Defense Power ${defensePower} · Spoils: ${reward}`,"good");
  }else{
    const mitigation=defenseMitigation();
    const loss=Math.floor(Math.min(state.cash,rnd(80,220)+a.level*20)*(1-mitigation));
@@ -7369,6 +7495,56 @@ function useStaminaPack(){
  save();render();
  if(document.getElementById("staminaReserveModal")?.classList.contains("show"))renderStaminaReserve();
 }
+function mysteryCrateCashAmount(){
+ const lvl=Math.max(1,Math.floor(Number(state.level)||1));
+ const base=2500+lvl*850+lvl*lvl*85;
+ return Math.max(2500,Math.round(base*(.78+Math.random()*.57)/100)*100);
+}
+function mysteryCrateScaledPercent(){return rnd(60,200)/100}
+function mysteryCrateEnergyPackReward(){
+ const target=Math.max(1,state.maxEn)*mysteryCrateScaledPercent();
+ const wanted=Math.max(1,Math.ceil(target/12.5));
+ const added=addLootItem("Energy Pack",wanted,99);
+ const overflow=wanted-added;
+ let cash=0;
+ if(overflow>0){cash=overflow*(2500+Math.max(1,state.level)*180);state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;}
+ return `Energy Pack ×${added}${overflow?` · ${money(cash)} overflow Cash`:""} · roughly ${Math.round(target/state.maxEn*100)}% Max Energy worth`;
+}
+function mysteryCrateStaminaReward(){
+ const maxSt=Math.max(1,state.maxSt),target=maxSt*mysteryCrateScaledPercent();
+ const shotTarget=Math.max(1,target*.30),packTarget=Math.max(1,target-shotTarget);
+ const wantedShots=Math.max(1,Math.ceil(shotTarget/2));
+ const wantedPacks=Math.max(1,Math.ceil(packTarget/5.5));
+ const shots=addLootItem("Adrenaline Shot",wantedShots,999);
+ const packs=addLootItem("Stamina Pack",wantedPacks,99);
+ const overflow=(wantedShots-shots)+(wantedPacks-packs)*3;
+ let cash=0;
+ if(overflow>0){cash=overflow*(1200+Math.max(1,state.level)*90);state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;}
+ return `Stamina Pack ×${packs} · Adrenaline Shot ×${shots}${cash?` · ${money(cash)} overflow Cash`:""} · roughly ${Math.round(target/maxSt*100)}% Max Stamina worth`;
+}
+function mysteryCrateBlackmailReward(){
+ const basis=Math.max(10,currentHeat());
+ const target=Math.max(10,basis*mysteryCrateScaledPercent());
+ const wanted=Math.max(2,Math.min(40,Math.ceil(target/5)));
+ const added=addLootItem("Blackmail",wanted,99);
+ const overflow=wanted-added;
+ let cash=0;
+ if(overflow>0){cash=overflow*(1800+Math.max(1,state.level)*120);state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;}
+ return `Blackmail ×${added}${cash?` · ${money(cash)} overflow Cash`:""} · up to ${wanted*5} Heat reduction`;
+}
+function mysteryCrateRareReward(){
+ const missing=mysteryCrateCollectibles.filter(item=>(state.loot[item]||0)<1);
+ if(missing.length){
+   const item=missing[rnd(0,missing.length-1)];
+   addLootItem(item,1,99);
+   return `RARE COLLECTIBLE · ${item}`;
+ }
+ const limited=activeLimitedLoot();
+ if(addLootItem(limited.name,1,99)>0)return `RARE CONTRABAND · ${limited.name}`;
+ const cash=Math.round(mysteryCrateCashAmount()*1.5/100)*100;
+ state.cash+=cash;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+cash;state.runCashEarned=(state.runCashEarned||0)+cash;
+ return `Rare collection complete · ${money(cash)} premium Cash`;
+}
 function useMysteryCrate(){
  const q=Math.max(0,Number(state.loot["Mystery Crate"])||0);
  if(q<=0)return toast("No Mystery Crates available.");
@@ -7377,43 +7553,30 @@ function useMysteryCrate(){
 
  const r=Math.random();
  let detail="",type="good";
- if(r<.35){
-   const amount=rnd(300,800)+Math.max(1,state.level)*15;
+ if(r<.25){
+   const amount=mysteryCrateCashAmount();
    state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
-   detail=`+${money(amount)} Cash`;
-   type="cash";
- }else if(r<.60){
-   const added=addLootItem("Energy Drink",1,999);
-   if(added>0)detail="Energy Drink ×1";
-   else{
-     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
-     detail=`Energy Drink stash full · +${money(amount)} Cash instead`;type="cash";
-   }
+   detail=`PREMIUM CASH BUNDLE · ${money(amount)}`;type="cash";
+ }else if(r<.47){
+   detail=mysteryCrateEnergyPackReward();
+ }else if(r<.67){
+   detail=mysteryCrateStaminaReward();
  }else if(r<.82){
-   const added=addLootItem("Adrenaline Shot",1,999);
-   if(added>0)detail="Adrenaline Shot ×1";
-   else{
-     const amount=500;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
-     detail=`Adrenaline stash full · +${money(amount)} Cash instead`;type="cash";
-   }
- }else if(r<.92){
-   const added=addLootItem("Energy Pack",1,99);
-   if(added>0)detail="Energy Pack ×1";
-   else{
-     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
-     detail=`Energy Pack stash full · +${money(amount)} Cash instead`;type="cash";
-   }
+   detail=mysteryCrateBlackmailReward();
+ }else if(r<.95){
+   detail=mysteryCrateRareReward();
  }else{
-   const added=addLootItem("Stamina Pack",1,99);
-   if(added>0)detail="Stamina Pack ×1";
-   else{
-     const amount=1000;state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;
-     detail=`Stamina Pack stash full · +${money(amount)} Cash instead`;type="cash";
-   }
+   const qty=Math.random()<.15?2:1;
+   state.goldBars=(state.goldBars||0)+qty;
+   state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+qty;
+   detail=`JACKPOT · GOLD BAR ×${qty}`;type="cash";
+   S.gold();
  }
  log(`Opened a Mystery Crate: ${detail}.`);
+ recordIntel("MYSTERY CRATE",detail,detail.includes("GOLD")?"good":"info");
  showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${Math.max(0,q-1)} remaining`,type);
- S.ok();save();render();
+ if(!detail.includes("GOLD"))S.ok();
+ save();render();
 }
 
 function bankDeposit(pct=1){
@@ -7677,7 +7840,7 @@ function render(){syncLegacyHeatAlias();syncStatHudMode();const sx=document.getE
  const renderers=[renderJobs,renderCrew,renderFight,renderGear,renderTerritory,renderProfile,renderInbox];
  renderers.forEach(fn=>{try{fn()}catch(e){console.error("Renderer failed:",fn.name,e)}})
 }
-function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and a Mystery Crate every third streak day.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
+function renderDaily(){const today=new Date().toISOString().slice(0,10),ready=state.daily.last!==today;dailyBox.innerHTML=`<div class="daily"><b>Daily Collection — Streak ${state.daily.streak}</b><div class="sub">Cash, energy, and a premium Mystery Crate every third streak day.</div><button class="btn small" style="margin-top:6px" onclick="claimDaily()" ${ready?"":"disabled"}>${ready?"COLLECT":"COLLECTED"}</button></div>`}
 function renderEvent(){
  const ev=activeWorldEvent(),limited=activeLimitedLoot(),left=limitedLootEndsAt()-now();
  eventBox.innerHTML=`<div class="event"><b>Rotating Operation: ${ev.name}</b><div class="sub">${ev.desc}</div><div class="badge gold" style="margin-top:5px">Rotates in ${fmtLong(ev.ends-now())}</div></div>
@@ -8358,7 +8521,7 @@ function renderProfile(){
    if(k==="Energy Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:energy-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 10–15 Energy.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useEnergyPack()" ${state.en>=state.maxEn?"disabled":""}>USE</button></div></div>`;
    if(k==="Stamina Pack")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:stamina-pack","sm")} ${k}</div><div class="sub">Rare crew supply. Restores 4–7 Stamina.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useStaminaPack()" ${state.st>=state.maxSt?"disabled":""}>USE</button></div></div>`;
    if(k==="Blackmail")return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("heat","sm")} ${k}</div><div class="sub">Semi-rare Help reward. Reduces Heat in the selected location by 5 points.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useBlackmail()" ${currentHeat()<=0?"disabled":""}>USE</button></div></div>`;
-   return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:help-cache","sm")} ${k}</div><div class="sub">Open for Cash or useful supplies. Full supply stacks convert to Cash.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useMysteryCrate()">OPEN</button></div></div>`;
+   return `<div class="inventory-use pack-item"><div><div class="title">${spriteIconHtml("2:help-cache","sm")} ${k}</div><div class="sub">Premium reward crate: scaled Cash, reserve packs, Blackmail, rare collectibles, or Gold Bars.</div></div><div class="right"><div class="qty">x${v}</div><button class="btn small" onclick="useMysteryCrate()">OPEN</button></div></div>`;
  }).join("");
 
  const collectionHtml=collectionDefs.map(c=>{
@@ -9140,6 +9303,12 @@ function go(v){
 function exportSave(){const d=btoa(unescape(encodeURIComponent(JSON.stringify(state))));navigator.clipboard?.writeText(d).then(()=>toast("Save copied")).catch(()=>prompt("Copy save:",d))}
 function importSave(){const d=prompt("Paste save code:");if(!d)return;try{state=Object.assign(fresh(),JSON.parse(decodeURIComponent(escape(atob(d)))));migrate();save();render();toast("Imported")}catch(e){toast("Invalid save")}}
 function resetGame(){if(confirm("Reset all progress?")){localStorage.removeItem(KEY);state=fresh();save();render();setTimeout(promptForPlayerName,250)}}
+const mgSafeZoneEl=document.getElementById("mgSafeZone");
+if(mgSafeZoneEl){mgSafeZoneEl.addEventListener("pointerdown",e=>{if(!msgSafe.active)return;msgSafe.drag=true;msgSafe.pointer=e.pointerId;msgSafe.lastAngle=msgSafePointerAngle(e);mgSafeZoneEl.setPointerCapture?.(e.pointerId);e.preventDefault()});mgSafeZoneEl.addEventListener("pointermove",e=>{if(!msgSafe.drag||e.pointerId!==msgSafe.pointer||!msgSafe.active)return;const a=msgSafePointerAngle(e);let diff=a-msgSafe.lastAngle;while(diff>Math.PI)diff-=Math.PI*2;while(diff<-Math.PI)diff+=Math.PI*2;msgSafe.lastAngle=a;messageSafeTurnDegrees(diff*180/Math.PI);e.preventDefault()});const end=e=>{if(e.pointerId!==msgSafe.pointer)return;msgSafe.drag=false;msgSafe.pointer=null};mgSafeZoneEl.addEventListener("pointerup",end);mgSafeZoneEl.addEventListener("pointercancel",end)}
+const mgEscapeCanvasEl=document.getElementById("mgEscapeCanvas");
+if(mgEscapeCanvasEl){mgEscapeCanvasEl.addEventListener("pointerdown",e=>{if(!msgEscape.active)return;const p=msgEscapeCanvasPoint(e),near=Math.abs(p.x-msgEscape.x)<msgEscape.w*.9&&Math.abs(p.y-msgEscape.y)<msgEscape.h*.9;msgEscape.pointer=true;msgEscape.pid=e.pointerId;msgEscape.startX=p.x;msgEscape.startY=p.y;msgEscape.dragCar=near;mgEscapeCanvasEl.setPointerCapture?.(e.pointerId);e.preventDefault()});mgEscapeCanvasEl.addEventListener("pointermove",e=>{if(!msgEscape.pointer||e.pointerId!==msgEscape.pid||!msgEscape.active)return;const p=msgEscapeCanvasPoint(e);if(msgEscape.dragCar){const left=msgEscape.W*.11+msgEscape.w*.4,right=msgEscape.W*.89-msgEscape.w*.4;msgEscape.x=Math.max(left,Math.min(right,p.x));msgEscape.targetX=msgEscape.x}e.preventDefault()});const end=e=>{if(!msgEscape.pointer||e.pointerId!==msgEscape.pid)return;const p=msgEscapeCanvasPoint(e),dx=p.x-msgEscape.startX;if(msgEscape.dragCar){let best=0,dist=Infinity;for(let i=0;i<4;i++){const d=Math.abs(msgEscape.x-msgEscapeLaneCenter(i));if(d<dist){dist=d;best=i}}msgEscape.lane=best;msgEscape.targetX=msgEscapeLaneCenter(best)}else if(Math.abs(dx)>28){messageEscapeLane(dx>0?1:-1)}else{messageEscapeLane(p.x<msgEscape.x?-1:1)}msgEscape.pointer=false;msgEscape.dragCar=false;msgEscape.pid=null;e.preventDefault()};mgEscapeCanvasEl.addEventListener("pointerup",end);mgEscapeCanvasEl.addEventListener("pointercancel",end)}
+window.addEventListener("resize",()=>{if(msgSafe.active)msgSafeResize();if(msgEscape.active)msgEscapeResize()});
+
 document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>go(b.dataset.v));
 document.addEventListener("error",e=>{if(e.target.tagName==="IMG")e.target.style.display="none"},true);
 document.addEventListener("click",e=>{
