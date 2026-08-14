@@ -3107,7 +3107,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.5";
+const BUILD_NUMBER="0.24.6";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3143,6 +3143,8 @@ function spriteIconHtml(name,size="md",extra=""){
  if(typeof icon==="string"&&icon.startsWith("2:")){
    icon=icon.slice(2);
    sheetCls="sheet-2";
+ }else if(typeof icon==="string"){
+   icon=SPRITE_MAP[icon]||icon;
  }
  const cls=["ue-sprite",sheetCls,`sprite-${icon}`,size?`sprite-${size}`:"",extra||""].filter(Boolean).join(" ");
  return `<span class="${cls}"></span>`;
