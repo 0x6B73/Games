@@ -29,7 +29,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .section-title{display:flex;align-items:flex-end;justify-content:space-between;gap:8px;margin:5px 0 8px}.section-title h2{font-family:Georgia,serif;font-size:18px;margin:0}.section-title span{font-size:10px;color:var(--muted);text-align:right;max-width:48%}
 .grid{display:grid;gap:8px}.cards{grid-template-columns:1fr}.card{background:var(--panel);border:1px solid var(--line);padding:10px;overflow:hidden;box-shadow:0 8px 20px #0005}.card h3{margin:0 0 5px;font-size:15px}.card p{font-size:11px;color:var(--muted);line-height:1.45}.art{width:calc(100% + 20px);height:105px;object-fit:cover;margin:-10px -10px 8px;display:block;border-bottom:1px solid #2f281f;filter:saturate(.55) contrast(1.07) brightness(.72)}
 
-:root{--ue-sprite-sheet:url("./Assets/ue-icon-sprite.png");--ue-sprite-sheet-2:url("./Assets/ue-icon-sprite-2.png");--ue-nav-sprite:url("./Assets/ue-nav-sprite-v2.png");}
+:root{--ue-sprite-sheet:url("./Assets/ue-icon-sprite.png?v=02411");--ue-sprite-sheet-2:url("./Assets/ue-icon-sprite-2.png");--ue-nav-sprite:url("./Assets/ue-nav-sprite-v2.png");}
 .ue-sprite{display:inline-block;flex:0 0 auto;vertical-align:middle;background-image:var(--ue-sprite-sheet);background-repeat:no-repeat;background-size:500% 400%;width:18px;height:18px;border-radius:3px;box-shadow:0 0 0 1px #0007 inset}
 .ue-sprite.sheet-2{background-image:var(--ue-sprite-sheet-2)}
 .ue-sprite.sheet-2.sprite-xs{width:13px;height:13px}
@@ -68,7 +68,7 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opac
 .sprite-lg{width:22px;height:22px}
 .sprite-card{width:26px;height:26px}
 .sprite-resource{width:22px;height:22px;display:block;margin:0 auto 5px}
-.sprite-heart,.sprite-health{background-position:0% 0%}
+.sprite-heart,.sprite-health{background-image:url("./Assets/ue-icon-sprite.png?v=02411")!important;background-size:500% 400%!important;background-position:0 0!important;background-repeat:no-repeat!important}
 .sprite-energy{background-position:25% 0%}
 .sprite-fist,.sprite-stamina,.sprite-attack,.sprite-fight{background-position:50% 0%}
 .sprite-cash{background-position:75% 0%}
@@ -3123,7 +3123,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.10";
+const BUILD_NUMBER="0.24.11";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
