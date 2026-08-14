@@ -854,8 +854,17 @@ body.manhunt #heatT{color:#ff7267!important;text-shadow:0 0 5px #b3130d}
 @media(max-width:430px){.bulk-buy-grid{grid-template-columns:1fr 1fr}}
 
 
-.job-result.bad b{color:#ff9288}
-.job-result.bad .detail{color:#e0b5af}
+.job-result.bad b{color:#ffb0a7;font-size:13px;letter-spacing:.07em}
+.job-result.bad .detail{color:#f0c4be;font-weight:800}
+.job-result.bad{border:1px solid #963d35;border-left:6px solid #d34b3f;background:linear-gradient(#30100d,#120807);box-shadow:inset 0 0 18px #7c1e1838,0 0 0 1px #000}
+.job-card.job-failed-pulse{animation:jobFailedCard .55s ease 2;border-color:#b74439!important}
+@keyframes jobFailedCard{0%,100%{transform:translateX(0);filter:none}20%{transform:translateX(-4px);filter:brightness(1.2)}40%{transform:translateX(4px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.job-failure-notice{position:fixed;left:50%;top:24%;transform:translate(-50%,-50%) scale(.92);z-index:2147483450;width:min(92vw,430px);padding:14px 14px 13px;border:2px solid #a83d34;border-left:7px solid #e0584d;background:linear-gradient(#35110f,#120706);box-shadow:0 22px 70px #000e,0 0 28px #8f211c55;opacity:0;pointer-events:none;text-align:center}
+.job-failure-notice.show{animation:jobFailureNotice 2.65s ease forwards}
+.job-failure-mark{font:900 26px/1 Arial,Helvetica,sans-serif;color:#ff7468;margin-bottom:3px;text-shadow:0 2px #000}
+.job-failure-title{font:900 19px/1.05 Arial,Helvetica,sans-serif;letter-spacing:.12em;color:#ffe3df}
+.job-failure-detail{margin-top:8px;padding-top:8px;border-top:1px solid #6f2b26;color:#f1b8b1;font-size:11px;font-weight:800;line-height:1.4}
+@keyframes jobFailureNotice{0%{opacity:0;transform:translate(-50%,-50%) scale(.82)}8%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}14%,82%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-62%) scale(.98)}}
 
 
 /* DASH JOB SUPPLY SERVICE */
@@ -3120,10 +3129,16 @@ body:after{
   <div id="actionFlashDetail" class="action-flash-detail"></div>
 </div>
 
+<div id="jobFailureNotice" class="job-failure-notice" aria-live="assertive">
+  <div class="job-failure-mark">✕</div>
+  <div id="jobFailureNoticeTitle" class="job-failure-title">JOB FAILED</div>
+  <div id="jobFailureNoticeDetail" class="job-failure-detail"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.11";
+const BUILD_NUMBER="0.24.12";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -5296,6 +5311,24 @@ function showActionFlash(title,detail="",type="good"){
  window._actionFlashTimer=setTimeout(()=>box.classList.remove("show"),1800);
 }
 
+function showJobFailureNotice(title,detail="",jobId=""){
+ recordIntel(title,detail,"bad");
+ const box=document.getElementById("jobFailureNotice"),t=document.getElementById("jobFailureNoticeTitle"),d=document.getElementById("jobFailureNoticeDetail");
+ if(state.messagePopups!==false&&box&&t&&d){
+   clearTimeout(window._jobFailureNoticeTimer);
+   box.className="job-failure-notice";
+   void box.offsetWidth;
+   t.textContent=title||"JOB FAILED";
+   d.textContent=detail||"The operation failed.";
+   box.classList.add("show");
+   window._jobFailureNoticeTimer=setTimeout(()=>box.classList.remove("show"),2700);
+ }
+ if(jobId){
+   const card=document.getElementById("job-"+jobId);
+   if(card){card.classList.remove("job-failed-pulse");void card.offsetWidth;card.classList.add("job-failed-pulse");setTimeout(()=>card.classList.remove("job-failed-pulse"),1200)}
+ }
+}
+
 function toast(x){const t=document.getElementById("toast");t.textContent=x;t.classList.add("show");clearTimeout(window.tt);window.tt=setTimeout(()=>t.classList.remove("show"),2200)}
 function addXp(n){
  state.xp+=n;
@@ -5726,7 +5759,7 @@ let jobBusy=false;
 let lastJobResult=null;
 let jobResultToken=0;
 
-function showJobResult(success,title,detail){
+function showJobResult(success,title,detail,jobId=""){
  const token=++jobResultToken;
  lastJobResult={success:!!success,title,detail,shownAt:now(),token};
 
@@ -5741,8 +5774,9 @@ function showJobResult(success,title,detail){
  clearTimeout(window._jrShow);
  clearTimeout(window._jrHide);
 
- // Center notification first.
- showActionFlash(title,detail,success?"good":"bad");
+ // Center notification first. Failures use a larger, unmistakable red notice.
+ if(success)showActionFlash(title,detail,"good");
+ else showJobFailureNotice(title,detail,jobId);
 
  // After the center animation completes, surface THIS exact result at the
  // top of Jobs. Token check prevents an older delayed success from winning.
@@ -5759,7 +5793,7 @@ function showJobResult(success,title,detail){
    const el=document.getElementById("jobResult");
    if(el)el.classList.remove("show");
    lastJobResult=null;
- },11850);
+ },success?11850:15850);
 }
 function setJobBusy(id,on){
  jobBusy=on;
@@ -5812,14 +5846,14 @@ function doJob(id){
 
    addXp(xpEarned);
    log(`${j.name} completed. Earned ${money(c)} and ${xpEarned} XP.`);
-   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${xpEarned} XP${j.noMastery?" · Emergency work":` · Mastery ${jobData.mastery}/3`}`);
+   showJobResult(true,"JOB COMPLETE",`${j.name} · ${money(c)} · +${xpEarned} XP${j.noMastery?" · Emergency work":` · Mastery ${jobData.mastery}/3`}`,j.id);
    playJobSound(j,true);
  }else{
    const mitigation=defenseMitigation(),baseLoss=Math.min(state.cash,rnd(80,220)+state.level*15);
    const loss=Math.floor(baseLoss*(1-mitigation)),hpLoss=Math.max(1,Math.floor(rnd(5,14)*(1-mitigation)));
    state.cash-=loss;state.hp=Math.max(1,state.hp-hpLoss);
    log(`${j.name} failed. Lost ${money(loss)} and ${hpLoss} health. Defense mitigated ${Math.round(mitigation*100)}% of losses.`);
-   showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · -${hpLoss} Health · Defense saved ${Math.round(mitigation*100)}%`);
+   showJobResult(false,"JOB FAILED",`${j.name} · Lost ${money(loss)} · -${hpLoss} Health · Defense saved ${Math.round(mitigation*100)}%`,j.id);
    playJobSound(j,false);
    if(Math.random()<Math.max(.12,.35-mitigation*.35))injureRandomCrew();
    if(heatForCity(j.city)>65&&Math.random()<Math.max(.08,.25-mitigation*.20))arrestRandomCrew();
