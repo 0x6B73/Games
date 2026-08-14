@@ -3107,7 +3107,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.4";
+const BUILD_NUMBER="0.24.5";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -7669,7 +7669,9 @@ function useMysteryCrate(){
  }
  log(`Opened a Mystery Crate: ${detail}.`);
  recordIntel("MYSTERY CRATE",detail,detail.includes("GOLD")?"good":"info");
- showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${Math.max(0,q-1)} remaining`,type);
+ const remaining=Math.max(0,q-1);
+ showActionFlash("MYSTERY CRATE OPENED",`${detail} · ${remaining} remaining`,type);
+ showMessageMissionReward("Mystery Crate Opened","",`Received: ${detail} · ${remaining} crate${remaining===1?"":"s"} remaining`,"MYSTERY CRATE REWARD");
  if(!detail.includes("GOLD"))S.ok();
  save();render();
 }
