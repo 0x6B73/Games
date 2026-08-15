@@ -3126,7 +3126,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.16";
+const BUILD_NUMBER="0.24.18";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3365,33 +3365,27 @@ const propDefs=[
 ];
 
 const facilityDefs=[
- {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:37500,income:1000,upkeep:400,level:6,crewReq:5,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
- {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:20,crewReq:15,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
- {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:35,crewReq:30,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
- {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:55,crewReq:50,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
+ {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:37500,income:1000,upkeep:400,level:5,crewReq:5,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
+ {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:15,crewReq:15,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
+ {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:30,crewReq:30,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
+ {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:50,crewReq:50,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
 ];
 
 const ENDGAME_AUTO_DEFS={
  autoMessages:{
    name:"Automated Liaison Network",
    cost:500,
-   level:65,
-   crewReq:70,
    desc:"A staffed communications bureau automatically handles incoming contact requests, gifts, favor requests, and backup requests when the required Cash or Stamina is available."
  },
  autoDefense:{
    name:"Automated Defense Network",
    cost:1000,
-   level:75,
-   crewReq:85,
    desc:"A hardened response network automatically answers incoming attacks when the special defense requirement is met and at least 1 Stamina is available."
  }
 };
 const ENDGAME_TIER_DEFS={
  energy:{
    name:"Energy Drink Production",
-   level:70,
-   crewReq:75,
    costs:[100,200,400,800,1600],
    rates:[1,3,6,10,15],
    unit:"Energy Drinks / hr",
@@ -3399,8 +3393,6 @@ const ENDGAME_TIER_DEFS={
  },
  adrenaline:{
    name:"Adrenaline Manufacturing",
-   level:75,
-   crewReq:90,
    costs:[150,300,600,1200,2400],
    rates:[1,2,4,7,10],
    unit:"Adrenaline / hr",
@@ -3408,8 +3400,6 @@ const ENDGAME_TIER_DEFS={
  },
  heat:{
    name:"Heat Suppression Bureau",
-   level:80,
-   crewReq:110,
    costs:[200,400,800,1600,3200],
    rates:[270,240,210,180,120],
    unit:"seconds / Heat",
@@ -5017,8 +5007,6 @@ function endgameBaseUnlocked(){
 function endgameRequirement(def){
  const missing=[];
  if(!endgameBaseUnlocked())missing.push("Underworld Operations Center");
- if(state.level<def.level)missing.push(`LVL ${def.level}`);
- if(crewSize()<def.crewReq)missing.push(`CREW ${def.crewReq}`);
  return missing;
 }
 function endgameCanBuy(def){
@@ -5215,8 +5203,6 @@ function renderEndgameFacilities(){
      </div>
      <div class="gold-infra-desc">${def.desc}</div>
      <div class="gold-infra-meta">
-       <span class="badge ${state.level>=def.level?"green":"red"}">LVL ${def.level}</span>
-       <span class="badge ${crewSize()>=def.crewReq?"green":"red"}">Crew ${crewSize()}/${def.crewReq}</span>
        <span class="badge ${endgameBaseUnlocked()?"green":"red"}">Operations Center</span>
        <span class="badge gold">Permanent</span>
      </div>
@@ -5247,8 +5233,6 @@ function renderEndgameFacilities(){
      <div class="gold-tier-track">${[1,2,3,4,5].map(n=>`<div class="gold-tier-seg ${n<=tier?"on":""}"></div>`).join("")}</div>
      <div class="gold-production-line">Tier <b>${tier}/5</b> · ${rateText}</div>
      <div class="gold-infra-meta">
-       <span class="badge ${state.level>=def.level?"green":"red"}">LVL ${def.level}</span>
-       <span class="badge ${crewSize()>=def.crewReq?"green":"red"}">Crew ${crewSize()}/${def.crewReq}</span>
        <span class="badge ${endgameBaseUnlocked()?"green":"red"}">Operations Center</span>
        <span class="badge gold">Permanent</span>
      </div>
@@ -7426,7 +7410,7 @@ function defendAttack(id){
 function resolveExpiredAttack(a){
  if(!a||a.resolved)return;
  a.resolved=true;
- const cashLoss=Math.min(state.cash,rnd(120,300)+a.level*25);
+ const cashLoss=Math.min(state.cash,(rnd(120,300)+a.level*25)*25);
  state.cash-=cashLoss;
  let itemLoss="";
  const ownedGear=gearDefs.filter(g=>gearQty(g.id)>0);
@@ -7842,7 +7826,7 @@ function renderUnderworldServices(){
  const hc=hospitalCost();
  el.innerHTML=`<div class="service-row">
    <div class="service-head"><div class="service-name">${spriteIconHtml("2:bank","sm")} Offshore Bank</div><div class="bank-balance">${money(state.bankCash)}</div></div>
-   <div class="service-note">Banked Cash is protected from fight losses. Deposits lose 10% to laundering fees.</div>
+   <div class="service-note">Banked Cash is protected from fight losses and missed incoming attacks. Deposits lose 10% to laundering fees.</div>
    <div class="service-actions">
     <button class="btn small" onclick="bankDeposit(.25)" ${state.cash<1?"disabled":""}>DEPOSIT 25%</button>
     <button class="btn small" onclick="bankDeposit(.5)" ${state.cash<1?"disabled":""}>DEPOSIT 50%</button>
@@ -7921,7 +7905,7 @@ function showLevelUpModal(level){
   <div class="level-up-summary"><div>SKILL POINTS<b>+5</b></div><div>MAX HEALTH<b>+5</b></div><div>MAX ENERGY<b>+2</b></div></div>
   <div class="level-up-summary"><div>MAX STAMINA<b>+1</b></div><div>NOTORIETY<b>+10</b></div><div>PRESTIGE<b>${state.prestige||0}</b></div></div>
   <div class="level-unlocks">${unlocks.length?`New at this level:<br>${unlocks.map(x=>`• ${x.title}`).join("<br>")}`:"No new catalog unlocks at this exact level."}</div>
-  ${level===6?`<div class="logistics-level-callout"><b>LOGISTICS WAREHOUSE NOW AVAILABLE</b><span>Build it in Territory → Facilities for ${money(facilityDefs.find(f=>f.id==="logisticsWarehouse")?.cost||37500)} once you have ${facilityDefs.find(f=>f.id==="logisticsWarehouse")?.crewReq||8} Crew. It unlocks DASH, which can automatically buy missing Job equipment at the convenience markup.</span></div>`:""}`;
+  ${level===5?`<div class="logistics-level-callout"><b>LOGISTICS WAREHOUSE NOW AVAILABLE</b><span>Build it in Territory → Facilities for ${money(facilityDefs.find(f=>f.id==="logisticsWarehouse")?.cost||37500)} once you have ${facilityDefs.find(f=>f.id==="logisticsWarehouse")?.crewReq||5} Crew. It unlocks DASH, which can automatically buy missing Job equipment at the convenience markup.</span></div>`:""}`;
  document.getElementById("levelUpModal").classList.add("show");
 }
 
