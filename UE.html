@@ -3126,7 +3126,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.15";
+const BUILD_NUMBER="0.24.16";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -3365,10 +3365,10 @@ const propDefs=[
 ];
 
 const facilityDefs=[
- {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:37500,income:1000,upkeep:400,level:6,crewReq:8,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
- {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:20,crewReq:30,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
- {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:35,crewReq:60,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
- {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:55,crewReq:100,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
+ {id:"logisticsWarehouse",name:"Logistics Warehouse",cost:37500,income:1000,upkeep:400,level:6,crewReq:5,unlock:"dash",unlockLabel:"DASH",prereq:null,img:"warehouse",desc:"A dedicated receiving floor, runners, inventory cages, and dispatch staff. Unlocks on-demand delivery of missing Job equipment at the existing convenience markup."},
+ {id:"payrollOffice",name:"Crew Payroll Office",cost:250000,income:3000,upkeep:1200,level:20,crewReq:15,unlock:"money",unlockLabel:"Mass Send Money",prereq:"logisticsWarehouse",img:"suit",desc:"A controlled payroll front with bookkeepers and trusted couriers. Unlocks organization-wide Cash distributions to eligible crew members."},
+ {id:"favorOffice",name:"Favor Coordination Office",cost:750000,income:8500,upkeep:3500,level:35,crewReq:30,unlock:"favor",unlockLabel:"Mass Return Favors",prereq:"payrollOffice",img:"hotel",desc:"A discreet office that tracks debts, favors, introductions, and obligations across the organization. Unlocks bulk favor repayment."},
+ {id:"operationsCenter",name:"Underworld Operations Center",cost:2500000,income:22000,upkeep:10000,level:55,crewReq:50,unlock:"help",unlockLabel:"Mass Ask for Help",prereq:"favorOffice",img:"warehouse",desc:"A hardened coordination center with secure communications, dispatch staff, and round-the-clock logistics. Unlocks organization-wide Help requests and sealed Help Caches."}
 ];
 
 const ENDGAME_AUTO_DEFS={
@@ -3376,14 +3376,14 @@ const ENDGAME_AUTO_DEFS={
    name:"Automated Liaison Network",
    cost:500,
    level:65,
-   crewReq:125,
+   crewReq:70,
    desc:"A staffed communications bureau automatically handles incoming contact requests, gifts, favor requests, and backup requests when the required Cash or Stamina is available."
  },
  autoDefense:{
    name:"Automated Defense Network",
    cost:1000,
    level:75,
-   crewReq:150,
+   crewReq:85,
    desc:"A hardened response network automatically answers incoming attacks when the special defense requirement is met and at least 1 Stamina is available."
  }
 };
@@ -3391,7 +3391,7 @@ const ENDGAME_TIER_DEFS={
  energy:{
    name:"Energy Drink Production",
    level:70,
-   crewReq:125,
+   crewReq:75,
    costs:[100,200,400,800,1600],
    rates:[1,3,6,10,15],
    unit:"Energy Drinks / hr",
@@ -3400,7 +3400,7 @@ const ENDGAME_TIER_DEFS={
  adrenaline:{
    name:"Adrenaline Manufacturing",
    level:75,
-   crewReq:150,
+   crewReq:90,
    costs:[150,300,600,1200,2400],
    rates:[1,2,4,7,10],
    unit:"Adrenaline / hr",
@@ -3409,7 +3409,7 @@ const ENDGAME_TIER_DEFS={
  heat:{
    name:"Heat Suppression Bureau",
    level:80,
-   crewReq:175,
+   crewReq:110,
    costs:[200,400,800,1600,3200],
    rates:[270,240,210,180,120],
    unit:"seconds / Heat",
@@ -3420,17 +3420,29 @@ const ENDGAME_TIER_DEFS={
 
 const territoryDefs=[
  {id:"dock9",name:"Dock 9",city:"east",reqNot:0,income:120,enemy:"Harbor Kings",desc:"A rusted stretch of waterfront where containers arrive before paperwork does. Control Dock 9 and everyone moving quiet cargo through East Harbor has to acknowledge your name."},
- {id:"market",name:"Old Market",city:"east",reqNot:40,income:240,enemy:"Rossi Crew",desc:"Wholesale stalls by day, envelopes and introductions after dark. Old Market is a web of shopkeepers, drivers, and fixers — exactly the kind of place influence spreads fast."},
- {id:"river",name:"River Ward",city:"east",reqNot:80,income:420,enemy:"Harbor Kings",desc:"Warehouses, row houses, river access, and a population that remembers who keeps trouble away. Owning the Ward means your organization has a neighborhood, not just a hideout."},
- {id:"clubrow",name:"Club Row",city:"downtown",reqNot:130,income:700,enemy:"Bellini Family",desc:"A neon strip of clubs, lounges, VIP entrances, and very expensive secrets. Control the Row and your crew gets seen standing where the city's important people go to disappear."},
- {id:"civic",name:"Civic Center",city:"downtown",reqNot:190,income:1100,enemy:"Bellini Family",desc:"Courthouses, contractors, offices, parking structures, and people who can make problems vanish with the right phone call. This is influence wearing a suit."},
- {id:"northyard",name:"North Freight Yard",city:"north",reqNot:260,income:1600,enemy:"Varga Syndicate",desc:"Acres of rail lines, containers, loading cranes, and guarded routes. Control the yard and you do not just intercept shipments — you decide what moves through Northside."}
+ {id:"market",name:"Old Market",city:"east",reqNot:150,income:240,enemy:"Rossi Crew",desc:"Wholesale stalls by day, envelopes and introductions after dark. Old Market is a web of shopkeepers, drivers, and fixers — exactly the kind of place influence spreads fast."},
+ {id:"river",name:"River Ward",city:"east",reqNot:350,income:420,enemy:"Harbor Kings",desc:"Warehouses, row houses, river access, and a population that remembers who keeps trouble away. Owning the Ward means your organization has a neighborhood, not just a hideout."},
+ {id:"clubrow",name:"Club Row",city:"downtown",reqNot:650,income:700,enemy:"Bellini Family",desc:"A neon strip of clubs, lounges, VIP entrances, and very expensive secrets. Control the Row and your crew gets seen standing where the city's important people go to disappear."},
+ {id:"civic",name:"Civic Center",city:"downtown",reqNot:1000,income:1100,enemy:"Bellini Family",desc:"Courthouses, contractors, offices, parking structures, and people who can make problems vanish with the right phone call. This is influence wearing a suit."},
+ {id:"northyard",name:"North Freight Yard",city:"north",reqNot:1450,income:1600,enemy:"Varga Syndicate",desc:"Acres of rail lines, containers, loading cranes, and guarded routes. Control the yard and you do not just intercept shipments — you decide what moves through Northside."},
+ {id:"foundry",name:"Foundry District",city:"north",reqNot:2000,income:2300,enemy:"Varga Syndicate",desc:"Machine shops, scrap yards, furnaces, and heavy trucks run around the clock. Controlling the Foundry District gives your crew industrial cover and leverage over the people who keep Northside moving."},
+ {id:"financial",name:"Financial Strip",city:"downtown",reqNot:2600,income:3200,enemy:"Meridian Outfit",desc:"Banks, private offices, rooftop restaurants, and service corridors full of people who move money for a living. The Strip is where street influence starts turning into institutional power."},
+ {id:"shipbreaker",name:"Shipbreaker Coast",city:"east",reqNot:3300,income:4300,enemy:"Meridian Outfit",desc:"Dry docks, salvage crews, fenced yards, and half-dismantled freighters create a maze of steel and cash. Control the coast and almost anything can disappear into legitimate industrial work."},
+ {id:"railjunction",name:"Grand Rail Junction",city:"north",reqNot:4100,income:5600,enemy:"Iron Meridian",desc:"Every major freight line eventually touches this sprawling junction. Taking it means controlling schedules, access roads, storage, and the crews who know which containers should never be inspected."},
+ {id:"embassy",name:"Embassy Quarter",city:"downtown",reqNot:5000,income:7200,enemy:"Iron Meridian",desc:"Consulates, luxury residences, private security, and diplomatic traffic make this one of the most protected blocks in the city. Influence here opens doors that intimidation cannot."},
+ {id:"industrial",name:"Industrial Basin",city:"north",reqNot:6100,income:9000,enemy:"Iron Meridian",desc:"Refineries, depots, fabrication plants, and private access roads form a city inside the city. Owning the Basin gives your organization a logistics backbone nobody can casually disrupt."},
+ {id:"waterfrontTowers",name:"Waterfront Towers",city:"east",reqNot:7400,income:11500,enemy:"Black Crown",desc:"Luxury towers rise directly above old smuggling routes and private docks. Taking them puts executives, waterfront access, and high-value real estate under the same umbrella."},
+ {id:"intermodal",name:"Intermodal Port",city:"north",reqNot:9000,income:14500,enemy:"Black Crown",desc:"Rail, highway, air freight, and container traffic converge here. Control this port and your organization can move serious volume without relying on anyone else's permission."},
+ {id:"skyline",name:"Skyline Exchange",city:"downtown",reqNot:11000,income:18500,enemy:"Black Crown",desc:"The city's highest-value commercial district is protected by money, private security, and old alliances. Conquering it is less about owning a block and more about proving the city now operates on your terms."}
 ];
 const factions=[
  {id:"harbor",name:"Harbor Kings",city:"east",strength:55,desc:"Dock thieves and cargo crews who treat East Harbor like inherited property. They are your first organized obstacle and control routes your operation needs."},
  {id:"rossi",name:"Rossi Crew",city:"east",strength:75,desc:"An old neighborhood crew with shopkeepers, bookmakers, and market muscle on their side. They are smaller than a Family but deeply embedded in local business."},
  {id:"bellini",name:"Bellini Family",city:"downtown",strength:120,desc:"A polished Downtown organization with political access, clubs, money, and people who have been making problems disappear for decades."},
- {id:"varga",name:"Varga Syndicate",city:"north",strength:190,desc:"A heavily armed logistics syndicate controlling Northside freight routes. Fighting them means attacking an organization built around moving serious cargo at scale."}
+ {id:"varga",name:"Varga Syndicate",city:"north",strength:190,desc:"A heavily armed logistics syndicate controlling Northside freight routes. Fighting them means attacking an organization built around moving serious cargo at scale."},
+ {id:"meridian",name:"Meridian Outfit",city:"downtown",strength:240,desc:"A cross-city racketeering outfit built around finance, salvage, and contract muscle. They are wealthier and better connected than the neighborhood organizations you displaced earlier."},
+ {id:"ironMeridian",name:"Iron Meridian",city:"north",strength:310,desc:"A disciplined industrial syndicate with control over freight labor, rail access, heavy equipment, and enough armed support to defend infrastructure instead of street corners."},
+ {id:"blackCrown",name:"Black Crown",city:"downtown",strength:390,desc:"The old citywide power structure. Black Crown protects premium real estate, major transportation hubs, and the relationships that keep legitimate institutions useful to organized crime."}
 ];
 const friendDefs=[
  {id:"jenny",name:"Jenny Sparks",av:"JS",tag:"Reliable. Knows everyone.",role:"Fixer",base:82,join:.9,help:.85,temper:.15,agenda:"Protect Lisa",rival:"chad"},
@@ -4270,7 +4282,16 @@ const territoryBonusDefs={
  river:{desc:"DASH markup reduced by 5 percentage points.",dashMarkupDelta:-.05,controlLoot:"River Ward Protection List"},
  clubrow:{desc:"Downtown Job Cash +5%.",jobCash:{downtown:1.05},controlLoot:"Club Row VIP Pass"},
  civic:{desc:"Downtown property income +5%.",propertyIncome:{downtown:1.05},controlLoot:"Civic Center Influence File"},
- northyard:{desc:"Northside Fight Cash +8%.",fightCash:{north:1.08},controlLoot:"North Freight Route Seal"}
+ northyard:{desc:"Northside Fight Cash +8%.",fightCash:{north:1.08},controlLoot:"North Freight Route Seal"},
+ foundry:{desc:"Northside Job Cash +5%.",jobCash:{north:1.05}},
+ financial:{desc:"Downtown Fight Cash +8%.",fightCash:{downtown:1.08}},
+ shipbreaker:{desc:"East Harbor property income +8%.",propertyIncome:{east:1.08}},
+ railjunction:{desc:"Northside property income +8%.",propertyIncome:{north:1.08}},
+ embassy:{desc:"Downtown Job rare-loot chance +2%.",rareLootBonus:{downtown:.02}},
+ industrial:{desc:"Northside Job Cash +8%.",jobCash:{north:1.08}},
+ waterfrontTowers:{desc:"East Harbor Job Cash +8%.",jobCash:{east:1.08}},
+ intermodal:{desc:"Northside Fight Cash +10%.",fightCash:{north:1.10}},
+ skyline:{desc:"Downtown property income +10%.",propertyIncome:{downtown:1.10}}
 };
 function territoryBonusOwned(id){return !!state.territory?.[id]?.owned}
 function locationIdentity(city=state.currentCity){return locationIdentityDefs[heatCityId(city)]||locationIdentityDefs.east}
@@ -6371,7 +6392,7 @@ function takeTerritory(id){
  if(!t)return toast("Territory unavailable.");
  if(!state.territory[id])state.territory[id]={owned:false,progress:0};
  const ts=state.territory[id];
- if(state.notoriety<t.reqNot)return toast("Not enough notoriety.");
+ if(state.notoriety<t.reqNot)return showRequirementPopup(`${t.name} requires ${t.reqNot.toLocaleString()} Notoriety. You have ${Math.floor(state.notoriety).toLocaleString()}.`);
  if(state.st<2)return toast("Territory moves cost 2 stamina.");
  const enemy=factions.find(f=>f.name===t.enemy);
  if(!enemy)return toast("Rival faction unavailable.");
@@ -8674,8 +8695,8 @@ function renderTerritory(){
        <div class="territory-icon-wrap">${spriteIconHtml("territory","sm")}</div>
        <div class="territory-title-copy">
          <div class="territory-title-row"><div class="title">${t.name}</div>${s.owned?'<span class="badge green">CONTROLLED</span>':`<span class="badge">${t.enemy}</span>`}</div>
-         <div class="territory-subline">${cities.find(c=>c.id===t.city).name} · ${money(t.income)}/hr · Requires ${t.reqNot} Notoriety</div>
-         <div class="territory-meta"><span class="badge ${state.notoriety>=t.reqNot?"green":"red"}">Notoriety ${state.notoriety}/${t.reqNot}</span><span class="badge">${spriteIconHtml("stamina","xs")} 2 to move</span></div>
+         <div class="territory-subline">${cities.find(c=>c.id===t.city).name} · ${money(t.income)}/hr · Requires ${t.reqNot.toLocaleString()} Notoriety</div>
+         <div class="territory-meta"><span class="badge ${state.notoriety>=t.reqNot?"green":"red"}">Notoriety ${Math.floor(state.notoriety).toLocaleString()}/${t.reqNot.toLocaleString()}</span><span class="badge">${spriteIconHtml("stamina","xs")} 2 to move</span></div>
          ${!s.owned?`<div class="mastery"><div style="width:${s.progress}%"></div></div><div class="territory-progress-copy">Takeover ${s.progress}% · successful moves add 35%</div>`:`<div class='territory-note'>CONTROL BONUS: ${territoryBonusDefs[t.id]?.desc||"Additional organization influence."}</div>`}
          <details class="compact-details"><summary>TERRITORY DETAILS</summary><div class="compact-details-body">${t.desc}</div></details>
        </div>
