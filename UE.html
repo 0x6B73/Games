@@ -3126,7 +3126,7 @@ body:after{
 <div class="toast" id="toast"></div>
 
 <script>
-const BUILD_NUMBER="0.24.18";
+const BUILD_NUMBER="0.24.19";
 const KEY="underworld_empire_full_v4", PREFS_KEY=`${KEY}_preferences`, now=()=>Date.now(), rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
 const UPDATE_URL="https://0x6b73.github.io/Games/UE";
 const BUILD_CHECK_INTERVAL_MS=5*60*1000;
@@ -6444,8 +6444,10 @@ function helpCacheTier(cache){
  return "THIN CACHE";
 }
 function helpCacheProfile(cache){
- const responders=Math.max(0,Number(cache?.responders)||0);
- return {rolls:Math.max(1,Math.min(12,1+Math.floor(responders/8))),rareBoost:Math.min(.10,responders/2000)};
+ const responders=Math.max(0,Math.floor(Number(cache?.responders)||0));
+ // Mass Ask for Help is a bulk replacement for asking crew individually:
+ // every successful crew response contributes exactly one normal Help reward.
+ return {rolls:responders};
 }
 function massCrewOperation(kind){
  if(!automationUnlocked(kind))return showRequirementPopup(automationLockMessage(kind));
@@ -6483,16 +6485,36 @@ function massCrewOperation(kind){
 
  if(kind==="help"){
    let responders=0;
+   const rewardRolls=[];
+   const memoryFactor=Math.max(.4,1-prestigePerkRank("longMemory")*.10);
    q.ids.forEach(id=>{
      const f=state.friends[id],d=getPersonDef(id);
+     if(!f||!d)return;
+
+     // Match the normal per-person Ask for Help flow, but bundle successful
+     // rewards into a sealed cache instead of playing dozens of animations.
+     const goldStatus=goldHelpStatus(id);
+     const helpChance=Math.max(.08,Math.min(.88,(d.help||.5)+(f.trust-50)/170-(f.resentment/160)));
      f.lastAsk=t;
-     const chance=Math.max(.08,Math.min(.88,(d?.help||.5)+(f.trust-50)/170-(f.resentment/160)));
-     changeRelationship(id,{trust:-1,resentment:1,rel:-1});
-     if(Math.random()<chance){
-       responders++;
+     if(goldStatus.unlocked)f.lastGoldBarAsk=t;
+     changeRelationship(id,{trust:-Math.max(1,Math.round(2*memoryFactor)),resentment:Math.max(1,Math.round(3*memoryFactor)),rel:-Math.max(1,Math.round(2*memoryFactor))});
+
+     let kindOut="";
+     if(goldStatus.unlocked&&(Math.random()*100)<goldBarChance(id)){
+       kindOut="gold";
+       f.response="I put something rare into the crew cache.";
+     }else if(Math.random()<helpChance){
+       const r=Math.random();
+       kindOut=r<.35?"energy":r<.64?"stamina":r<.78?"energyPack":r<.92?"staminaPack":"blackmail";
        f.response="I put something into the crew cache.";
      }else{
-       f.response="Nothing to spare this time.";
+       f.response=meanReplies[rnd(0,meanReplies.length-1)];
+       changeRelationship(id,{resentment:3,rel:-2});
+     }
+
+     if(kindOut){
+       responders++;
+       rewardRolls.push(kindOut);
      }
    });
    const cache={
@@ -6500,12 +6522,13 @@ function massCrewOperation(kind){
      createdAt:t,
      contacted:q.count,
      responders,
+     rewardRolls,
      level:state.level
    };
    state.helpCaches.unshift(cache);
    state.helpCaches=state.helpCaches.slice(0,MAX_HELP_CACHES);
-   log(`Crew Operations sealed a ${helpCacheTier(cache)} after contacting ${q.count} crew members; ${responders} contributed.`);
-      showActionFlash("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} responses · Open it when ready`,"good");
+   log(`Crew Operations sealed a ${helpCacheTier(cache)} after contacting ${q.count} crew members; ${responders} contributed ${responders} reward roll${responders===1?"":"s"}.`);
+   showActionFlash("HELP CACHE SEALED",`${helpCacheTier(cache)} · ${responders}/${q.count} responses · ${responders} reward roll${responders===1?"":"s"}`,responders?"good":"info");
  }
  S.cash();save();render();
 }
@@ -6514,48 +6537,52 @@ function openHelpCache(id=null){
  const idx=id?state.helpCaches.findIndex(x=>x.id===id):0;
  if(idx<0)return showRequirementPopup("That Help Cache is no longer available.");
  const cache=state.helpCaches[idx];
- const responders=Math.max(0,Number(cache.responders)||0);
- const profile=helpCacheProfile(cache),rolls=profile.rolls,rareBoost=profile.rareBoost;
- const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,blackmail:0,cash:0,limited:0,nothing:0,blocked:0};
+ const responders=Math.max(0,Math.floor(Number(cache.responders)||0));
 
- for(let i=0;i<rolls;i++){
-   let r=Math.random();
-   if(responders===0)r=Math.min(.999,r+.24);
-   const energyEnd=.28-rareBoost*.4,adrenalineEnd=.53-rareBoost*.6,energyPackEnd=.66,staminaPackEnd=.78,blackmailEnd=.85+rareBoost*.5,cashEnd=.94,limitedEnd=Math.min(.995,.98+rareBoost*.15);
-   if(r<energyEnd){
-     if(addLootItem("Energy Drink",1,999)>0)rewards.energy++;else rewards.blocked++;
-   }else if(r<adrenalineEnd){
-     if(addLootItem("Adrenaline Shot",1,999)>0)rewards.stamina++;else rewards.blocked++;
-   }else if(r<energyPackEnd){
-     if(addLootItem("Energy Pack",1,99)>0)rewards.energyPack++;else rewards.blocked++;
-   }else if(r<staminaPackEnd){
-     if(addLootItem("Stamina Pack",1,99)>0)rewards.staminaPack++;else rewards.blocked++;
-   }else if(r<blackmailEnd){
-     if(addLootItem("Blackmail",1,99)>0)rewards.blackmail++;else rewards.blocked++;
-   }else if(r<cashEnd){
-     const amount=rnd(250,700)+Math.max(1,Number(cache.level)||1)*25+responders*20;
-     state.cash+=amount;state.lifetimeCashEarned=(state.lifetimeCashEarned||0)+amount;state.runCashEarned=(state.runCashEarned||0)+amount;rewards.cash+=amount;
-   }else if(r<limitedEnd&&responders>=8){
-     const limited=activeLimitedLoot();
-     if(addLootItem(limited.name,1,99)>0)rewards.limited++;else rewards.blocked++;
-   }else rewards.nothing++;
+ // New caches store the exact reward kind produced by each successful crew
+ // response. Legacy caches are upgraded on open: one normal Help reward roll
+ // per recorded response, so existing saves receive the corrected behavior.
+ let rewardRolls=Array.isArray(cache.rewardRolls)?cache.rewardRolls.slice(0,responders):[];
+ while(rewardRolls.length<responders){
+   const r=Math.random();
+   rewardRolls.push(r<.35?"energy":r<.64?"stamina":r<.78?"energyPack":r<.92?"staminaPack":"blackmail");
  }
+ const rolls=rewardRolls.length;
+ const rewards={energy:0,stamina:0,energyPack:0,staminaPack:0,blackmail:0,gold:0,nothing:0,blocked:0};
+
+ rewardRolls.forEach(kind=>{
+   if(kind==="gold"){
+     state.goldBars=(state.goldBars||0)+1;
+     state.lifetimeGoldBars=(state.lifetimeGoldBars||0)+1;
+     rewards.gold++;
+   }else if(kind==="energy"){
+     if(addLootItem("Energy Drink",1,999)>0)rewards.energy++;else rewards.blocked++;
+   }else if(kind==="stamina"){
+     if(addLootItem("Adrenaline Shot",1,999)>0)rewards.stamina++;else rewards.blocked++;
+   }else if(kind==="energyPack"){
+     if(addLootItem("Energy Pack",1,99)>0)rewards.energyPack++;else rewards.blocked++;
+   }else if(kind==="staminaPack"){
+     if(addLootItem("Stamina Pack",1,99)>0)rewards.staminaPack++;else rewards.blocked++;
+   }else if(kind==="blackmail"){
+     if(addLootItem("Blackmail",1,99)>0)rewards.blackmail++;else rewards.blocked++;
+   }else rewards.nothing++;
+ });
 
  state.helpCaches.splice(idx,1);
  const parts=[];
+ if(rewards.gold)parts.push(`Gold Bar ×${rewards.gold}`);
  if(rewards.energy)parts.push(`${rewards.energy} Energy Drink${rewards.energy===1?"":"s"}`);
  if(rewards.stamina)parts.push(`${rewards.stamina} Adrenaline Shot${rewards.stamina===1?"":"s"}`);
  if(rewards.energyPack)parts.push(`Energy Pack ×${rewards.energyPack}`);
  if(rewards.staminaPack)parts.push(`Stamina Pack ×${rewards.staminaPack}`);
  if(rewards.blackmail)parts.push(`Blackmail ×${rewards.blackmail}`);
- if(rewards.cash)parts.push(money(rewards.cash));
- if(rewards.limited)parts.push(`Weekly Loot ×${rewards.limited}`);
  if(rewards.blocked)parts.push(`Stash full ×${rewards.blocked}`);
  if(rewards.nothing)parts.push(`Nothing ×${rewards.nothing}`);
- if(!parts.length)parts.push("Nothing useful");
+ if(!parts.length)parts.push(responders?"Nothing useful":"No crew responded");
  const summary=parts.join(" · ");
- log(`Opened ${helpCacheTier(cache)}: ${summary}.`);
- showActionFlash("HELP CACHE OPENED",summary,(rewards.nothing+rewards.blocked)===rolls?"info":"good");
+ log(`Opened ${helpCacheTier(cache)} (${rolls} reward roll${rolls===1?"":"s"}): ${summary}.`);
+ showActionFlash(`HELP CACHE OPENED · ${rolls} ROLL${rolls===1?"":"S"}`,summary,rolls&&rewards.blocked<rolls?"good":"info");
+ if(rewards.gold)S.gold();else if(rolls)S.ok();
  save();render();
 }
 function renderCrewOperations(){
@@ -6580,7 +6607,7 @@ function renderCrewOperations(){
  el.innerHTML=`<div class="crew-op-grid">
    ${opCard("MASS SEND MONEY","Distribute level-scaled Cash to every eligible recruited crew member. 60m per-person cooldown.",qm,"money","SEND MONEY")}
    ${opCard("MASS RETURN FAVORS","Settle obligations across eligible recruited crew. Uses each contact's normal favor cooldown.",qf,"favor","RETURN FAVORS")}
-   ${opCard("MASS ASK FOR HELP","Coordinate one request across eligible recruited crew. Larger response counts improve cache quality and can add more reward rolls.",qh,"help","ASK FOR HELP")}
+   ${opCard("MASS ASK FOR HELP","Ask every eligible recruited crew member at once. Each successful response adds one normal Ask for Help reward to a sealed cache.",qh,"help","ASK FOR HELP")}
  </div>
  <div class="help-cache-head"><b>SEALED HELP CACHES</b><span>${caches.length}/${MAX_HELP_CACHES}</span></div>
  <div class="help-cache-list">${caches.length?caches.map(c=>`<div class="help-cache-row"><div><b>${spriteIconHtml("2:help-cache","sm")} ${helpCacheTier(c)}</b><span>${c.responders}/${c.contacted} responses · ${intelAge(c.createdAt)} ago</span></div><button class="btn small" onclick="openHelpCache('${c.id}')">OPEN</button></div>`).join(""):`<div class="sub">No sealed caches. Mass Ask for Help creates one without opening its rewards immediately.</div>`}</div>`;
